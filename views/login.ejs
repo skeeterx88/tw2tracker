@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/login.css' />
+  </head>
+  <body>
+    <h1>Admin login</h1>
+    <form action="/login" method="POST">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit" value="Login">
+        <input type="hidden" name="username" value="admin">
+    </form>
+
+    <script type="text/javascript">
+      document.querySelector('input[name=password]').focus()
+    </script>
+  </body>
+</html>

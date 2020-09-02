@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/admin.css' />
+  </head>
+  <body class="admin-panel">
+    <h1><%= title %></h1>
+
+    <!-- <ul>
+        <li><span class="flag flag-de"></span></li>
+        <li><span class="flag flag-en"></span></li>
+        <li><span class="flag flag-br"></span></li>
+        <li><span class="flag flag-pl"></span></li>
+        <li><span class="flag flag-nl"></span></li>
+        <li><span class="flag flag-fr"></span></li>
+        <li><span class="flag flag-ru"></span></li>
+        <li><span class="flag flag-zz"></span></li>
+        <li><span class="flag flag-us"></span></li>
+        <li><span class="flag flag-es"></span></li>
+        <li><span class="flag flag-it"></span></li>
+        <li><span class="flag flag-gr"></span></li>
+        <li><span class="flag flag-tr"></span></li>
+        <li><span class="flag flag-cz"></span></li>
+        <li><span class="flag flag-pt"></span></li>
+        <li><span class="flag flag-sk"></span></li>
+        <li><span class="flag flag-ro"></span></li>
+        <li><span class="flag flag-hu"></span></li>
+    </ul> -->
+
+    <h2>Settings</h2>
+
+    <form class="settings">
+        <label>
+            <span>Site Name</span>
+            <input type="text" name="site-name" value="<%= settings.site_name %>">
+        </label>
+        <label>
+            <span>Admin Password</span>
+            <input type="text" name="admin-password" value="">
+        </label>
+        <label>
+            <span>Scrapper - Allow barbarians</span>
+            <input type="checkbox" name="scrapper-allow-barbarians" checked="<%= settings.scrapper_allow_barbarians %>">
+        </label>
+        <label>
+            <span>Scrapper - Sync interval</span>
+            <input type="number" name="scrapper-interval-minutes" value="<%= settings.scrapper_interval_minutes %>"> minutes
+        </label>
+
+        <div class="footer">
+            <input type="submit" value="Save">
+        </div>
+    </form>
+
+    <h2>Worlds</h2>
+
+    <div class="worlds">
+        <% worlds.forEach(function (world) { %>
+        <% const world_enabled = world.enabled ? 'Yes' : 'No' %>
+        <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
+
+        <div class="world">
+            <span class="flag flag-<%= world.market %>"></span>
+            <span><%= world.market %><%= world.id %> <%= world.name %></span>
+            <div class="world-info">
+                <span class="enabled">Enabled: <strong><%= world_enabled %></strong>,</span>
+                <span class="last-sync">Last sync: <strong><%= world_last_sync.toLocaleString('pt-BR') %></strong></span>
+            </div>
+            <div class="world-actions">
+                <span class="sync"><a href="/admin/scrapper/<%= world.market %>/<%= world.id %>">Sync now</a></span>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+
+    <p><a href="/logout">Logout</a></p>
+  </body>
+</html>

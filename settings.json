@@ -1,0 +1,16 @@
+{
+    "site_name": "tw2logan",
+    "db_user": "lain",
+    "db_host": "127.0.0.1",
+    "db_password": "",
+    "db_port": 5432,
+    "db_name": "tw2logan",
+    "bcrypt_salt_rounds": 3,
+    "tw_accounts": {
+        "br": {
+            "username": "-Relaxeaza-",
+            "token": "8910e7f5c7f8b6e042ea53dbcd9346d165aae17f",
+            "uid": 650985
+        }
+    }
+}

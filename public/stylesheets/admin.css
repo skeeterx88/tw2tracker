@@ -1,0 +1,37 @@
+.admin-panel .settings {
+    width: 800px;
+    border: 1px solid black;
+    padding: 5px 0;
+}
+
+.admin-panel .settings label {
+    display: block;
+    margin: 5px 0;
+}
+
+.admin-panel .settings label span {
+    display: inline-block;
+    width: 400px;
+    text-align: right;
+    padding-right: 15px;
+}
+
+.admin-panel .settings .footer {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.admin-panel .worlds {
+    border: 1px solid black;
+    width: 800px;
+}
+
+.admin-panel .world {
+    border: 1px solid #555;
+    margin: 10px;
+    padding: 10px;
+}
+
+.admin-panel .worlds .world-info {
+    float: right;
+}

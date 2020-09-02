@@ -1,0 +1,26 @@
+{
+  "name": "tw2logan",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "autoreload": "TZ=UTC NODE_ENV=development nodemon ./bin/www",
+    "start": "TZ=UTC NODE_ENV=development node ./bin/www"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "connect-ensure-login": "^0.1.1",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "express-session": "^1.17.1",
+    "http-errors": "^1.6.3",
+    "morgan": "~1.9.1",
+    "node-postgres": "^0.6.2",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "pg": "^8.3.3",
+    "pg-promise": "^10.6.1",
+    "puppeteer-core": "^5.2.1"
+  }
+}
