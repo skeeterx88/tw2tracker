@@ -2,9 +2,11 @@ const express = require('express')
 const router = express.Router()
 const passport = require('passport')
 
-router.get('/', function(req, res, next) {
+router.get('/', async function (req, res, next) {
+    const settings = await db.one(sql.settings)
+
     res.render('login', {
-        title: 'Login - tw2logan'
+        title: 'Admin login - ' + settings.site_name
     })
 })
 

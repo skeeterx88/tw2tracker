@@ -31,32 +31,59 @@
 
     <h2>Settings</h2>
 
-    <form class="settings">
-        <label>
-            <span>Site Name</span>
-            <input type="text" name="site-name" value="<%= settings.site_name %>">
-        </label>
-        <label>
-            <span>Admin Password</span>
-            <input type="text" name="admin-password" value="">
-        </label>
-        <label>
-            <span>Scrapper - Allow barbarians</span>
-            <input type="checkbox" name="scrapper-allow-barbarians" checked="<%= settings.scrapper_allow_barbarians %>">
-        </label>
-        <label>
-            <span>Scrapper - Sync interval</span>
-            <input type="number" name="scrapper-interval-minutes" value="<%= settings.scrapper_interval_minutes %>"> minutes
-        </label>
+    <section>
+        <form action="/admin/change-settings" method="POST" class="settings">
+            <label>
+                <span>Site Name</span>
+                <input type="text" name="site-name" value="<%= settings.site_name %>">
+            </label>
+            <label>
+                <span>Admin Password</span>
+                <input type="text" name="admin-password" value="">
+            </label>
+            <label>
+                <span>Scrapper - Allow barbarians</span>
+                <input type="checkbox" name="scrapper-allow-barbarians" checked="<%= settings.scrapper_allow_barbarians %>">
+            </label>
+            <label>
+                <span>Scrapper - Sync interval</span>
+                <input type="number" name="scrapper-interval-minutes" value="<%= settings.scrapper_interval_minutes %>"> minutes
+            </label>
 
-        <div class="footer">
-            <input type="submit" value="Save">
+            <div class="footer">
+                <input type="submit" value="Save">
+            </div>
+        </form>
+    </section>
+
+    <h2>Markets</h2>
+
+    <section class="markets">
+        <% markets.forEach(function (market) { %>
+        <% const market_enabled = market.enabled ? 'Yes' : 'No' %>
+
+        <div class="market">
+            <span class="flag flag-<%= market.id %>"></span>
+            <span><%= market.id %></span>
+
+            <div class="long-info">
+                <span>account_name: <%= market.account_name %></span>
+                <span>account_id: <%= market.account_id %></span>
+                <span>account_token: <%= market.account_token %></span>
+                <span>account_enabled: <%= market_enabled %></span>
+            </div>
+
+            <ul class="actions">
+                <li><a href="/admin/edit-market/<%= market.id %>">Edit</a></li>
+                <li><a href="/admin/edit-market/<%= market.id %>">Test account</a></li>
+            </ul>
         </div>
-    </form>
+        <% }) %>
+    </section>
 
     <h2>Worlds</h2>
 
-    <div class="worlds">
+    <section class="worlds">
         <% worlds.forEach(function (world) { %>
         <% const world_enabled = world.enabled ? 'Yes' : 'No' %>
         <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
@@ -64,17 +91,60 @@
         <div class="world">
             <span class="flag flag-<%= world.market %>"></span>
             <span><%= world.market %><%= world.id %> <%= world.name %></span>
-            <div class="world-info">
+            <div class="short-info">
                 <span class="enabled">Enabled: <strong><%= world_enabled %></strong>,</span>
                 <span class="last-sync">Last sync: <strong><%= world_last_sync.toLocaleString('pt-BR') %></strong></span>
             </div>
-            <div class="world-actions">
-                <span class="sync"><a href="/admin/scrapper/<%= world.market %>/<%= world.id %>">Sync now</a></span>
-            </div>
+            <ul class="actions">
+                <li><a href="/admin/scrapper/<%= world.market %>/<%= world.id %>">Sync now</a></li>
+                <li><a href="/admin/scrapper/<%= world.market %>/<%= world.id %>">Delete</a></li>
+            </ul>
         </div>
         <% }) %>
-    </div>
+    </section>
+
+    <h2>Add market</h2>
+
+    <section>
+        <form action="/admin/add-market" method="POST">
+            <label>
+                <span>market</span>
+                <input type="text" name="market" minlength="2">
+            </label>
+            <label>
+                <span>account_name</span>
+                <input type="text" name="account_name" minlength="4" maxlength="24">
+            </label>
+            <label>
+                <span>account_id</span>
+                <input type="text" name="account_id">
+            </label>
+            <label>
+                <span>account_token</span>
+                <input type="text" name="account_token" minlength="40" maxlength="40">
+            </label>
+            <label>
+                <span>enabled</span>
+                <input type="checkbox" name="enabled">
+            </label>
+
+            <div class="footer">
+                <input type="submit" value="Add world">
+            </div>
+        </form>
+    </section>
+
+    <h2>Debug area</h2>
+
+    <section class="debug">
+        <ul>
+            <li><a href="javascript:debug.addMarket()">Add market</a></li>
+        </ul>
+    </section>
 
     <p><a href="/logout">Logout</a></p>
+
+    <script type="text/javascript" src="/javascripts/utils.js"></script>
+    <script type="text/javascript" src="/javascripts/admin.js"></script>
   </body>
 </html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/admin.css' />
+  </head>
+  <body class="admin-panel">
+    <h1><%= title %></h1>
+
+    <h2>Market <span class="flag flag-<%= market.id %>"></span><%= market.id %></h2>
+
+    <form action="/admin/add-market" method="POST">
+        <input type="hidden" name="market" value="<%= market.id %>">
+
+        <label>
+            <span>accountName</span>
+            <input type="text" name="accountName" minlength="4" maxlength="24" value="<%= market.account_name %>">
+        </label>
+        <label>
+            <span>accountId</span>
+            <input type="text" name="accountId" value="<%= market.account_id %>">
+        </label>
+        <label>
+            <span>accountToken</span>
+            <input type="text" name="accountToken" minlength="40" maxlength="40" value="<%= market.account_token %>">
+        </label>
+        <label>
+            <span>enabled</span>
+            <input type="checkbox" name="enabled" <%= market.enabled ? "checked" : "" %>>
+        </label>
+
+        <div class="footer">
+            <input type="submit" value="Save">
+        </div>
+    </form>
+
+    <p><a href="/admin">Cancel</a></p>
+
+    <script type="text/javascript" src="/javascripts/utils.js"></script>
+    <script type="text/javascript" src="/javascripts/admin.js"></script>
+  </body>
+</html>

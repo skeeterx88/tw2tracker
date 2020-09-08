@@ -1,37 +1,53 @@
-.admin-panel .settings {
-    width: 800px;
-    border: 1px solid black;
-    padding: 5px 0;
+.admin-panel form {
+    padding: 5px;
 }
 
-.admin-panel .settings label {
+.admin-panel form label {
     display: block;
     margin: 5px 0;
 }
 
-.admin-panel .settings label span {
+.admin-panel form label span {
     display: inline-block;
     width: 400px;
     text-align: right;
     padding-right: 15px;
 }
 
-.admin-panel .settings .footer {
+.admin-panel form .footer {
     text-align: center;
     margin-top: 15px;
 }
 
-.admin-panel .worlds {
+.admin-panel section {
     border: 1px solid black;
     width: 800px;
 }
 
-.admin-panel .world {
+.admin-panel section > div {
     border: 1px solid #555;
     margin: 10px;
     padding: 10px;
 }
 
-.admin-panel .worlds .world-info {
+.admin-panel section > div div.short-info {
+    font-family: monospace;
     float: right;
+}
+
+.admin-panel section > div div.long-info span {
+    font-family: monospace;
+    display: block;
+}
+
+.admin-panel section > div ul.actions {
+    margin: 0px;
+    margin-top: 3px;
+    padding: 0;
+}
+
+.admin-panel section > div ul.actions li {
+    list-style: none;
+    display: inline;
+    padding: 3px 5px;
 }

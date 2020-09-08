@@ -25,18 +25,6 @@ Sync.scrappeAll = async function (callback) {
 
         worlds.forEach(async function (world) {
             await Sync.scrappeWorld(world.market, world.id)
-
-            // const now = Date.now()
-            // const lastSync = world.last_sync
-            // const diff = (now - lastSync.getTime()) / 1000 / 60
-
-            // if (diff > settings.scrapper_interval_minutes) {
-            //     console.log(`Syncing ${world.market}${world.id}`)
-
-            //     const account = accounts[world.market]
-            //     await ScrapperAuth(world.market, world.id, account)
-            //     await db.query(sql.updateWorldSync, [market, world])
-            // }
         })
 
         resolve()

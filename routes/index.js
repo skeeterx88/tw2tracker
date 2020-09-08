@@ -1,10 +1,14 @@
-let express = require('express');
-let router = express.Router();
+const express = require('express')
+const router = express.Router()
+const db = require('../db')
+const sql = require('../sql')
 
-router.get('/', function(req, res, next) {
+router.get('/', async function (req, res, next) {
+    const settings = await db.one(sql.settings)
+
     res.render('index', {
-        title: 'Home - TW2Maps'
-    });
-});
+        title: 'Home - ' + settings.site_name
+    })
+})
 
-module.exports = router;
+module.exports = router
