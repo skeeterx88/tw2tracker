@@ -28,7 +28,7 @@ CREATE TABLE public.worlds (
 );
 
 INSERT INTO settings (site_name, admin_password, scrapper_allow_barbarians, scrapper_interval_minutes) VALUES ('TW2Logan', '123', TRUE, 30);
-INSERT INTO markets (id, account_name, account_token, account_id, enabled) VALUES ('br', '-Relaxeaza-', '8910e7f5c7f8b6e042ea53dbcd9346d165aae17f', 650985, TRUE);
+INSERT INTO markets (id, account_name, account_token, account_id, enabled) VALUES ('br', '-Relaxeaza-', '1969744a92eaf69fb01bf6c0194d7659e5ba2217', 650985, TRUE);
 INSERT INTO markets (id, account_name, account_token, account_id, enabled) VALUES ('en', '-Relaxeaza-', '0f1673d8f39aa4c15687f5c5afea0ba57d1e6ce6', 848900934, TRUE);
 
 INSERT INTO worlds (market, id, name, enabled, last_sync) VALUES ('br', 48, 'Visegrád', TRUE, NOW() AT TIME ZONE 'UTC');
