@@ -38,9 +38,9 @@ router.get('/scrapper/:market/:world', /*ensureLoggedIn,*/ async function (req, 
         try {
             response.success = await Sync.scrappeWorld(market, req.params.world)
             response.reason = 'synced successfully'
-        } catch (reason) {
+        } catch (error) {
             response.success = false
-            response.reason = reason
+            response.reason = error.message
         }
     }
 

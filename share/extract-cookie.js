@@ -1,7 +1,7 @@
-const token = (function () {
+var token = (function () {
     const cookies = {}
 
-    document.cookie.split('; ').every(function (cookie) {
+    document.cookie.split('; ').forEach(function (cookie) {
         const [name, value] = cookie.split('=')
 
         try {
