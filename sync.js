@@ -1,6 +1,7 @@
 const db = require('./db')
 const sql = require('./sql')
 const utils = require('./utils')
+const Scrapper = require('./scrapper.js')
 const ScrapperAuth = require('./scrapper-auth.js')
 
 const parseAccounts = function (markets) {
@@ -33,28 +34,48 @@ Sync.scrappeAll = async function (callback) {
 
 Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
     return new Promise(async function (resolve, reject) {
+        let account
+        let worldData
+        let page
+        let browser
+
         try {
-            const marketData = await db.one(sql.market, [marketId])
-            const worldData = await db.one(sql.world, [marketId, worldId])
-
-            const settings = await db.one(sql.settings)
-            const accounts = parseAccounts([marketData])
-            const minutesSinceLastSync = (Date.now() - worldData.last_sync.getTime()) / 1000 / 60
-
-            if (minutesSinceLastSync > settings.scrapper_interval_minutes) {
-                console.log(`Syncing ${worldData.market}${worldData.id}`)
-
-                const account = accounts[worldData.market]
-                await ScrapperAuth(marketId, worldId, account)
-                await db.query(sql.updateWorldSync, [marketId, worldId])
-                
-                resolve(true)
-            } else {
-                console.log(`${world.market}${world.id} already sync.`)
-                resolve(false)
-            }
+            account = await db.one(sql.enabledMarket, [marketId])
+            worldData = await db.one(sql.world, [marketId, worldId])
         } catch (error) {
-            reject('Invalid world or market: ' + marketId + worldId)
+            return reject(`Invalid world or market: ${marketId}${worldId}`)
+        }
+
+        const settings = await db.one(sql.settings)
+        const minutesSinceLastSync = (Date.now() - worldData.last_sync.getTime()) / 1000 / 60
+
+        if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
+            console.log(`${world.market}${world.id} already sync.`)
+
+            return resolve(false)
+        }
+
+        console.log(`Syncing ${marketId}${worldId}`)
+
+        try {
+            const {page, browser} = await ScrapperAuth(marketId, worldId, account)
+
+            console.log(`Scrapping ${market}${world}`)
+
+            const data = await page.evaluate(Scrapper, {
+                allowBarbarians: settings.scrapper_allow_barbarians
+            })
+            await fs.writeFileSync(`data/${market}${world}.json`, JSON.stringify(data))
+
+            console.log(`Scrapping ${market}${world} finished`)
+
+            browser.close()
+
+            await db.query(sql.updateWorldSync, [marketId, worldId])
+            
+            resolve(true)
+        } catch (error) {
+            return reject(error)
         }
     })
 }

@@ -14,14 +14,14 @@ module.exports = async function (market, world, account) {
 
         const page = await browser.newPage()
 
-        console.log(`Authenticating "${account.playerName}" on world "${market}${world}"`)
+        console.log(`Authenticating "${account.account_name}" on world "${market}${world}"`)
 
         await page.goto(`https://${market}.tribalwars2.com/page`)
         await page.setCookie({
             name: 'globalAuthCookie',
             value: JSON.stringify({
-                token: account.token,
-                playerName: account.playerName,
+                token: account.account_token,
+                playerName: account.account_name,
                 autologin: true
             }),
             domain: `.${market}.tribalwars2.com`,
@@ -32,25 +32,28 @@ module.exports = async function (market, world, account) {
             secure: false,
             session: false
         })
-        await page.goto(`https://${market}.tribalwars2.com/game.php?world=${market}${world}&character_id=${account.id}`)
 
-        await page.waitForSelector('#map', {
-            timeout: 10000
-        })
+        await page.goto(`https://${market}.tribalwars2.com/game.php?world=${market}${world}&character_id=${account.account_id}`)
 
-        console.log(`Scrapping ${market}${world}`)
+        try {
+            await page.waitForSelector('.login-error', {
+                visible: true,
+                timeout: 5000
+            })
 
-        const settings = await db.query(sql.settings)
+            reject('Login error')
+        } catch (error) {}
 
-        const data = await page.evaluate(Scrapper, {
-            allowBarbarians: settings.scrapper_allow_barbarians
-        })
+        try {
+            await page.waitForSelector('#map', {
+                timeout: 10000
+            })
 
-        console.log(`Scrapping ${market}${world} finished`)
+            resolve({ page, browser })
+        } catch (error) {
+            reject('Game page not loaded')
+        }
 
-        await fs.writeFileSync(`data/${market}${world}.json`, JSON.stringify(data))
-
-        browser.close()
         resolve()
     })
 }
