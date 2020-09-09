@@ -79,4 +79,9 @@ app.use(function (err, req, res, next) {
     res.render('error')
 })
 
+// ;(async () => {
+//     const Sync = require('./sync')
+//     await Sync.scrappeWorld('br', 48)
+// })()
+
 module.exports = app

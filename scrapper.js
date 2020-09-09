@@ -146,7 +146,7 @@ module.exports = function Scrapper (scrapperSettings) {
 
         const handleLoop = function () {
             loadBlock(x, y, BLOCK_SIZE, function (raw) {
-                // console.log('puppeteer::' + raw.x + ' ' + raw.y)
+                console.log('puppeteer', 'loading block', raw.x + '|' + raw.y)
 
                 if (raw.x === LAST_BLOCK) {
                     x = 0
