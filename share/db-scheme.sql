@@ -13,10 +13,10 @@ CREATE TABLE public.settings (
 
 CREATE TABLE public.markets (
     id VARCHAR (10) PRIMARY KEY,
-    account_name VARCHAR (255) NOT NULL,
-    account_token VARCHAR (255) NOT NULL,
-    account_id INT NOT NULL,
-    enabled BOOLEAN NOT NULL
+    account_name VARCHAR (255),
+    account_token VARCHAR (255),
+    account_id INT,
+    enabled BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE public.worlds (

@@ -77,7 +77,11 @@ router.post('/add-market', /*ensureLoggedIn,*/ async function (req, res) {
             ? sql.updateMarket
             : sql.addMarket
 
-        await db.query(query, [
+        if (!marketCount.length) {
+            await db.query(sql.addMarket, [market])
+        }
+
+        await db.query(sql.updateMarket, [
             market,
             accountName,
             accountToken,
@@ -104,6 +108,13 @@ router.get('/edit-market/:marketId', /*ensureLoggedIn,*/ async function (req, re
         title: `Edit market ${marketId} - Admin Panel - ${settings.site_name}`,
         market: market
     })
+})
+
+router.get('/sync-markets', /*ensureLoggedIn,*/ async function (req, res) {
+    const addedMarkets = await Sync.markets()
+
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(addedMarkets))
 })
 
 module.exports = router
