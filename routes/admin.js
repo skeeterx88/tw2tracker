@@ -117,4 +117,34 @@ router.get('/sync-markets', /*ensureLoggedIn,*/ async function (req, res) {
     res.end(JSON.stringify(addedMarkets))
 })
 
+router.post('/change-settings', /*ensureLoggedIn,*/ async function (req, res) {
+    const response = {}
+
+    const siteName = req.body['site-name']
+    const adminPassword = req.body['admin-password']
+    const scrapperAllowBarbarians = req.body['scrapper-allow-barbarians']
+    const scrapperIntervalMinutes = req.body['scrapper-interval-minutes']
+
+    if (siteName.length < 1) {
+        response.success = false
+        response.reason = 'invalid site name'
+    } else if (adminPassword.length < 3) {
+        response.success = false
+        response.reason = 'invalid admin password'
+    } else {
+        await db.query(sql.updateSettings, [
+            siteName,
+            adminPassword,
+            scrapperAllowBarbarians,
+            scrapperIntervalMinutes
+        ])
+
+        response.success = true
+        response.reason = 'settings updated successfully'
+    }
+
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(response))
+})
+
 module.exports = router

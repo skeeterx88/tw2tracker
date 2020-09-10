@@ -35,11 +35,11 @@
         <form action="/admin/change-settings" method="POST" class="settings">
             <label>
                 <span>Site Name</span>
-                <input type="text" name="site-name" value="<%= settings.site_name %>">
+                <input type="text" name="site-name" value="<%= settings.site_name %>" minlength="1" required>
             </label>
             <label>
                 <span>Admin Password</span>
-                <input type="text" name="admin-password" value="">
+                <input type="text" name="admin-password" value="" minlength="3" required>
             </label>
             <label>
                 <span>Scrapper - Allow barbarians</span>
@@ -47,7 +47,7 @@
             </label>
             <label>
                 <span>Scrapper - Sync interval</span>
-                <input type="number" name="scrapper-interval-minutes" value="<%= settings.scrapper_interval_minutes %>"> minutes
+                <input type="number" name="scrapper-interval-minutes" value="<%= settings.scrapper_interval_minutes %>" required> minutes
             </label>
 
             <div class="footer">
