@@ -1,12 +1,92 @@
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
-module.exports = function Scrapper (scrapperSettings) {
+module.exports = function () {
     const socketService = injector.get('socketService')
     const eventTypeProvider = injector.get('eventTypeProvider')
     const routeProvider = injector.get('routeProvider')
     const transferredSharedDataService = injector.get('transferredSharedDataService')
     const $timeHelper = require('helper/time')
+
+    const worldData = {
+        villages: {},
+        villagesByPlayer: {},
+        players: {},
+        tribes: {}
+    }
+
+    const BLOCK_SIZE = 50
+
+    const refBlocksAll = [
+        [0, 0], [100, 0], [200, 0], [300, 0], [400, 0],
+        [500, 0], [600, 0], [700, 0], [800, 0], [900, 0],
+        [0, 100], [100, 100], [200, 100], [300, 100], [400, 100],
+        [500, 100], [600, 100], [700, 100], [800, 100], [900, 100],
+        [0, 200], [100, 200], [200, 200], [300, 200], [400, 200],
+        [500, 200], [600, 200], [700, 200], [800, 200], [900, 200],
+        [0, 300], [100, 300], [200, 300], [300, 300], [400, 300],
+        [500, 300], [600, 300], [700, 300], [800, 300], [900, 300],
+        [0, 400], [100, 400], [200, 400], [300, 400], [400, 400],
+        [500, 400], [600, 400], [700, 400], [800, 400], [900, 400],
+        [0, 500], [100, 500], [200, 500], [300, 500], [400, 500],
+        [500, 500], [600, 500], [700, 500], [800, 500], [900, 500],
+        [0, 600], [100, 600], [200, 600], [300, 600], [400, 600],
+        [500, 600], [600, 600], [700, 600], [800, 600], [900, 600],
+        [0, 700], [100, 700], [200, 700], [300, 700], [400, 700],
+        [500, 700], [600, 700], [700, 700], [800, 700], [900, 700],
+        [0, 800], [100, 800], [200, 800], [300, 800], [400, 800],
+        [500, 800], [600, 800], [700, 800], [800, 800], [900, 800],
+        [0, 900], [100, 900], [200, 900], [300, 900], [400, 900],
+        [500, 900], [600, 900], [700, 900], [800, 900], [900, 900]
+    ]
+
+    const refBlocks = {
+        topLeft: [
+            [0, 0], [100, 0], [200, 0], [300, 0],
+            [0, 100], [100, 100], [200, 100], [300, 100],
+            [0, 200], [100, 200], [200, 200], [300, 200],
+            [0, 300], [100, 300], [200, 300], [300, 300]
+        ],
+        topRight: [
+            [600, 0], [700, 0], [800, 0], [900, 0],
+            [600, 100], [700, 100], [800, 100], [900, 100],
+            [600, 200], [700, 200], [800, 200], [900, 200],
+            [600, 300], [700, 300], [800, 300], [900, 300]
+        ],
+        bottomLeft: [
+            [0, 600], [100, 600], [200, 600], [300, 600],
+            [0, 700], [100, 700], [200, 700], [300, 700],
+            [0, 800], [100, 800], [200, 800], [300, 800],
+            [0, 900], [100, 900], [200, 900], [300, 900]
+        ],
+        bottomRight: [
+            [600, 600], [700, 600], [800, 600], [900, 600],
+            [600, 700], [700, 700], [800, 700], [900, 700],
+            [600, 800], [700, 800], [800, 800], [900, 800],
+            [600, 900], [700, 900], [800, 900], [900, 900]
+        ]
+    }
+
+    const crossRefBlocks = {
+        left: [
+            [400, 400], [400, 500], [300, 400], [300, 500],
+            [200, 400], [200, 500], [100, 400], [100, 500],
+            [0, 400], [0, 500]
+        ],
+        right: [
+            [500, 400], [500, 500], [600, 400], [600, 500],
+            [700, 400], [700, 500], [800, 400], [800, 500],
+            [900, 400], [900, 500]
+        ],
+        top: [
+            [400, 300], [500, 300], [400, 200], [500, 200],
+            [400, 100], [500, 100], [400, 0], [500, 0]
+        ],
+        bottom: [
+            [400, 600], [500, 600], [400, 700], [500, 700],
+            [400, 800], [500, 800], [400, 900], [500, 900]
+        ]
+    }
 
     const ready = function (callback) {
         const mapScope = transferredSharedDataService.getSharedData('MapController')
@@ -24,189 +104,209 @@ module.exports = function Scrapper (scrapperSettings) {
         rootScope.$on(eventTypeProvider.MAP_INITIALIZED, callback)
     }
 
-    const Scrapper = (function () {
-        const Scrapper = {}        
-        let data
-        let x
-        let y
-
-        const defaults = {
-            allowBarbarians: true,
-            includeVillagePerPlayer: false,
-            finishCallback: function () {},
-            includeDate: true
+    const getBondaries = async function () {
+        const bondaries = {
+            left: {x: 500, y: 500},
+            right: {x: 500, y: 500},
+            top: {x: 500, y: 500},
+            bottom: {x: 500, y: 500}
         }
 
-        const BLOCK_SIZE = 50
-        const MAP_SIZE = 1000
-        const LAST_BLOCK = MAP_SIZE - BLOCK_SIZE
+        const sides = ['left', 'right', 'top', 'bottom']
 
-        const loadBlock = function (x, y, blockSize, callback) {
+        for (let i = 0; i < sides.length; i++) {
+            const side = sides[i]
+
+            for (let j = 0; j < crossRefBlocks[side].length; j++) {
+                const [x, y] = crossRefBlocks[side][j]
+                const [firstBlock, secondBlock] = await loadBlock(x, y)
+
+                processBlock(firstBlock)
+                processBlock(secondBlock)
+
+                if (firstBlock.villages.length + secondBlock.villages.length) {
+                    bondaries[side].x = x
+                    bondaries[side].y = y
+                } else {
+                    break
+                }
+            }
+        }
+
+        return bondaries
+    }
+
+    const filterBlocks = function (bondaries) {
+        return [
+            ...refBlocks.topLeft.filter(([x, y]) => x >= bondaries.left.x  && y >= bondaries.top.y),
+            ...refBlocks.topRight.filter(([x, y]) => x <= bondaries.right.x && y >= bondaries.top.y),
+            ...refBlocks.bottomLeft.filter(([x, y]) => x >= bondaries.left.x  && y <= bondaries.bottom.y),
+            ...refBlocks.bottomRight.filter(([x, y]) => x <= bondaries.right.x && y <= bondaries.bottom.y)
+        ]
+    }
+
+    const assert = function (conditionHandler) {
+        if (conditionHandler() !== true) {
+            throw new Error('Assertion failed');
+        }
+    }
+
+    const loadBlock = function (x, y) {
+        return new Promise(function (resolve) {
             socketService.emit(routeProvider.MAP_GETVILLAGES, {
                 x: x,
                 y: y,
-                width: blockSize,
-                height: blockSize
-            }, callback)
-        }
-
-        const insertUpdateDate = function () {
-            data.updated = $timeHelper.gameDate().toLocaleString('pt-BR')
-        }
-
-        const hasPlayer = function (pid) {
-            return !!data.players.hasOwnProperty(pid)
-        }
-
-        const hasTribe = function (tid) {
-            return tid && !!data.tribes.hasOwnProperty(tid)
-        }
-
-        const setTribe = function (v) {
-            data.tribes[v.tribe_id] = [
-                v.tribe_name,
-                v.tribe_tag,
-                v.tribe_points
-            ]
-        }
-
-
-        const setPlayer = function (v, pid, tid) {
-            data.players[pid] = [
-                v.character_name,
-                v.character_points
-            ]
-
-            if (tid) {
-                data.players[pid].push(tid)
-            }
-        }
-
-        const setVillage = function (v) {
-            data.villages[v.x] = data.villages[v.x] || {}
-            data.villages[v.x][v.y] = [
-                v.id,
-                v.name,
-                v.points,
-                v.character_id || 0
-            ]
-        }
-
-        const process = function (raw) {
-            let pid
-            let tid
-
-            raw.villages.forEach(function (v) {
-                if (!settings.allowBarbarians && !v.character_id) {
-                    return false
-                }
-
-                pid = v.character_id
-                tid = v.tribe_id
-
-                setVillage(v)
-
-                if (pid) {
-                    if (!hasPlayer(pid)) {
-                        setPlayer(v, pid, tid)
-                    }
-
-                    if (!hasTribe(tid)) {
-                        setTribe(v, tid)
-                    }
-                }
+                width: BLOCK_SIZE,
+                height: BLOCK_SIZE
+            }, function (firstBlock) {
+                socketService.emit(routeProvider.MAP_GETVILLAGES, {
+                    x: x + BLOCK_SIZE,
+                    y: y + BLOCK_SIZE,
+                    width: BLOCK_SIZE,
+                    height: BLOCK_SIZE
+                }, function (secondBlock) {
+                    resolve([ firstBlock, secondBlock ])
+                })
             })
+        })
+    }
+
+    const hasPlayer = function (pid) {
+        return !!worldData.players.hasOwnProperty(pid)
+    }
+
+    const hasTribe = function (tid) {
+        return tid && !!worldData.tribes.hasOwnProperty(tid)
+    }
+
+    const setTribe = function (v) {
+        worldData.tribes[v.tribe_id] = [
+            v.tribe_name,
+            v.tribe_tag,
+            v.tribe_points
+        ]
+    }
+
+    const setPlayer = function (v, pid, tid) {
+        worldData.players[pid] = [
+            v.character_name,
+            v.character_points
+        ]
+
+        if (tid) {
+            worldData.players[pid].push(tid)
+        }
+    }
+
+    const setVillage = function (v) {
+        worldData.villages[v.x] = worldData.villages[v.x] || {}
+        worldData.villages[v.x][v.y] = [
+            v.id,
+            v.name,
+            v.points,
+            v.character_id || 0
+        ]
+    }
+
+    const processBlock = function (blockData) {
+        console.log('Scrapper:', 'Processing block', blockData.x, blockData.y, 'Villages:', blockData.villages.length)
+
+        if (!blockData.villages.length) {
+            return
         }
 
-        const finish = function () {
-            let pid
-            let x
-            let y
-            let v
+        blockData.villages.forEach(function (v) {
+            const pid = v.character_id
+            const tid = v.tribe_id
 
-            for (pid in data.players) {
-                data.playerVillages[pid] = []
-            }
+            setVillage(v)
 
-            for (x in data.villages) {
-                for (y in data.villages[x]) {
-                    v = data.villages[x][y]
+            if (pid) {
+                if (!hasPlayer(pid)) {
+                    setPlayer(v, pid, tid)
+                }
 
-                    if (!v[3]) {
-                        continue
-                    }
-
-                    data.playerVillages[v[3]].push([
-                        parseInt(x, 10),
-                        parseInt(y, 10)
-                    ])
+                if (!hasTribe(tid)) {
+                    setTribe(v, tid)
                 }
             }
+        })
+    }
+
+    const processFinish = function () {
+        for (let pid in worldData.players) {
+            worldData.villagesByPlayer[pid] = []
         }
 
-        const handleLoop = function () {
-            loadBlock(x, y, BLOCK_SIZE, function (raw) {
-                console.log('puppeteer', 'loading block', raw.x + '|' + raw.y)
+        for (let x in worldData.villages) {
+            for (let y in worldData.villages[x]) {
+                const v = worldData.villages[x][y]
 
-                if (raw.x === LAST_BLOCK) {
-                    x = 0
-                    y += BLOCK_SIZE
-                } else {
-                    x += BLOCK_SIZE
+                if (!v[3]) {
+                    continue
                 }
 
-                if (raw.villages.length) {
-                    process(raw)
-                }
-
-                // last block finished
-                if (raw.x === LAST_BLOCK && raw.y === LAST_BLOCK) {
-                    if (settings.includeVillagePerPlayer) {
-                        finish()
-                    }
-
-                    if (settings.includeDate) {
-                        insertUpdateDate()
-                    }
-
-                    if (settings.finishCallback) {
-                        settings.finishCallback(data)
-                    }
-
-                    return true
-                }
-
-                handleLoop()
-            })
-        }
-
-        Scrapper.getData = function () {
-            return data
-        }
-
-        Scrapper.start = function (options, callback) {
-            settings = angular.extend(defaults, options)
-            settings.finishCallback = callback
-            data = {
-                villages: {},
-                playerVillages: {},
-                players: {},
-                tribes: {}
+                worldData.villagesByPlayer[v[3]].push([
+                    parseInt(x, 10),
+                    parseInt(y, 10)
+                ])
             }
-            x = 0
-            y = 0
-
-            handleLoop()
         }
 
-        return Scrapper
-    })()
+        worldData.updated = $timeHelper.gameDate().toLocaleString('pt-BR')
+    }
 
     return new Promise(function (resolve, reject) {
-        ready(function () {
-            Scrapper.start(scrapperSettings, function (data) {
-                resolve(data)
-            })
+        ready(async function () {
+            // assert(function () {
+            //     const result = filterBlocks({
+            //         left: { x: 200 },
+            //         right: { x: 700 },
+            //         top: { y: 200 },
+            //         bottom: { y: 700 }
+            //     });
+
+            //     const expect = [
+            //         [200, 200],[300, 200],[200, 300],[300, 300],
+            //         [600, 200],[700, 200],[600, 300],[700, 300],
+            //         [200, 600],[300, 600],[200, 700],[300, 700],
+            //         [600, 600],[700, 600],[600, 700],[700, 700],
+            //     ]
+
+            //     return JSON.stringify(result) === JSON.stringify(expect)
+            // })
+
+            // assert(function () {
+            //     const result = filterBlocks({
+            //         left: { x: 300, y: 0 },
+            //         right: { x: 700, y: 0 },
+            //         top: { x: 0, y: 300 },
+            //         bottom: { x: 0, y: 700 }
+            //     });
+
+            //     const expect = [
+            //         [300, 300],[600, 300],[700, 300],[300, 600],
+            //         [300, 700],[600, 600],[700, 600],[600, 700],
+            //         [700, 700]
+            //     ]
+
+            //     return JSON.stringify(result) === JSON.stringify(expect)
+            // })
+
+            const bondaries = await getBondaries()
+            const missingBlocks = filterBlocks(bondaries)
+
+            for (let i = 0; i < missingBlocks.length; i++) {
+                const [x, y] = missingBlocks[i]
+                const [firstBlock, secondBlock] = await loadBlock(x, y)
+
+                processBlock(firstBlock)
+                processBlock(secondBlock)
+            }
+
+            processFinish()
+
+            resolve(worldData)
         })
     })
 }
