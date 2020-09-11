@@ -6,28 +6,22 @@ const sql = require('./sql')
 
 module.exports = async function (market, world, account) {
     const puppeteer = require('puppeteer-core')
-    const browser = await puppeteer.launch({
-        // devtools: true,
-        executablePath: '/usr/bin/chromium'
-    })
-
+    const browser = await puppeteer.launch({devtools: false, executablePath: '/usr/bin/chromium'})
     const page = await browser.newPage()
 
     page.on('console', function (msg) {
-        console.log(msg)
-        if (msg._type === 'log' && msg._text.startsWith('puppeteer ')) {
-            console.log(msg._text.split('puppeteer ')[1])
+        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
+            console.log(msg._text)
         }
     })
 
-    console.log(`Authenticating "${account.account_name}" on world "${market}${world}"`)
-
-    console.log('goto login page')
+    console.log('ScrapperAuth: Authenticating ' + account.account_name + ' on ' + market + world)
+    console.log('ScrapperAuth: Loading login page')
 
     await page.goto(`https://${market}.tribalwars2.com/page`)
     await page.waitFor(2500)
     
-    console.log('set login cookies')
+    console.log('ScrapperAuth: Setting account credentials')
 
     await page.setCookie({
         name: 'globalAuthCookie',
@@ -44,34 +38,21 @@ module.exports = async function (market, world, account) {
         secure: false,
         session: false
     })
-    await page.goto(`https://${market}.tribalwars2.com/page`, {
-        waitUntil: ['domcontentloaded']
-    })
+
+    await page.goto(`https://${market}.tribalwars2.com/page`)
 
     try {
-        console.log('checking login')
-
+        console.log('ScrapperAuth: Checking login')
         await page.waitForSelector('.player-worlds', { timeout: 10000 })
-
-        console.log('goto game page')
-
-        await page.goto(`https://${market}.tribalwars2.com/game.php?world=${market}${world}&character_id=${account.account_id}`, {
-            waitUntil: ['domcontentloaded']
-        })
-
+        console.log('ScrapperAuth: Loading game\'s page')
+        await page.goto(`https://${market}.tribalwars2.com/game.php?world=${market}${world}&character_id=${account.account_id}`)
         await page.waitFor(2500)
-
-        console.log('wait for #map element')
-
-        await page.waitForSelector('#map', {
-            timeout: 10000
-        })
-
-        console.log('Authenticated')
+        await page.waitForSelector('#map', { timeout: 10000 })
+        console.log('ScrapperAuth: Account ' + account.account_name + ' Authenticated')
 
         return [page, browser]
     } catch (error) {
         browser.close()
-        throw new Error('ScrapperAuth: Login error')
+        throw new Error('ScrapperAuth: Authentication failed')
     }
 }

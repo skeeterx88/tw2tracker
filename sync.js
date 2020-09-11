@@ -51,28 +51,18 @@ Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
     const minutesSinceLastSync = (Date.now() - worldData.last_sync.getTime()) / 1000 / 60
 
     if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-        console.log(`${world.market}${world.id} already sync.`)
-
-        return false
+        return [false, marketId + worldId + ' already syncronized']
     }
 
     const [page, browser] = await ScrapperAuth(marketId, worldId, account)
-
-    console.log(`Scrapping ${marketId}${worldId}`)
-
-    const data = await page.evaluate(Scrapper, {
-        allowBarbarians: settings.scrapper_allow_barbarians
-    })
-
+    console.log('Scrapper: Start scrapping', marketId + worldId)
+    const data = await page.evaluate(Scrapper)
     await fs.writeFileSync(`data/${marketId}${worldId}.json`, JSON.stringify(data))
-
-    console.log(`Scrapping ${marketId}${worldId} finished`)
-
+    console.log('Scrapper:', marketId + worldId, 'scrapped successfully')
     browser.close()
-
     await db.query(sql.updateWorldSync, [marketId, worldId])
     
-    return true
+    return [true, marketId + worldId + ' synced successfully']
 }
 
 Sync.markets = async function () {
