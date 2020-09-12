@@ -1,10 +1,10 @@
 {
-    "site_name": "tw2logan",
+    "site_name": "tw2tracker",
     "db_user": "lain",
     "db_host": "127.0.0.1",
     "db_password": "",
     "db_port": 5432,
-    "db_name": "tw2logan",
+    "db_name": "tw2tracker",
     "bcrypt_salt_rounds": 3,
     "tw_accounts": {
         "br": {

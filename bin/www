@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('tw2logan:server');
+var debug = require('debug')('tw2tracker:server');
 var http = require('http');
 
 /**

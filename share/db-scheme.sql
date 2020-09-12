@@ -26,7 +26,7 @@ CREATE TABLE public.worlds (
     last_sync TIMESTAMP
 );
 
-INSERT INTO settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('TW2Logan', '123', 1);
+INSERT INTO settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 1);
 INSERT INTO markets (id, account_name, account_token, account_id, enabled) VALUES ('br', '-Relaxeaza-', 'ab264b13447cbfdbb91a79e655d1d52380a69e24', 650985, TRUE);
 INSERT INTO markets (id, account_name, account_token, account_id, enabled) VALUES ('en', '-Relaxeaza-', '0f1673d8f39aa4c15687f5c5afea0ba57d1e6ce6', 848900934, TRUE);
 
