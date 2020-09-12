@@ -17,30 +17,30 @@ module.exports = function () {
 
     const BLOCK_SIZE = 50
 
-    const refBlocksAll = [
-        [0, 0], [100, 0], [200, 0], [300, 0], [400, 0],
-        [500, 0], [600, 0], [700, 0], [800, 0], [900, 0],
-        [0, 100], [100, 100], [200, 100], [300, 100], [400, 100],
-        [500, 100], [600, 100], [700, 100], [800, 100], [900, 100],
-        [0, 200], [100, 200], [200, 200], [300, 200], [400, 200],
-        [500, 200], [600, 200], [700, 200], [800, 200], [900, 200],
-        [0, 300], [100, 300], [200, 300], [300, 300], [400, 300],
-        [500, 300], [600, 300], [700, 300], [800, 300], [900, 300],
-        [0, 400], [100, 400], [200, 400], [300, 400], [400, 400],
-        [500, 400], [600, 400], [700, 400], [800, 400], [900, 400],
-        [0, 500], [100, 500], [200, 500], [300, 500], [400, 500],
-        [500, 500], [600, 500], [700, 500], [800, 500], [900, 500],
-        [0, 600], [100, 600], [200, 600], [300, 600], [400, 600],
-        [500, 600], [600, 600], [700, 600], [800, 600], [900, 600],
-        [0, 700], [100, 700], [200, 700], [300, 700], [400, 700],
-        [500, 700], [600, 700], [700, 700], [800, 700], [900, 700],
-        [0, 800], [100, 800], [200, 800], [300, 800], [400, 800],
-        [500, 800], [600, 800], [700, 800], [800, 800], [900, 800],
-        [0, 900], [100, 900], [200, 900], [300, 900], [400, 900],
-        [500, 900], [600, 900], [700, 900], [800, 900], [900, 900]
-    ]
+    // const refCoordsAll = [
+    //     [0, 0], [100, 0], [200, 0], [300, 0], [400, 0],
+    //     [500, 0], [600, 0], [700, 0], [800, 0], [900, 0],
+    //     [0, 100], [100, 100], [200, 100], [300, 100], [400, 100],
+    //     [500, 100], [600, 100], [700, 100], [800, 100], [900, 100],
+    //     [0, 200], [100, 200], [200, 200], [300, 200], [400, 200],
+    //     [500, 200], [600, 200], [700, 200], [800, 200], [900, 200],
+    //     [0, 300], [100, 300], [200, 300], [300, 300], [400, 300],
+    //     [500, 300], [600, 300], [700, 300], [800, 300], [900, 300],
+    //     [0, 400], [100, 400], [200, 400], [300, 400], [400, 400],
+    //     [500, 400], [600, 400], [700, 400], [800, 400], [900, 400],
+    //     [0, 500], [100, 500], [200, 500], [300, 500], [400, 500],
+    //     [500, 500], [600, 500], [700, 500], [800, 500], [900, 500],
+    //     [0, 600], [100, 600], [200, 600], [300, 600], [400, 600],
+    //     [500, 600], [600, 600], [700, 600], [800, 600], [900, 600],
+    //     [0, 700], [100, 700], [200, 700], [300, 700], [400, 700],
+    //     [500, 700], [600, 700], [700, 700], [800, 700], [900, 700],
+    //     [0, 800], [100, 800], [200, 800], [300, 800], [400, 800],
+    //     [500, 800], [600, 800], [700, 800], [800, 800], [900, 800],
+    //     [0, 900], [100, 900], [200, 900], [300, 900], [400, 900],
+    //     [500, 900], [600, 900], [700, 900], [800, 900], [900, 900]
+    // ]
 
-    const refBlocks = {
+    const refCoords = {
         topLeft: [
             [0, 0], [100, 0], [200, 0], [300, 0],
             [0, 100], [100, 100], [200, 100], [300, 100],
@@ -67,7 +67,7 @@ module.exports = function () {
         ]
     }
 
-    const crossRefBlocks = {
+    const boundarieRefCoords = {
         left: [
             [400, 400], [400, 500], [300, 400], [300, 500],
             [200, 400], [200, 500], [100, 400], [100, 500],
@@ -104,44 +104,36 @@ module.exports = function () {
         rootScope.$on(eventTypeProvider.MAP_INITIALIZED, callback)
     }
 
-    const getBondaries = async function () {
-        const bondaries = {
-            left: {x: 500, y: 500},
-            right: {x: 500, y: 500},
-            top: {x: 500, y: 500},
-            bottom: {x: 500, y: 500}
+    const getBoundaries = async function () {
+        const boundaries = {
+            left: 500,
+            right: 500,
+            top: 500,
+            bottom: 500
         }
 
-        const sides = ['left', 'right', 'top', 'bottom']
+        for (let side of ['left', 'right', 'top', 'bottom']) {
+            for (let i = 0; i < boundarieRefCoords[side].length; i++) {
+                const [x, y] = boundarieRefCoords[side][i]
+                const villageCount = await loadMapChunk(x, y)
 
-        for (let i = 0; i < sides.length; i++) {
-            const side = sides[i]
-
-            for (let j = 0; j < crossRefBlocks[side].length; j++) {
-                const [x, y] = crossRefBlocks[side][j]
-                const [firstBlock, secondBlock] = await loadBlock(x, y)
-
-                processBlock(firstBlock)
-                processBlock(secondBlock)
-
-                if (firstBlock.villages.length + secondBlock.villages.length) {
-                    bondaries[side].x = x
-                    bondaries[side].y = y
-                } else {
+                if (!villageCount) {
                     break
                 }
+
+                boundaries[side] = (side === 'left' || side === 'right') ? x : y
             }
         }
 
-        return bondaries
+        return boundaries
     }
 
-    const filterBlocks = function (bondaries) {
+    const filterBlocks = function (boundaries) {
         return [
-            ...refBlocks.topLeft.filter(([x, y]) => x >= bondaries.left.x  && y >= bondaries.top.y),
-            ...refBlocks.topRight.filter(([x, y]) => x <= bondaries.right.x && y >= bondaries.top.y),
-            ...refBlocks.bottomLeft.filter(([x, y]) => x >= bondaries.left.x  && y <= bondaries.bottom.y),
-            ...refBlocks.bottomRight.filter(([x, y]) => x <= bondaries.right.x && y <= bondaries.bottom.y)
+            ...refCoords.topLeft.filter(([x, y]) => x >= boundaries.left && y >= boundaries.top),
+            ...refCoords.topRight.filter(([x, y]) => x <= boundaries.right && y >= boundaries.top),
+            ...refCoords.bottomLeft.filter(([x, y]) => x >= boundaries.left  && y <= boundaries.bottom),
+            ...refCoords.bottomRight.filter(([x, y]) => x <= boundaries.right && y <= boundaries.bottom)
         ]
     }
 
@@ -151,24 +143,25 @@ module.exports = function () {
         }
     }
 
-    const loadBlock = function (x, y) {
+    const loadVillages = function (x, y) {
         return new Promise(function (resolve) {
             socketService.emit(routeProvider.MAP_GETVILLAGES, {
                 x: x,
                 y: y,
                 width: BLOCK_SIZE,
                 height: BLOCK_SIZE
-            }, function (firstBlock) {
-                socketService.emit(routeProvider.MAP_GETVILLAGES, {
-                    x: x + BLOCK_SIZE,
-                    y: y + BLOCK_SIZE,
-                    width: BLOCK_SIZE,
-                    height: BLOCK_SIZE
-                }, function (secondBlock) {
-                    resolve([ firstBlock, secondBlock ])
-                })
-            })
+            }, resolve)
         })
+    }
+
+    const loadMapChunk = async function (x, y) {
+        const firstChunk = await loadVillages(x, y)
+        const secondChunk = await loadVillages(x + BLOCK_SIZE, y + BLOCK_SIZE)
+
+        processVillages(firstChunk)
+        processVillages(secondChunk)
+
+        return firstChunk.villages.length + secondChunk.villages.length
     }
 
     const hasPlayer = function (pid) {
@@ -208,7 +201,7 @@ module.exports = function () {
         ]
     }
 
-    const processBlock = function (blockData) {
+    const processVillages = function (blockData) {
         console.log('Scrapper:', 'Processing block', blockData.x, blockData.y, 'Villages:', blockData.villages.length)
 
         if (!blockData.villages.length) {
@@ -293,15 +286,13 @@ module.exports = function () {
             //     return JSON.stringify(result) === JSON.stringify(expect)
             // })
 
-            const bondaries = await getBondaries()
-            const missingBlocks = filterBlocks(bondaries)
+            const boundaries = await getBoundaries()
+            const missingBlocks = filterBlocks(boundaries)
 
             for (let i = 0; i < missingBlocks.length; i++) {
                 const [x, y] = missingBlocks[i]
-                const [firstBlock, secondBlock] = await loadBlock(x, y)
 
-                processBlock(firstBlock)
-                processBlock(secondBlock)
+                await loadMapChunk(x, y)
             }
 
             processFinish()
