@@ -219,7 +219,7 @@ module.exports = function () {
                     setPlayer(v, pid, tid)
                 }
 
-                if (!hasTribe(tid)) {
+                if (tid && !hasTribe(tid)) {
                     setTribe(v, tid)
                 }
             }

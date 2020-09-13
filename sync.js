@@ -50,10 +50,6 @@ const insertWorldData = async function (dbWorld, worldData) {
     const {villages, villagesByPlayer, players, tribes, updated} = worldData
 
     for (let id in tribes) {
-        if (id === 'null') {
-            continue
-        }
-
         const [name, tag, points] = tribes[id]
 
         await dbWorld.query(sql.insertWorldTribe, [
