@@ -2,7 +2,6 @@ const db = require('./db')
 const sql = require('./sql')
 const utils = require('./utils')
 const Scrapper = require('./scrapper.js')
-const ScrapperAuth = require('./scrapper-auth.js')
 const fs = require('fs')
 
 const getMarketList = function () {
@@ -105,6 +104,54 @@ const insertWorldData = async function (dbWorld, worldData) {
 
 const Sync = {}
 
+Sync.authToken = async function (marketId, account) {
+    const puppeteer = require('puppeteer-core')
+    const browser = await puppeteer.launch({ devtools: false, executablePath: '/usr/bin/chromium' })
+    const page = await browser.newPage()
+
+    page.on('console', function (msg) {
+        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
+            console.log(msg._text)
+        }
+    })
+
+    console.log('Sync: Authenticating ' + account.account_name + ' on market ' + marketId)
+    console.log('Sync: Loading login page')
+
+    await page.goto(`https://${marketId}.tribalwars2.com/page`)
+    await page.waitFor(2500)
+    
+    console.log('Sync: Setting account credentials')
+
+    await page.setCookie({
+        name: 'globalAuthCookie',
+        value: JSON.stringify({
+            token: account.account_token,
+            playerName: account.account_name,
+            autologin: true
+        }),
+        domain: `.${marketId}.tribalwars2.com`,
+        path: '/',
+        expires: 2147482647,
+        size: 149,
+        httpOnly: false,
+        secure: false,
+        session: false
+    })
+
+    await page.goto(`https://${marketId}.tribalwars2.com/page`)
+
+    try {
+        console.log('Sync: Checking login')
+        await page.waitForSelector('.player-worlds', { timeout: 10000 })
+    
+        return [page, browser]
+    } catch (error) {
+        browser.close()
+        throw new Error('Sync: Authentication failed')
+    }
+}
+
 Sync.scrappeAll = async function (callback) {
     const worlds = await db.any(sql.worlds)
 
@@ -123,13 +170,17 @@ Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
         return [false, marketId + worldId + ' already syncronized']
     }
 
-    const [page, browser] = await ScrapperAuth(marketId, worldId, account)
+    const [page, browser] = await Sync.authToken(marketId, account)
 
     console.log('Scrapper: Start scrapping', marketId + worldId)
 
     const dbWorld = connectWorldDatabase(marketId, worldId)
+
+    await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=${marketId}${worldId}&character_id=${account.account_id}`)
+    await page.waitFor(2500)
+    await page.waitForSelector('#map', { timeout: 10000 })
     const worldData = await page.evaluate(Scrapper)
-    
+
     await insertWorldData(dbWorld, worldData)
 
     console.log('Scrapper:', marketId + worldId, 'scrapped successfully')
