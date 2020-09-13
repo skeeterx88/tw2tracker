@@ -104,7 +104,7 @@ const insertWorldData = async function (dbWorld, worldData) {
 
 const Sync = {}
 
-Sync.authToken = async function (marketId, account) {
+Sync.authToken = async function (marketId, { account_name, account_token }) {
     const puppeteer = require('puppeteer-core')
     const browser = await puppeteer.launch({ devtools: false, executablePath: '/usr/bin/chromium' })
     const page = await browser.newPage()
@@ -150,6 +150,61 @@ Sync.authToken = async function (marketId, account) {
         browser.close()
         throw new Error('Sync: Authentication failed')
     }
+}
+
+Sync.getToken = async function (marketId, { account_name, account_password }) {
+    const puppeteer = require('puppeteer-core')
+    const browser = await puppeteer.launch({ devtools: false, executablePath: '/usr/bin/chromium' })
+    const page = await browser.newPage()
+
+    console.log('Sync: Loading login page')
+
+    await page.goto(`https://${marketId}.tribalwars2.com/page`, {
+        waitUntil: ['domcontentloaded', 'networkidle0']
+    })
+
+    console.log('Sync: Getting account token')
+
+    const response = {}
+
+    const data = await page.evaluate(function (account_name, account_password) {
+        return new Promise(function (resolve) {
+            const socketService = injector.get('socketService')
+            const routeProvider = injector.get('routeProvider')
+
+            const loginTimeout = setTimeout(function () {
+                resolve(false)
+            }, 5000)
+
+            socketService.emit(routeProvider.LOGIN, {
+                name: account_name,
+                pass: account_password,
+                ref_param: ''
+            }, function (data) {
+                clearTimeout(loginTimeout)
+                resolve(data)
+            })
+        })
+    }, account_name, account_password)
+
+    if (data && data.token) {
+        response.success = true
+        response.token = data.token
+    } else {
+        console.log('Sync: Authentication failed')
+
+        try {
+            await page.waitForSelector('.login-error', { visible: true, timeout: 5000 })
+
+            response.success = false
+            response.reason = await page.$eval('.login-error', elem => elem.textContent)
+        } catch (error) {
+            response.success = false
+            response.reason = 'unknow'
+        }
+    }
+
+    return response
 }
 
 Sync.scrappeAll = async function (callback) {
