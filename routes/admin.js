@@ -136,4 +136,24 @@ router.post('/change-settings', /*ensureLoggedIn,*/ async function (req, res) {
     res.end(JSON.stringify(response))
 })
 
+router.get('/test-account/:marketId', /*ensureLoggedIn,*/ async function (req, res) {
+    const marketId = req.params.marketId
+    const response = {}
+
+    console.log('Account test on market', marketId)
+
+    const market = await db.one(sql.market, [marketId])
+
+    if (!market.account_name || !market.account_password) {
+        response.error = 'invalid market account'
+    } else {
+        const result = await Sync.getToken(marketId, market)
+        response.account = market.account_name
+        response.working = result.success
+    }
+
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(response))
+})
+
 module.exports = router
