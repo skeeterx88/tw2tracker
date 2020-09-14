@@ -36,12 +36,11 @@ router.get('/scrapper/:market/:world', /*ensureLoggedIn,*/ async function (req, 
         response.reason = `world ${world} is invalid`
     } else {
         try {
-            const [success, reason] = await Sync.scrappeWorld(market, req.params.world)
-            response.success = success
-            response.reason = reason
+            response.reason = await Sync.scrappeWorld(market, req.params.world)
+            response.success = true
         } catch (error) {
-            response.success = false
             response.reason = error.message
+            response.success = false
         }
     }
 
@@ -147,9 +146,14 @@ router.get('/test-account/:marketId', /*ensureLoggedIn,*/ async function (req, r
     if (!market.account_name || !market.account_password) {
         response.error = 'invalid market account'
     } else {
-        const result = await Sync.getToken(marketId, market)
         response.account = market.account_name
-        response.working = result.success
+
+        try {
+            await Sync.auth(marketId, market)
+            response.working = true
+        } catch (error) {
+            response.working = false
+        }
     }
 
     res.setHeader('Content-Type', 'application/json')

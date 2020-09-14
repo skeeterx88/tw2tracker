@@ -104,70 +104,90 @@ const insertWorldData = async function (dbWorld, worldData) {
 
 const Sync = {}
 
-Sync.authToken = async function (marketId, { account_name, account_token }) {
-    const puppeteer = require('puppeteer-core')
-    const browser = await puppeteer.launch({ devtools: false, executablePath: '/usr/bin/chromium' })
-    const page = await browser.newPage()
+Sync.all = async function () {
+    
+}
 
-    page.on('console', function (msg) {
-        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
-            console.log(msg._text)
+Sync.registerWorlds = async function () {
+    console.log('Sync.registerWorlds()')
+
+    const markets = await db.any(sql.markets)
+
+    const enabledMarkets = markets.filter(function (market) {
+        return market.account_name && market.account_password
+    })
+
+    console.log('enabledMarkets', enabledMarkets)
+
+    for (let i = 0; i < enabledMarkets.length; i++) {
+        const market = enabledMarkets[i]
+
+        try {
+            const [account, page, browser] = await Sync.auth(market.id, market)
+
+            console.log('Missing worlds:', account.worlds)
+
+            if (account.worlds.length) {
+                for (let j = 0; j < account.worlds.length; j++) {
+                    const world = account.worlds[j]
+                    const worldId = parseInt(world.id.match(/\d+/)[0], 10)
+
+                    await Sync.registerWorld(page, market.id, worldId, world.name)
+                }
+
+                console.log('Sync.registerWorlds: All worlds for', market.id, 'registered')
+            } else {
+                console.log('Sync.registerWorlds: All worlds for', market.id, 'already registered')
+            }
+
+        } catch (error) {
+            console.log('Sync.registerWorlds: Error while trying to register characters on market', market.id, ' | ', (error.message || error))
+            continue
         }
-    })
 
-    console.log('Sync: Authenticating ' + account.account_name + ' on market ' + marketId)
-    console.log('Sync: Loading login page')
-
-    await page.goto(`https://${marketId}.tribalwars2.com/page`)
-    await page.waitFor(2500)
-    
-    console.log('Sync: Setting account credentials')
-
-    await page.setCookie({
-        name: 'globalAuthCookie',
-        value: JSON.stringify({
-            token: account.account_token,
-            playerName: account.account_name,
-            autologin: true
-        }),
-        domain: `.${marketId}.tribalwars2.com`,
-        path: '/',
-        expires: 2147482647,
-        size: 149,
-        httpOnly: false,
-        secure: false,
-        session: false
-    })
-
-    await page.goto(`https://${marketId}.tribalwars2.com/page`)
-
-    try {
-        console.log('Sync: Checking login')
-        await page.waitForSelector('.player-worlds', { timeout: 10000 })
-    
-        return [page, browser]
-    } catch (error) {
         browser.close()
-        throw new Error('Sync: Authentication failed')
     }
 }
 
-Sync.getToken = async function (marketId, { account_name, account_password }) {
-    const puppeteer = require('puppeteer-core')
-    const browser = await puppeteer.launch({ devtools: false, executablePath: '/usr/bin/chromium' })
-    const page = await browser.newPage()
+Sync.registerWorld = async function (page, marketId, worldId, worldName) {
+    console.log('Sync.registerWorld()', marketId, worldId, worldName)
 
-    console.log('Sync: Loading login page')
+    await page.evaluate(function (marketId, worldId) {
+        return new Promise(function (resolve) {
+            const socketService = injector.get('socketService')
+            const routeProvider = injector.get('routeProvider')
+
+            socketService.emit(routeProvider.CREATE_CHARACTER, {
+                world: marketId + worldId
+            }, resolve)
+        })
+    }, marketId, worldId)
+
+    await page.waitFor(500)
 
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {
         waitUntil: ['domcontentloaded', 'networkidle0']
     })
 
-    console.log('Sync: Getting account token')
+    console.log('Sync.registerWorld:', 'character for', marketId + worldId, 'created')
 
-    const response = {}
+    // create world database
 
-    const data = await page.evaluate(function (account_name, account_password) {
+    return true
+}
+
+Sync.auth = async function (marketId, { account_name, account_password }) {
+    console.log('Sync.auth()', marketId, account_name)
+
+    const puppeteer = require('puppeteer-core')
+    const browser = await puppeteer.launch({ headless: true, executablePath: '/usr/bin/chromium' })
+    const page = await browser.newPage()
+
+    await page.goto(`https://${marketId}.tribalwars2.com/page`, {
+        waitUntil: ['domcontentloaded', 'networkidle0']
+    })
+
+    const account = await page.evaluate(function (account_name, account_password) {
         return new Promise(function (resolve) {
             const socketService = injector.get('socketService')
             const routeProvider = injector.get('routeProvider')
@@ -187,24 +207,31 @@ Sync.getToken = async function (marketId, { account_name, account_password }) {
         })
     }, account_name, account_password)
 
-    if (data && data.token) {
-        response.success = true
-        response.token = data.token
-    } else {
-        console.log('Sync: Authentication failed')
-
-        try {
-            await page.waitForSelector('.login-error', { visible: true, timeout: 5000 })
-
-            response.success = false
-            response.reason = await page.$eval('.login-error', elem => elem.textContent)
-        } catch (error) {
-            response.success = false
-            response.reason = 'unknow'
-        }
+    if (!account) {
+        throw new Error('Sync: Authentication failed')
     }
 
-    return response
+    await page.setCookie({
+        name: 'globalAuthCookie',
+        value: JSON.stringify({
+            token: account.token,
+            playerName: account.name,
+            autologin: true
+        }),
+        domain: `.${marketId}.tribalwars2.com`,
+        path: '/',
+        expires: 2147482647,
+        size: 149,
+        httpOnly: false,
+        secure: false,
+        session: false
+    })
+
+    await page.goto(`https://${marketId}.tribalwars2.com/page`, {
+        waitUntil: ['domcontentloaded', 'networkidle0']
+    })
+
+    return [account, page, browser]
 }
 
 Sync.scrappeAll = async function (callback) {
@@ -216,16 +243,16 @@ Sync.scrappeAll = async function (callback) {
 }
 
 Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
-    const account = await db.one(sql.enabledMarket, [marketId])
+    const accountCredentials = await db.one(sql.enabledMarket, [marketId])
     const worldInfo = await db.one(sql.world, [marketId, worldId])
     const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
     const settings = await db.one(sql.settings)
 
     if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-        return [false, marketId + worldId + ' already syncronized']
+        throw new Error(marketId + worldId + ' already syncronized')
     }
 
-    const [page, browser] = await Sync.authToken(marketId, account)
+    const [account, page, browser] = await Sync.auth(marketId, accountCredentials)
 
     console.log('Scrapper: Start scrapping', marketId + worldId)
 
@@ -243,7 +270,7 @@ Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
 
     await db.query(sql.updateWorldSync, [marketId, worldId])
     
-    return [true, marketId + worldId + ' synced successfully']
+    return marketId + worldId + ' synced successfully'
 }
 
 Sync.markets = async function () {
