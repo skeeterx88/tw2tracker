@@ -68,6 +68,7 @@
 
             <div class="long-info">
                 <span>account_name: <%= market.account_name %></span>
+                <span>account_password: <%= market.account_password %></span>
                 <span>account_id: <%= market.account_id %></span>
                 <span>account_token: <%= market.account_token %></span>
                 <span>account_enabled: <%= market_enabled %></span>
@@ -139,6 +140,7 @@
     <section class="debug">
         <ul>
             <li><a href="javascript:debug.addMarket()">Add market</a></li>
+            <li><a href="/admin/sync-markets">Sync markets</a></li>
         </ul>
     </section>
 

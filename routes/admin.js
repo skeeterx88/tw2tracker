@@ -53,48 +53,36 @@ router.post('/add-market', /*ensureLoggedIn,*/ async function (req, res) {
     console.log(req.body)
 
     const market = req.body.market
-    const accountName = req.body.accountName
-    const accountId = req.body.accountId
-    const accountToken = req.body.accountToken
+    const accountName = req.body.accountName || null
+    const accountPassword = req.body.accountPassword || null
+    const accountId = req.body.accountId || null
+    const accountToken = req.body.accountToken || null
     const enabled = req.body.enabled === 'on' || req.body.enabled === true
 
     const response = {}
 
-    if (market.length < 2) {
-        response.success = false
-        response.reason = 'invalid market id'
-    } else if (accountName.length < 4 || accountName.length > 24) {
-        response.success = false
-        response.reason = 'invalid account name'
-    } else if (isNaN(accountId)) {
-        response.success = false
-        response.reason = 'invalid account id'
-    } else if (accountToken.length !== 40) {
-        response.success = false
-        response.reason = 'invalid account token'
-    } else {
-        const marketCount = await db.any(sql.market, market)
-        const query = marketCount.length
-            ? sql.updateMarket
-            : sql.addMarket
+    const marketCount = await db.any(sql.market, market)
+    const query = marketCount.length
+        ? sql.updateMarket
+        : sql.addMarket
 
-        if (!marketCount.length) {
-            await db.query(sql.addMarket, [market])
-        }
-
-        await db.query(sql.updateMarket, [
-            market,
-            accountName,
-            accountToken,
-            accountId,
-            enabled
-        ])
-
-        response.success = true
-        response.reason = marketCount.length
-            ? 'market updated successfully'
-            : 'market added successfully'
+    if (!marketCount.length) {
+        await db.query(sql.addMarket, [market])
     }
+
+    await db.query(sql.updateMarket, [
+        market,
+        accountName,
+        accountPassword,
+        accountToken,
+        accountId,
+        enabled
+    ])
+
+    response.success = true
+    response.reason = marketCount.length
+        ? 'market updated successfully'
+        : 'market added successfully'
 
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(response))

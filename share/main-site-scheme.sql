@@ -13,6 +13,7 @@ CREATE TABLE public.settings (
 CREATE TABLE public.markets (
     id VARCHAR (10) PRIMARY KEY,
     account_name VARCHAR (255),
+    account_password VARCHAR (255),
     account_token VARCHAR (255),
     account_id INT,
     enabled BOOLEAN NOT NULL DEFAULT FALSE
@@ -27,8 +28,8 @@ CREATE TABLE public.worlds (
 );
 
 INSERT INTO settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 1);
-INSERT INTO markets (id, account_name, account_token, account_id, enabled) VALUES ('br', '-Relaxeaza-', 'ab264b13447cbfdbb91a79e655d1d52380a69e24', 650985, TRUE);
-INSERT INTO markets (id, account_name, account_token, account_id, enabled) VALUES ('en', '-Relaxeaza-', '0f1673d8f39aa4c15687f5c5afea0ba57d1e6ce6', 848900934, TRUE);
 
-INSERT INTO worlds (market, id, name, enabled, last_sync) VALUES ('br', 48, 'Visegrád', TRUE, NOW() AT TIME ZONE 'UTC');
-INSERT INTO worlds (market, id, name, enabled, last_sync) VALUES ('br', 46, 'Tzschocha', TRUE, NOW() AT TIME ZONE 'UTC');
+-- INSERT INTO markets (id, account_name, account_password, enabled) VALUES ('beta', 'tribalwarstracker', '2tribalwarstracker2', TRUE);
+
+-- INSERT INTO worlds (market, id, name, enabled, last_sync) VALUES ('br', 48, 'Visegrád', TRUE, NOW() AT TIME ZONE 'UTC');
+-- INSERT INTO worlds (market, id, name, enabled, last_sync) VALUES ('br', 46, 'Tzschocha', TRUE, NOW() AT TIME ZONE 'UTC');
