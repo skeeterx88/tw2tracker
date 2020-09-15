@@ -26,6 +26,6 @@ CREATE TABLE IF NOT EXISTS ${schema:name}.villages (
 );
 
 CREATE TABLE IF NOT EXISTS ${schema:name}.villages_by_player (
-    character_id INT REFERENCES ${schema:name}.players(id),
+    character_id INT REFERENCES ${schema:name}.players(id) PRIMARY KEY,
     villages_id INT[]
 );
