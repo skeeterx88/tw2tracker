@@ -81,7 +81,7 @@ app.use(function (err, req, res, next) {
 
 ;(async () => {
     const Sync = require('./sync')
-    await Sync.all()
+    await Sync.init()
 })()
 
 module.exports = app
