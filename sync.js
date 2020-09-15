@@ -296,7 +296,15 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
 
     console.log('Scrapper: Start scrapping', marketId + worldNumber)
 
-    const worldData = await page.evaluate(Scrapper)
+    let worldData
+
+    try {
+        worldData = await page.evaluate(Scrapper)
+    } catch (error) {
+        await page.close()
+        return marketId + worldNumber + ' failed sync'
+    }
+
     await page.close()
     const schema = marketId + worldNumber
 

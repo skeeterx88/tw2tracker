@@ -255,7 +255,11 @@ module.exports = function () {
     }
 
     return new Promise(async function (resolve, reject) {
-        await readyState()
+        try {
+            await readyState()
+        } catch (error) {
+            return reject('Scrapper: Couldn\'t get ready state.')
+        }
 
         // assert(function () {
         //     const result = filterBlocks({
