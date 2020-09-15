@@ -20,23 +20,23 @@ router.get('/', /*ensureLoggedIn,*/ async function (req, res) {
     })
 })
 
-router.get('/scrapper/:market/:world', /*ensureLoggedIn,*/ async function (req, res) {
-    const market = req.params.market
-    const world = parseInt(req.params.world, 10)
+router.get('/scrapper/:marketId/:worldNumber', /*ensureLoggedIn,*/ async function (req, res) {
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
     const enabledMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
-    const enabledWorlds = await db.map(sql.enabledWorlds, [], world => world.id)
+    const worlds = await db.map(sql.worlds, [], world => world.id)
 
     const response = {}
 
-    if (!enabledMarkets.includes(market)) {
+    if (!enabledMarkets.includes(marketId)) {
         response.success = false
-        response.reason = `market ${market} is invalid`
-    } else if (!enabledWorlds.includes(world)) {
+        response.reason = `market ${marketId} is invalid`
+    } else if (!worlds.includes(worldNumber)) {
         response.success = false
-        response.reason = `world ${world} is invalid`
+        response.reason = `world ${worldNumber} is invalid`
     } else {
         try {
-            response.reason = await Sync.scrappeWorld(market, req.params.world)
+            response.reason = await Sync.scrappeWorld(marketId, worldNumber)
             response.success = true
         } catch (error) {
             response.reason = error.message
