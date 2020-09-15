@@ -3,6 +3,7 @@ const sql = require('./sql')
 const utils = require('./utils')
 const Scrapper = require('./scrapper.js')
 const fs = require('fs')
+const authenticatedMarkets = {}
 
 const getMarketList = function () {
     return new Promise(function (resolve) {
@@ -180,58 +181,74 @@ Sync.registerCharacter = async function (browser, marketId, worldNumber) {
     console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
 }
 
-Sync.auth = async function (browser, marketId, { account_name, account_password }) {
-    console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
-
-    const page = await browser.newPage()
-
-    await page.goto(`https://${marketId}.tribalwars2.com/page`, {
-        waitUntil: ['domcontentloaded', 'networkidle0']
-    })
-
-    const account = await page.evaluate(function (account_name, account_password) {
-        return new Promise(function (resolve) {
-            const socketService = injector.get('socketService')
-            const routeProvider = injector.get('routeProvider')
-
-            const loginTimeout = setTimeout(function () {
-                resolve(false)
-            }, 5000)
-
-            socketService.emit(routeProvider.LOGIN, {
-                name: account_name,
-                pass: account_password,
-                ref_param: ''
-            }, function (data) {
-                clearTimeout(loginTimeout)
-                resolve(data)
-            })
-        })
-    }, account_name, account_password)
-
-    if (!account) {
-        throw new Error('Sync: Authentication failed')
+Sync.auth = async function (browser, marketId, { account_name, account_password }, _tries = 0) {
+    if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
+        const account = authenticatedMarkets[marketId]
+        console.log('Sync.auth() market:' + marketId + ', already authenticated with account', account.name)
+        return account
     }
 
-    await page.setCookie({
-        name: 'globalAuthCookie',
-        value: JSON.stringify({
-            token: account.token,
-            playerName: account.name,
-            autologin: true
-        }),
-        domain: `.${marketId}.tribalwars2.com`,
-        path: '/',
-        expires: 2147482647,
-        size: 149,
-        httpOnly: false,
-        secure: false,
-        session: false
-    })
+    if (_tries >= 3) {
+        return false
+    }
 
-    await page.close()
+    console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
 
-    return account
+    try {
+        const page = await browser.newPage()
+
+        await page.goto(`https://${marketId}.tribalwars2.com/page`, {
+            waitUntil: ['domcontentloaded', 'networkidle0']
+        })
+
+        const account = await page.evaluate(function (account_name, account_password) {
+            return new Promise(function (resolve) {
+                const socketService = injector.get('socketService')
+                const routeProvider = injector.get('routeProvider')
+
+                const loginTimeout = setTimeout(function () {
+                    resolve(false)
+                }, 5000)
+
+                socketService.emit(routeProvider.LOGIN, {
+                    name: account_name,
+                    pass: account_password,
+                    ref_param: ''
+                }, function (data) {
+                    clearTimeout(loginTimeout)
+                    resolve(data)
+                })
+            })
+        }, account_name, account_password)
+
+        if (!account) {
+            throw new Error('Sync: Authentication failed')
+        }
+
+        await page.setCookie({
+            name: 'globalAuthCookie',
+            value: JSON.stringify({
+                token: account.token,
+                playerName: account.name,
+                autologin: true
+            }),
+            domain: `.${marketId}.tribalwars2.com`,
+            path: '/',
+            expires: 2147482647,
+            size: 149,
+            httpOnly: false,
+            secure: false,
+            session: false
+        })
+
+        await page.close()
+
+        authenticatedMarkets[marketId] = account
+
+        return account
+    } catch (error) {
+        return await Sync.auth(browser, marketId, { account_name, account_password }, ++_tries)
+    }
 }
 
 Sync.scrappeAll = async function (browser) {
@@ -260,6 +277,11 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
     }
 
     const account = await Sync.auth(browser, marketId, accountCredentials)
+
+    if (!account) {
+        return marketId + worldNumber + ' failed sync'
+    }
+
     const page = await browser.newPage()
 
     page.on('console', function (msg) {
