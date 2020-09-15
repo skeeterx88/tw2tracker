@@ -14,16 +14,12 @@ CREATE TABLE public.markets (
     id VARCHAR (10) PRIMARY KEY,
     account_name VARCHAR (255),
     account_password VARCHAR (255),
-    account_token VARCHAR (255),
-    account_id INT,
-    enabled BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE public.worlds (
     market VARCHAR (10) REFERENCES markets(id),
     id SMALLINT PRIMARY KEY,
     name VARCHAR (255) NOT NULL,
-    enabled BOOLEAN NOT NULL,
     last_sync TIMESTAMP
 );
 

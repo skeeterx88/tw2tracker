@@ -3,4 +3,6 @@ SELECT
 FROM
     markets
 WHERE
-    enabled
+    account_name <> ''
+AND
+    account_password <> ''

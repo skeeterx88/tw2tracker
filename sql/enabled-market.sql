@@ -5,4 +5,6 @@ FROM
 WHERE
     id = $1
 AND
-    enabled
+    account_name <> ''
+AND
+    account_password <> ''
