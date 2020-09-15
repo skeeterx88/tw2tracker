@@ -257,7 +257,9 @@ Sync.scrappeAll = async function (browser) {
     const worlds = await db.any(sql.worlds)
 
     for (let world of worlds) {
-        await Sync.scrappeWorld(browser, world.market, world.num)
+        const scrappeResult = await Sync.scrappeWorld(browser, world.market, world.num)
+
+        console.log('Sync:', scrappeResult)
     }
 }
 
@@ -272,14 +274,14 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
         const settings = await db.one(sql.settings)
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-            throw new Error(marketId + worldNumber + ' already syncronized')
+            return marketId + worldNumber + ' already syncronized'
         }
     }
 
     const account = await Sync.auth(browser, marketId, accountCredentials)
 
     if (!account) {
-        return marketId + worldNumber + ' failed sync'
+        return marketId + worldNumber + ' failed to syncronize'
     }
 
     const page = await browser.newPage()
@@ -296,19 +298,19 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
         await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
     }
 
-    console.log('Scrapper: Start scrapping', marketId + worldNumber)
-
     let worldData
 
     try {
-        worldData = await page.evaluate(Scrapper)
+        worldData = await page.evaluate(Scrapper, marketId, worldNumber)
     } catch (error) {
         await page.close()
-        return marketId + worldNumber + ' failed sync'
+        return marketId + worldNumber + ' failed to syncronize'
     }
 
     await page.close()
     const schema = marketId + worldNumber
+
+    console.log('Sync: Inseting data into the database')
 
     for (let id in worldData.tribes) {
         const [name, tag, points] = worldData.tribes[id]
@@ -367,11 +369,11 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
         })
     }
 
-    console.log('Scrapper:', marketId + worldNumber, 'scrapped successfully')
+    console.log('Sync: Updating last syncronization date')
 
     await db.query(sql.updateWorldSync, [marketId, worldNumber])
 
-    return marketId + worldNumber + ' synced successfully'
+    return marketId + worldNumber + ' syncronzed'
 }
 
 Sync.markets = async function () {

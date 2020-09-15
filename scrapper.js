@@ -1,8 +1,8 @@
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
-module.exports = function () {
-    console.log('Scrapper: Evaluation init')
+module.exports = function (marketId, worldNumber) {
+    console.log('Scrapper: Start scrapping', marketId + worldNumber)
 
     const $rootScope = injector.get('$rootScope')
     const socketService = injector.get('socketService')
@@ -308,6 +308,8 @@ module.exports = function () {
         }
 
         processFinish()
+
+        console.log('Scrapper: Finished scrapping', marketId + worldNumber)
 
         resolve(worldData)
     })
