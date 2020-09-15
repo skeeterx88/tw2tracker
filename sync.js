@@ -117,15 +117,14 @@ Sync.registerWorlds = async function () {
         return market.account_name && market.account_password
     })
 
-    console.log('enabledMarkets', enabledMarkets)
-
     for (let i = 0; i < enabledMarkets.length; i++) {
         const market = enabledMarkets[i]
+        let account, page, browser
 
         try {
-            const [account, page, browser] = await Sync.auth(market.id, market)
+            [account, page, browser] = await Sync.auth(market.id, market)
 
-            console.log('Missing worlds:', account.worlds)
+            console.log('Sync.registerWorlds: market:' + market.id + ', missing worlds:', account.worlds.length ? account.worlds.map(world => world.id).join(', ') : 'none')
 
             if (account.worlds.length) {
                 for (let j = 0; j < account.worlds.length; j++) {
@@ -135,13 +134,13 @@ Sync.registerWorlds = async function () {
                     await Sync.registerWorld(page, market.id, worldId, world.name)
                 }
 
-                console.log('Sync.registerWorlds: All worlds for', market.id, 'registered')
+                console.log('Sync.registerWorlds: All worlds for market:' + market.id, 'registered')
             } else {
-                console.log('Sync.registerWorlds: All worlds for', market.id, 'already registered')
+                console.log('Sync.registerWorlds: All worlds for market:' + market.id, 'already registered')
             }
 
         } catch (error) {
-            console.log('Sync.registerWorlds: Error while trying to register characters on market', market.id, ' | ', (error.message || error))
+            console.log('Sync.registerWorlds: Error while trying to register characters on market:' + market.id, ' | ', (error.message || error))
             continue
         }
 
@@ -150,7 +149,7 @@ Sync.registerWorlds = async function () {
 }
 
 Sync.registerWorld = async function (page, marketId, worldId, worldName) {
-    console.log('Sync.registerWorld()', marketId, worldId, worldName)
+    console.log('Sync.registerWorld() market:' + marketId + ', world:' + worldId + ', world name:' + worldName)
 
     await page.evaluate(function (marketId, worldId) {
         return new Promise(function (resolve) {
@@ -177,7 +176,7 @@ Sync.registerWorld = async function (page, marketId, worldId, worldName) {
 }
 
 Sync.auth = async function (marketId, { account_name, account_password }) {
-    console.log('Sync.auth()', marketId, account_name)
+    console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
 
     const puppeteer = require('puppeteer-core')
     const browser = await puppeteer.launch({ headless: true, executablePath: '/usr/bin/chromium' })
