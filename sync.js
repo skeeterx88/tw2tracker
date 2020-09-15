@@ -5,30 +5,19 @@ const Scrapper = require('./scrapper.js')
 const fs = require('fs')
 const authenticatedMarkets = {}
 
-const getMarketList = function () {
+const getHTML = function (url) {
     return new Promise(function (resolve) {
         const https = require('https')
         const HTMLParser = require('fast-html-parser')
 
-        https.get('https://en.tribalwars2.com/portal-bar/https/portal-bar.html', function (res) {
+        https.get(url, function (res) {
             res.setEncoding('utf8')
 
             let body = ''
 
-            res.on('data', data => {
-                body += data
-            })
-
+            res.on('data', data => { body += data })
             res.on('end', async function () {
-                const root = HTMLParser.parse(body)
-                const marketElements = root.querySelectorAll('.pb-lang-sec-options a')
-
-                const markets = marketElements.map(function (elem) {
-                    const marketUrl = elem.attributes.href
-                    return marketUrl.split('//')[1].split('.')[0]
-                })
-
-                resolve(markets)
+                resolve(HTMLParser.parse(body))
             })
         })
     })
@@ -380,7 +369,9 @@ Sync.markets = async function () {
     console.log('Sync.markets()')
 
     const storedMarkets = await db.map(sql.markets, [], market => market.id)
-    const marketList = await getMarketList()
+    const $portalBar = await getHTML('https://en.tribalwars2.com/portal-bar/https/portal-bar.html')
+    const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
+    const marketList = $markets.map($market => $market.attributes.href.split('//')[1].split('.')[0])
 
     const addedMarkets = marketList.filter(function (marketId) {
         if (storedMarkets.includes(marketId)) {
