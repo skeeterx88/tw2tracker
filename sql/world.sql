@@ -1,12 +1,11 @@
 SELECT
     market,
-    id,
+    num,
     name,
-    enabled,
     last_sync
 FROM
     worlds
 WHERE
     market = $1
 AND
-    id = $2
+    num = $2

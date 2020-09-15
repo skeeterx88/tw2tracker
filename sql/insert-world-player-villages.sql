@@ -1,4 +1,6 @@
-INSERT INTO villages_by_player
+INSERT INTO ${schema:name}.villages_by_player
     (character_id, villages_id)
 VALUES
-    ($1, $2)
+    (${character_id}, ${villages_id})
+ON CONFLICT (character_id) DO UPDATE
+SET villages_id = excluded.villages_id;

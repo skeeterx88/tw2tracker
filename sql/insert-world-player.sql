@@ -1,4 +1,6 @@
-INSERT INTO players
+INSERT INTO ${schema:name}.players
     (id, name, points)
 VALUES
-    ($1, $2, $3)
+    (${id}, ${name}, ${points})
+ON CONFLICT (id) DO UPDATE 
+SET points = excluded.points;

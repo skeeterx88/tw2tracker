@@ -5,4 +5,4 @@ SET
 WHERE
     market = $1
 AND
-    id = $2
+    num = $2

@@ -1,4 +1,8 @@
-INSERT INTO villages
+INSERT INTO ${schema:name}.villages
     (id, x, y, name, points, character_id)
 VALUES
-    ($1, $2, $3, $4, $5, $6)
+    (${id}, ${x}, ${y}, ${name}, ${points}, ${character_id})
+ON CONFLICT (id) DO UPDATE 
+SET name = excluded.name,
+    points = excluded.points,
+    character_id = excluded.character_id;
