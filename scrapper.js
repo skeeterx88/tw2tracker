@@ -2,6 +2,8 @@
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
 module.exports = function () {
+    console.log('Scrapper: Evaluation init')
+
     const $rootScope = injector.get('$rootScope')
     const socketService = injector.get('socketService')
     const eventTypeProvider = injector.get('eventTypeProvider')
