@@ -2,11 +2,10 @@
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
 module.exports = function () {
+    const $rootScope = injector.get('$rootScope')
     const socketService = injector.get('socketService')
     const eventTypeProvider = injector.get('eventTypeProvider')
     const routeProvider = injector.get('routeProvider')
-    const transferredSharedDataService = injector.get('transferredSharedDataService')
-    const $timeHelper = require('helper/time')
 
     const worldData = {
         villages: {},
@@ -88,20 +87,10 @@ module.exports = function () {
         ]
     }
 
-    const ready = function (callback) {
-        const mapScope = transferredSharedDataService.getSharedData('MapController')
-
-        if (!mapScope) {
-            return setTimeout(function () {
-                ready(callback)
-            }, 250)
-        }
-
-        if (mapScope.isInitialized) {
-            return callback()
-        }
-
-        rootScope.$on(eventTypeProvider.MAP_INITIALIZED, callback)
+    const readyState = function (callback) {
+        return new Promise(function (resolve) {
+            $rootScope.$on(eventTypeProvider.CHARACTER_INFO, resolve)
+        })
     }
 
     const getBoundaries = async function () {
@@ -245,59 +234,57 @@ module.exports = function () {
                 ])
             }
         }
-
-        worldData.updated = $timeHelper.gameDate().toLocaleString('pt-BR')
     }
 
-    return new Promise(function (resolve, reject) {
-        ready(async function () {
-            // assert(function () {
-            //     const result = filterBlocks({
-            //         left: { x: 200 },
-            //         right: { x: 700 },
-            //         top: { y: 200 },
-            //         bottom: { y: 700 }
-            //     });
+    return new Promise(async function (resolve, reject) {
+        await readyState()
 
-            //     const expect = [
-            //         [200, 200],[300, 200],[200, 300],[300, 300],
-            //         [600, 200],[700, 200],[600, 300],[700, 300],
-            //         [200, 600],[300, 600],[200, 700],[300, 700],
-            //         [600, 600],[700, 600],[600, 700],[700, 700],
-            //     ]
+        // assert(function () {
+        //     const result = filterBlocks({
+        //         left: { x: 200 },
+        //         right: { x: 700 },
+        //         top: { y: 200 },
+        //         bottom: { y: 700 }
+        //     });
 
-            //     return JSON.stringify(result) === JSON.stringify(expect)
-            // })
+        //     const expect = [
+        //         [200, 200],[300, 200],[200, 300],[300, 300],
+        //         [600, 200],[700, 200],[600, 300],[700, 300],
+        //         [200, 600],[300, 600],[200, 700],[300, 700],
+        //         [600, 600],[700, 600],[600, 700],[700, 700],
+        //     ]
 
-            // assert(function () {
-            //     const result = filterBlocks({
-            //         left: { x: 300, y: 0 },
-            //         right: { x: 700, y: 0 },
-            //         top: { x: 0, y: 300 },
-            //         bottom: { x: 0, y: 700 }
-            //     });
+        //     return JSON.stringify(result) === JSON.stringify(expect)
+        // })
 
-            //     const expect = [
-            //         [300, 300],[600, 300],[700, 300],[300, 600],
-            //         [300, 700],[600, 600],[700, 600],[600, 700],
-            //         [700, 700]
-            //     ]
+        // assert(function () {
+        //     const result = filterBlocks({
+        //         left: { x: 300, y: 0 },
+        //         right: { x: 700, y: 0 },
+        //         top: { x: 0, y: 300 },
+        //         bottom: { x: 0, y: 700 }
+        //     });
 
-            //     return JSON.stringify(result) === JSON.stringify(expect)
-            // })
+        //     const expect = [
+        //         [300, 300],[600, 300],[700, 300],[300, 600],
+        //         [300, 700],[600, 600],[700, 600],[600, 700],
+        //         [700, 700]
+        //     ]
 
-            const boundaries = await getBoundaries()
-            const missingBlocks = filterBlocks(boundaries)
+        //     return JSON.stringify(result) === JSON.stringify(expect)
+        // })
 
-            for (let i = 0; i < missingBlocks.length; i++) {
-                const [x, y] = missingBlocks[i]
+        const boundaries = await getBoundaries()
+        const missingBlocks = filterBlocks(boundaries)
 
-                await loadMapChunk(x, y)
-            }
+        for (let i = 0; i < missingBlocks.length; i++) {
+            const [x, y] = missingBlocks[i]
 
-            processFinish()
+            await loadMapChunk(x, y)
+        }
 
-            resolve(worldData)
-        })
+        processFinish()
+
+        resolve(worldData)
     })
 }
