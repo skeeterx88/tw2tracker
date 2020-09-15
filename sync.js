@@ -112,16 +112,18 @@ const Sync = {}
 Sync.all = async function () {
     const browser = await createPuppeteerInstance()
     await Sync.registerWorlds(browser)
+    await browser.close()
 }
 
 Sync.registerWorlds = async function (browser) {
     console.log('Sync.registerWorlds()')
 
     const markets = await db.any(sql.markets)
+    const enabledMarkets = markets.filter(market => market.account_name && market.account_password)
 
-    const enabledMarkets = markets.filter(function (market) {
-        return market.account_name && market.account_password
-    })
+    if (!enabledMarkets.length) {
+        console.log('Sync.registerWorlds: No enabled markets')
+    }
 
     for (let i = 0; i < enabledMarkets.length; i++) {
         const market = enabledMarkets[i]
@@ -144,6 +146,22 @@ Sync.registerWorlds = async function (browser) {
             } else {
                 console.log('Sync.registerWorlds: All worlds for market:' + market.id, 'already registered')
             }
+
+            // Create world schema for existing character in case it was not
+            // created before.
+            if (account.characters.length) {
+                for (let c = 0; c < account.characters.length; c++) {
+                    const character = account.characters[c]
+                    const worldNumber = parseInt(character.world_id.match(/\d+/)[0], 10)
+                    const worldSchema = await db.one(sql.worldSchemaExists, [character.world_id])
+
+                    if (!worldSchema.exists) {
+                        console.log('Sync.registerWorlds: Creating schema for', character.world_id)
+                        await db.query(sql.createWorldSchema, { schema: character.world_id })
+                        await db.query(sql.addWorld, [market.id, worldNumber, character.world_name])
+                    }
+                }
+            }
         } catch (error) {
             console.log('Sync.registerWorlds: Error while trying to register characters on market:' + market.id, ' | ', (error.message || error))
             continue
@@ -151,6 +169,8 @@ Sync.registerWorlds = async function (browser) {
 
         page.close()
     }
+
+    console.log('Sync.registerWorlds: Finish')
 }
 
 Sync.registerWorld = async function (page, marketId, worldId, worldName) {
@@ -172,6 +192,10 @@ Sync.registerWorld = async function (page, marketId, worldId, worldName) {
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {
         waitUntil: ['domcontentloaded', 'networkidle0']
     })
+
+    console.log('Sync.registerWorlds: Creating schema for', marketId + worldId)
+    await db.query(sql.createWorldSchema, { schema: marketId + worldId })
+    await db.query(sql.addWorld, [marketId, worldId, worldName])
 
     console.log('Sync.registerWorld:', 'character for', marketId + worldId, 'created')
 
