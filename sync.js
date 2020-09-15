@@ -290,9 +290,11 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
         }
     })
 
-    await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
-    await page.waitForSelector('#map', { timeout: 10000 })
-    await page.waitFor(2500)
+    if (marketId === 'beta') {
+        await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=zz${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
+    } else {
+        await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
+    }
 
     console.log('Scrapper: Start scrapping', marketId + worldNumber)
 
