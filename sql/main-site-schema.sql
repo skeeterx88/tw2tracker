@@ -1,5 +1,3 @@
--- BASE
-
 DROP SCHEMA IF EXISTS public CASCADE;
 CREATE SCHEMA public;
 SET TIMEZONE='UTC';
@@ -24,8 +22,3 @@ CREATE TABLE worlds (
 );
 
 INSERT INTO settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 1);
-
--- INSERT INTO markets (id, account_name, account_password, enabled) VALUES ('beta', 'tribalwarstracker', '2tribalwarstracker2', TRUE);
-
--- INSERT INTO worlds (market, id, name, enabled, last_sync) VALUES ('br', 48, 'Visegrád', TRUE, NOW() AT TIME ZONE 'UTC');
--- INSERT INTO worlds (market, id, name, enabled, last_sync) VALUES ('br', 46, 'Tzschocha', TRUE, NOW() AT TIME ZONE 'UTC');
