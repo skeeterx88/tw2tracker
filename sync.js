@@ -102,13 +102,19 @@ const insertWorldData = async function (dbWorld, worldData) {
     }
 }
 
+const createPuppeteerInstance = async function () {
+    const puppeteer = require('puppeteer-core')
+    return await puppeteer.launch({ headless: true, executablePath: '/usr/bin/chromium' })
+}
+
 const Sync = {}
 
 Sync.all = async function () {
-    
+    const browser = await createPuppeteerInstance()
+    await Sync.registerWorlds(browser)
 }
 
-Sync.registerWorlds = async function () {
+Sync.registerWorlds = async function (browser) {
     console.log('Sync.registerWorlds()')
 
     const markets = await db.any(sql.markets)
@@ -119,10 +125,10 @@ Sync.registerWorlds = async function () {
 
     for (let i = 0; i < enabledMarkets.length; i++) {
         const market = enabledMarkets[i]
-        let account, page, browser
+        let account, page
 
         try {
-            [account, page, browser] = await Sync.auth(market.id, market)
+            [account, page] = await Sync.auth(browser, market.id, market)
 
             console.log('Sync.registerWorlds: market:' + market.id + ', missing worlds:', account.worlds.length ? account.worlds.map(world => world.id).join(', ') : 'none')
 
@@ -138,13 +144,12 @@ Sync.registerWorlds = async function () {
             } else {
                 console.log('Sync.registerWorlds: All worlds for market:' + market.id, 'already registered')
             }
-
         } catch (error) {
             console.log('Sync.registerWorlds: Error while trying to register characters on market:' + market.id, ' | ', (error.message || error))
             continue
         }
 
-        browser.close()
+        page.close()
     }
 }
 
@@ -175,11 +180,9 @@ Sync.registerWorld = async function (page, marketId, worldId, worldName) {
     return true
 }
 
-Sync.auth = async function (marketId, { account_name, account_password }) {
+Sync.auth = async function (browser, marketId, { account_name, account_password }) {
     console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
 
-    const puppeteer = require('puppeteer-core')
-    const browser = await puppeteer.launch({ headless: true, executablePath: '/usr/bin/chromium' })
     const page = await browser.newPage()
 
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {
@@ -230,18 +233,19 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
         waitUntil: ['domcontentloaded', 'networkidle0']
     })
 
-    return [account, page, browser]
+    return [account, page]
 }
 
 Sync.scrappeAll = async function (callback) {
     const worlds = await db.any(sql.worlds)
+    const browser = await createPuppeteerInstance()
 
     worlds.forEach(async function (world) {
-        await Sync.scrappeWorld(world.market, world.id)
+        await Sync.scrappeWorld(browser, world.market, world.id)
     })
 }
 
-Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
+Sync.scrappeWorld = async function (browser, marketId, worldId, callback = utils.noop) {
     const accountCredentials = await db.one(sql.enabledMarket, [marketId])
     const worldInfo = await db.one(sql.world, [marketId, worldId])
     const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
@@ -251,7 +255,7 @@ Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
         throw new Error(marketId + worldId + ' already syncronized')
     }
 
-    const [account, page, browser] = await Sync.auth(marketId, accountCredentials)
+    const [account, page] = await Sync.auth(browser, marketId, accountCredentials)
 
     console.log('Scrapper: Start scrapping', marketId + worldId)
 
@@ -265,7 +269,7 @@ Sync.scrappeWorld = async function (marketId, worldId, callback = utils.noop) {
     await insertWorldData(dbWorld, worldData)
 
     console.log('Scrapper:', marketId + worldId, 'scrapped successfully')
-    browser.close()
+    page.close()
 
     await db.query(sql.updateWorldSync, [marketId, worldId])
     

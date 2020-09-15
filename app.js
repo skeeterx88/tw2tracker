@@ -81,7 +81,7 @@ app.use(function (err, req, res, next) {
 
 ;(async () => {
     const Sync = require('./sync')
-    await Sync.registerWorlds()
+    await Sync.all()
 })()
 
 module.exports = app
