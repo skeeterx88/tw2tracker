@@ -158,6 +158,11 @@ Sync.registerWorlds = async function (browser) {
                     if (!worldSchema.exists) {
                         console.log('Sync.registerWorlds: Creating schema for', character.world_id)
                         await db.query(sql.createWorldSchema, { schema: character.world_id })
+                    }
+
+                    const worldRow = await db.one(sql.worldExists, [market.id, worldNumber])
+
+                    if (!worldRow.exists) {
                         await db.query(sql.addWorld, [market.id, worldNumber, character.world_name])
                     }
                 }
