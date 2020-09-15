@@ -33,75 +33,6 @@ const getMarketList = function () {
     })
 }
 
-const connectWorldDatabase = async function (marketId, worldId) {
-    const settings = await db.one(sql.settings)
-    const pgp = require('pg-promise')()
-    return pgp({
-        user: settings.db_user,
-        host: settings.db_host,
-        database: 'tw2tracker-' + marketId + worldId,
-        password: settings.db_password,
-        port: settings.db_port
-    })
-}
-
-const insertWorldData = async function (dbWorld, worldData) {
-    const {villages, villagesByPlayer, players, tribes, updated} = worldData
-
-    for (let id in tribes) {
-        const [name, tag, points] = tribes[id]
-
-        await dbWorld.query(sql.insertWorldTribe, [
-            parseInt(id, 10),
-            name,
-            tag,
-            points
-        ])
-    }
-
-    for (let id in players) {
-        const [name, points] = players[id]
-
-        await dbWorld.query(sql.insertWorldPlayer, [
-            parseInt(id, 10),
-            name,
-            points
-        ])
-    }
-
-    for (let x in villages) {
-        for (let y in villages[x]) {
-            const [id, name, points, character_id] = villages[x][y]
-
-            await dbWorld.query(sql.insertWorldVillage, [
-                parseInt(id, 10),
-                x,
-                y,
-                name,
-                points,
-                character_id || null
-            ])
-        }
-    }
-
-    for (let character_id in villagesByPlayer) {
-        const playerVillagesCoords = villagesByPlayer[character_id]
-        const playerVillages = []
-
-        for (let i = 0; i < playerVillagesCoords.length; i++) {
-            const [x, y] = playerVillagesCoords[i]
-            const villageId = villages[x][y][0]
-
-            playerVillages.push(villageId)
-        }
-
-        await dbWorld.query(sql.insertWorldPlayerVillages, [
-            parseInt(character_id, 10),
-            playerVillages
-        ])
-    }
-}
-
 const createPuppeteerInstance = async function () {
     const puppeteer = require('puppeteer-core')
     return await puppeteer.launch({ headless: true, executablePath: '/usr/bin/chromium' })
@@ -125,20 +56,18 @@ const checkWorldEntryExists = async function (marketId, worldNumber) {
 const Sync = {}
 
 Sync.init = async function () {
-    // const browser = await createPuppeteerInstance()
-    // const account = await Sync.auth(browser, 'br', {
-    //     account_name: 'tribalwarstracker',
-    //     account_password: 'tribalwarstracker'
-    // })
+    try {
+        // reset db init
+        // await db.query(sql.mainSiteSchema)
+        // await Sync.markets()
+        // await db.query(sql.createWorldSchema, {schema: 'br48'})
+        // await db.query(sql.addWorldEntry, ['br', 48, 'Auto'])
 
-    // console.log('account', account)
-
-    // await Sync.getAllWorlds(browser)
-    // await Sync.registerCharacter(browser, 'cz', 47)
-    // await Sync.markets()
-    // await Sync.registerWorlds(browser)
-
-    // await browser.close()
+        // const browser = await createPuppeteerInstance()
+        // await browser.close()
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 Sync.getAllWorlds = async function (browser) {
@@ -184,8 +113,6 @@ Sync.getAllWorlds = async function (browser) {
         if (nonFullWorlds.length) {
             availableWorlds[market.id] = formatedNonFullWorlds
         }
-
-        page.close()
     }
 
     return [allWorlds, availableWorlds]
@@ -248,7 +175,7 @@ Sync.registerCharacter = async function (browser, marketId, worldNumber) {
 
     await page.waitFor(3000)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
-    // await page.close()
+    await page.close()
 
     console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
 }
@@ -307,44 +234,112 @@ Sync.auth = async function (browser, marketId, { account_name, account_password 
     return account
 }
 
-Sync.scrappeAll = async function (callback) {
-    const worlds = await db.any(sql.worlds)
-    const browser = await createPuppeteerInstance()
+Sync.scrappeAll = async function (browser) {
+    console.log('Sync.scrappeAll()')
 
-    worlds.forEach(async function (world) {
-        await Sync.scrappeWorld(browser, world.market, world.id)
-    })
+    const worlds = await db.any(sql.worlds)
+
+    for (let world of worlds) {
+        await Sync.scrappeWorld(browser, world.market, world.num)
+    }
 }
 
-Sync.scrappeWorld = async function (browser, marketId, worldId, callback = utils.noop) {
-    const accountCredentials = await db.one(sql.enabledMarket, [marketId])
-    const worldInfo = await db.one(sql.world, [marketId, worldId])
-    const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
-    const settings = await db.one(sql.settings)
+Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
+    console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
-    if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-        throw new Error(marketId + worldId + ' already syncronized')
+    const accountCredentials = await db.one(sql.enabledMarket, [marketId])
+    const worldInfo = await db.one(sql.world, [marketId, worldNumber])
+
+    if (worldInfo.last_sync) {
+        const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
+        const settings = await db.one(sql.settings)
+
+        if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
+            throw new Error(marketId + worldNumber + ' already syncronized')
+        }
     }
 
-    const [account, page] = await Sync.auth(browser, marketId, accountCredentials)
+    const account = await Sync.auth(browser, marketId, accountCredentials)
+    const page = await browser.newPage()
 
-    console.log('Scrapper: Start scrapping', marketId + worldId)
+    page.on('console', function (msg) {
+        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
+            console.log(msg._text)
+        }
+    })
 
-    const dbWorld = connectWorldDatabase(marketId, worldId)
-
-    await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=${marketId}${worldId}&character_id=${account.account_id}`)
-    await page.waitFor(2500)
+    await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
     await page.waitForSelector('#map', { timeout: 10000 })
+    await page.waitFor(2500)
+
+    console.log('Scrapper: Start scrapping', marketId + worldNumber)
+
     const worldData = await page.evaluate(Scrapper)
+    await page.close()
+    const schema = marketId + worldNumber
 
-    await insertWorldData(dbWorld, worldData)
+    for (let id in worldData.tribes) {
+        const [name, tag, points] = worldData.tribes[id]
 
-    console.log('Scrapper:', marketId + worldId, 'scrapped successfully')
-    page.close()
+        await db.query(sql.insertWorldTribe, {
+            schema: schema,
+            id: parseInt(id, 10),
+            name: name,
+            tag: tag,
+            points: points
+        })
+    }
 
-    await db.query(sql.updateWorldSync, [marketId, worldId])
+    for (let id in worldData.players) {
+        const [name, points] = worldData.players[id]
 
-    return marketId + worldId + ' synced successfully'
+        await db.query(sql.insertWorldPlayer, {
+            schema: schema,
+            id: parseInt(id, 10),
+            name: name,
+            points: points
+        })
+    }
+
+    for (let x in worldData.villages) {
+        for (let y in worldData.villages[x]) {
+            const [id, name, points, character_id] = worldData.villages[x][y]
+
+            await db.query(sql.insertWorldVillage, {
+                schema: schema,
+                id: parseInt(id, 10),
+                x: x,
+                y: y,
+                name: name,
+                points: points,
+                character_id: character_id || null
+            })
+        }
+    }
+
+    for (let character_id in worldData.villagesByPlayer) {
+        const playerVillagesCoords = worldData.villagesByPlayer[character_id]
+        const playerVillages = []
+
+        for (let i = 0; i < playerVillagesCoords.length; i++) {
+            const [x, y] = playerVillagesCoords[i]
+            const villageId = worldData.villages[x][y][0]
+
+            playerVillages.push(villageId)
+        }
+
+        await db.query(sql.insertWorldPlayerVillages, {
+            schema: schema,
+            character_id: parseInt(character_id, 10),
+            villages_id: playerVillages
+        })
+    }
+
+    console.log('Scrapper:', marketId + worldNumber, 'scrapped successfully')
+
+    await db.query(sql.updateWorldSync, [marketId, worldNumber])
+
+    return marketId + worldNumber + ' synced successfully'
 }
 
 Sync.markets = async function () {
