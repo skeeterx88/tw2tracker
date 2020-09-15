@@ -88,8 +88,26 @@ module.exports = function () {
     }
 
     const readyState = function (callback) {
-        return new Promise(function (resolve) {
-            $rootScope.$on(eventTypeProvider.CHARACTER_INFO, resolve)
+        return new Promise(function (resolve, reject) {
+            const timeout = setTimeout(function () {
+                if (document.querySelector('.modal-establish-village')) {
+                    return resolve()
+                }
+
+                const transferredSharedDataService = injector.get('transferredSharedDataService')
+                const mapScope = transferredSharedDataService.getSharedData('MapController')
+
+                if (mapScope && mapScope.isInitialized) {
+                    return resolve()
+                }
+
+                reject()
+            }, 10000)
+
+            $rootScope.$on(eventTypeProvider.CHARACTER_INFO, function () {
+                clearTimeout(timeout)
+                resolve()
+            })
         })
     }
 
