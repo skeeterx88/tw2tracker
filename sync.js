@@ -249,8 +249,8 @@ Sync.auth = async function (browser, marketId, { account_name, account_password 
     }
 }
 
-Sync.scrappeAll = async function (browser) {
-    console.log('Sync.scrappeAll()')
+Sync.scrappeAllWorlds = async function (browser) {
+    console.log('Sync.scrappeAllWorlds()')
 
     const worlds = await db.any(sql.worlds)
 
