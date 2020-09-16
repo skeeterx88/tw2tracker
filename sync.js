@@ -170,7 +170,7 @@ Sync.registerCharacter = async function (browser, marketId, worldNumber) {
     console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
 }
 
-Sync.auth = async function (browser, marketId, { account_name, account_password }, _tries = 0) {
+Sync.auth = async function (browser, marketId, { account_name, account_password }) {
     if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
         const account = authenticatedMarkets[marketId]
         console.log('Sync.auth() market:' + marketId + ', already authenticated with account', account.name)
@@ -209,7 +209,9 @@ Sync.auth = async function (browser, marketId, { account_name, account_password 
         }, account_name, account_password)
 
         if (!account) {
-            throw new Error('Sync: Authentication failed')
+            const errorMessage = await page.$eval('.login-error .error-message', $elem => $elem.textContent)
+
+            throw new Error('Sync.auth: Authentication to market:' + marketId + ' failed "' + errorMessage + '"')
         }
 
         await page.setCookie({
@@ -228,13 +230,22 @@ Sync.auth = async function (browser, marketId, { account_name, account_password 
             session: false
         })
 
-        await page.close()
+        await page.goto(`https://${urlId}.tribalwars2.com/page`, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+
+        try {
+            await page.waitForSelector('.player-worlds', { timeout: 3000 })
+        } catch (error) {
+            await page.close()
+            throw new Error('Sync.auth: Authentication to market:' + marketId + ' failed "unknown reason"')
+        }
 
         authenticatedMarkets[marketId] = account
 
+        await page.close()
         return account
     } catch (error) {
-        return await Sync.auth(browser, marketId, { account_name, account_password }, ++_tries)
+        await page.close()
+        throw new Error(error.message)
     }
 }
 
