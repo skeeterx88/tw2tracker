@@ -177,16 +177,14 @@ Sync.auth = async function (browser, marketId, { account_name, account_password 
         return account
     }
 
-    if (_tries >= 3) {
-        return false
-    }
-
     console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
 
-    try {
-        const page = await browser.newPage()
+    const page = await browser.newPage()
 
-        await page.goto(`https://${marketId}.tribalwars2.com/page`, {
+    try {
+        const urlId = marketId === 'zz' ? 'beta' : marketId
+
+        await page.goto(`https://${urlId}.tribalwars2.com/page`, {
             waitUntil: ['domcontentloaded', 'networkidle0']
         })
 
@@ -221,7 +219,7 @@ Sync.auth = async function (browser, marketId, { account_name, account_password 
                 playerName: account.name,
                 autologin: true
             }),
-            domain: `.${marketId}.tribalwars2.com`,
+            domain: `.${urlId}.tribalwars2.com`,
             path: '/',
             expires: 2147482647,
             size: 149,
@@ -257,6 +255,7 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
 
     const accountCredentials = await db.one(sql.enabledMarket, [marketId])
     const worldInfo = await db.one(sql.world, [marketId, worldNumber])
+    const urlId = marketId === 'zz' ? 'beta' : marketId
 
     if (worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
@@ -281,11 +280,7 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
         }
     })
 
-    if (marketId === 'beta') {
-        await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=zz${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
-    } else {
-        await page.goto(`https://${marketId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
-    }
+    await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
 
     let worldData
 
@@ -374,6 +369,10 @@ Sync.markets = async function () {
     const marketList = $markets.map($market => $market.attributes.href.split('//')[1].split('.')[0])
 
     const addedMarkets = marketList.filter(function (marketId) {
+        if (marketId === 'beta') {
+            marketId = 'zz'
+        }
+
         if (storedMarkets.includes(marketId)) {
             return false
         } else {
