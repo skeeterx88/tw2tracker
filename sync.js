@@ -53,8 +53,9 @@ Sync.init = async function () {
         // await db.query(sql.createWorldSchema, {schema: 'br48'})
         // await db.query(sql.addWorldEntry, ['br', 48, 'Auto'])
 
-        // const browser = await createPuppeteerInstance()
-        // await browser.close()
+        const browser = await createPuppeteerInstance()
+        await Sync.scrappeWorld(browser, 'br', 48)
+        await browser.close()
     } catch (error) {
         console.log(error.message)
     }
@@ -338,35 +339,6 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
                 })
             }
         }
-<<<<<<< HEAD
-
-        for (let character_id in worldData.villagesByPlayer) {
-            const playerVillagesCoords = worldData.villagesByPlayer[character_id]
-            const playerVillages = []
-
-            for (let i = 0; i < playerVillagesCoords.length; i++) {
-                const [x, y] = playerVillagesCoords[i]
-                const villageId = worldData.villages[x][y][0]
-
-                playerVillages.push(villageId)
-            }
-
-            await db.query(sql.insertWorldPlayerVillages, {
-                schema: schema,
-                character_id: parseInt(character_id, 10),
-                villages_id: playerVillages
-            })
-        }
-
-        console.log('Sync.scrappeWorld: Updating last syncronization date')
-
-        await db.query(sql.updateWorldSync, [marketId, worldNumber])
-
-        return true
-    } catch (error) {
-        await page.close()
-        throw new Error('Sync.scrappeWorld: Failed to syncronize ' + marketId + worldNumber + ' "' + error.message + '"')
-=======
 
         for (let character_id in worldData.villagesByPlayer) {
             const playerVillagesCoords = worldData.villagesByPlayer[character_id]
@@ -394,7 +366,6 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
     } catch (error) {
         await page.close()
         throw new Error('Sync.scrappeWorld: Failed to syncronize ' + marketId + worldNumber + ' (' + error.message + ')')
->>>>>>> 5a8cd24... Sync: Improve error handling + better logging.
     }
 }
 
