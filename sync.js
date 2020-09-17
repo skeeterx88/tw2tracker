@@ -56,7 +56,7 @@ Sync.init = async function () {
         // const browser = await createPuppeteerInstance()
         // await browser.close()
     } catch (error) {
-        console.log(error)
+        console.log(error.message)
     }
 }
 
@@ -103,6 +103,8 @@ Sync.getAllWorlds = async function (browser) {
         if (nonFullWorlds.length) {
             availableWorlds[market.id] = formatedNonFullWorlds
         }
+
+        console.log('Sync.getAllWorlds: market:' + market.id + ' worlds:', allWorlds[market.id].map(world => world.worldNumber).join(','))
     }
 
     return [allWorlds, availableWorlds]
@@ -112,9 +114,6 @@ Sync.registerWorlds = async function (browser) {
     console.log('Sync.registerWorlds()')
 
     const [allWorlds, availableWorlds] = await Sync.getAllWorlds(browser)
-
-    console.log('allWorlds', allWorlds)
-    console.log('availableWorlds', availableWorlds)
 
     for (let [marketId, marketWorlds] of Object.entries(availableWorlds)) {
         for (let i = 0; i < marketWorlds.length; i++) {
@@ -255,10 +254,14 @@ Sync.scrappeAllWorlds = async function (browser) {
     const worlds = await db.any(sql.worlds)
 
     for (let world of worlds) {
-        const scrappeResult = await Sync.scrappeWorld(browser, world.market, world.num)
-
-        console.log('Sync:', scrappeResult)
+        try {
+            await Sync.scrappeWorld(browser, world.market, world.num)
+        } catch (error) {
+            console.log(error.message)
+        }
     }
+
+    console.log('Sync.scrappeAllWorlds: Finished')
 }
 
 Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
@@ -335,6 +338,7 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
                 })
             }
         }
+<<<<<<< HEAD
 
         for (let character_id in worldData.villagesByPlayer) {
             const playerVillagesCoords = worldData.villagesByPlayer[character_id]
@@ -362,6 +366,35 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
     } catch (error) {
         await page.close()
         throw new Error('Sync.scrappeWorld: Failed to syncronize ' + marketId + worldNumber + ' "' + error.message + '"')
+=======
+
+        for (let character_id in worldData.villagesByPlayer) {
+            const playerVillagesCoords = worldData.villagesByPlayer[character_id]
+            const playerVillages = []
+
+            for (let i = 0; i < playerVillagesCoords.length; i++) {
+                const [x, y] = playerVillagesCoords[i]
+                const villageId = worldData.villages[x][y][0]
+
+                playerVillages.push(villageId)
+            }
+
+            await db.query(sql.insertWorldPlayerVillages, {
+                schema: schema,
+                character_id: parseInt(character_id, 10),
+                villages_id: playerVillages
+            })
+        }
+
+        await db.query(sql.updateWorldSync, [marketId, worldNumber])
+
+        console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
+
+        return true
+    } catch (error) {
+        await page.close()
+        throw new Error('Sync.scrappeWorld: Failed to syncronize ' + marketId + worldNumber + ' (' + error.message + ')')
+>>>>>>> 5a8cd24... Sync: Improve error handling + better logging.
     }
 }
 
