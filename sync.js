@@ -273,14 +273,10 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
         const settings = await db.one(sql.settings)
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-            return marketId + worldNumber + ' already syncronized'
+            console.log('Sync.scrappeWorld: ' + marketId + worldNumber + ' already sincronized')
+
+            return true
         }
-    }
-
-    const account = await Sync.auth(browser, marketId, accountCredentials)
-
-    if (!account) {
-        return marketId + worldNumber + ' failed to syncronize'
     }
 
     const page = await browser.newPage()
@@ -291,84 +287,82 @@ Sync.scrappeWorld = async function (browser, marketId, worldNumber) {
         }
     })
 
-    await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
-
-    let worldData
-
     try {
-        worldData = await page.evaluate(Scrapper, marketId, worldNumber)
-    } catch (error) {
+        const account = await Sync.auth(browser, marketId, accountCredentials)
+        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
+        const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
         await page.close()
-        return marketId + worldNumber + ' failed to syncronize'
-    }
 
-    await page.close()
-    const schema = marketId + worldNumber
+        const schema = marketId + worldNumber
 
-    console.log('Sync: Inseting data into the database')
+        console.log('Sync.scrappeWorld: Inseting ' + marketId + worldNumber + ' data into database')
 
-    for (let id in worldData.tribes) {
-        const [name, tag, points] = worldData.tribes[id]
+        for (let id in worldData.tribes) {
+            const [name, tag, points] = worldData.tribes[id]
 
-        await db.query(sql.insertWorldTribe, {
-            schema: schema,
-            id: parseInt(id, 10),
-            name: name,
-            tag: tag,
-            points: points
-        })
-    }
-
-    for (let id in worldData.players) {
-        const [name, points] = worldData.players[id]
-
-        await db.query(sql.insertWorldPlayer, {
-            schema: schema,
-            id: parseInt(id, 10),
-            name: name,
-            points: points
-        })
-    }
-
-    for (let x in worldData.villages) {
-        for (let y in worldData.villages[x]) {
-            const [id, name, points, character_id] = worldData.villages[x][y]
-
-            await db.query(sql.insertWorldVillage, {
+            await db.query(sql.insertWorldTribe, {
                 schema: schema,
                 id: parseInt(id, 10),
-                x: x,
-                y: y,
                 name: name,
-                points: points,
-                character_id: character_id || null
+                tag: tag,
+                points: points
             })
         }
-    }
 
-    for (let character_id in worldData.villagesByPlayer) {
-        const playerVillagesCoords = worldData.villagesByPlayer[character_id]
-        const playerVillages = []
+        for (let id in worldData.players) {
+            const [name, points] = worldData.players[id]
 
-        for (let i = 0; i < playerVillagesCoords.length; i++) {
-            const [x, y] = playerVillagesCoords[i]
-            const villageId = worldData.villages[x][y][0]
-
-            playerVillages.push(villageId)
+            await db.query(sql.insertWorldPlayer, {
+                schema: schema,
+                id: parseInt(id, 10),
+                name: name,
+                points: points
+            })
         }
 
-        await db.query(sql.insertWorldPlayerVillages, {
-            schema: schema,
-            character_id: parseInt(character_id, 10),
-            villages_id: playerVillages
-        })
+        for (let x in worldData.villages) {
+            for (let y in worldData.villages[x]) {
+                const [id, name, points, character_id] = worldData.villages[x][y]
+
+                await db.query(sql.insertWorldVillage, {
+                    schema: schema,
+                    id: parseInt(id, 10),
+                    x: x,
+                    y: y,
+                    name: name,
+                    points: points,
+                    character_id: character_id || null
+                })
+            }
+        }
+
+        for (let character_id in worldData.villagesByPlayer) {
+            const playerVillagesCoords = worldData.villagesByPlayer[character_id]
+            const playerVillages = []
+
+            for (let i = 0; i < playerVillagesCoords.length; i++) {
+                const [x, y] = playerVillagesCoords[i]
+                const villageId = worldData.villages[x][y][0]
+
+                playerVillages.push(villageId)
+            }
+
+            await db.query(sql.insertWorldPlayerVillages, {
+                schema: schema,
+                character_id: parseInt(character_id, 10),
+                villages_id: playerVillages
+            })
+        }
+
+        console.log('Sync.scrappeWorld: Updating last syncronization date')
+
+        await db.query(sql.updateWorldSync, [marketId, worldNumber])
+
+        return true
+    } catch (error) {
+        await page.close()
+        throw new Error('Sync.scrappeWorld: Failed to syncronize ' + marketId + worldNumber + ' "' + error.message + '"')
     }
-
-    console.log('Sync: Updating last syncronization date')
-
-    await db.query(sql.updateWorldSync, [marketId, worldNumber])
-
-    return marketId + worldNumber + ' syncronzed'
 }
 
 Sync.markets = async function () {
