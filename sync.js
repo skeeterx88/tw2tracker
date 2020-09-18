@@ -61,8 +61,8 @@ Sync.init = async function () {
     }
 }
 
-Sync.getAllWorlds = async function (browser) {
-    console.log('Sync.getAllWorlds()')
+Sync.fetchAllWorlds = async function (browser) {
+    console.log('Sync.fetchAllWorlds()')
 
     const markets = (await db.any(sql.markets)).filter(market => market.account_name && market.account_password)
     const allWorlds = {}
@@ -105,7 +105,7 @@ Sync.getAllWorlds = async function (browser) {
             availableWorlds[market.id] = formatedNonFullWorlds
         }
 
-        console.log('Sync.getAllWorlds: market:' + market.id + ' worlds:', allWorlds[market.id].map(world => world.worldNumber).join(','))
+        console.log('Sync.fetchAllWorlds: market:' + market.id + ' worlds:', allWorlds[market.id].map(world => world.worldNumber).join(','))
     }
 
     return [allWorlds, availableWorlds]
@@ -114,7 +114,7 @@ Sync.getAllWorlds = async function (browser) {
 Sync.registerWorlds = async function (browser) {
     console.log('Sync.registerWorlds()')
 
-    const [allWorlds, availableWorlds] = await Sync.getAllWorlds(browser)
+    const [allWorlds, availableWorlds] = await Sync.fetchAllWorlds(browser)
 
     for (let [marketId, marketWorlds] of Object.entries(availableWorlds)) {
         for (let i = 0; i < marketWorlds.length; i++) {
