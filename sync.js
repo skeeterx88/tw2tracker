@@ -393,4 +393,74 @@ Sync.markets = async function () {
     return addedMarkets
 }
 
+Sync.genWorldBlocks = async function (marketId, worldNumber) {
+    console.log('Sync.genWorldBlocks()', marketId + worldNumber)
+
+    const worldId = marketId + worldNumber
+    const players = await db.any(sql.worldData, { worldId, table: 'players' })
+    const villages = await db.any(sql.worldData, { worldId, table: 'villages' })
+    const tribes = await db.any(sql.worldData, { worldId, table: 'tribes' })
+
+    const parsedPlayers = {}
+    const parsedTribes = {}
+    const continents = {}
+
+    const fs = require('fs')
+    const path = require('path')
+    const dataPath = path.join('.', 'data', worldId)
+
+    await fs.promises.mkdir(dataPath, { recursive: true })
+
+    for (let village of villages) {
+        let { id, x, y, name, points, character_id } = village
+
+        let kx
+        let ky
+
+        if (x < 100) {
+            kx = '0'
+        } else {
+            kx = String(x)[0]
+        }
+
+        if (y < 100) {
+            ky = '0'
+        } else {
+            ky = String(y)[0]
+        }
+
+        const k = parseInt(ky + kx, 10)
+
+        if (!continents.hasOwnProperty(k)) {
+            continents[k] = {}
+        }
+
+        if (!continents[k].hasOwnProperty(x)) {
+            continents[k][x] = []
+        }
+
+        continents[k][x].push([ y, id, name, points, character_id || 0 ])
+    }
+
+    for (let k in continents) {
+        const data = JSON.stringify(continents[k])
+        await fs.promises.writeFile(path.join(dataPath, k + '.json'), data)
+    }
+
+    for (let { id, name, tribe_id, points } of players) {
+        parsedPlayers[id] = [name, tribe_id || 0, points]
+    }
+
+    for (let { id, name, tag, points } of tribes) {
+        parsedTribes[id] = [name, tag, points]
+    }
+
+    await fs.promises.writeFile(path.join(dataPath, 'players.json'), JSON.stringify(parsedPlayers))
+    await fs.promises.writeFile(path.join(dataPath, 'tribes.json'), JSON.stringify(parsedTribes))
+
+    console.log('Sync.genWorldBlocks:', worldId, 'finished')
+
+    return true
+}
+
 module.exports = Sync
