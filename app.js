@@ -16,6 +16,7 @@ const adminRouter = require('./routes/admin')
 const loginRouter = require('./routes/login')
 const logoutRouter = require('./routes/logout')
 const mapsRouter = require('./routes/maps')
+const testRouter = require('./routes/test')
 
 const app = express()
 
@@ -64,6 +65,7 @@ app.use('/admin', adminRouter)
 app.use('/login', loginRouter)
 app.use('/logout', logoutRouter)
 app.use('/maps', mapsRouter)
+app.use('/test', testRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -81,9 +83,9 @@ app.use(function (err, req, res, next) {
     res.render('error')
 })
 
-;(async () => {
-    const Sync = require('./sync')
-    await Sync.init()
-})()
+// ;(async function () {
+//     const Sync = require('./sync')
+//     Sync.init()
+// })()
 
 module.exports = app

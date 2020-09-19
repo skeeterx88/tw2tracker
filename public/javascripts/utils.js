@@ -10,3 +10,7 @@ const ajaxPost = async function (url = '', data = {}) {
 
     return response.json()
 }
+
+const boundNumber = function (value, min, max) {
+    return Math.min(max, Math.max(parseInt(value, 10), min))
+}

@@ -100,7 +100,7 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId', async function 
         return false
     }
 
-    if (!continentId || continentId < 0 || continentId > 99) {
+    if (continentId < 0 || continentId > 99) {
         res.status(400)
         res.send('Invalid API call')
         return false

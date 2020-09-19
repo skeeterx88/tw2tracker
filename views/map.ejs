@@ -3,9 +3,16 @@
     <head>
         <title><%= title %></title>
         <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel='stylesheet' href='/stylesheets/map.css' />
+        <script type="text/javascript">
+            const marketId = '<%= marketId %>'
+            const worldNumber = <%= worldNumber %>
+        </script>
     </head>
     <body>
-        <h1><%= title %></h1>
+        <div id="map"></div>
+
+        <div id="tooltip" style="display:none"></div>
 
         <script type="text/javascript" src="/javascripts/utils.js"></script>
         <script type="text/javascript" src="/javascripts/maps.js"></script>
