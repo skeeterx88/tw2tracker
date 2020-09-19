@@ -251,13 +251,21 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const loadMapChunk = async function (x, y) {
-            const firstChunk = await loadVillages(x, y)
-            const secondChunk = await loadVillages(x + BLOCK_SIZE, y + BLOCK_SIZE)
+            const chunks = [
+                await loadVillages(x, y),
+                await loadVillages(x + BLOCK_SIZE, y),
+                await loadVillages(x, y + BLOCK_SIZE),
+                await loadVillages(x + BLOCK_SIZE, y + BLOCK_SIZE)
+            ]
 
-            processVillages(firstChunk)
-            processVillages(secondChunk)
+            let loadedVillages = 0
 
-            return firstChunk.villages.length + secondChunk.villages.length
+            for (let chunk of chunks) {
+                processVillages(chunk)
+                loadedVillages += chunk.villages.length
+            }
+
+            return loadedVillages
         }
 
         const hasPlayer = function (pid) {
