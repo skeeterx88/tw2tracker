@@ -34,7 +34,7 @@ const getNumbers = function (value) {
 }
 
 const checkWorldSchemaExists = async function (marketId, worldNumber) {
-    const worldSchema = await db.one(sql.worldSchemaExists, [marketId + worldNumber])
+    const worldSchema = await db.one(sql.schemaExists, [marketId + worldNumber])
     return worldSchema.exists
 }
 
