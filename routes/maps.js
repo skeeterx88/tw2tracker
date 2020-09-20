@@ -8,7 +8,7 @@ const sql = require('../sql')
 const Sync = require('../sync')
 
 const checkWorldSchemaExists = async function (marketId, worldNumber) {
-    const worldSchema = await db.one(sql.worldSchemaExists, [marketId + worldNumber])
+    const worldSchema = await db.one(sql.schemaExists, [marketId + worldNumber])
     return worldSchema.exists
 }
 
