@@ -432,10 +432,10 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
         }
 
         if (!continents[k].hasOwnProperty(x)) {
-            continents[k][x] = []
+            continents[k][x] = {}
         }
 
-        continents[k][x].push([ y, id, name, points, character_id || 0 ])
+        continents[k][x][y] = [id, name, points, character_id || 0]
     }
 
     for (let k in continents) {
