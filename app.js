@@ -8,6 +8,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const db = require('./db')
 const sql = require('./sql')
+const Sync = require('./sync')
 
 // console.log(sql)
 
@@ -83,9 +84,6 @@ app.use(function (err, req, res, next) {
     res.render('error')
 })
 
-// ;(async function () {
-//     const Sync = require('./sync')
-//     Sync.init()
-// })()
+Sync.init()
 
 module.exports = app
