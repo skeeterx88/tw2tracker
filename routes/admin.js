@@ -7,7 +7,7 @@ const db = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
 
-router.get('/', /*ensureLoggedIn,*/ async function (req, res) {
+router.get('/', ensureLoggedIn, async function (req, res) {
     const worlds = await db.any(sql.worlds)
     const markets = await db.any(sql.markets)
     const settings = await db.one(sql.settings)
@@ -20,7 +20,7 @@ router.get('/', /*ensureLoggedIn,*/ async function (req, res) {
     })
 })
 
-router.get('/scrapper/:marketId/:worldNumber', /*ensureLoggedIn,*/ async function (req, res) {
+router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const enabledMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
@@ -48,7 +48,7 @@ router.get('/scrapper/:marketId/:worldNumber', /*ensureLoggedIn,*/ async functio
     res.end(JSON.stringify(response))
 })
 
-router.post('/add-market', /*ensureLoggedIn,*/ async function (req, res) {
+router.post('/add-market', ensureLoggedIn, async function (req, res) {
     console.log(req.body)
 
     const market = req.body.market
@@ -87,7 +87,7 @@ router.post('/add-market', /*ensureLoggedIn,*/ async function (req, res) {
     res.end(JSON.stringify(response))
 })
 
-router.get('/edit-market/:marketId', /*ensureLoggedIn,*/ async function (req, res) {
+router.get('/edit-market/:marketId', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const market = await db.one(sql.market, [marketId])
     const settings = await db.one(sql.settings)
@@ -98,14 +98,14 @@ router.get('/edit-market/:marketId', /*ensureLoggedIn,*/ async function (req, re
     })
 })
 
-router.get('/sync-markets', /*ensureLoggedIn,*/ async function (req, res) {
+router.get('/sync-markets', ensureLoggedIn, async function (req, res) {
     const addedMarkets = await Sync.markets()
 
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(addedMarkets))
 })
 
-router.post('/change-settings', /*ensureLoggedIn,*/ async function (req, res) {
+router.post('/change-settings', ensureLoggedIn, async function (req, res) {
     const response = {}
 
     const siteName = req.body['site-name']
@@ -135,7 +135,7 @@ router.post('/change-settings', /*ensureLoggedIn,*/ async function (req, res) {
     res.end(JSON.stringify(response))
 })
 
-router.get('/test-account/:marketId', /*ensureLoggedIn,*/ async function (req, res) {
+router.get('/test-account/:marketId', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const response = {}
 
