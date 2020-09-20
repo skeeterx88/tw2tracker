@@ -25,7 +25,11 @@ const getHTML = function (url) {
 
 const createPuppeteerInstance = async function () {
     const puppeteer = require('puppeteer-core')
-    return await puppeteer.launch({ headless: true, executablePath: '/usr/bin/chromium' })
+
+    return await puppeteer.launch({
+        headless: true,
+        executablePath: '/usr/bin/chromium'
+    })
 }
 
 const getNumbers = function (value) {
@@ -47,18 +51,39 @@ const Sync = {}
 
 Sync.init = async function () {
     try {
-        // reset db init
-        // await db.query(sql.mainSiteSchema)
-        // await Sync.markets()
-        // await db.query(sql.createWorldSchema, {schema: 'br48'})
-        // await db.query(sql.addWorldEntry, ['br', 48, 'Auto'])
-
-        const browser = await createPuppeteerInstance()
-        await Sync.scrappeWorld(browser, 'br', 48)
-        await browser.close()
+        await Sync.createInitialStructure()
+        await Sync.daemon()
     } catch (error) {
         console.log(error.message)
     }
+}
+
+Sync.createInitialStructure = async function () {
+    const publicSchemaExists = await db.one(sql.schemaExists, ['public'])
+
+    if (!publicSchemaExists.exists) {
+        await db.query(sql.mainSiteSchema)
+        await Sync.markets()
+    }
+}
+
+Sync.daemon = async function () {
+    console.log('Sync.daemon()')
+
+    const CronJob = require('cron').CronJob
+    const browser = await createPuppeteerInstance()
+
+    const scrappeJob = new CronJob('0 */2 * * *', async function () {
+        await Sync.scrappeAllWorlds(browser)
+    })
+
+    const marketsJob = new CronJob('0 1 * * *', async function () {
+        await Sync.markets()
+        await Sync.registerWorlds(browser)
+    })
+
+    scrappeJob.start()
+    marketsJob.start()
 }
 
 Sync.fetchAllWorlds = async function (browser) {

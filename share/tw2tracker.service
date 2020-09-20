@@ -1,0 +1,14 @@
+[Unit]
+Description=Systemd tw2tracker unit
+After=network.target
+
+[Service]
+Environment=PORT=3000
+Environment=TZ=UTC
+Type=simple
+WorkingDirectory=/var/www/tw2tracker
+ExecStart=npm start
+Restart=always
+
+[Install]
+WantedBy=default.target
