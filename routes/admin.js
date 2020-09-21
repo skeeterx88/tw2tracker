@@ -49,6 +49,22 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     res.end(JSON.stringify(response))
 })
 
+router.get('/scrapper/all', ensureLoggedIn, async function (req, res) {
+    const response = {}
+
+    try {
+        await Sync.scrappeAllWorlds()
+        response.message = 'worlds synchronized successfully'
+        response.success = true
+    } catch (error) {
+        response.message = error.message
+        response.success = false
+    }
+
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(response))
+})
+
 router.post('/add-market', ensureLoggedIn, async function (req, res) {
     console.log(req.body)
 
