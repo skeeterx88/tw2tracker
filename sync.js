@@ -335,7 +335,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber) {
 
         const schema = marketId + worldNumber
 
-        console.log('Sync.scrappeWorld: Inseting ' + marketId + worldNumber + ' data into database')
+        console.log('Sync.scrappeWorld: Saving ' + marketId + worldNumber + ' data')
 
         for (let id in worldData.tribes) {
             const [name, tag, points] = worldData.tribes[id]

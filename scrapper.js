@@ -5,19 +5,15 @@ module.exports = function (marketId, worldNumber) {
     console.log('Scrapper: Start scrapping', marketId + worldNumber)
 
     const readyState = function (callback) {
-        console.log('Scrapper: readyState()')
-
         return new Promise(function (resolve, reject) {
             let injectorTimeout
             let timeout
 
             timeout = setTimeout(function () {
-                console.log('Scrapper: readyState: timeout!')
-
                 clearTimeout(injectorTimeout)
 
                 if (document.querySelector('.modal-establish-village')) {
-                    console.log('Scrapper: readyState: element modal-establish-village found!')
+                    console.log('Scrapper: Ready to fetch villages')
 
                     return resolve()
                 }
@@ -26,7 +22,7 @@ module.exports = function (marketId, worldNumber) {
                 const mapScope = transferredSharedDataService.getSharedData('MapController')
 
                 if (mapScope && mapScope.isInitialized) {
-                    console.log('Scrapper: readyState: map is initialized!')
+                    console.log('Scrapper: Ready to fetch villages')
 
                     resolve()
                 } else {
@@ -42,11 +38,7 @@ module.exports = function (marketId, worldNumber) {
                 }
             }
 
-            console.log('Scrapper: readyState: waiting for injector...')
-
             waitForInjector(function () {
-                console.log('Scrapper: readyState: waiting for CHARACTER_INFO trigger...')
-
                 const $rootScope = injector.get('$rootScope')
                 const eventTypeProvider = injector.get('eventTypeProvider')
 
@@ -54,7 +46,7 @@ module.exports = function (marketId, worldNumber) {
                     clearTimeout(timeout)
                     clearTimeout(injectorTimeout)
 
-                    console.log('Scrapper: readyState: OK')
+                    console.log('Scrapper: Ready to fetch villages')
 
                     resolve()
                 })
@@ -265,6 +257,8 @@ module.exports = function (marketId, worldNumber) {
                 loadedVillages += chunk.villages.length
             }
 
+            console.log('Scrapper:', 'Fetched k' + coords2continent(x, y) + ', villages:', loadedVillages)
+
             return loadedVillages
         }
 
@@ -306,8 +300,6 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const processVillages = function (blockData) {
-            console.log('Scrapper:', 'Processing block', blockData.x, blockData.y, 'Villages:', blockData.villages.length)
-
             if (!blockData.villages.length) {
                 return
             }
@@ -349,6 +341,25 @@ module.exports = function (marketId, worldNumber) {
                     ])
                 }
             }
+        }
+
+        const coords2continent = function (x, y) {
+            let kx
+            let ky
+
+            if (x < 100) {
+                kx = '0'
+            } else {
+                kx = String(x)[0]
+            }
+
+            if (y < 100) {
+                ky = '0'
+            } else {
+                ky = String(y)[0]
+            }
+
+            return ky + kx
         }
 
         return await init()
