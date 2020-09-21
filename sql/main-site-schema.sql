@@ -2,9 +2,9 @@ CREATE SCHEMA main;
 SET TIMEZONE='UTC';
 
 CREATE TABLE main.settings (
-    site_name VARCHAR (255) NOT NULL DEFAULT 'tw2tracker',
-    admin_password VARCHAR (255) NOT NULL DEFAULT '123',
-    scrapper_interval_minutes SMALLINT NOT NULL DEFAULT 60
+    site_name VARCHAR (255) NOT NULL,
+    admin_password VARCHAR (255) NOT NULL,
+    scrapper_interval_minutes SMALLINT NOT NULL
 );
 
 CREATE TABLE main.markets (
@@ -19,3 +19,5 @@ CREATE TABLE main.worlds (
     name VARCHAR (255) NOT NULL,
     last_sync TIMESTAMP
 );
+
+INSERT INTO main.settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 30);
