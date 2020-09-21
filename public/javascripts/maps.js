@@ -237,9 +237,10 @@ const TW2Map = function (containerSelector, dataLoader) {
 
         $overlayContext.fillStyle = 'white'
 
-        for (let village of dataLoader.playerVillages[characterId]) {
-            let x = Math.abs(positionX - (village[0] * tileSize) - offsetX)
-            let y = Math.abs(positionY - (village[1] * tileSize) - offsetY)
+        for (let [x, y] of dataLoader.playerVillages[characterId]) {
+            x = x * tileSize - positionX + offsetX
+            y = y * tileSize - positionY + offsetY
+
             $overlayContext.fillRect(x, y, villageSize, villageSize)
         }
     }
