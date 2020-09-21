@@ -56,6 +56,7 @@ Sync.createInitialStructure = async function () {
     if (!mainSchamaExists) {
         await db.query(sql.mainSiteSchema)
         await Sync.markets()
+        await Sync.registerWorlds()
     }
 }
 
