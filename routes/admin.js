@@ -24,22 +24,23 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const enabledMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
-    const worlds = await db.map(sql.worlds, [], world => world.id)
+    const worlds = await db.map(sql.worlds, [], world => world.num)
 
     const response = {}
 
     if (!enabledMarkets.includes(marketId)) {
         response.success = false
-        response.reason = `market ${marketId} is invalid`
+        response.message = `market ${marketId} is invalid`
     } else if (!worlds.includes(worldNumber)) {
         response.success = false
-        response.reason = `world ${worldNumber} is invalid`
+        response.message = `world ${worldNumber} is invalid`
     } else {
         try {
-            response.reason = await Sync.scrappeWorld(marketId, worldNumber)
+            await Sync.scrappeWorld(marketId, worldNumber)
+            response.message = marketId + worldNumber + ' synchronized successfully'
             response.success = true
         } catch (error) {
-            response.reason = error.message
+            response.message = error.message
             response.success = false
         }
     }
