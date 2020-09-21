@@ -409,15 +409,16 @@ Sync.markets = async function () {
     const storedMarkets = await db.map(sql.markets, [], market => market.id)
     const $portalBar = await getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
     const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
-    const marketList = $markets.map($market => $market.attributes.href.split('//')[1].split('.')[0])
-
-    const missingMarkets = marketList.filter(function (marketId) {
-        marketId = marketId === 'beta' ? 'zz' : marketId
-        return !storedMarkets.includes(marketId)
+    
+    const marketList = $markets.map(function ($market) {
+        const market = $market.attributes.href.split('//')[1].split('.')[0]
+        return market === 'beta' ? 'zz' : market
     })
 
+    const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId))
+
     for (let missingMarket of missingMarkets) {
-        await db.query(sql.addMarketEntry, [missingMarket])
+        await db.query(sql.addMarketEntry, missingMarket)
     }
 
     return missingMarkets
