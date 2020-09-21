@@ -80,7 +80,7 @@ router.post('/add-market', ensureLoggedIn, async function (req, res) {
     ])
 
     response.success = true
-    response.reason = marketCount.length
+    response.message = marketCount.length
         ? 'market updated successfully'
         : 'market added successfully'
 
@@ -116,10 +116,10 @@ router.post('/change-settings', ensureLoggedIn, async function (req, res) {
 
     if (siteName.length < 1) {
         response.success = false
-        response.reason = 'invalid site name'
+        response.message = 'invalid site name'
     } else if (adminPassword.length < 3) {
         response.success = false
-        response.reason = 'invalid admin password'
+        response.message = 'invalid admin password'
     } else {
         await db.query(sql.updateSettings, [
             siteName,
@@ -129,7 +129,7 @@ router.post('/change-settings', ensureLoggedIn, async function (req, res) {
         ])
 
         response.success = true
-        response.reason = 'settings updated successfully'
+        response.message = 'settings updated successfully'
     }
 
     res.setHeader('Content-Type', 'application/json')
