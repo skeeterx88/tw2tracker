@@ -294,8 +294,10 @@ const TW2Map = function (containerSelector, dataLoader) {
 }
 
 const DataLoader = function (marketId, worldNumber) {
+    const self = this
     let loadedPlayers = false
     let loadedTribes = false
+    let continentPromises = {}
 
     this.players = {}
     this.tribes = {}
@@ -307,21 +309,21 @@ const DataLoader = function (marketId, worldNumber) {
     const mergeVillages = function (villages) {
         for (let x in villages) {
             for (let y in villages[x]) {
-                if (x in this.villages) {
-                    this.villages[x][y] = villages[x][y]
+                if (x in self.villages) {
+                    self.villages[x][y] = villages[x][y]
                 } else {
-                    this.villages[x] = {}
-                    this.villages[x][y] = villages[x][y]
+                    self.villages[x] = {}
+                    self.villages[x][y] = villages[x][y]
                 }
 
-                let village = this.villages[x][y]
+                let village = self.villages[x][y]
                 let character_id = village[3]
 
                 if (character_id) {
-                    if (character_id in this.playerVillages) {
-                        this.playerVillages[character_id].push([x, y])
+                    if (character_id in self.playerVillages) {
+                        self.playerVillages[character_id].push([x, y])
                     } else {
-                        this.playerVillages[character_id] = [[x, y]]
+                        self.playerVillages[character_id] = [[x, y]]
                     }
                 }
             }
@@ -330,22 +332,18 @@ const DataLoader = function (marketId, worldNumber) {
 
     this.loadPlayers = async function () {
         if (!loadedPlayers) {
+            loadedPlayers = true
             const players = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
             this.players = await players.json()
-            loadedPlayers = true
         }
-
-        return this.players
     }
 
     this.loadTribes = async function () {
         if (!loadedTribes) {
+            loadedTribes = true
             const tribes = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
             this.tribes = await tribes.json()
-            loadedTribes = true
         }
-
-        return this.tribes
     }
 
     this.loadContinent = async function (continent) {
@@ -353,16 +351,19 @@ const DataLoader = function (marketId, worldNumber) {
             throw new Error('Invalid continent value')
         }
 
-        if (!(continent in this.continents)) {
-            const load = await fetch(`/maps/api/${marketId}/${worldNumber}/continent/${continent}`)
-            const villages = await load.json()
-            this.continents[continent] = villages
-            mergeVillages.call(this, villages)
-
-            return this.continents[continent]
+        if (continentPromises.hasOwnProperty(continent)) {
+            return continentPromises
         }
 
-        return {}
+        continentPromises[continent] = new Promise(async function (resolve) {
+            const load = await fetch(`/maps/api/${marketId}/${worldNumber}/continent/${continent}`)
+            const villages = await load.json()
+            self.continents[continent] = villages
+            mergeVillages(villages)
+            resolve(villages)
+        })
+
+        return continentPromises[continent]
     }
 }
 
