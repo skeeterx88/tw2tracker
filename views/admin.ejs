@@ -69,9 +69,6 @@
             <div class="long-info">
                 <span>account_name: <%= market.account_name %></span>
                 <span>account_password: <%= market.account_password %></span>
-                <span>account_id: <%= market.account_id %></span>
-                <span>account_token: <%= market.account_token %></span>
-                <span>account_enabled: <%= market_enabled %></span>
             </div>
 
             <ul class="actions">
@@ -86,62 +83,19 @@
 
     <section class="worlds">
         <% worlds.forEach(function (world) { %>
-        <% const world_enabled = world.enabled ? 'Yes' : 'No' %>
         <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
 
         <div class="world">
             <span class="flag flag-<%= world.market %>"></span>
-            <span><%= world.market %><%= world.id %> <%= world.name %></span>
+            <span><%= world.market %><%= world.num %> (<%= world.name %></span>)
             <div class="short-info">
-                <span class="enabled">Enabled: <strong><%= world_enabled %></strong>,</span>
                 <span class="last-sync">Last sync: <strong><%= world_last_sync.toLocaleString('pt-BR') %></strong></span>
             </div>
             <ul class="actions">
                 <li><a href="/admin/scrapper/<%= world.market %>/<%= world.id %>">Sync now</a></li>
-                <li><a href="/admin/scrapper/<%= world.market %>/<%= world.id %>">Delete</a></li>
             </ul>
         </div>
         <% }) %>
-    </section>
-
-    <!-- <h2>Add market</h2>
-
-    <section>
-        <form action="/admin/add-market" method="POST">
-            <label>
-                <span>market</span>
-                <input type="text" name="market" minlength="2">
-            </label>
-            <label>
-                <span>account_name</span>
-                <input type="text" name="account_name" minlength="4" maxlength="24">
-            </label>
-            <label>
-                <span>account_id</span>
-                <input type="text" name="account_id">
-            </label>
-            <label>
-                <span>account_token</span>
-                <input type="text" name="account_token" minlength="40" maxlength="40">
-            </label>
-            <label>
-                <span>enabled</span>
-                <input type="checkbox" name="enabled">
-            </label>
-
-            <div class="footer">
-                <input type="submit" value="Add world">
-            </div>
-        </form>
-    </section> -->
-
-    <h2>Debug area</h2>
-
-    <section class="debug">
-        <ul>
-            <li><a href="javascript:debug.addMarket()">Add market</a></li>
-            <li><a href="/admin/sync-markets">Sync markets</a></li>
-        </ul>
     </section>
 
     <p><a href="/logout">Logout</a></p>
