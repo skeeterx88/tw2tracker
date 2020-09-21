@@ -36,21 +36,6 @@ const puppeteerBrowser = async function () {
     }
 }
 
-const getNumbers = function (value) {
-    const num = value.match(/\d+/)
-    return num ? parseInt(num[0], 10) : value
-}
-
-const checkWorldSchemaExists = async function (marketId, worldNumber) {
-    const worldSchema = await db.one(sql.schemaExists, [marketId + worldNumber])
-    return worldSchema.exists
-}
-
-const checkWorldEntryExists = async function (marketId, worldNumber) {
-    const worldEntry = await db.one(sql.worldEntryExists, [marketId, worldNumber])
-    return worldEntry.exists
-}
-
 const Sync = {}
 
 Sync.init = async function () {
@@ -66,9 +51,9 @@ Sync.init = async function () {
 }
 
 Sync.createInitialStructure = async function () {
-    const publicSchemaExists = await db.one(sql.schemaExists, ['public'])
+    const publicSchemaExists = await utils.schemaExists('public')
 
-    if (!publicSchemaExists.exists) {
+    if (!publicSchemaExists) {
         await db.query(sql.mainSiteSchema)
         await Sync.markets()
     }
@@ -117,14 +102,14 @@ Sync.fetchAllWorlds = async function () {
 
         const formatedAllowedLoginCharacters = allowedLoginCharacters.map(function (world) {
             return {
-                worldNumber: getNumbers(world.world_id),
+                worldNumber: utils.extractNumbers(world.world_id),
                 worldName: world.world_name
             }
         })
 
         const formatedNonFullWorlds = nonFullWorlds.map(function (world) {
             return {
-                worldNumber: getNumbers(world.id),
+                worldNumber: utils.extractNumbers(world.id),
                 worldName: world.name
             }
         })
@@ -161,12 +146,12 @@ Sync.registerWorlds = async function () {
         for (let i = 0; i < marketWorlds.length; i++) {
             const {worldNumber, worldName} = marketWorlds[i]
 
-            const worldSchemaExists = await checkWorldSchemaExists(marketId, worldNumber)
-            const worldEntryExists = await checkWorldEntryExists(marketId, worldNumber)
+            const worldSchemaExists = await utils.schemaExists(marketId + worldNumber)
+            const worldEntryExists = await utils.worldEntryExists(marketId, worldNumber)
 
             if (!worldSchemaExists) {
                 console.log('Sync.registerWorlds: Creating schema for', marketId + worldNumber)
-                await db.query(sql.createWorldSchema, { schema: marketId + worldNumber })
+                await db.query(sql.createWorldSchema, {schema: marketId + worldNumber})
             }
 
             if (!worldEntryExists) {
