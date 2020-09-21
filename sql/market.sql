@@ -1,6 +1,3 @@
-SELECT
-    *
-FROM
-    markets
-WHERE
-    id = $1
+SELECT *
+FROM main.markets
+WHERE id = $1

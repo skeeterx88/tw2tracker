@@ -1,4 +1,2 @@
-INSERT INTO
-    markets (id)
-VALUES
-    ($1)
+INSERT INTO main.markets (id)
+VALUES ($1)

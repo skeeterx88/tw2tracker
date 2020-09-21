@@ -1,5 +1,4 @@
-UPDATE
-    settings
+UPDATE main.settings
 SET
     site_name = $1,
     admin_password = $2,

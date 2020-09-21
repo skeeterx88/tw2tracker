@@ -46,14 +46,14 @@ Sync.init = async function () {
             await Sync.daemon()
         }
     } catch (error) {
-        console.log(error.message)
+        console.log(error)
     }
 }
 
 Sync.createInitialStructure = async function () {
-    const publicSchemaExists = await utils.schemaExists('public')
+    const mainSchamaExists = await utils.schemaExists('main')
 
-    if (!publicSchemaExists) {
+    if (!mainSchamaExists) {
         await db.query(sql.mainSiteSchema)
         await Sync.markets()
     }

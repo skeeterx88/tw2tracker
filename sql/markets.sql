@@ -1,3 +1,3 @@
 SELECT *
-FROM markets
+FROM main.markets
 ORDER BY id

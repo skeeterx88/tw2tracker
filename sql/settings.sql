@@ -1,4 +1,2 @@
-SELECT
-    *
-FROM
-    settings
+SELECT *
+FROM main.settings

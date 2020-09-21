@@ -1,11 +1,4 @@
-SELECT
-    market,
-    num,
-    name,
-    last_sync
-FROM
-    worlds
-WHERE
-    market = $1
-AND
-    num = $2
+SELECT market, num, name, last_sync
+FROM main.worlds
+WHERE market = $1
+AND num = $2
