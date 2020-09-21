@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "autoreload": "TZ=UTC NODE_ENV=development nodemon ./bin/www",
+    "autoreload": "TZ=UTC nodemon ./bin/www",
     "start": "TZ=UTC node ./bin/www"
   },
   "dependencies": {

@@ -56,7 +56,10 @@ const Sync = {}
 Sync.init = async function () {
     try {
         await Sync.createInitialStructure()
-        await Sync.daemon()
+
+        if (process.env.NODE_ENV !== 'development') {
+            await Sync.daemon()
+        }
     } catch (error) {
         console.log(error.message)
     }
