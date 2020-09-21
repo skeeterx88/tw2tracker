@@ -1,4 +1,3 @@
-SELECT
-    *
-FROM
-    markets
+SELECT *
+FROM markets
+ORDER BY id
