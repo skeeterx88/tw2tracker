@@ -328,8 +328,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber) {
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
             console.log('Sync.scrappeWorld: ' + marketId + worldNumber + ' already sincronized')
-
-            return true
+            return
         }
     }
 
@@ -410,10 +409,9 @@ Sync.scrappeWorld = async function (marketId, worldNumber) {
         }
 
         await db.query(sql.updateWorldSync, [marketId, worldNumber])
+        await Sync.genWorldBlocks(marketId, worldNumber)
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
-
-        return true
     } catch (error) {
         await page.close()
         throw new Error('Sync.scrappeWorld: Failed to syncronize ' + marketId + worldNumber + ' (' + error.message + ')')
