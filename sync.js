@@ -287,7 +287,22 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
 Sync.scrappeAllWorlds = async function () {
     console.log('Sync.scrappeAllWorlds()')
 
-    const worlds = await db.any(sql.worlds)
+    let worlds
+
+    if (process.env.NODE_ENV === 'development') {
+        worlds = [{
+            market: 'de',
+            num: 48
+        }, {
+            market: 'br',
+            num: 46
+        }, {
+            market: 'en',
+            num: 56
+        }]
+    } else {
+        worlds = await db.any(sql.worlds)
+    }
 
     for (let world of worlds) {
         try {
