@@ -350,13 +350,14 @@ Sync.scrappeWorld = async function (marketId, worldNumber, _force = false) {
         }
 
         for (let id in worldData.players) {
-            const [name, points] = worldData.players[id]
+            const [name, points, tribe_id] = worldData.players[id]
 
             await db.query(sql.insertWorldPlayer, {
-                schema: schema,
+                schema,
                 id: parseInt(id, 10),
-                name: name,
-                points: points
+                name,
+                tribe_id,
+                points
             })
         }
 
