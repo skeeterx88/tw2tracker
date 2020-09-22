@@ -14,6 +14,7 @@ router.get('/', async function (req, res, next) {
 })
 
 router.post('/', passport.authenticate('local', {
+    successReturnToOrRedirect: '/admin',
     failureRedirect: '/login'
 }), function (req, res) {
     res.redirect('/admin')
