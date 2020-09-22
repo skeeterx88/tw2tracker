@@ -49,6 +49,35 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     res.end(JSON.stringify(response))
 })
 
+router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async function (req, res) {
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const enabledMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
+    const worlds = await db.map(sql.worlds, [], world => world.num)
+
+    const response = {}
+
+    if (!enabledMarkets.includes(marketId)) {
+        response.success = false
+        response.message = `market ${marketId} is invalid`
+    } else if (!worlds.includes(worldNumber)) {
+        response.success = false
+        response.message = `world ${worldNumber} is invalid`
+    } else {
+        try {
+            await Sync.scrappeWorld(marketId, worldNumber, true)
+            response.message = marketId + worldNumber + ' synchronized successfully'
+            response.success = true
+        } catch (error) {
+            response.message = error.message
+            response.success = false
+        }
+    }
+
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(response))
+})
+
 router.get('/scrapper/all', ensureLoggedIn, async function (req, res) {
     const response = {}
 

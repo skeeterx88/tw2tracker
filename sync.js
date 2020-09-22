@@ -301,14 +301,14 @@ Sync.scrappeAllWorlds = async function () {
     console.log('Sync.scrappeAllWorlds: Finished')
 }
 
-Sync.scrappeWorld = async function (marketId, worldNumber) {
+Sync.scrappeWorld = async function (marketId, worldNumber, _force = false) {
     console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
     const accountCredentials = await db.one(sql.enabledMarket, [marketId])
     const worldInfo = await db.one(sql.world, [marketId, worldNumber])
     const urlId = marketId === 'zz' ? 'beta' : marketId
 
-    if (worldInfo.last_sync) {
+    if (!_force && worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
         const settings = await db.one(sql.settings)
 
