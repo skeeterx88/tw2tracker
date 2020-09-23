@@ -39,6 +39,22 @@ const TW2Map = function (containerSelector, dataLoader) {
 
     let activeVillage = false
 
+    const CUSTOM_CATEGORIES = {
+        players: 'players',
+        tribes: 'tribes'
+    }
+
+    const customColors = {
+        [CUSTOM_CATEGORIES.players]: {},
+        [CUSTOM_CATEGORIES.tribes]: {}
+    }
+
+    const COLORS = {
+        neutral: '#823c0a',
+        barbarian: '#4c6f15',
+        background: '#436213'
+    }
+
     const setupElements = function () {
         $viewport.width = viewportWidth
         $viewport.height = viewportHeight
@@ -194,7 +210,18 @@ const TW2Map = function (containerSelector, dataLoader) {
             for (let y in villages[x]) {
                 let [id, name, points, character_id] = villages[x][y]
 
-                $cacheContext.fillStyle = character_id ? '#823c0a' : '#4c6f15'
+                let tribeId = character_id ? dataLoader.players[character_id][1] : false
+
+                if (!character_id) {
+                    $cacheContext.fillStyle = COLORS.barbarian
+                } else if (character_id in customColors.players) {
+                    $cacheContext.fillStyle = customColors.players[character_id].color
+                } else if (tribeId && tribeId in customColors.tribes) {
+                    $cacheContext.fillStyle = customColors.tribes[tribeId].color
+                } else {
+                    $cacheContext.fillStyle = COLORS.neutral
+                }
+
                 $cacheContext.fillRect(x * tileSize, y * tileSize, villageSize, villageSize)
             }
         }
@@ -203,7 +230,7 @@ const TW2Map = function (containerSelector, dataLoader) {
     }
 
     const renderViewport = function () {
-        $viewportContext.fillStyle = '#436213'
+        $viewportContext.fillStyle = COLORS.background
         $viewportContext.fillRect(0, 0, mapWidth, mapHeight)
 
         const positionXcenter = Math.floor(positionX - offsetX)
@@ -253,6 +280,70 @@ const TW2Map = function (containerSelector, dataLoader) {
         requestAnimationFrame(continuousRender)
     }
 
+    const formatVillagesToDraw = function (villagesId, scope) {
+        for (let [x, y] of villagesId) {
+            scope[x] = scope[x] || {}
+            scope[x][y] = dataLoader.villages[x][y]
+        }
+    }
+
+    const customColorGetRealId = function (category, id) {
+        const lowerId = id.toLowerCase()
+
+        switch (category) {
+            case CUSTOM_CATEGORIES.players: {
+                if (dataLoader.playersByName.hasOwnProperty(lowerId)) {
+                    return dataLoader.playersByName[lowerId]
+                } else {
+                    throw new Error('Custom colors: Player ' + id + ' not found')
+                }
+
+                break
+            }
+            case CUSTOM_CATEGORIES.tribes: {
+                if (dataLoader.tribesByTag.hasOwnProperty(lowerId)) {
+                    return dataLoader.tribesByTag[lowerId]
+                } else if (dataLoader.tribesByName.hasOwnProperty(lowerId)) {
+                    return dataLoader.tribesByName[lowerId]
+                } else {
+                    throw new Error('Custom colors: Tribe ' + id + ' not found')
+                }
+
+                break
+            }
+            default: {
+                throw new Error('Custom colors: Invalid category')
+            }
+        }
+    }
+
+    const getVillagesToDraw = function (category, realId) {
+        let redrawVillages = {
+            x: {}
+        }
+
+        console.log('category', category, 'CUSTOM_CATEGORIES.tribes', CUSTOM_CATEGORIES.tribes)
+
+        switch (category) {
+            case CUSTOM_CATEGORIES.players: {
+                formatVillagesToDraw(dataLoader.playerVillages[realId], redrawVillages)
+                break
+            }
+            case CUSTOM_CATEGORIES.tribes: {
+                for (let playerId of dataLoader.tribePlayers[realId]) {
+                    formatVillagesToDraw(dataLoader.playerVillages[playerId], redrawVillages)
+                }
+
+                break
+            }
+            default: {
+                throw new Error('Custom colors: Invalid category')
+            }
+        }
+
+        return redrawVillages
+    }
+
     this.recalcSize = function () {        
         ({
             width: viewportWidth,
@@ -285,13 +376,46 @@ const TW2Map = function (containerSelector, dataLoader) {
         }
     }
 
+    this.addCustom = function (category, id, color) {
+        if (typeof id !== 'string') {
+            throw new Error('Custom colors: Invalid id')
+        }
+
+        const realId = customColorGetRealId(category, id)
+        const redrawVillages = getVillagesToDraw(category, realId)
+
+        customColors[category][realId] = {
+            display: id,
+            color: color
+        }
+
+        renderVillages(redrawVillages)
+    }
+
+    this.removeCustom = function (category, id) {
+        if (typeof id !== 'string') {
+            throw new Error('Custom colors: Invalid id')
+        }
+
+        const realId = customColorGetRealId(category, id)
+        const redrawVillages = getVillagesToDraw(category, realId)
+
+        delete customColors[category][realId]
+
+        renderVillages(redrawVillages)
+    }
+
     setupElements()
     mouseEvents()
     renderGrid()
-    loadVisibleContinents()
-    dataLoader.loadPlayers()
-    dataLoader.loadTribes()
-    continuousRender()
+
+    Promise.all([
+        dataLoader.loadPlayers(),
+        dataLoader.loadTribes()
+    ]).then(function () {
+        loadVisibleContinents()
+        continuousRender()
+    })
 }
 
 const DataLoader = function (marketId, worldNumber) {
@@ -301,11 +425,15 @@ const DataLoader = function (marketId, worldNumber) {
     let continentPromises = {}
 
     this.players = {}
+    this.playersByName = {}
+    this.playerVillages = {}
     this.tribes = {}
+    this.tribesByTag = {}
+    this.tribesByName = {}
+    this.tribePlayers = {}
     this.continents = {}
     this.villages = {}
     this.villages.x = {}
-    this.playerVillages = {}
 
     const mergeVillages = function (villages) {
         for (let x in villages) {
@@ -336,6 +464,16 @@ const DataLoader = function (marketId, worldNumber) {
             loadedPlayers = true
             const players = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
             this.players = await players.json()
+
+            for (let id in this.players) {
+                let [name, tribeId, points] = this.players[id]
+                this.playersByName[name.toLowerCase()] = parseInt(id, 10)
+
+                if (tribeId) {
+                    this.tribePlayers[tribeId] = this.tribePlayers[tribeId] || []
+                    this.tribePlayers[tribeId].push(parseInt(id, 10))
+                }
+            }
         }
     }
 
@@ -344,6 +482,12 @@ const DataLoader = function (marketId, worldNumber) {
             loadedTribes = true
             const tribes = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
             this.tribes = await tribes.json()
+
+            for (let id in this.tribes) {
+                let [name, tag, points] = this.tribes[id]
+                this.tribesByName[name.toLowerCase()] = parseInt(id, 10)
+                this.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
+            }
         }
     }
 
