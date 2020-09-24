@@ -20,10 +20,9 @@ const TW2Map = function (containerSelector, dataLoader) {
     const $overlay = document.createElement('canvas')
     const $overlayContext = $overlay.getContext('2d')
 
-    let {
-        width: viewportWidth,
-        height: viewportHeight
-    } = $container.getBoundingClientRect()
+    const { width, height } = $container.getBoundingClientRect()
+    let viewportWidth = width ? width : window.innerWidth
+    let viewportHeight = height ? height : window.innerHeight
 
     const mapWidth = 1000 * tileSize
     const mapHeight = 1000 * tileSize
@@ -56,6 +55,8 @@ const TW2Map = function (containerSelector, dataLoader) {
     }
 
     const setupElements = function () {
+        $container.style.position = 'relative'
+
         $viewport.width = viewportWidth
         $viewport.height = viewportHeight
         $overlay.width = viewportWidth
@@ -345,10 +346,9 @@ const TW2Map = function (containerSelector, dataLoader) {
     }
 
     this.recalcSize = function () {        
-        ({
-            width: viewportWidth,
-            height: viewportHeight
-        } = $container.getBoundingClientRect())
+        const { width, height } = $container.getBoundingClientRect()
+        viewportWidth = width ? width : window.innerWidth
+        viewportHeight = height ? height : window.innerHeight
 
         offsetX = Math.floor(viewportWidth / 2)
         offsetY = Math.floor(viewportHeight / 2)
@@ -410,8 +410,8 @@ const TW2Map = function (containerSelector, dataLoader) {
     renderGrid()
 
     Promise.all([
-        dataLoader.loadPlayers(),
-        dataLoader.loadTribes()
+        dataLoader.loadPlayers,
+        dataLoader.loadTribes
     ]).then(function () {
         loadVisibleContinents()
         continuousRender()
@@ -459,37 +459,41 @@ const DataLoader = function (marketId, worldNumber) {
         }
     }
 
-    this.loadPlayers = async function () {
+    this.loadPlayers = new Promise(async function (resolve) {
         if (!loadedPlayers) {
             loadedPlayers = true
             const players = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
-            this.players = await players.json()
+            self.players = await players.json()
 
-            for (let id in this.players) {
-                let [name, tribeId, points] = this.players[id]
-                this.playersByName[name.toLowerCase()] = parseInt(id, 10)
+            for (let id in self.players) {
+                let [name, tribeId, points] = self.players[id]
+                self.playersByName[name.toLowerCase()] = parseInt(id, 10)
 
                 if (tribeId) {
-                    this.tribePlayers[tribeId] = this.tribePlayers[tribeId] || []
-                    this.tribePlayers[tribeId].push(parseInt(id, 10))
+                    self.tribePlayers[tribeId] = self.tribePlayers[tribeId] || []
+                    self.tribePlayers[tribeId].push(parseInt(id, 10))
                 }
             }
         }
-    }
 
-    this.loadTribes = async function () {
+        resolve()
+    })
+
+    this.loadTribes = new Promise(async function (resolve) {
         if (!loadedTribes) {
             loadedTribes = true
             const tribes = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
-            this.tribes = await tribes.json()
+            self.tribes = await tribes.json()
 
-            for (let id in this.tribes) {
-                let [name, tag, points] = this.tribes[id]
-                this.tribesByName[name.toLowerCase()] = parseInt(id, 10)
-                this.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
+            for (let id in self.tribes) {
+                let [name, tag, points] = self.tribes[id]
+                self.tribesByName[name.toLowerCase()] = parseInt(id, 10)
+                self.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
             }
         }
-    }
+
+        resolve()
+    })
 
     this.loadContinent = async function (continent) {
         if (typeof continent !== 'number' || continent < 0 || continent > 99) {
@@ -512,6 +516,103 @@ const DataLoader = function (marketId, worldNumber) {
     }
 }
 
+const userInterface = function () {
+    const colorPalette = [
+        ["ffffff", "ffd1d1", "aee7ff", "c0ffd0", "ffe7cf", "fff9a1", "ffdaee", "ffd5b6", "dfceff", "cde4ff", "d8dcff", "ffcff8", "f0c800", "ff4b4b"],
+        ["dfdfdf", "e21f1f", "03709d", "0a8028", "aa6b2b", "ffee00", "b2146b", "d96a19", "5c32a9", "47617f", "0111af", "d315b6", "8888fc", "ce8856"],
+        ["e0ff4c", "980e0e", "014a69", "04571a", "7f5122", "7b730c", "870d50", "a44c0b", "452483", "2a3e55", "000b74", "9d0886", "00a0f4", "969696"],
+        ["000000", "730202", "00293a", "02350f", "572412", "494500", "6a043e", "723305", "2f1460", "152232", "000645", "6c055b", "c766c7", "74c374"]
+    ]
+
+    $customColorId = document.getElementById('custom-color-id')
+    $customColorItems = document.getElementById('custom-color-items')
+
+    const autocompleteInstance = new autoComplete({
+        data: {
+            src: async function () {
+                await data.loadPlayers
+                await data.loadTribes
+
+                const matches = []
+
+                for (let [name] of Object.values(data.players)) {
+                    matches.push({
+                        search: name,
+                        id: name,
+                        type: 'players'
+                    })
+                }
+
+                for (let [name, tag] of Object.values(data.tribes)) {
+                    matches.push({
+                        search: tag + ' (' + name + ')',
+                        id: tag,
+                        type: 'tribes'
+                    })
+                }
+
+                return matches
+            },
+            key: ['search'],
+            cache: false
+        },
+        searchEngine: 'loose',
+        selector: '#custom-color-id',
+        resultsList: {
+            render: true
+        },
+        threshold: 1,
+        trigger: {
+            event: ['input', 'keypress', 'focusin']
+        },
+        sort: function (a, b) {
+            if (a.match < b.match) return -1
+            if (a.match > b.match) return 1
+            return 0
+        },
+        noResults: function () {
+            const $item = document.createElement('li')
+            $item.innerHTML = 'no results'
+            $autoCompleteList.appendChild($item)
+        },
+        placeHolder: 'search...',
+        highlight: true,
+        onSelection: function (feedback) {
+            const { id, type } = feedback.selection.value
+            const color = '#' + arrayRandom(colorPalette.flat())
+
+            map.addCustom(type, id, color)
+            $customColorId.value = ''
+        }
+    })
+
+    const $autoCompleteList = document.getElementById('autoComplete_list')
+
+    $customColorId.addEventListener('blur', function () {
+        $autoCompleteList.style.display = 'none'
+    })
+
+    $customColorId.addEventListener('focus', function () {
+        $autoCompleteList.style.display = ''
+    })
+
+    $customColorId.addEventListener('keydown', async function (event) {
+        if (event.key === 'Escape') {
+            $customColorId.value = ''
+            $customColorId.dispatchEvent(new Event('input'))
+        }
+    })
+
+    $customColorId.addEventListener('autoComplete', function ({ detail }) {
+        if (detail.event.key == 'Enter' && detail.matches > 0) {
+            autocompleteInstance.listMatchedResults(autocompleteInstance.dataStream).then(function () {
+                const first = autocompleteInstance.resultsList.view.children.item(0)
+                first.dispatchEvent(new Event('mousedown'))
+            })
+        }
+    })
+}
+
 ;(async function () {
     let reInitTimeout
 
@@ -522,5 +623,7 @@ const DataLoader = function (marketId, worldNumber) {
         clearTimeout(reInitTimeout)
         reInitTimeout = setTimeout(() => map.recalcSize(), 200)
     })
-})();
+
+    userInterface()
+})()
 

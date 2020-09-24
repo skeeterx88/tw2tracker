@@ -4,17 +4,30 @@
         <title><%= title %></title>
         <link rel='stylesheet' href='/stylesheets/style.css' />
         <link rel='stylesheet' href='/stylesheets/map.css' />
+        <!-- <link rel='stylesheet' href='/stylesheets/autoComplete.css' /> -->
         <script type="text/javascript">
             const marketId = '<%= marketId %>'
             const worldNumber = <%= worldNumber %>
         </script>
     </head>
     <body>
-        <div id="map"></div>
+        <div id="map-wrapper">
+            <div id="side-panel">
+                <div>
+                    <input type="text" id="custom-color-id" spellcheck="false">
+                    <ul id="custom-color-items"></ul>
+                </div>
+            </div>
+            <div id="map"></div>
+        </div>
 
         <div id="tooltip" style="display:none"></div>
 
+        <script type="text/javascript">
+            document.querySelector('#custom-color-id').focus()
+        </script>
         <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/autoComplete.js"></script>
         <script type="text/javascript" src="/javascripts/maps.js"></script>
     </body>
 </html>
