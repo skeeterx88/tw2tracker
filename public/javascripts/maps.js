@@ -477,8 +477,6 @@ const TW2Map = function (containerSelector, dataLoader) {
 
 const DataLoader = function (marketId, worldNumber) {
     const self = this
-    let loadedPlayers = false
-    let loadedTribes = false
     let continentPromises = {}
 
     this.players = {}
@@ -517,19 +515,16 @@ const DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadPlayers = new Promise(async function (resolve) {
-        if (!loadedPlayers) {
-            loadedPlayers = true
-            const players = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
-            self.players = await players.json()
+        const players = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
+        self.players = await players.json()
 
-            for (let id in self.players) {
-                let [name, tribeId, points] = self.players[id]
-                self.playersByName[name.toLowerCase()] = parseInt(id, 10)
+        for (let id in self.players) {
+            let [name, tribeId, points] = self.players[id]
+            self.playersByName[name.toLowerCase()] = parseInt(id, 10)
 
-                if (tribeId) {
-                    self.tribePlayers[tribeId] = self.tribePlayers[tribeId] || []
-                    self.tribePlayers[tribeId].push(parseInt(id, 10))
-                }
+            if (tribeId) {
+                self.tribePlayers[tribeId] = self.tribePlayers[tribeId] || []
+                self.tribePlayers[tribeId].push(parseInt(id, 10))
             }
         }
 
@@ -537,16 +532,13 @@ const DataLoader = function (marketId, worldNumber) {
     })
 
     this.loadTribes = new Promise(async function (resolve) {
-        if (!loadedTribes) {
-            loadedTribes = true
-            const tribes = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
-            self.tribes = await tribes.json()
+        const tribes = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
+        self.tribes = await tribes.json()
 
-            for (let id in self.tribes) {
-                let [name, tag, points] = self.tribes[id]
-                self.tribesByName[name.toLowerCase()] = parseInt(id, 10)
-                self.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
-            }
+        for (let id in self.tribes) {
+            let [name, tag, points] = self.tribes[id]
+            self.tribesByName[name.toLowerCase()] = parseInt(id, 10)
+            self.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
         }
 
         resolve()
