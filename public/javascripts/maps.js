@@ -27,15 +27,17 @@ const TW2Map = function (containerSelector, dataLoader) {
     const $overlay = document.createElement('canvas')
     const $overlayContext = $overlay.getContext('2d')
 
-    const { width, height } = $container.getBoundingClientRect()
+    const { x, y, width, height } = $container.getBoundingClientRect()
     let viewportWidth = width ? width : window.innerWidth
     let viewportHeight = height ? height : window.innerHeight
+    let viewportOffsetX = x
+    let viewportOffsetY = y
 
     const mapWidth = 1000 * tileSize
     const mapHeight = 1000 * tileSize
 
-    let offsetX = Math.floor(viewportWidth / 2)
-    let offsetY = Math.floor(viewportHeight / 2)
+    let middleViewportOffsetX = Math.floor(viewportWidth / 2)
+    let middleViewportOffsetY = Math.floor(viewportHeight / 2)
 
     let positionX = 500 * tileSize
     let positionY = 500 * tileSize
@@ -123,8 +125,8 @@ const TW2Map = function (containerSelector, dataLoader) {
         })
 
         $overlay.addEventListener('mousemove', function (event) {
-            mouseCoordX = Math.floor((positionX - offsetX + event.pageX) / tileSize)
-            mouseCoordY = Math.floor((positionY - offsetY + event.pageY) / tileSize)
+            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX) / tileSize)
+            mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / tileSize)
 
             const villagesX = dataLoader.villages[mouseCoordX]
 
@@ -175,10 +177,10 @@ const TW2Map = function (containerSelector, dataLoader) {
     const loadVisibleContinents = function () {
         const visibleContinents = []
 
-        let ax = boundNumber(((positionX - offsetX) / tileSize), 0, 999)
-        let ay = boundNumber(((positionY - offsetY) / tileSize), 0, 999)
-        let bx = boundNumber(((positionX + offsetX) / tileSize), 0, 999)
-        let by = boundNumber(((positionY + offsetY) / tileSize), 0, 999)
+        let ax = boundNumber(((positionX - middleViewportOffsetX) / tileSize), 0, 999)
+        let ay = boundNumber(((positionY - middleViewportOffsetY) / tileSize), 0, 999)
+        let bx = boundNumber(((positionX + middleViewportOffsetX) / tileSize), 0, 999)
+        let by = boundNumber(((positionY + middleViewportOffsetY) / tileSize), 0, 999)
 
         ax = ax < 100 ? 0 : String(ax)[0]
         ay = ay < 100 ? 0 : String(ay)[0]
@@ -245,8 +247,8 @@ const TW2Map = function (containerSelector, dataLoader) {
         $viewportContext.fillStyle = COLORS.background
         $viewportContext.fillRect(0, 0, mapWidth, mapHeight)
 
-        const positionXcenter = Math.floor(positionX - offsetX)
-        const positionYcenter = Math.floor(positionY - offsetY)
+        const positionXcenter = Math.floor(positionX - middleViewportOffsetX)
+        const positionYcenter = Math.floor(positionY - middleViewportOffsetY)
 
         $viewportContext.drawImage($cache, -positionXcenter, -positionYcenter)
     }
@@ -258,8 +260,8 @@ const TW2Map = function (containerSelector, dataLoader) {
             return
         }
 
-        const borderX = Math.abs(positionX - (activeVillage.x * tileSize) - offsetX) - 1
-        const borderY = Math.abs(positionY - (activeVillage.y * tileSize) - offsetY) - 1
+        const borderX = Math.abs(positionX - (activeVillage.x * tileSize) - middleViewportOffsetX) - 1
+        const borderY = Math.abs(positionY - (activeVillage.y * tileSize) - middleViewportOffsetY) - 1
         const borderSize = villageSize + 2
 
         $overlayContext.fillStyle = 'rgba(255, 255, 255, 0.5)'
@@ -277,8 +279,8 @@ const TW2Map = function (containerSelector, dataLoader) {
         $overlayContext.fillStyle = 'white'
 
         for (let [x, y] of dataLoader.playerVillages[characterId]) {
-            x = x * tileSize - positionX + offsetX
-            y = y * tileSize - positionY + offsetY
+            x = x * tileSize - positionX + middleViewportOffsetX
+            y = y * tileSize - positionY + middleViewportOffsetY
 
             $overlayContext.fillRect(x, y, villageSize, villageSize)
         }
@@ -361,8 +363,8 @@ const TW2Map = function (containerSelector, dataLoader) {
         viewportWidth = width ? width : window.innerWidth
         viewportHeight = height ? height : window.innerHeight
 
-        offsetX = Math.floor(viewportWidth / 2)
-        offsetY = Math.floor(viewportHeight / 2)
+        middleViewportOffsetX = Math.floor(viewportWidth / 2)
+        middleViewportOffsetY = Math.floor(viewportHeight / 2)
 
         $viewport.width = viewportWidth
         $viewport.height = viewportHeight
