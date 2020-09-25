@@ -548,7 +548,7 @@ const DataLoader = function (marketId, worldNumber) {
         }
 
         if (continentPromises.hasOwnProperty(continent)) {
-            return continentPromises
+            return continentPromises[continent]
         }
 
         continentPromises[continent] = new Promise(async function (resolve) {
