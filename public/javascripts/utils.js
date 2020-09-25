@@ -20,3 +20,7 @@ const arrayRandom = function (arr) {
 }
 
 const noop = function () {}
+
+const normalizeString = function (value) {
+    return String(value).toLowerCase().replace(/[^\w]/g, '')
+}

@@ -35,12 +35,21 @@ ul {
 
 #side-panel {
     flex: 0 0 125px;
+    /*flex: 0 0 90px;*/
     color: #ffeccc;
     background: url("/images/side-bar-border.jpg") right top repeat-y,
                 url("/images/side-bar-left.jpg") left repeat-y,
                 url("/images/side-bar-right.jpg") right top repeat-y,
                 url("/images/side-bar-middle.jpg") center;
 }
+
+
+
+
+
+
+
+
 
 #highlight-id {
     margin-left: 3px;
@@ -63,12 +72,92 @@ ul {
 }
 
 #highlight-id::placeholder {
-    color: #00000050;
+    color: #333;
 }
 
-#autoComplete_list:empty {
-    display: none;
+#highlight-items {
+    width: 90%;
+    margin-top: 5px;
+    margin-left: 2px;
 }
+
+#highlight-items .name {
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 97px;
+    cursor: pointer;
+}
+
+#highlight-items .name:hover {
+    color: #f3a859;
+}
+
+#highlight-items .color {
+    display: inline-block;
+    padding: 1px;
+    width: 11px;
+    height: 10px;
+    position: relative;
+    border-radius: 1px;
+    border: 1px solid #8d5b39;
+    background: url('/images/bg1.png') #a07246;
+    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e;
+    cursor: pointer;
+}
+
+#highlight-items .color:hover {
+    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #d8bfb0;
+}
+
+#highlight-items .players {
+    background: url('/images/player.png') left center no-repeat;
+    padding-left: 19px;
+}
+
+#highlight-items .tribes {
+    background: url('/images/tribe.png') left center no-repeat;
+    padding-left: 19px;
+}
+
+#highlight-items .item {
+    line-height: 16px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#tooltip {
+    position: absolute;
+    background: rgba(0,0,0, 0.85);
+    color: #eee;
+    z-index: 20;
+    display: inline-table;
+    padding: 6px;
+    border-radius: 3px;
+    box-shadow: 2px 2px 2px #000;
+}
+
+#tooltip span {
+    white-space: nowrap;
+}
+
+
+
+
 
 .autoComplete_highlighted {
     font-weight: bold;
@@ -87,7 +176,13 @@ ul {
     width: 107px;
     position: fixed;
     margin: 0;
+    margin-left: 3px;
     margin-top: 4px;
+    z-index: 10;
+}
+
+#autoComplete_list:empty {
+    display: none;
 }
 
 #autoComplete_list li {
@@ -102,39 +197,4 @@ ul {
 #autoComplete_list li.autoComplete_selected {
     color: #824300;
     background-color: #f4dec666;
-}
-
-#highlight-items {
-    margin-top: 5px;
-    margin-left: 2px;
-}
-
-#highlight-items .players {
-    background: url('/images/player.png') left center no-repeat;
-    padding-left: 19px;
-}
-
-#highlight-items .tribes {
-    background: url('/images/tribe.png') left center no-repeat;
-    padding-left: 19px;
-}
-
-#highlight-items li {
-    line-height: 16px;
-}
-
-
-#tooltip {
-    position: absolute;
-    background: rgba(0,0,0, 0.85);
-    color: #eee;
-    z-index: 20;
-    display: inline-table;
-    padding: 6px;
-    border-radius: 3px;
-    box-shadow: 2px 2px 2px #000;
-}
-
-#tooltip span {
-    white-space: nowrap;
 }

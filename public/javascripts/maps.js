@@ -1,3 +1,10 @@
+const colorPalette = [
+    ["#ffffff", "#ffd1d1", "#aee7ff", "#c0ffd0", "#ffe7cf", "#fff9a1", "#ffdaee", "#ffd5b6", "#dfceff", "#cde4ff", "#d8dcff", "#ffcff8", "#f0c800", "#ff4b4b"],
+    ["#dfdfdf", "#e21f1f", "#03709d", "#0a8028", "#aa6b2b", "#ffee00", "#b2146b", "#d96a19", "#5c32a9", "#47617f", "#0111af", "#d315b6", "#8888fc", "#ce8856"],
+    ["#e0ff4c", "#980e0e", "#014a69", "#04571a", "#7f5122", "#7b730c", "#870d50", "#a44c0b", "#452483", "#2a3e55", "#000b74", "#9d0886", "#00a0f4", "#969696"],
+    ["#000000", "#730202", "#00293a", "#02350f", "#572412", "#494500", "#6a043e", "#723305", "#2f1460", "#152232", "#000645", "#6c055b", "#c766c7", "#74c374"]
+]
+
 const TW2Map = function (containerSelector, dataLoader) {
     const $container = document.querySelector(containerSelector)
 
@@ -385,6 +392,10 @@ const TW2Map = function (containerSelector, dataLoader) {
             throw new Error('Highlights: Invalid id')
         }
 
+        if (!color) {
+            color = arrayRandom(colorPalette.flat())
+        }
+
         let realId
         let displayName
 
@@ -544,7 +555,7 @@ const DataLoader = function (marketId, worldNumber) {
         resolve()
     })
 
-    this.loadContinent = async function (continent) {
+    this.loadContinent = function (continent) {
         if (typeof continent !== 'number' || continent < 0 || continent > 99) {
             throw new Error('Invalid continent value')
         }
@@ -566,13 +577,6 @@ const DataLoader = function (marketId, worldNumber) {
 }
 
 const userInterface = function () {
-    const colorPalette = [
-        ["ffffff", "ffd1d1", "aee7ff", "c0ffd0", "ffe7cf", "fff9a1", "ffdaee", "ffd5b6", "dfceff", "cde4ff", "d8dcff", "ffcff8", "f0c800", "ff4b4b"],
-        ["dfdfdf", "e21f1f", "03709d", "0a8028", "aa6b2b", "ffee00", "b2146b", "d96a19", "5c32a9", "47617f", "0111af", "d315b6", "8888fc", "ce8856"],
-        ["e0ff4c", "980e0e", "014a69", "04571a", "7f5122", "7b730c", "870d50", "a44c0b", "452483", "2a3e55", "000b74", "9d0886", "00a0f4", "969696"],
-        ["000000", "730202", "00293a", "02350f", "572412", "494500", "6a043e", "723305", "2f1460", "152232", "000645", "6c055b", "c766c7", "74c374"]
-    ]
-
     const $highlightId = document.getElementById('highlight-id')
     const $highlightItems = document.getElementById('highlight-items')
 
@@ -631,7 +635,7 @@ const userInterface = function () {
             highlight: true,
             onSelection: function (feedback) {
                 const { search, id, type } = feedback.selection.value
-                const color = '#' + arrayRandom(colorPalette.flat())
+                const color = arrayRandom(colorPalette.flat())
 
                 map.addHighlight(type, id, color)
                 $highlightId.value = ''
@@ -665,38 +669,49 @@ const userInterface = function () {
 
     map.onAddHighlight(function (category, id, displayName, color) {
         const $item = document.createElement('li')
-        const $content = document.createElement('span')
-        $content.innerHTML = displayName
-        $content.className = category
-        $item.appendChild($content)
-
-        $item.classList.add('highlight-' + id)
-
+        const $name = document.createElement('div')
+        const $nameSpan = document.createElement('span')
+        const $color = document.createElement('div')
+        
+        $item.classList.add('highlight-' + normalizeString(id))
+        $item.classList.add('item')
         $item.dataset.category = category
-        $item.dataset.realId = id
+        $item.dataset.id = id
         $item.dataset.color = color
 
-        $item.addEventListener('click', function () {
+        $name.addEventListener('click', function () {
             map.removeHighlight(category, id)
         })
 
+        $name.className = 'name'
+
+        $nameSpan.innerHTML = displayName
+        $nameSpan.className = category
+
+        $color.className = 'color'
+        $color.style.backgroundColor = color
+
+        $name.appendChild($nameSpan)
+        $item.appendChild($name)
+        $item.appendChild($color)
         $highlightItems.appendChild($item)
     })
 
     map.onUpdateHighlight(function (category, id, displayName, color) {
-        const $item = $highlightItems.querySelector('.highlight-' + id)
+        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
 
         if (!$item) {
             return false
         }
 
-        $item.dataset.color = color
+        const $color = $item.querySelector('.color')
 
-        // update color picker element
+        $color.style.background = color
+        $item.dataset.color = color
     })
 
     map.onRemoveHighlight(function (category, id) {
-        const $item = $highlightItems.querySelector('.highlight-' + id)
+        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
 
         if ($item) {
             $item.remove()
@@ -718,5 +733,11 @@ const userInterface = function () {
     })
 
     userInterface()
+
+    await data.loadTribes
+    await data.loadPlayers
+
+    map.addHighlight('tribes', 'OUT', 'blue')
+    map.addHighlight('players', 'she-ra', 'red')
 })()
 
