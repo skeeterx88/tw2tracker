@@ -286,9 +286,11 @@ const TW2Map = function (containerSelector, dataLoader) {
     }
 
     const formatVillagesToDraw = function (villagesId, scope) {
-        for (let [x, y] of villagesId) {
-            scope[x] = scope[x] || {}
-            scope[x][y] = dataLoader.villages[x][y]
+        if (villagesId) {
+            for (let [x, y] of villagesId) {
+                scope[x] = scope[x] || {}
+                scope[x][y] = dataLoader.villages[x][y]
+            }
         }
     }
 
