@@ -18,3 +18,5 @@ const boundNumber = function (value, min, max) {
 const arrayRandom = function (arr) {
     return arr[Math.floor(Math.random() * arr.length)]
 }
+
+const noop = function () {}

@@ -48,6 +48,10 @@ const TW2Map = function (containerSelector, dataLoader) {
         [CUSTOM_CATEGORIES.tribes]: {}
     }
 
+    let onAddHighlight = noop
+    let onRemoveHighlight = noop
+    let onUpdateHighlight = noop
+
     const COLORS = {
         neutral: '#823c0a',
         barbarian: '#4c6f15',
@@ -381,11 +385,38 @@ const TW2Map = function (containerSelector, dataLoader) {
             throw new Error('Custom colors: Invalid id')
         }
 
-        const realId = customColorGetRealId(category, id)
+        let realId
+        let displayName
+
+        try {
+            realId = customColorGetRealId(category, id)
+        } catch (error) {
+            return console.log(error)
+        }
+
         const redrawVillages = getVillagesToDraw(category, realId)
 
+        switch (category) {
+            case CUSTOM_CATEGORIES.tribes: {
+                const [name, tag] = dataLoader.tribes[realId]
+                displayName = tag + ' (' + name + ')'
+                break
+            }
+            case CUSTOM_CATEGORIES.players: {
+                const [name] = dataLoader.players[realId]
+                displayName = name
+                break
+            }
+        }
+
+        if (customColors[category].hasOwnProperty(realId)) {
+            onUpdateHighlight(category, id, displayName, color)
+        } else {
+            onAddHighlight(category, id, displayName, color)
+        }
+
         customColors[category][realId] = {
-            display: id,
+            display: displayName,
             color: color
         }
 
@@ -397,12 +428,38 @@ const TW2Map = function (containerSelector, dataLoader) {
             throw new Error('Custom colors: Invalid id')
         }
 
-        const realId = customColorGetRealId(category, id)
+        let realId
+
+        try {
+            realId = customColorGetRealId(category, id)
+        } catch (error) {
+            return console.log(error)
+        }
+
         const redrawVillages = getVillagesToDraw(category, realId)
 
         delete customColors[category][realId]
 
+        onRemoveHighlight(category, id)
         renderVillages(redrawVillages)
+    }
+
+    this.onAddHighlight = function (fn) {
+        if (typeof fn === 'function') {
+            onAddHighlight = fn
+        }
+    }
+
+    this.onRemoveHighlight = function (fn) {
+        if (typeof fn === 'function') {
+            onRemoveHighlight = fn
+        }
+    }
+
+    this.onUpdateHighlight = function (fn) {
+        if (typeof fn === 'function') {
+            onUpdateHighlight = fn
+        }
     }
 
     setupElements()
