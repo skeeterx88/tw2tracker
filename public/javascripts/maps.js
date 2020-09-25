@@ -38,14 +38,14 @@ const TW2Map = function (containerSelector, dataLoader) {
 
     let activeVillage = false
 
-    const CUSTOM_CATEGORIES = {
+    const HIGHLIGHT_CATEGORIES = {
         players: 'players',
         tribes: 'tribes'
     }
 
-    const customColors = {
-        [CUSTOM_CATEGORIES.players]: {},
-        [CUSTOM_CATEGORIES.tribes]: {}
+    const highlights = {
+        [HIGHLIGHT_CATEGORIES.players]: {},
+        [HIGHLIGHT_CATEGORIES.tribes]: {}
     }
 
     let onAddHighlight = noop
@@ -219,10 +219,10 @@ const TW2Map = function (containerSelector, dataLoader) {
 
                 if (!character_id) {
                     $cacheContext.fillStyle = COLORS.barbarian
-                } else if (character_id in customColors.players) {
-                    $cacheContext.fillStyle = customColors.players[character_id].color
-                } else if (tribeId && tribeId in customColors.tribes) {
-                    $cacheContext.fillStyle = customColors.tribes[tribeId].color
+                } else if (character_id in highlights.players) {
+                    $cacheContext.fillStyle = highlights.players[character_id].color
+                } else if (tribeId && tribeId in highlights.tribes) {
+                    $cacheContext.fillStyle = highlights.tribes[tribeId].color
                 } else {
                     $cacheContext.fillStyle = COLORS.neutral
                 }
@@ -292,32 +292,32 @@ const TW2Map = function (containerSelector, dataLoader) {
         }
     }
 
-    const customColorGetRealId = function (category, id) {
+    const highlightGetRealId = function (category, id) {
         const lowerId = id.toLowerCase()
 
         switch (category) {
-            case CUSTOM_CATEGORIES.players: {
+            case HIGHLIGHT_CATEGORIES.players: {
                 if (dataLoader.playersByName.hasOwnProperty(lowerId)) {
                     return dataLoader.playersByName[lowerId]
                 } else {
-                    throw new Error('Custom colors: Player ' + id + ' not found')
+                    throw new Error('Highlights: Player ' + id + ' not found')
                 }
 
                 break
             }
-            case CUSTOM_CATEGORIES.tribes: {
+            case HIGHLIGHT_CATEGORIES.tribes: {
                 if (dataLoader.tribesByTag.hasOwnProperty(lowerId)) {
                     return dataLoader.tribesByTag[lowerId]
                 } else if (dataLoader.tribesByName.hasOwnProperty(lowerId)) {
                     return dataLoader.tribesByName[lowerId]
                 } else {
-                    throw new Error('Custom colors: Tribe ' + id + ' not found')
+                    throw new Error('Highlights: Tribe ' + id + ' not found')
                 }
 
                 break
             }
             default: {
-                throw new Error('Custom colors: Invalid category')
+                throw new Error('Highlights: Invalid category')
             }
         }
     }
@@ -327,14 +327,12 @@ const TW2Map = function (containerSelector, dataLoader) {
             x: {}
         }
 
-        console.log('category', category, 'CUSTOM_CATEGORIES.tribes', CUSTOM_CATEGORIES.tribes)
-
         switch (category) {
-            case CUSTOM_CATEGORIES.players: {
+            case HIGHLIGHT_CATEGORIES.players: {
                 formatVillagesToDraw(dataLoader.playerVillages[realId], redrawVillages)
                 break
             }
-            case CUSTOM_CATEGORIES.tribes: {
+            case HIGHLIGHT_CATEGORIES.tribes: {
                 for (let playerId of dataLoader.tribePlayers[realId]) {
                     formatVillagesToDraw(dataLoader.playerVillages[playerId], redrawVillages)
                 }
@@ -342,7 +340,7 @@ const TW2Map = function (containerSelector, dataLoader) {
                 break
             }
             default: {
-                throw new Error('Custom colors: Invalid category')
+                throw new Error('Highlights: Invalid category')
             }
         }
 
@@ -380,16 +378,16 @@ const TW2Map = function (containerSelector, dataLoader) {
         }
     }
 
-    this.addCustom = function (category, id, color) {
+    this.addHighlight = function (category, id, color) {
         if (typeof id !== 'string') {
-            throw new Error('Custom colors: Invalid id')
+            throw new Error('Highlights: Invalid id')
         }
 
         let realId
         let displayName
 
         try {
-            realId = customColorGetRealId(category, id)
+            realId = highlightGetRealId(category, id)
         } catch (error) {
             return console.log(error)
         }
@@ -397,25 +395,25 @@ const TW2Map = function (containerSelector, dataLoader) {
         const redrawVillages = getVillagesToDraw(category, realId)
 
         switch (category) {
-            case CUSTOM_CATEGORIES.tribes: {
+            case HIGHLIGHT_CATEGORIES.tribes: {
                 const [name, tag] = dataLoader.tribes[realId]
                 displayName = tag + ' (' + name + ')'
                 break
             }
-            case CUSTOM_CATEGORIES.players: {
+            case HIGHLIGHT_CATEGORIES.players: {
                 const [name] = dataLoader.players[realId]
                 displayName = name
                 break
             }
         }
 
-        if (customColors[category].hasOwnProperty(realId)) {
+        if (highlights[category].hasOwnProperty(realId)) {
             onUpdateHighlight(category, id, displayName, color)
         } else {
             onAddHighlight(category, id, displayName, color)
         }
 
-        customColors[category][realId] = {
+        highlights[category][realId] = {
             display: displayName,
             color: color
         }
@@ -423,22 +421,22 @@ const TW2Map = function (containerSelector, dataLoader) {
         renderVillages(redrawVillages)
     }
 
-    this.removeCustom = function (category, id) {
+    this.removeHighlight = function (category, id) {
         if (typeof id !== 'string') {
-            throw new Error('Custom colors: Invalid id')
+            throw new Error('Highlights: Invalid id')
         }
 
         let realId
 
         try {
-            realId = customColorGetRealId(category, id)
+            realId = highlightGetRealId(category, id)
         } catch (error) {
             return console.log(error)
         }
 
         const redrawVillages = getVillagesToDraw(category, realId)
 
-        delete customColors[category][realId]
+        delete highlights[category][realId]
 
         onRemoveHighlight(category, id)
         renderVillages(redrawVillages)
@@ -573,93 +571,137 @@ const userInterface = function () {
         ["000000", "730202", "00293a", "02350f", "572412", "494500", "6a043e", "723305", "2f1460", "152232", "000645", "6c055b", "c766c7", "74c374"]
     ]
 
-    $customColorId = document.getElementById('custom-color-id')
-    $customColorItems = document.getElementById('custom-color-items')
+    const $highlightId = document.getElementById('highlight-id')
+    const $highlightItems = document.getElementById('highlight-items')
 
-    const autocompleteInstance = new autoComplete({
-        data: {
-            src: async function () {
-                await data.loadPlayers
-                await data.loadTribes
+    const autoCompleteSource = async function () {
+        await data.loadPlayers
+        await data.loadTribes
 
-                const matches = []
+        const matches = []
 
-                for (let [name] of Object.values(data.players)) {
-                    matches.push({
-                        search: name,
-                        id: name,
-                        type: 'players'
-                    })
-                }
-
-                for (let [name, tag] of Object.values(data.tribes)) {
-                    matches.push({
-                        search: tag + ' (' + name + ')',
-                        id: tag,
-                        type: 'tribes'
-                    })
-                }
-
-                return matches
-            },
-            key: ['search'],
-            cache: false
-        },
-        searchEngine: 'loose',
-        selector: '#custom-color-id',
-        resultsList: {
-            render: true
-        },
-        threshold: 1,
-        trigger: {
-            event: ['input', 'keypress', 'focusin']
-        },
-        sort: function (a, b) {
-            if (a.match < b.match) return -1
-            if (a.match > b.match) return 1
-            return 0
-        },
-        noResults: function () {
-            const $item = document.createElement('li')
-            $item.innerHTML = 'no results'
-            $autoCompleteList.appendChild($item)
-        },
-        placeHolder: 'search...',
-        highlight: true,
-        onSelection: function (feedback) {
-            const { id, type } = feedback.selection.value
-            const color = '#' + arrayRandom(colorPalette.flat())
-
-            map.addCustom(type, id, color)
-            $customColorId.value = ''
-        }
-    })
-
-    const $autoCompleteList = document.getElementById('autoComplete_list')
-
-    $customColorId.addEventListener('blur', function () {
-        $autoCompleteList.style.display = 'none'
-    })
-
-    $customColorId.addEventListener('focus', function () {
-        $autoCompleteList.style.display = ''
-    })
-
-    $customColorId.addEventListener('keydown', async function (event) {
-        if (event.key === 'Escape') {
-            $customColorId.value = ''
-            $customColorId.dispatchEvent(new Event('input'))
-        }
-    })
-
-    $customColorId.addEventListener('autoComplete', function ({ detail }) {
-        if (detail.event.key == 'Enter' && detail.matches > 0) {
-            autocompleteInstance.listMatchedResults(autocompleteInstance.dataStream).then(function () {
-                const first = autocompleteInstance.resultsList.view.children.item(0)
-                first.dispatchEvent(new Event('mousedown'))
+        for (let [name] of Object.values(data.players)) {
+            matches.push({
+                search: name,
+                id: name,
+                type: 'players'
             })
         }
+
+        for (let [name, tag] of Object.values(data.tribes)) {
+            matches.push({
+                search: tag + ' (' + name + ')',
+                id: tag,
+                type: 'tribes'
+            })
+        }
+
+        return matches
+    }
+
+    const autoCompleteInit = function () {
+        const ac = new autoComplete({
+            data: {
+                src: autoCompleteSource,
+                key: ['search'],
+                cache: false
+            },
+            searchEngine: 'loose',
+            selector: '#highlight-id',
+            resultsList: {
+                render: true
+            },
+            threshold: 1,
+            trigger: {
+                event: ['input', 'keypress', 'focusin']
+            },
+            sort: function (a, b) {
+                if (a.match < b.match) return -1
+                if (a.match > b.match) return 1
+                return 0
+            },
+            noResults: function () {
+                const $item = document.createElement('li')
+                $item.innerHTML = 'no results'
+                ac.resultsList.view.appendChild($item)
+            },
+            placeHolder: 'search...',
+            highlight: true,
+            onSelection: function (feedback) {
+                const { search, id, type } = feedback.selection.value
+                const color = '#' + arrayRandom(colorPalette.flat())
+
+                map.addHighlight(type, id, color)
+                $highlightId.value = ''
+            }
+        })
+
+        $highlightId.addEventListener('blur', function () {
+            ac.resultsList.view.style.display = 'none'
+        })
+
+        $highlightId.addEventListener('focus', function () {
+            ac.resultsList.view.style.display = ''
+        })
+
+        $highlightId.addEventListener('keydown', async function (event) {
+            if (event.key === 'Escape') {
+                $highlightId.value = ''
+                $highlightId.dispatchEvent(new Event('input'))
+            }
+        })
+
+        $highlightId.addEventListener('autoComplete', function ({ detail }) {
+            if (detail.event.key == 'Enter' && detail.matches > 0) {
+                ac.listMatchedResults(ac.dataStream).then(function () {
+                    const first = ac.resultsList.view.children.item(0)
+                    first.dispatchEvent(new Event('mousedown'))
+                })
+            }
+        })
+    }
+
+    map.onAddHighlight(function (category, id, displayName, color) {
+        const $item = document.createElement('li')
+        const $content = document.createElement('span')
+        $content.innerHTML = displayName
+        $content.className = category
+        $item.appendChild($content)
+
+        $item.classList.add('highlight-' + id)
+
+        $item.dataset.category = category
+        $item.dataset.realId = id
+        $item.dataset.color = color
+
+        $item.addEventListener('click', function () {
+            map.removeHighlight(category, id)
+        })
+
+        $highlightItems.appendChild($item)
     })
+
+    map.onUpdateHighlight(function (category, id, displayName, color) {
+        const $item = $highlightItems.querySelector('.highlight-' + id)
+
+        if (!$item) {
+            return false
+        }
+
+        $item.dataset.color = color
+
+        // update color picker element
+    })
+
+    map.onRemoveHighlight(function (category, id) {
+        const $item = $highlightItems.querySelector('.highlight-' + id)
+
+        if ($item) {
+            $item.remove()
+        }
+    })
+
+    autoCompleteInit()
 }
 
 ;(async function () {
