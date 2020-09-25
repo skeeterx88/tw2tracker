@@ -35,7 +35,8 @@ ul {
 
 #side-panel {
     flex: 0 0 125px;
-    /*flex: 0 0 90px;*/
+    box-shadow: 5px 0px 6px #00000080;
+    z-index: 5;
     color: #ffeccc;
     background: url("/images/side-bar-border.jpg") right top repeat-y,
                 url("/images/side-bar-left.jpg") left repeat-y,
@@ -79,6 +80,7 @@ ul {
     width: 90%;
     margin-top: 5px;
     margin-left: 2px;
+    text-shadow: 1px 1px 0px #000;
 }
 
 #highlight-items .name {
@@ -103,7 +105,9 @@ ul {
     border-radius: 1px;
     border: 1px solid #8d5b39;
     background: url('/images/bg1.png') #a07246;
-    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                1px 1px 2px #000;
     cursor: pointer;
 }
 
