@@ -70,8 +70,8 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
         background: '#436213',
         highlightPlayer: '#ffffff',
         activeVillageBorder: 'rgba(255, 255, 255, 0.5)',
-        continentDemarcation: 'rgba(0,0,0,0.3)',
-        provinceDemarcation: 'rgba(0,0,0,0.1)'
+        continentDemarcation: 'rgba(0,0,0,0.15)',
+        provinceDemarcation: 'rgba(0,0,0,0.05)'
     }
 
     const setupElements = function () {
