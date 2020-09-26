@@ -132,7 +132,9 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
         })
 
         $overlay.addEventListener('mousemove', function (event) {
-            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX) / tileSize)
+            let off = Math.floor(event.pageY / tileSize) % 2 ? 0 : 2
+
+            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / tileSize)
             mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / tileSize)
 
             const villagesX = dataLoader.villages[mouseCoordX]
@@ -244,7 +246,9 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
                     $cacheContext.fillStyle = COLORS.neutral
                 }
 
-                $cacheContext.fillRect(x * tileSize, y * tileSize, villageSize, villageSize)
+                let off = y % 2 ? 2 : 0
+
+                $cacheContext.fillRect(x * tileSize + off, y * tileSize, villageSize, villageSize)
             }
         }
 
@@ -268,7 +272,9 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
             return
         }
 
-        const borderX = Math.abs(positionX - (activeVillage.x * tileSize) - middleViewportOffsetX) - 1
+        let off = activeVillage.y % 2 ? 2 : 0
+
+        const borderX = Math.abs(positionX - (activeVillage.x * tileSize) - middleViewportOffsetX) - 1 + off
         const borderY = Math.abs(positionY - (activeVillage.y * tileSize) - middleViewportOffsetY) - 1
         const borderSize = villageSize + 2
 
@@ -287,7 +293,9 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
         $overlayContext.fillStyle = COLORS.highlightPlayer
 
         for (let [x, y] of dataLoader.playerVillages[characterId]) {
-            x = x * tileSize - positionX + middleViewportOffsetX
+            let off = y % 2 ? 2 : 0
+
+            x = x * tileSize - positionX + middleViewportOffsetX + off
             y = y * tileSize - positionY + middleViewportOffsetY
 
             $overlayContext.fillRect(x, y, villageSize, villageSize)
