@@ -5,7 +5,7 @@ const colorPalette = [
     ["#000000", "#730202", "#00293a", "#02350f", "#572412", "#494500", "#6a043e", "#723305", "#2f1460", "#152232", "#000645", "#6c055b", "#c766c7", "#74c374"]
 ]
 
-const TW2Map = function (containerSelector, dataLoader) {
+const TW2Map = function (containerSelector, dataLoader, tooltip) {
     const $container = document.querySelector(containerSelector)
 
     if (!$container || !$container.nodeName || $container.nodeName !== 'DIV') {
@@ -60,6 +60,9 @@ const TW2Map = function (containerSelector, dataLoader) {
     let onAddHighlight = noop
     let onRemoveHighlight = noop
     let onUpdateHighlight = noop
+
+    let onActiveVillage = noop
+    let onInactiveVillage = noop
 
     const COLORS = {
         neutral: '#823c0a',
@@ -166,6 +169,7 @@ const TW2Map = function (containerSelector, dataLoader) {
         const tribe = player ? dataLoader.tribes[player[1]] : false
 
         renderOverlay()
+        onActiveVillage(activeVillage)
     }
 
     const unsetActiveVillage = function () {
@@ -173,8 +177,8 @@ const TW2Map = function (containerSelector, dataLoader) {
             return
         }
 
+        onInactiveVillage(activeVillage)
         activeVillage = false
-
         $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
     }
 
@@ -479,6 +483,18 @@ const TW2Map = function (containerSelector, dataLoader) {
         }
     }
 
+    this.onActiveVillage = function (fn) {
+        if (typeof fn === 'function') {
+            onActiveVillage = fn
+        }
+    }
+
+    this.onInactiveVillage = function (fn) {
+        if (typeof fn === 'function') {
+            onInactiveVillage = fn
+        }
+    }
+
     setupElements()
     mouseEvents()
     renderGrid()
@@ -490,6 +506,53 @@ const TW2Map = function (containerSelector, dataLoader) {
         loadVisibleContinents()
         continuousRender()
     })
+
+    if (tooltip) {
+        this.onActiveVillage(function (village) {
+            const {
+                id,
+                name: villageName,
+                points: villagePoints,
+                character_id: villageCharacterId,
+                x: villageX,
+                y: villageY
+            } = village
+
+            let playerName
+            let tribeId
+            let playerPoints
+            let tribe
+            let tribeName
+            let tribeTag
+            let tribePoints
+
+            if (villageCharacterId) {
+                ([ playerName, tribeId, playerPoints ] = dataLoader.players[villageCharacterId])
+
+                if (tribeId) {
+                    ([ tribeName, tribeTag, tribePoints ] = dataLoader.tribes[tribeId])
+                }
+            }
+
+            tooltip.set({
+                villageName,
+                villageX,
+                villageY,
+                villagePoints,
+                playerName,
+                playerPoints,
+                tribeName,
+                tribeTag,
+                tribePoints
+            })
+
+            tooltip.show()
+        })
+
+        this.onInactiveVillage(function (village) {
+            tooltip.hide()
+        })
+    }
 }
 
 const DataLoader = function (marketId, worldNumber) {
@@ -727,11 +790,103 @@ const userInterface = function () {
     autoCompleteInit()
 }
 
+const TW2MapTooltip = function (selector) {
+    const $tooltip = document.querySelector(selector)
+
+    if (!$tooltip || !$tooltip.nodeName || $tooltip.nodeName !== 'DIV') {
+        throw new Error('Invalid tooltip element')
+    }
+
+    const mouseDistance = 30
+
+    let $map
+    let visible = false
+
+    $tooltip.style.visibility = 'hidden'
+    $tooltip.style.opacity = 0
+
+    let $villageName = $tooltip.querySelector('.village-name')
+    let $villageX = $tooltip.querySelector('.village-x')
+    let $villageY = $tooltip.querySelector('.village-y')
+    let $villagePoints = $tooltip.querySelector('.village-points')
+    let $playerName = $tooltip.querySelector('.player-name')
+    let $playerPoints = $tooltip.querySelector('.player-points')
+    let $tribeName = $tooltip.querySelector('.tribe-name')
+    let $tribeTag = $tooltip.querySelector('.tribe-tag')
+    let $tribePoints = $tooltip.querySelector('.tribe-points')
+
+    const mouseMoveHandler = function (event) {
+        let x = event.pageX
+        let y = event.pageY
+
+        if (x + 400 > window.innerWidth) {
+            x -= 370
+            x -= mouseDistance
+        } else {
+            x += mouseDistance
+        }
+
+        if (y + 140 > window.innerHeight) {
+            y -= 110
+            y -= mouseDistance
+        } else {
+            y += mouseDistance
+        }
+
+        $tooltip.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)'
+    }
+
+    const setEvents = function () {
+        window.addEventListener('mousemove', mouseMoveHandler)
+    }
+
+    const unsetEvents = function () {
+        window.removeEventListener('mousemove', mouseMoveHandler)
+    }
+
+    this.set = function ({
+        villageName,
+        villageX,
+        villageY,
+        villagePoints,
+        playerName,
+        playerPoints,
+        tribeName,
+        tribeTag,
+        tribePoints
+    }) {
+        $villageName.innerHTML = villageName
+        $villageX.innerHTML = villageX
+        $villageY.innerHTML = villageY
+        $villagePoints.innerHTML = villagePoints.toLocaleString('pt-BR')
+        $playerName.innerHTML = playerName || '-'
+        $playerPoints.innerHTML = playerPoints ? playerPoints.toLocaleString('pt-BR') : 0
+        $tribeName.innerHTML = tribeName || '-'
+        $tribeTag.innerHTML = tribeTag || '-'
+        $tribePoints.innerHTML = tribePoints ? tribePoints.toLocaleString('pt-BR') : 0
+    }
+
+    this.show = function () {
+        setEvents()
+        $tooltip.style.visibility = 'visible'
+        $tooltip.style.opacity = 1
+        visible = true
+    }
+
+    this.hide = function () {
+        unsetEvents()
+        $tooltip.style.visibility = 'hidden'
+        $tooltip.style.opacity = 0
+        visible = false
+    }
+}
+
 ;(async function () {
     let reInitTimeout
 
     data = new DataLoader(marketId, worldNumber)
-    map = new TW2Map('#map', data)
+    tooltip = new TW2MapTooltip('#tooltip')
+    map = new TW2Map('#map', data, tooltip)
 
     window.addEventListener('resize', function () {
         clearTimeout(reInitTimeout)

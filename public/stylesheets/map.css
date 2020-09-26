@@ -9,6 +9,7 @@ body {
     margin: 0;
     padding: 0;
     font: 11px Arial, Helvetica, sans-serif;
+    overflow: hidden;
 }
 
 input {
@@ -66,7 +67,7 @@ ul {
     position: relative;
     border-radius: 1px;
     border: 1px solid #8d5b39;
-    background: url("/images/bg1.png") #a07246;
+    background: url("/images/noise.png") #a07246;
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000;
@@ -104,7 +105,7 @@ ul {
     position: relative;
     border-radius: 1px;
     border: 1px solid #8d5b39;
-    background: url('/images/bg1.png') #a07246;
+    background: url('/images/noise.png') #a07246;
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 1px 1px 2px #000;
@@ -145,18 +146,102 @@ ul {
 
 
 #tooltip {
+    opacity: 0;
+    visibility: hidden;
     position: absolute;
-    background: rgba(0,0,0, 0.85);
-    color: #eee;
-    z-index: 20;
-    display: inline-table;
-    padding: 6px;
-    border-radius: 3px;
-    box-shadow: 2px 2px 2px #000;
+    transition: opacity .2s;
+    width: 360px;
+    z-index: 5;
+    padding: 3px;
+    top: 0px;
+    left: 0px;
+    margin-top: 3px;
+    border: 1px solid #5e351b;
+    background: url("/images/tooltip-background.png") #d0ac86;
+    box-shadow: 0 0 0 2px #000,
+                inset 0 0 0 1px #000,
+                2px 2px 4px #000;
 }
 
-#tooltip span {
+#tooltip table {
+    width: 100%;
+    border-spacing: 1px;
+    border-collapse: separate;
+    box-shadow: 0 0 0 2px rgba(124,54,0,0.4);
+    background: url("/images/tooltip-background-2.png") #d1ad86;
+}
+
+#tooltip td {
+    border: 1px solid rgba(124,54,0,0.3);
+    box-shadow: none;
+    background: url("/images/tooltip-background-2.png") #c39c72;
+    padding: 1px;
+}
+
+#tooltip td > div {
+    padding-left: 30px;
+    position: relative;
+}
+
+#tooltip .title {
+    display: block;
+}
+
+#tooltip.left {
+    left: -380px;
+}
+
+#tooltip.top {
+    top: -120px;
+}
+
+#tooltip span,
+#tooltip div {
     white-space: nowrap;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    margin: 2px;
+    display: inline-block;
+    border: 1px solid #2b2121;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: linear-gradient(rgba(2,3,3,0.45), rgba(2,3,3,0)),
+                url("/images/background_noise_icon_black.png");
+}
+
+.icon:before {
+    content: " ";
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    z-index: 1;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.icon.village:before {
+    background-image: url("/images/village-icon.png");
+}
+
+.icon.player:before {
+    background-image: url("/images/player-icon.png");
+}
+
+.icon.tribe:before {
+    background-image: url("/images/tribe-icon.png");
+}
+
+.icon.tribe-points-x:before {
+    background-image: url("/images/tribe-points-icon.png");
+}
+
+.icon.points:before {
+    background-image: url("/images/points-icon.png");
 }
 
 
