@@ -33,7 +33,8 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
     res.render('map', {
         title: 'Map ' + worldId + ' - ' + settings.site_name,
         marketId,
-        worldNumber
+        worldNumber,
+        development: process.env.NODE_ENV === 'development'
     })
 })
 
