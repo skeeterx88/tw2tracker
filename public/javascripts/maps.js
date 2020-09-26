@@ -653,151 +653,6 @@ const DataLoader = function (marketId, worldNumber) {
     }
 }
 
-const userInterface = function () {
-    const $highlightId = document.getElementById('highlight-id')
-    const $highlightItems = document.getElementById('highlight-items')
-
-    const autoCompleteSource = async function () {
-        await data.loadPlayers
-        await data.loadTribes
-
-        const matches = []
-
-        for (let [name] of Object.values(data.players)) {
-            matches.push({
-                search: name,
-                id: name,
-                type: 'players'
-            })
-        }
-
-        for (let [name, tag] of Object.values(data.tribes)) {
-            matches.push({
-                search: tag + ' (' + name + ')',
-                id: tag,
-                type: 'tribes'
-            })
-        }
-
-        return matches
-    }
-
-    const autoCompleteInit = function () {
-        const ac = new autoComplete({
-            data: {
-                src: autoCompleteSource,
-                key: ['search'],
-                cache: false
-            },
-            searchEngine: 'loose',
-            selector: '#highlight-id',
-            resultsList: {
-                render: true
-            },
-            threshold: 1,
-            trigger: {
-                event: ['input', 'keypress', 'focusin']
-            },
-            sort: function (a, b) {
-                if (a.match < b.match) return -1
-                if (a.match > b.match) return 1
-                return 0
-            },
-            noResults: function () {
-                const $item = document.createElement('li')
-                $item.innerHTML = 'no results'
-                ac.resultsList.view.appendChild($item)
-            },
-            placeHolder: 'search...',
-            highlight: true,
-            onSelection: function (feedback) {
-                const { search, id, type } = feedback.selection.value
-                const color = arrayRandom(colorPalette.flat())
-
-                map.addHighlight(type, id, color)
-                $highlightId.value = ''
-            }
-        })
-
-        $highlightId.addEventListener('blur', function () {
-            ac.resultsList.view.style.display = 'none'
-        })
-
-        $highlightId.addEventListener('focus', function () {
-            ac.resultsList.view.style.display = ''
-        })
-
-        $highlightId.addEventListener('keydown', async function (event) {
-            if (event.key === 'Escape') {
-                $highlightId.value = ''
-                $highlightId.dispatchEvent(new Event('input'))
-            }
-        })
-
-        $highlightId.addEventListener('autoComplete', function ({ detail }) {
-            if (detail.event.key == 'Enter' && detail.matches > 0) {
-                ac.listMatchedResults(ac.dataStream).then(function () {
-                    const first = ac.resultsList.view.children.item(0)
-                    first.dispatchEvent(new Event('mousedown'))
-                })
-            }
-        })
-    }
-
-    map.onAddHighlight(function (category, id, displayName, color) {
-        const $item = document.createElement('li')
-        const $name = document.createElement('div')
-        const $nameSpan = document.createElement('span')
-        const $color = document.createElement('div')
-        
-        $item.classList.add('highlight-' + normalizeString(id))
-        $item.classList.add('item')
-        $item.dataset.category = category
-        $item.dataset.id = id
-        $item.dataset.color = color
-
-        $name.addEventListener('click', function () {
-            map.removeHighlight(category, id)
-        })
-
-        $name.className = 'name'
-
-        $nameSpan.innerHTML = displayName
-        $nameSpan.className = category
-
-        $color.className = 'color'
-        $color.style.backgroundColor = color
-
-        $name.appendChild($nameSpan)
-        $item.appendChild($name)
-        $item.appendChild($color)
-        $highlightItems.appendChild($item)
-    })
-
-    map.onUpdateHighlight(function (category, id, displayName, color) {
-        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
-
-        if (!$item) {
-            return false
-        }
-
-        const $color = $item.querySelector('.color')
-
-        $color.style.background = color
-        $item.dataset.color = color
-    })
-
-    map.onRemoveHighlight(function (category, id) {
-        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
-
-        if ($item) {
-            $item.remove()
-        }
-    })
-
-    autoCompleteInit()
-}
-
 const TW2MapTooltip = function (selector) {
     const $tooltip = document.querySelector(selector)
 
@@ -889,24 +744,155 @@ const TW2MapTooltip = function (selector) {
     }
 }
 
-;(async function () {
-    let reInitTimeout
+{
+    const dataLoader = new DataLoader(marketId, worldNumber)
+    const tooltip = new TW2MapTooltip('#tooltip')
+    const map = new TW2Map('#map', dataLoader, tooltip)
 
-    data = new DataLoader(marketId, worldNumber)
-    tooltip = new TW2MapTooltip('#tooltip')
-    map = new TW2Map('#map', data, tooltip)
-
+    let resizeTimeout
     window.addEventListener('resize', function () {
-        clearTimeout(reInitTimeout)
-        reInitTimeout = setTimeout(() => map.recalcSize(), 200)
+        clearTimeout(resizeTimeout)
+        resizeTimeout = setTimeout(() => map.recalcSize(), 200)
     })
 
-    userInterface()
+    const $highlightId = document.getElementById('highlight-id')
+    const $highlightItems = document.getElementById('highlight-items')
 
-    await data.loadTribes
-    await data.loadPlayers
+    const ac = new autoComplete({
+        data: {
+            src: async function () {
+                await dataLoader.loadPlayers
+                await dataLoader.loadTribes
 
-    map.addHighlight('tribes', 'OUT', 'blue')
-    map.addHighlight('players', 'she-ra', 'red')
-})()
+                const matches = []
+
+                for (let [name] of Object.values(dataLoader.players)) {
+                    matches.push({
+                        search: name,
+                        id: name,
+                        type: 'players'
+                    })
+                }
+
+                for (let [name, tag] of Object.values(dataLoader.tribes)) {
+                    matches.push({
+                        search: tag + ' (' + name + ')',
+                        id: tag,
+                        type: 'tribes'
+                    })
+                }
+
+                return matches
+            },
+            key: ['search'],
+            cache: false
+        },
+        searchEngine: 'loose',
+        selector: '#highlight-id',
+        resultsList: {
+            render: true
+        },
+        threshold: 1,
+        trigger: {
+            event: ['input', 'keypress', 'focusin']
+        },
+        sort: function (a, b) {
+            if (a.match < b.match) return -1
+            if (a.match > b.match) return 1
+            return 0
+        },
+        noResults: function () {
+            const $item = document.createElement('li')
+            $item.innerHTML = 'no results'
+            ac.resultsList.view.appendChild($item)
+        },
+        placeHolder: 'search...',
+        highlight: true,
+        onSelection: function (feedback) {
+            const { search, id, type } = feedback.selection.value
+            const color = arrayRandom(colorPalette.flat())
+
+            map.addHighlight(type, id, color)
+            $highlightId.value = ''
+        }
+    })
+
+    $highlightId.addEventListener('blur', function () {
+        ac.resultsList.view.style.display = 'none'
+    })
+
+    $highlightId.addEventListener('focus', function () {
+        ac.resultsList.view.style.display = ''
+    })
+
+    $highlightId.addEventListener('keydown', async function (event) {
+        if (event.key === 'Escape') {
+            $highlightId.value = ''
+            $highlightId.dispatchEvent(new Event('input'))
+        }
+    })
+
+    $highlightId.addEventListener('autoComplete', function ({ detail }) {
+        if (detail.event.key == 'Enter' && detail.matches > 0) {
+            ac.listMatchedResults(ac.dataStream).then(function () {
+                const first = ac.resultsList.view.children.item(0)
+                first.dispatchEvent(new Event('mousedown'))
+            })
+        }
+    })
+
+    map.onAddHighlight(function (category, id, displayName, color) {
+        const $item = document.createElement('li')
+        const $name = document.createElement('div')
+        const $nameSpan = document.createElement('span')
+        const $color = document.createElement('div')
+        
+        $item.classList.add('highlight-' + normalizeString(id))
+        $item.classList.add('item')
+        $item.dataset.category = category
+        $item.dataset.id = id
+        $item.dataset.color = color
+
+        $name.addEventListener('click', function () {
+            map.removeHighlight(category, id)
+        })
+
+        $name.className = 'name'
+
+        $nameSpan.innerHTML = displayName
+        $nameSpan.className = category
+
+        $color.className = 'color'
+        $color.style.backgroundColor = color
+
+        $name.appendChild($nameSpan)
+        $item.appendChild($name)
+        $item.appendChild($color)
+        $highlightItems.appendChild($item)
+    })
+
+    map.onUpdateHighlight(function (category, id, displayName, color) {
+        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
+
+        if (!$item) {
+            return false
+        }
+
+        const $color = $item.querySelector('.color')
+
+        $color.style.background = color
+        $item.dataset.color = color
+    })
+
+    map.onRemoveHighlight(function (category, id) {
+        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
+
+        if ($item) {
+            $item.remove()
+        }
+    })
+
+    // dataLoader.loadTribes
+    // dataLoader.loadPlayers
+}
 
