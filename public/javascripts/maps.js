@@ -64,7 +64,11 @@ const TW2Map = function (containerSelector, dataLoader) {
     const COLORS = {
         neutral: '#823c0a',
         barbarian: '#4c6f15',
-        background: '#436213'
+        background: '#436213',
+        highlightPlayer: '#ffffff',
+        activeVillageBorder: 'rgba(255, 255, 255, 0.5)',
+        continentDemarcation: 'rgba(0,0,0,0.3)',
+        provinceDemarcation: 'rgba(0,0,0,0.1)'
     }
 
     const setupElements = function () {
@@ -201,7 +205,7 @@ const TW2Map = function (containerSelector, dataLoader) {
     const renderGrid = function () {
         $cacheContext.clearRect(0, 0, mapWidth, mapHeight)
 
-        $cacheContext.fillStyle = 'rgba(0,0,0,0.3)'
+        $cacheContext.fillStyle = COLORS.continentDemarcation
 
         $cacheContext.fillRect(0, 0, 1, mapWidth)
         $cacheContext.fillRect(0, 0, mapWidth, 1)
@@ -211,7 +215,7 @@ const TW2Map = function (containerSelector, dataLoader) {
             $cacheContext.fillRect(0, i * 100 * tileSize - 1, mapWidth, 1)
         }
 
-        $cacheContext.fillStyle = 'rgba(0,0,0,0.1)'
+        $cacheContext.fillStyle = COLORS.provinceDemarcation
 
         for (let i = 1; i < 100; i++) {
             $cacheContext.fillRect(i * 10 * tileSize - 1, 0, 1, mapWidth)
@@ -264,7 +268,7 @@ const TW2Map = function (containerSelector, dataLoader) {
         const borderY = Math.abs(positionY - (activeVillage.y * tileSize) - middleViewportOffsetY) - 1
         const borderSize = villageSize + 2
 
-        $overlayContext.fillStyle = 'rgba(255, 255, 255, 0.5)'
+        $overlayContext.fillStyle = COLORS.activeVillageBorder
         $overlayContext.fillRect(borderX, borderY - 1, borderSize, 1)
         $overlayContext.fillRect(borderX + borderSize, borderY, 1, borderSize)
         $overlayContext.fillRect(borderX, borderY + borderSize, borderSize, 1)
@@ -276,7 +280,7 @@ const TW2Map = function (containerSelector, dataLoader) {
             return
         }
 
-        $overlayContext.fillStyle = 'white'
+        $overlayContext.fillStyle = COLORS.highlightPlayer
 
         for (let [x, y] of dataLoader.playerVillages[characterId]) {
             x = x * tileSize - positionX + middleViewportOffsetX
