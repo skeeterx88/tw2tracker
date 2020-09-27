@@ -143,11 +143,19 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
                     onCenterCoordsUpdate(centerCoordX, centerCoordY)
                 }
 
+                if (tooltip) {
+                    tooltip.hide()
+                }
+
                 loadVisibleContinents()
             }
         })
 
         $overlay.addEventListener('mousemove', function (event) {
+            if (draggable) {
+                return
+            }
+
             let off = Math.floor(event.pageY / tileSize) % 2 ? 0 : 2
 
             mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / tileSize)
