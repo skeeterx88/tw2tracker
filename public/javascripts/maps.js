@@ -149,6 +149,15 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
 
             return unsetActiveVillage()
         })
+
+        $overlay.addEventListener('mouseleave', function (event) {
+            draggable = false
+            dragStartX = 0
+            dragStartY = 0
+            renderEnabled = false
+            $overlay.style.cursor = 'default'
+            unsetActiveVillage()
+        })
     }
 
     const setActiveVillage = function (village) {
