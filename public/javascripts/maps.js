@@ -838,7 +838,6 @@ const generateColorPicker = function () {
             $item.innerHTML = 'no results'
             ac.resultsList.view.appendChild($item)
         },
-        placeHolder: 'search...',
         highlight: true,
         onSelection: function (feedback) {
             const { search, id, type } = feedback.selection.value
