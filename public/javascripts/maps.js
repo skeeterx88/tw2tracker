@@ -5,11 +5,18 @@ const colorPalette = [
     ["#000000", "#730202", "#00293a", "#02350f", "#572412", "#494500", "#6a043e", "#723305", "#2f1460", "#152232", "#000645", "#6c055b", "#c766c7", "#74c374"]
 ]
 
-const TW2Map = function (containerSelector, dataLoader, tooltip) {
+const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
     const $container = document.querySelector(containerSelector)
 
     if (!$container || !$container.nodeName || $container.nodeName !== 'DIV') {
         throw new Error('Invalid map element')
+    }
+
+    settings = {
+        ...{
+            hexagonVillages: false
+        },
+        ...settings
     }
 
     let renderEnabled = false
@@ -284,7 +291,15 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
 
                 let off = y % 2 ? 3 : 0
 
-                $cacheContext.fillRect(x * tileSize + off, y * tileSize, villageSize, villageSize)
+                if (settings.hexagonVillages) {
+                    $cacheContext.fillRect(x * tileSize + off + 1, y * tileSize, 3, 1)
+                    $cacheContext.fillRect(x * tileSize + off    , y * tileSize + 1, 5, 1)
+                    $cacheContext.fillRect(x * tileSize + off    , y * tileSize + 2, 5, 1)
+                    $cacheContext.fillRect(x * tileSize + off    , y * tileSize + 3, 5, 1)
+                    $cacheContext.fillRect(x * tileSize + off + 1, y * tileSize + 4, 3, 1)
+                } else {
+                    $cacheContext.fillRect(x * tileSize + off, y * tileSize, villageSize, villageSize)
+                }
             }
         }
 
@@ -314,11 +329,24 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
         const borderY = Math.abs(positionY - (activeVillage.y * tileSize) - middleViewportOffsetY) - 1
         const borderSize = villageSize + 2
 
+
         $overlayContext.fillStyle = COLORS.activeVillageBorder
-        $overlayContext.fillRect(borderX, borderY - 1, borderSize, 1)
-        $overlayContext.fillRect(borderX + borderSize, borderY, 1, borderSize)
-        $overlayContext.fillRect(borderX, borderY + borderSize, borderSize, 1)
-        $overlayContext.fillRect(borderX - 1, borderY, 1, borderSize)
+
+        if (settings.hexagonVillages) {
+            $overlayContext.fillRect(borderX + 1, borderY - 1, 5, 1)
+            $overlayContext.fillRect(borderX    , borderY    , 1, 1)
+            $overlayContext.fillRect(borderX + 6, borderY    , 1, 1)
+            $overlayContext.fillRect(borderX - 1, borderY + 1, 1, 5)
+            $overlayContext.fillRect(borderX + 7, borderY + 1, 1, 5)
+            $overlayContext.fillRect(borderX    , borderY + 6, 1, 1)
+            $overlayContext.fillRect(borderX + 6, borderY + 6, 1, 1)
+            $overlayContext.fillRect(borderX + 1, borderY + 7, 5, 1)
+        } else {
+            $overlayContext.fillRect(borderX, borderY - 1, borderSize, 1)
+            $overlayContext.fillRect(borderX + borderSize, borderY, 1, borderSize)
+            $overlayContext.fillRect(borderX, borderY + borderSize, borderSize, 1)
+            $overlayContext.fillRect(borderX - 1, borderY, 1, borderSize)
+        }
 
         const characterId = activeVillage.character_id
 
@@ -334,7 +362,15 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
             x = x * tileSize - positionX + middleViewportOffsetX + off
             y = y * tileSize - positionY + middleViewportOffsetY
 
-            $overlayContext.fillRect(x, y, villageSize, villageSize)
+            if (settings.hexagonVillages) {
+                $overlayContext.fillRect(x + 1, y, 3, 1)
+                $overlayContext.fillRect(x    , y + 1, 5, 1)
+                $overlayContext.fillRect(x    , y + 2, 5, 1)
+                $overlayContext.fillRect(x    , y + 3, 5, 1)
+                $overlayContext.fillRect(x + 1, y + 4, 3, 1)
+            } else {
+                $overlayContext.fillRect(x, y, villageSize, villageSize)
+            }
         }
     }
 
@@ -813,7 +849,9 @@ const generateColorPicker = function () {
 {
     const dataLoader = new DataLoader(marketId, worldNumber)
     const tooltip = new TW2MapTooltip('#tooltip')
-    const map = new TW2Map('#map', dataLoader, tooltip)
+    const map = new TW2Map('#map', dataLoader, tooltip, {
+        hexagonVillages: true
+    })
 
     window.addEventListener('resize', map.recalcSize)
 
