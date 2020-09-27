@@ -29,9 +29,9 @@ ul {
 }
 
 #map {
-    background: #436213;
     flex: 1 1 auto;
     user-select: none;
+    background-color: #436213;
 }
 
 #side-panel {
@@ -39,10 +39,7 @@ ul {
     box-shadow: 5px 0px 6px #00000080;
     z-index: 5;
     color: #ffeccc;
-    background: url("/images/side-bar-border.jpg") right top repeat-y,
-                url("/images/side-bar-left.jpg") left repeat-y,
-                url("/images/side-bar-right.jpg") right top repeat-y,
-                url("/images/side-bar-middle.jpg") center;
+    background: url("/images/side-bar.jpg") repeat-y #413127;
 }
 
 
