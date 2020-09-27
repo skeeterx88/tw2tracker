@@ -998,6 +998,11 @@ const generateColorPicker = function () {
         }
     })
 
+    const $lastSync = document.querySelector('#last-sync-date')
+    const lastSyncDate = lastSync ? new Date(lastSync).toLocaleString('pt-BR') : 'never'
+
+    $lastSync.innerHTML = lastSyncDate
+
     if (development && marketId === 'br' && worldNumber === 48) {
         Promise.all([dataLoader.loadTribes, dataLoader.loadPlayers]).then(function () {
             map.addHighlight('tribes', 'OUT', '#0111af')

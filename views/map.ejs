@@ -9,6 +9,8 @@
             const marketId = '<%= marketId %>'
             const worldNumber = <%= worldNumber %>
             const development = <%= development %>
+            const worldName = '<%= worldName %>'
+            const lastSync = <%= lastSync %>
         </script>
     </head>
     <body>
@@ -92,6 +94,11 @@
         <div id="color-picker" class="box-border">
             <span class="close"></span>
             <table></table>
+        </div>
+
+        <div id="last-sync">
+            <span>Last update:</span>
+            <span id="last-sync-date"></span>
         </div>
 
         <script type="text/javascript" src="/javascripts/utils.js"></script>

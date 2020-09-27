@@ -281,7 +281,7 @@ Sync.scrappeAllWorlds = async function () {
             num: 48
         }, {
             market: 'br',
-            num: 46
+            num: 48
         }, {
             market: 'en',
             num: 56

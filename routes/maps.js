@@ -29,11 +29,15 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
+    const worldInfo = await db.one(sql.world, [marketId, worldNumber])
+    const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
 
     res.render('map', {
         title: 'Map ' + worldId + ' - ' + settings.site_name,
         marketId,
         worldNumber,
+        worldName: worldInfo.name,
+        lastSync,
         development: process.env.NODE_ENV === 'development'
     })
 })
