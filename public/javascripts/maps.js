@@ -45,6 +45,9 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
     let mouseCoordX = 0
     let mouseCoordY = 0
 
+    let centerCoordX = 0
+    let centerCoordY = 0
+
     let activeVillage = false
 
     const HIGHLIGHT_CATEGORIES = {
@@ -63,6 +66,8 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
 
     let onActiveVillage = noop
     let onInactiveVillage = noop
+
+    let onCenterCoordsUpdate = noop
 
     const COLORS = {
         neutral: '#823c0a',
@@ -127,6 +132,17 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
             if (draggable) {
                 positionX = dragStartX - event.pageX
                 positionY = dragStartY - event.pageY
+
+                const currentCenterX = Math.floor(positionX / tileSize)
+                const currentCenterY = Math.floor(positionY / tileSize)
+
+                if (centerCoordX !== currentCenterX || centerCoordY !== currentCenterY) {
+                    centerCoordX = currentCenterX
+                    centerCoordY = currentCenterY
+
+                    onCenterCoordsUpdate(centerCoordX, centerCoordY)
+                }
+
                 loadVisibleContinents()
             }
         })
@@ -509,6 +525,12 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
     this.onInactiveVillage = function (fn) {
         if (typeof fn === 'function') {
             onInactiveVillage = fn
+        }
+    }
+
+    this.onCenterCoordsUpdate = function (fn) {
+        if (typeof fn === 'function') {
+            onCenterCoordsUpdate = fn
         }
     }
 
@@ -1002,6 +1024,14 @@ const generateColorPicker = function () {
     const lastSyncDate = lastSync ? new Date(lastSync).toLocaleString('pt-BR') : 'never'
 
     $lastSync.innerHTML = lastSyncDate
+
+    const $centerCoordsX = document.querySelector('#center-coords-x')
+    const $centerCoordsY = document.querySelector('#center-coords-y')
+
+    map.onCenterCoordsUpdate(function (x, y) {
+        $centerCoordsX.innerHTML = x
+        $centerCoordsY.innerHTML = y
+    })
 
     if (development && marketId === 'br' && worldNumber === 48) {
         Promise.all([dataLoader.loadTribes, dataLoader.loadPlayers]).then(function () {
