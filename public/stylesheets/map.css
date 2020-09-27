@@ -320,7 +320,7 @@ ul {
     z-index: 10;
     border-radius: 1px;
     border: 1px solid #6b635e;
-    background: url(/images/noise.png) #413127;
+    background: url("/images/noise.png") #413127;
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000;

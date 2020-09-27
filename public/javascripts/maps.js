@@ -14,7 +14,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
 
     let renderEnabled = false
 
-    let villageSize = 4
+    let villageSize = 5
     let villageMargin = 1
     let tileSize = villageSize + villageMargin
 
@@ -148,10 +148,9 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
                 return
             }
 
-            let off = Math.floor(event.pageY / tileSize) % 2 ? 0 : 2
-
-            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / tileSize)
             mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / tileSize)
+            let off = mouseCoordY % 2 ? 3 : 0
+            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / tileSize)
 
             const villagesX = dataLoader.villages[mouseCoordX]
 
@@ -283,7 +282,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
                     $cacheContext.fillStyle = COLORS.neutral
                 }
 
-                let off = y % 2 ? 2 : 0
+                let off = y % 2 ? 3 : 0
 
                 $cacheContext.fillRect(x * tileSize + off, y * tileSize, villageSize, villageSize)
             }
@@ -309,7 +308,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
             return
         }
 
-        let off = activeVillage.y % 2 ? 2 : 0
+        let off = activeVillage.y % 2 ? 3 : 0
 
         const borderX = Math.abs(positionX - (activeVillage.x * tileSize) - middleViewportOffsetX) - 1 + off
         const borderY = Math.abs(positionY - (activeVillage.y * tileSize) - middleViewportOffsetY) - 1
@@ -330,7 +329,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
         $overlayContext.fillStyle = COLORS.highlightPlayer
 
         for (let [x, y] of dataLoader.playerVillages[characterId]) {
-            let off = y % 2 ? 2 : 0
+            let off = y % 2 ? 3 : 0
 
             x = x * tileSize - positionX + middleViewportOffsetX + off
             y = y * tileSize - positionY + middleViewportOffsetY
