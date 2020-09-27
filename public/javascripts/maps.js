@@ -133,15 +133,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
                 positionX = dragStartX - event.pageX
                 positionY = dragStartY - event.pageY
 
-                const currentCenterX = Math.floor(positionX / tileSize)
-                const currentCenterY = Math.floor(positionY / tileSize)
-
-                if (centerCoordX !== currentCenterX || centerCoordY !== currentCenterY) {
-                    centerCoordX = currentCenterX
-                    centerCoordY = currentCenterY
-
-                    onCenterCoordsUpdate(centerCoordX, centerCoordY)
-                }
+                updateCenter()
 
                 if (tooltip) {
                     tooltip.hide()
@@ -239,6 +231,18 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
         visibleContinents.forEach(function (continent) {
             dataLoader.loadContinent(continent).then(villages => renderVillages(villages))
         })
+    }
+
+    const updateCenter = function () {
+        const currentCenterX = Math.floor(positionX / tileSize)
+        const currentCenterY = Math.floor(positionY / tileSize)
+
+        if (centerCoordX !== currentCenterX || centerCoordY !== currentCenterY) {
+            centerCoordX = currentCenterX
+            centerCoordY = currentCenterY
+
+            onCenterCoordsUpdate(centerCoordX, centerCoordY)
+        }
     }
 
     const renderGrid = function () {
@@ -427,6 +431,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip) {
     this.moveTo = function (x, y) {
         positionX = boundNumber(x, 0, 999) * tileSize
         positionY = boundNumber(y, 0, 999) * tileSize
+        updateCenter()
         loadVisibleContinents()
         renderViewport()
     }
@@ -812,6 +817,12 @@ const generateColorPicker = function () {
     const map = new TW2Map('#map', dataLoader, tooltip)
 
     window.addEventListener('resize', map.recalcSize)
+
+    window.addEventListener('keydown', function (event) {
+        if (event.target.nodeName !== 'INPUT' && event.code === 'Space') {
+            map.moveTo(500, 500)
+        }
+    })
 
     const $highlightId = document.getElementById('highlight-id')
     const $highlightItems = document.getElementById('highlight-items')
