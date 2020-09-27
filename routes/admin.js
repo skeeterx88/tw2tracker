@@ -7,18 +7,21 @@ const db = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
 
-router.get('/', ensureLoggedIn, async function (req, res) {
-    const worlds = await db.any(sql.worlds)
-    const markets = await db.any(sql.markets)
-    const settings = await db.one(sql.settings)
+if (process.env.NODE_ENV === 'development') {
+    router.get('/', ensureLoggedIn, async function (req, res) {
+        const worlds = await db.any(sql.worlds)
+        const markets = await db.any(sql.markets)
+        const settings = await db.one(sql.settings)
 
-    res.render('admin', {
-        title: 'Admin Panel - ' + settings.site_name,
-        worlds: worlds,
-        markets: markets,
-        settings: settings
+        res.render('admin', {
+            title: 'Admin Panel - ' + settings.site_name,
+            worlds: worlds,
+            markets: markets,
+            settings: settings
+        })
     })
-})
+}
+
 
 router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
