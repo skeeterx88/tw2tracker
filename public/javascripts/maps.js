@@ -744,6 +744,29 @@ const TW2MapTooltip = function (selector) {
     }
 }
 
+const generateColorPicker = function () {
+    const $colorPicker = document.querySelector('#color-picker')
+    const $colorPickerTable = $colorPicker.querySelector('table')
+
+    for (let colorsRow of colorPalette) {
+        const $row = document.createElement('tr')
+
+        for (let color of colorsRow) {
+            const $wrapper = document.createElement('td')
+            const $color = document.createElement('div')
+            $color.className = 'color'
+            $color.style.background = color
+            $color.dataset.color = color
+            $wrapper.appendChild($color)
+            $row.appendChild($wrapper)
+        }
+
+        $colorPickerTable.appendChild($row)
+    }
+
+    return [$colorPicker, $colorPicker.querySelectorAll('div')]
+}
+
 {
     const dataLoader = new DataLoader(marketId, worldNumber)
     const tooltip = new TW2MapTooltip('#tooltip')
@@ -862,8 +885,14 @@ const TW2MapTooltip = function (selector) {
         $nameSpan.innerHTML = displayName
         $nameSpan.className = category
 
-        $color.className = 'color'
+        $color.className = 'color open-color-picker'
         $color.style.backgroundColor = color
+
+        $color.addEventListener('click', function () {
+            colorPicker($color, color, function (pickedColor) {
+                map.addHighlight(category, id, pickedColor)
+            })
+        })
 
         $name.appendChild($nameSpan)
         $item.appendChild($name)
@@ -892,7 +921,77 @@ const TW2MapTooltip = function (selector) {
         }
     })
 
-    // dataLoader.loadTribes
-    // dataLoader.loadPlayers
+    const [$colorPicker, $colors] = generateColorPicker()
+
+    let activeColorPicker = false
+
+    const colorPicker = function ($reference, selectedColor, callback) {
+        if (!$reference) {
+            throw new Error('Color Picker: Invalid reference element')
+        }
+
+        if (activeColorPicker) {
+            $colorPicker.removeEventListener('click', activeColorPicker)
+            for (let $color of $colors) {
+                if ($color.classList.contains('active')) {
+                    $color.classList.remove('active')
+                    break
+                }
+            }
+        }
+
+        let { x, y, width, height } = $reference.getBoundingClientRect()
+
+        x = Math.floor(x + width + 5)
+        y = Math.floor(y + height + 5)
+
+        $colorPicker.style.visibility = 'visible'
+        $colorPicker.style.opacity = 1
+        $colorPicker.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)'
+
+        const index = colorPalette.flat().indexOf(selectedColor)
+
+        if (index !== -1) {
+            $colors[index].classList.add('active')
+        }
+
+        $colorPicker.style.visibility = 'visible'
+        $colorPicker.style.opacity = 1
+
+        setTimeout(function () {
+            activeColorPicker = function (event) {
+                if (event.target.classList.contains('color')) {
+                    callback(event.target.dataset.color)
+                    closeColorPicker()
+                }
+            }
+
+            $colorPicker.addEventListener('click', activeColorPicker)
+        }, 25)
+    }
+
+    const closeColorPicker = function () {
+        $colorPicker.removeEventListener('click', activeColorPicker)
+        $colorPicker.style.visibility = 'hidden'
+        $colorPicker.style.opacity = 0
+        activeColorPicker = false
+    }
+
+    window.addEventListener('click', function (event) {
+        if (!activeColorPicker || event.target.classList.contains('open-color-picker')) {
+            return
+        }
+
+        if (!event.target.closest('#color-picker')) {
+            closeColorPicker()
+        }
+    })
+
+    if (development && marketId === 'br' && worldNumber === 48) {
+        Promise.all([dataLoader.loadTribes, dataLoader.loadPlayers]).then(function () {
+            map.addHighlight('tribes', 'OUT', '#0111af')
+            map.addHighlight('players', 'she-ra', '#e21f1f')
+        })
+    }
 }
 

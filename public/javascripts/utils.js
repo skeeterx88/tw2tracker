@@ -24,3 +24,10 @@ const noop = function () {}
 const normalizeString = function (value) {
     return String(value).toLowerCase().replace(/[^\w]/g, '')
 }
+
+
+const querySelectorFrom = function (selector, elements) {
+    return [].filter.call(elements, function(element) {
+        return element.matches(selector)
+    })
+}

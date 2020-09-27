@@ -156,11 +156,7 @@ ul {
     top: 0px;
     left: 0px;
     margin-top: 3px;
-    border: 1px solid #5e351b;
     background: url("/images/tooltip-background.png") #d0ac86;
-    box-shadow: 0 0 0 2px #000,
-                inset 0 0 0 1px #000,
-                2px 2px 4px #000;
 }
 
 #tooltip table {
@@ -199,6 +195,12 @@ ul {
 #tooltip div {
     white-space: nowrap;
 }
+
+
+
+
+
+
 
 .icon {
     width: 24px;
@@ -245,6 +247,82 @@ ul {
 }
 
 
+
+
+
+.box-border {
+    box-shadow: inset 0 0 0 1px #45505c, 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000;
+    border: 1px solid #5e351b;
+    border-radius: 1px;
+}
+
+
+
+#color-picker {
+    visibility: hidden;
+    opacity: 0;
+
+    border-collapse:separate;
+    display:inline-block;
+    border-spacing:1px;
+    transition: opacity .2s;
+
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 10;
+    
+    background: url(/images/tooltip-background.png) #d0ac86;
+}
+
+#color-picker td {
+    padding:0;
+    border:1px solid #000;
+}
+
+#color-picker .color {
+    display:inline-block;
+    float:left;
+    margin:1px;
+    width:20px;
+    height:20px;
+}
+
+#color-picker .active {
+    box-shadow: inset 0 0 6px 0 #0f0, inset 0 0 3px 0 #0f0;
+}
+
+
+/*
+
+.close {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    margin: 2px;
+    display: inline-block;
+    border: 1px solid #2b2121;
+    float: right;
+    background: linear-gradient(rgba(2,3,3,0.45), rgba(2,3,3,0)) #9a1d18;
+}
+
+.close:before {
+    content: " ";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    z-index: 1;
+    background-image: url("/images/close.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#color-picker .close {
+    right: 0px;
+}
+
+
+*/
 
 
 
