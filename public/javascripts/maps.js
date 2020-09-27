@@ -811,11 +811,7 @@ const generateColorPicker = function () {
     const tooltip = new TW2MapTooltip('#tooltip')
     const map = new TW2Map('#map', dataLoader, tooltip)
 
-    let resizeTimeout
-    window.addEventListener('resize', function () {
-        clearTimeout(resizeTimeout)
-        resizeTimeout = setTimeout(() => map.recalcSize(), 200)
-    })
+    window.addEventListener('resize', map.recalcSize)
 
     const $highlightId = document.getElementById('highlight-id')
     const $highlightItems = document.getElementById('highlight-items')
