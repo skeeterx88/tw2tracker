@@ -887,9 +887,11 @@ const generateColorPicker = function () {
 
         $color.className = 'color open-color-picker'
         $color.style.backgroundColor = color
+        $color.dataset.color = color
 
         $color.addEventListener('click', function () {
-            colorPicker($color, color, function (pickedColor) {
+            colorPicker($color, $color.dataset.color, function (pickedColor) {
+                $color.dataset.color = pickedColor
                 map.addHighlight(category, id, pickedColor)
             })
         })
@@ -932,11 +934,12 @@ const generateColorPicker = function () {
 
         if (activeColorPicker) {
             $colorPicker.removeEventListener('click', activeColorPicker)
-            for (let $color of $colors) {
-                if ($color.classList.contains('active')) {
-                    $color.classList.remove('active')
-                    break
-                }
+        }
+
+        for (let $color of $colors) {
+            if ($color.classList.contains('active')) {
+                $color.classList.remove('active')
+                break
             }
         }
 
