@@ -464,6 +464,10 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
     }
 
     this.moveTo = function (x, y) {
+        if (x === '' || isNaN(x) || y === '' || isNaN(y)) {
+            return
+        }
+
         positionX = boundNumber(x, 0, 999) * tileSize
         positionY = boundNumber(y, 0, 999) * tileSize
         updateCenter()
@@ -847,10 +851,61 @@ const generateColorPicker = function () {
 }
 
 {
+    const setupQuickJump = function () {
+        const $quickJumpX = document.querySelector('#quick-jump-x')
+        const $quickJumpY = document.querySelector('#quick-jump-y')
+        const $quickJumpGo = document.querySelector('#quick-jump-go')
+
+        $quickJumpX.addEventListener('keydown', function (event) {
+            if (event.code === 'Enter') {
+                map.moveTo($quickJumpX.value, $quickJumpY.value)
+            }
+        })
+
+        const rnondigit = /[^\d]/g
+        const rloosecoords = /(\d{1,3})[^\d](\d{1,3})/
+
+        const coordsInputFactory = function ($input) {
+            return function (event) {
+                if (event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrag') {
+                    const coords = $input.value.match(rloosecoords)
+
+                    if (coords !== null) {
+                        $quickJumpX.value = coords[1]
+                        $quickJumpY.value = coords[2]
+                        $quickJumpY.focus()
+                        map.moveTo(coords[1], coords[2])
+
+                        return
+                    }
+                }
+
+                $input.value = $input.value.replace(rnondigit, '')
+
+                if ($input.value.length > 3) {
+                    $input.value = $quickJumpX.value.slice(0, 3)
+                }
+            }
+        }
+
+        $quickJumpX.addEventListener('input', coordsInputFactory($quickJumpX))
+        $quickJumpY.addEventListener('input', coordsInputFactory($quickJumpY))
+
+        $quickJumpY.addEventListener('keydown', function (event) {
+            if (event.code === 'Enter') {
+                map.moveTo($quickJumpX.value, $quickJumpY.value)
+            }
+        })
+
+        $quickJumpGo.addEventListener('click', function (event) {
+            map.moveTo($quickJumpX.value, $quickJumpY.value)
+        })
+    }
+
     const dataLoader = new DataLoader(marketId, worldNumber)
     const tooltip = new TW2MapTooltip('#tooltip')
     const map = new TW2Map('#map', dataLoader, tooltip, {
-        hexagonVillages: true
+        hexagonVillages: false
     })
 
     window.addEventListener('resize', map.recalcSize)
@@ -1121,6 +1176,8 @@ const generateColorPicker = function () {
         $centerCoordsX.innerHTML = x
         $centerCoordsY.innerHTML = y
     })
+
+    setupQuickJump()
 
     if (development && marketId === 'br' && worldNumber === 48) {
         Promise.all([dataLoader.loadTribes, dataLoader.loadPlayers]).then(function () {

@@ -22,6 +22,11 @@ ul {
     padding: 0;
 }
 
+::placeholder {
+    color: #333;
+    text-shadow: none;
+}
+
 #map-wrapper {
     display: flex;
     flex-flow: row;
@@ -45,8 +50,84 @@ ul {
 
 
 
+#quick-jump {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    height: 22px;
+}
 
 
+
+#quick-jump-coords {
+    margin-left: 3px;
+
+    color: #6d4f32;
+
+    width: 71px;
+    height: 18px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-weight: bold;
+    position: relative;
+    float: left;
+
+    text-align: center;
+
+}
+
+#quick-jump-x,
+#quick-jump-y {
+    border: none;
+    width: 22px;
+    background: none;
+    text-align: center;
+    padding: 0px;
+    padding-top: 2px;
+    text-shadow: 0px 0px 1px #00000070;
+}
+
+.button-border {
+    font-weight: bold;
+    height: 22px;
+    border-radius: 1px;
+    border: 1px solid #923f32;
+    background: url("/images/noise.png"), linear-gradient(#bd4646, #7d1616);
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset -1px -1px 2px #000;
+}
+
+.button-border:hover,
+.button-border:focus {
+    background: url("/images/noise.png"), linear-gradient(#ca5c5c, #7d1616);
+}
+
+#quick-jump-go {
+    float: right;
+    font-size: 11px;
+    margin-right: 11px;
+    outline: none;
+    cursor: pointer;
+}
+
+
+
+.input {
+    border-radius: 1px;
+    border: 1px solid #8d5b39;
+    background: url("/images/noise.png") #a07246;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset 1px 1px 3px #00000095;
+}
+
+.input:focus-within {
+    border: 1px solid #b17a55;
+}
 
 
 
@@ -55,23 +136,12 @@ ul {
     margin-right: 11px;
     margin-top: 5px;
     margin-bottom: 5px;
-
     width: 82%;
     height: 18px;
     padding-left: 3px;
     padding-right: 3px;
-    font-weight: bold;
     position: relative;
-    border-radius: 1px;
-    border: 1px solid #8d5b39;
-    background: url("/images/noise.png") #a07246;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000;
-}
-
-#highlight-id::placeholder {
-    color: #333;
+    text-shadow: 0px 0px 1px #00000070;
 }
 
 #highlight-items {

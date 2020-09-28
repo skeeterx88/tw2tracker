@@ -16,7 +16,15 @@
     <body>
         <div id="map-wrapper">
             <div id="side-panel">
-                <input type="text" id="highlight-id" spellcheck="false" placeholder="search...">
+                <div id="quick-jump">
+                    <div id="quick-jump-coords" class="input">
+                        x:<input type="text" id="quick-jump-x" placeholder="500">
+                        y:<input type="text" id="quick-jump-y" placeholder="500">
+                    </div>
+                    <button id="quick-jump-go" class="button-border">go</button>
+                </div>
+
+                <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="search...">
                 <ul id="highlight-items"></ul>
             </div>
             <div id="map"></div>
