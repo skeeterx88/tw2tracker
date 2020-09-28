@@ -287,7 +287,7 @@ Sync.scrappeAllWorlds = async function () {
             num: 56
         }]
     } else {
-        worlds = await db.any(sql.worlds)
+        worlds = await db.any(sql.openWorlds)
     }
 
     for (let world of worlds) {
@@ -301,20 +301,23 @@ Sync.scrappeAllWorlds = async function () {
     console.log('Sync.scrappeAllWorlds: Finished')
 }
 
-Sync.scrappeWorld = async function (marketId, worldNumber, _force = false) {
+Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = false) {
     console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
     const accountCredentials = await db.one(sql.enabledMarket, [marketId])
     const worldInfo = await db.one(sql.world, [marketId, worldNumber])
     const urlId = marketId === 'zz' ? 'beta' : marketId
 
-    if (!_force && worldInfo.last_sync) {
+    if (!worldInfo.open) {
+        throw new Error('Sync.scrappeWorld: World ' + marketId + worldNumber + ' is closed')
+    }
+
+    if (!ignoreLastSync && worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
         const settings = await db.one(sql.settings)
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-            console.log('Sync.scrappeWorld: ' + marketId + worldNumber + ' already sincronized')
-            return
+            throw new Error('Sync.scrappeWorld: ' + marketId + worldNumber + ' already sincronized')
         }
     }
 
@@ -329,6 +332,16 @@ Sync.scrappeWorld = async function (marketId, worldNumber, _force = false) {
 
     try {
         const account = await Sync.auth(marketId, accountCredentials)
+        const worldCharacter = account.characters.find(function ({ world_id }) {
+            return world_id === marketId + worldNumber
+        })
+
+        if (!worldCharacter.allow_login) {
+            await db.query(sql.updateWorldLocked, [marketId, worldNumber])
+            throw new Error('world is not open')
+        }
+
+
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
         const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
         await page.close()
@@ -401,7 +414,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, _force = false) {
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
     } catch (error) {
         await page.close()
-        throw new Error('Sync.scrappeWorld: Failed to syncronize ' + marketId + worldNumber + ' (' + error.message + ')')
+        throw new Error('Sync.scrappeWorld: Failed to synchronize ' + marketId + worldNumber + ' (' + error.message + ')')
     }
 }
 

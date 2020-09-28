@@ -17,7 +17,8 @@ CREATE TABLE main.worlds (
     market VARCHAR (10) REFERENCES main.markets(id),
     num SMALLINT,
     name VARCHAR (255) NOT NULL,
-    last_sync TIMESTAMP
+    last_sync TIMESTAMP,
+    open BOOLEAN NOT NULL
 );
 
 INSERT INTO main.settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 30);
