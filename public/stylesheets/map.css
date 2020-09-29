@@ -248,6 +248,7 @@ ul {
 
 #tooltip .title {
     display: block;
+    color: #00000095;
 }
 
 #tooltip.left {
