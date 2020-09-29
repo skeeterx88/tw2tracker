@@ -5,7 +5,7 @@ const colorPalette = [
     ["#000000", "#730202", "#00293a", "#02350f", "#572412", "#494500", "#6a043e", "#723305", "#2f1460", "#152232", "#000645", "#6c055b", "#c766c7", "#74c374"]
 ]
 
-const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
+const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const $container = document.querySelector(containerSelector)
 
     if (!$container || !$container.nodeName || $container.nodeName !== 'DIV') {
@@ -159,7 +159,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
             let off = mouseCoordY % 2 ? 3 : 0
             mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / tileSize)
 
-            const villagesX = dataLoader.villages[mouseCoordX]
+            const villagesX = loader.villages[mouseCoordX]
 
             if (villagesX) {
                 const village = villagesX[mouseCoordY]
@@ -198,8 +198,8 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
             y: mouseCoordY
         }
 
-        const player = dataLoader.players[character_id]
-        const tribe = player ? dataLoader.tribes[player[1]] : false
+        const player = loader.players[character_id]
+        const tribe = player ? loader.tribes[player[1]] : false
 
         renderOverlay()
         onActiveVillage(activeVillage)
@@ -235,7 +235,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
         }
 
         visibleContinents.forEach(function (continent) {
-            dataLoader.loadContinent(continent).then(villages => renderVillages(villages))
+            loader.loadContinent(continent).then(villages => renderVillages(villages))
         })
     }
 
@@ -277,7 +277,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
             for (let y in villages[x]) {
                 let [id, name, points, character_id] = villages[x][y]
 
-                let tribeId = character_id ? dataLoader.players[character_id][1] : false
+                let tribeId = character_id ? loader.players[character_id][1] : false
 
                 if (!character_id) {
                     $cacheContext.fillStyle = COLORS.barbarian
@@ -356,7 +356,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
 
         $overlayContext.fillStyle = COLORS.highlightPlayer
 
-        for (let [x, y] of dataLoader.playerVillages[characterId]) {
+        for (let [x, y] of loader.playerVillages[characterId]) {
             let off = y % 2 ? 3 : 0
 
             x = x * tileSize - positionX + middleViewportOffsetX + off
@@ -386,7 +386,7 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
         if (villagesId) {
             for (let [x, y] of villagesId) {
                 scope[x] = scope[x] || {}
-                scope[x][y] = dataLoader.villages[x][y]
+                scope[x][y] = loader.villages[x][y]
             }
         }
     }
@@ -396,8 +396,8 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
 
         switch (category) {
             case HIGHLIGHT_CATEGORIES.players: {
-                if (dataLoader.playersByName.hasOwnProperty(lowerId)) {
-                    return dataLoader.playersByName[lowerId]
+                if (loader.playersByName.hasOwnProperty(lowerId)) {
+                    return loader.playersByName[lowerId]
                 } else {
                     throw new Error('Highlights: Player ' + id + ' not found')
                 }
@@ -405,10 +405,10 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
                 break
             }
             case HIGHLIGHT_CATEGORIES.tribes: {
-                if (dataLoader.tribesByTag.hasOwnProperty(lowerId)) {
-                    return dataLoader.tribesByTag[lowerId]
-                } else if (dataLoader.tribesByName.hasOwnProperty(lowerId)) {
-                    return dataLoader.tribesByName[lowerId]
+                if (loader.tribesByTag.hasOwnProperty(lowerId)) {
+                    return loader.tribesByTag[lowerId]
+                } else if (loader.tribesByName.hasOwnProperty(lowerId)) {
+                    return loader.tribesByName[lowerId]
                 } else {
                     throw new Error('Highlights: Tribe ' + id + ' not found')
                 }
@@ -428,12 +428,12 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
 
         switch (category) {
             case HIGHLIGHT_CATEGORIES.players: {
-                formatVillagesToDraw(dataLoader.playerVillages[realId], redrawVillages)
+                formatVillagesToDraw(loader.playerVillages[realId], redrawVillages)
                 break
             }
             case HIGHLIGHT_CATEGORIES.tribes: {
-                for (let playerId of dataLoader.tribePlayers[realId]) {
-                    formatVillagesToDraw(dataLoader.playerVillages[playerId], redrawVillages)
+                for (let playerId of loader.tribePlayers[realId]) {
+                    formatVillagesToDraw(loader.playerVillages[playerId], redrawVillages)
                 }
 
                 break
@@ -504,12 +504,12 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
 
         switch (category) {
             case HIGHLIGHT_CATEGORIES.tribes: {
-                const [name, tag] = dataLoader.tribes[realId]
+                const [name, tag] = loader.tribes[realId]
                 displayName = tag + ' (' + name + ')'
                 break
             }
             case HIGHLIGHT_CATEGORIES.players: {
-                const [name] = dataLoader.players[realId]
+                const [name] = loader.players[realId]
                 displayName = name
                 break
             }
@@ -591,8 +591,8 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
     renderGrid()
 
     Promise.all([
-        dataLoader.loadPlayers,
-        dataLoader.loadTribes
+        loader.loadPlayers,
+        loader.loadTribes
     ]).then(function () {
         loadVisibleContinents()
         continuousRender()
@@ -618,10 +618,10 @@ const TW2Map = function (containerSelector, dataLoader, tooltip, settings) {
             let tribePoints
 
             if (villageCharacterId) {
-                ([ playerName, tribeId, playerPoints ] = dataLoader.players[villageCharacterId])
+                ([ playerName, tribeId, playerPoints ] = loader.players[villageCharacterId])
 
                 if (tribeId) {
-                    ([ tribeName, tribeTag, tribePoints ] = dataLoader.tribes[tribeId])
+                    ([ tribeName, tribeTag, tribePoints ] = loader.tribes[tribeId])
                 }
             }
 
@@ -827,30 +827,9 @@ const TW2MapTooltip = function (selector) {
     }
 }
 
-const generateColorPicker = function () {
-    const $colorPicker = document.querySelector('#color-picker')
-    const $colorPickerTable = $colorPicker.querySelector('table')
+;(async function () {
+    let colorPicker
 
-    for (let colorsRow of colorPalette) {
-        const $row = document.createElement('tr')
-
-        for (let color of colorsRow) {
-            const $wrapper = document.createElement('td')
-            const $color = document.createElement('div')
-            $color.className = 'color'
-            $color.style.background = color
-            $color.dataset.color = color
-            $wrapper.appendChild($color)
-            $row.appendChild($wrapper)
-        }
-
-        $colorPickerTable.appendChild($row)
-    }
-
-    return [$colorPicker, $colorPicker.querySelectorAll('div')]
-}
-
-{
     const setupQuickJump = function () {
         const $quickJumpX = document.querySelector('#quick-jump-x')
         const $quickJumpY = document.querySelector('#quick-jump-y')
@@ -874,7 +853,6 @@ const generateColorPicker = function () {
                         $quickJumpX.value = coords[1]
                         $quickJumpY.value = coords[2]
                         $quickJumpY.focus()
-                        map.moveTo(coords[1], coords[2])
 
                         return
                     }
@@ -902,288 +880,336 @@ const generateColorPicker = function () {
         })
     }
 
-    const dataLoader = new DataLoader(marketId, worldNumber)
-    const tooltip = new TW2MapTooltip('#tooltip')
-    const map = new TW2Map('#map', dataLoader, tooltip, {
-        hexagonVillages: false
-    })
+    const setupCustomHighlights = function () {
+        const $highlightId = document.getElementById('highlight-id')
+        const $highlightItems = document.getElementById('highlight-items')
 
-    window.addEventListener('resize', map.recalcSize)
+        const setupAutoComplete = function () {
+            const autoComplete = new AutoComplete({
+                data: {
+                    src: async function () {
+                        await Promise.all([
+                            loader.loadPlayers,
+                            loader.loadTribes
+                        ])
 
-    window.addEventListener('keydown', function (event) {
-        if (event.target.nodeName !== 'INPUT' && event.code === 'Space') {
-            map.moveTo(500, 500)
+                        const matches = []
+
+                        for (let [name] of Object.values(loader.players)) {
+                            matches.push({
+                                search: name,
+                                id: name,
+                                type: 'players'
+                            })
+                        }
+
+                        for (let [name, tag] of Object.values(loader.tribes)) {
+                            matches.push({
+                                search: tag + ' (' + name + ')',
+                                id: tag,
+                                type: 'tribes'
+                            })
+                        }
+
+                        return matches
+                    },
+                    key: ['search'],
+                    cache: false
+                },
+                searchEngine: 'loose',
+                selector: '#highlight-id',
+                resultsList: {
+                    render: true
+                },
+                threshold: 1,
+                trigger: {
+                    event: ['input', 'keypress', 'focusin']
+                },
+                sort: function (a, b) {
+                    if (a.match < b.match) return -1
+                    if (a.match > b.match) return 1
+                    return 0
+                },
+                noResults: function () {
+                    const $item = document.createElement('li')
+                    $item.innerHTML = 'no results'
+                    autoComplete.resultsList.view.appendChild($item)
+                },
+                highlight: true,
+                onSelection: function (feedback) {
+                    const { search, id, type } = feedback.selection.value
+                    const color = arrayRandom(colorPalette.flat())
+
+                    map.addHighlight(type, id, color)
+                    $highlightId.value = ''
+                }
+            })
+
+            $highlightId.addEventListener('blur', function () {
+                autoComplete.resultsList.view.style.display = 'none'
+            })
+
+            $highlightId.addEventListener('focus', function () {
+                autoComplete.resultsList.view.style.display = ''
+            })
+
+            $highlightId.addEventListener('keydown', async function (event) {
+                if (event.key === 'Escape') {
+                    $highlightId.value = ''
+                    $highlightId.dispatchEvent(new Event('input'))
+                }
+            })
+
+            $highlightId.addEventListener('autoComplete', function ({ detail }) {
+                if (detail.event.key == 'Enter' && detail.matches > 0) {
+                    autoComplete.listMatchedResults(autoComplete.dataStream).then(function () {
+                        const first = autoComplete.resultsList.view.children.item(0)
+                        first.dispatchEvent(new Event('mousedown'))
+                    })
+                }
+            })
         }
-    })
 
-    const $highlightId = document.getElementById('highlight-id')
-    const $highlightItems = document.getElementById('highlight-items')
-
-    const ac = new autoComplete({
-        data: {
-            src: async function () {
-                await dataLoader.loadPlayers
-                await dataLoader.loadTribes
-
-                const matches = []
-
-                for (let [name] of Object.values(dataLoader.players)) {
-                    matches.push({
-                        search: name,
-                        id: name,
-                        type: 'players'
-                    })
-                }
-
-                for (let [name, tag] of Object.values(dataLoader.tribes)) {
-                    matches.push({
-                        search: tag + ' (' + name + ')',
-                        id: tag,
-                        type: 'tribes'
-                    })
-                }
-
-                return matches
-            },
-            key: ['search'],
-            cache: false
-        },
-        searchEngine: 'loose',
-        selector: '#highlight-id',
-        resultsList: {
-            render: true
-        },
-        threshold: 1,
-        trigger: {
-            event: ['input', 'keypress', 'focusin']
-        },
-        sort: function (a, b) {
-            if (a.match < b.match) return -1
-            if (a.match > b.match) return 1
-            return 0
-        },
-        noResults: function () {
+        map.onAddHighlight(function (category, id, displayName, color) {
             const $item = document.createElement('li')
-            $item.innerHTML = 'no results'
-            ac.resultsList.view.appendChild($item)
-        },
-        highlight: true,
-        onSelection: function (feedback) {
-            const { search, id, type } = feedback.selection.value
-            const color = arrayRandom(colorPalette.flat())
+            const $name = document.createElement('div')
+            const $nameSpan = document.createElement('span')
+            const $color = document.createElement('div')
+            
+            $item.classList.add('highlight-' + normalizeString(id))
+            $item.classList.add('item')
+            $item.dataset.category = category
+            $item.dataset.id = id
+            $item.dataset.color = color
 
-            map.addHighlight(type, id, color)
-            $highlightId.value = ''
-        }
-    })
-
-    $highlightId.addEventListener('blur', function () {
-        ac.resultsList.view.style.display = 'none'
-    })
-
-    $highlightId.addEventListener('focus', function () {
-        ac.resultsList.view.style.display = ''
-    })
-
-    $highlightId.addEventListener('keydown', async function (event) {
-        if (event.key === 'Escape') {
-            $highlightId.value = ''
-            $highlightId.dispatchEvent(new Event('input'))
-        }
-    })
-
-    $highlightId.addEventListener('autoComplete', function ({ detail }) {
-        if (detail.event.key == 'Enter' && detail.matches > 0) {
-            ac.listMatchedResults(ac.dataStream).then(function () {
-                const first = ac.resultsList.view.children.item(0)
-                first.dispatchEvent(new Event('mousedown'))
+            $name.addEventListener('click', function () {
+                map.removeHighlight(category, id)
             })
-        }
-    })
 
-    map.onAddHighlight(function (category, id, displayName, color) {
-        const $item = document.createElement('li')
-        const $name = document.createElement('div')
-        const $nameSpan = document.createElement('span')
-        const $color = document.createElement('div')
-        
-        $item.classList.add('highlight-' + normalizeString(id))
-        $item.classList.add('item')
-        $item.dataset.category = category
-        $item.dataset.id = id
-        $item.dataset.color = color
+            $name.className = 'name'
 
-        $name.addEventListener('click', function () {
-            map.removeHighlight(category, id)
+            $nameSpan.innerHTML = displayName
+            $nameSpan.className = category
+
+            $color.className = 'color open-color-picker'
+            $color.style.backgroundColor = color
+            $color.dataset.color = color
+
+            $color.addEventListener('click', function () {
+                colorPicker($color, $color.dataset.color, function (pickedColor) {
+                    $color.dataset.color = pickedColor
+                    map.addHighlight(category, id, pickedColor)
+                })
+            })
+
+            $name.appendChild($nameSpan)
+            $item.appendChild($name)
+            $item.appendChild($color)
+            $highlightItems.appendChild($item)
         })
 
-        $name.className = 'name'
+        map.onUpdateHighlight(function (category, id, displayName, color) {
+            const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
 
-        $nameSpan.innerHTML = displayName
-        $nameSpan.className = category
-
-        $color.className = 'color open-color-picker'
-        $color.style.backgroundColor = color
-        $color.dataset.color = color
-
-        $color.addEventListener('click', function () {
-            colorPicker($color, $color.dataset.color, function (pickedColor) {
-                $color.dataset.color = pickedColor
-                map.addHighlight(category, id, pickedColor)
-            })
-        })
-
-        $name.appendChild($nameSpan)
-        $item.appendChild($name)
-        $item.appendChild($color)
-        $highlightItems.appendChild($item)
-    })
-
-    map.onUpdateHighlight(function (category, id, displayName, color) {
-        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
-
-        if (!$item) {
-            return false
-        }
-
-        const $color = $item.querySelector('.color')
-
-        $color.style.background = color
-        $item.dataset.color = color
-    })
-
-    map.onRemoveHighlight(function (category, id) {
-        const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
-
-        if ($item) {
-            $item.remove()
-        }
-    })
-
-    const [$colorPicker, $colors] = generateColorPicker()
-
-    let activeColorPicker = false
-
-    const colorPicker = function ($reference, selectedColor, callback) {
-        if (!$reference) {
-            throw new Error('Color Picker: Invalid reference element')
-        }
-
-        if (activeColorPicker) {
-            $colorPicker.removeEventListener('click', activeColorPicker)
-        }
-
-        for (let $color of $colors) {
-            if ($color.classList.contains('active')) {
-                $color.classList.remove('active')
-                break
+            if (!$item) {
+                return false
             }
+
+            const $color = $item.querySelector('.color')
+
+            $color.style.background = color
+            $item.dataset.color = color
+        })
+
+        map.onRemoveHighlight(function (category, id) {
+            const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
+
+            if ($item) {
+                $item.remove()
+            }
+        })
+
+        setupAutoComplete()
+    }
+
+    const setupColorPicker = function () {
+        let activeColorPicker = false
+
+        const $colorPicker = document.querySelector('#color-picker')
+        const $colorPickerTable = $colorPicker.querySelector('table')
+
+        for (let colorsRow of colorPalette) {
+            const $row = document.createElement('tr')
+
+            for (let color of colorsRow) {
+                const $wrapper = document.createElement('td')
+                const $color = document.createElement('div')
+                $color.className = 'color'
+                $color.style.background = color
+                $color.dataset.color = color
+                $wrapper.appendChild($color)
+                $row.appendChild($wrapper)
+            }
+
+            $colorPickerTable.appendChild($row)
         }
 
-        let { x, y, width, height } = $reference.getBoundingClientRect()
+        const $colors = $colorPicker.querySelectorAll('div')
 
-        x = Math.floor(x + width + 5)
-        y = Math.floor(y + height + 5)
+        colorPicker = function ($reference, selectedColor, callback) {
+            if (!$reference) {
+                throw new Error('Color Picker: Invalid reference element')
+            }
 
-        $colorPicker.style.visibility = 'visible'
-        $colorPicker.style.opacity = 1
-        $colorPicker.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)'
+            if (activeColorPicker) {
+                $colorPicker.removeEventListener('click', activeColorPicker)
+            }
 
-        const index = colorPalette.flat().indexOf(selectedColor)
-
-        if (index !== -1) {
-            $colors[index].classList.add('active')
-        }
-
-        $colorPicker.style.visibility = 'visible'
-        $colorPicker.style.opacity = 1
-
-        setTimeout(function () {
-            activeColorPicker = function (event) {
-                if (event.target.classList.contains('color')) {
-                    callback(event.target.dataset.color)
-                    closeColorPicker()
+            for (let $color of $colors) {
+                if ($color.classList.contains('active')) {
+                    $color.classList.remove('active')
+                    break
                 }
             }
 
-            $colorPicker.addEventListener('click', activeColorPicker)
-        }, 25)
+            let { x, y, width, height } = $reference.getBoundingClientRect()
+
+            x = Math.floor(x + width + 5)
+            y = Math.floor(y + height + 5)
+
+            $colorPicker.style.visibility = 'visible'
+            $colorPicker.style.opacity = 1
+            $colorPicker.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)'
+
+            const index = colorPalette.flat().indexOf(selectedColor)
+
+            if (index !== -1) {
+                $colors[index].classList.add('active')
+            }
+
+            $colorPicker.style.visibility = 'visible'
+            $colorPicker.style.opacity = 1
+
+            setTimeout(function () {
+                activeColorPicker = function (event) {
+                    if (event.target.classList.contains('color')) {
+                        callback(event.target.dataset.color)
+                        closeColorPicker()
+                    }
+                }
+
+                $colorPicker.addEventListener('click', activeColorPicker)
+            }, 25)
+        }
+
+        const closeColorPicker = function () {
+            $colorPicker.removeEventListener('click', activeColorPicker)
+            $colorPicker.style.visibility = 'hidden'
+            $colorPicker.style.opacity = 0
+            activeColorPicker = false
+        }
+
+        window.addEventListener('click', function (event) {
+            if (!activeColorPicker || event.target.classList.contains('open-color-picker')) {
+                return
+            }
+
+            if (!event.target.closest('#color-picker')) {
+                closeColorPicker()
+            }
+        })
     }
 
-    const closeColorPicker = function () {
-        $colorPicker.removeEventListener('click', activeColorPicker)
-        $colorPicker.style.visibility = 'hidden'
-        $colorPicker.style.opacity = 0
-        activeColorPicker = false
-    }
+    const setupDisplayLastSync = function () {
+        const $lastSync = document.querySelector('#last-sync-date')
 
-    window.addEventListener('click', function (event) {
-        if (!activeColorPicker || event.target.classList.contains('open-color-picker')) {
+        if (!lastSync) {
+            $lastSync.innerHTML = 'never'
+
             return
         }
 
-        if (!event.target.closest('#color-picker')) {
-            closeColorPicker()
-        }
-    })
+        const formatSince = function (lastSync) {
+            const elapsedTime = Date.now() - lastSync
 
-    const $lastSync = document.querySelector('#last-sync-date')
+            const seconds = elapsedTime / 1000
+            const minutes = seconds / 60
+            const hours = minutes / 60
+            const days = hours / 24
 
-    const formatSince = function (lastSync) {
-        const elapsedTime = Date.now() - lastSync
+            let format = ''
 
-        const seconds = elapsedTime / 1000
-        const minutes = seconds / 60
-        const hours = minutes / 60
-        const days = hours / 24
-
-        let format = ''
-
-        if (minutes <= 1) {
-            format = 'just now'
-        } else if (hours <= 1) {
-            format = Math.floor(minutes) + ' minutes ago'
-        } else if (days <= 1) {
-            format = Math.floor(hours) + ' hours ago'
-        } else {
-            if (days > 2) {
-                format = Math.floor(days) + ' days ago'
+            if (minutes <= 1) {
+                format = 'just now'
+            } else if (hours <= 1) {
+                format = Math.floor(minutes) + ' minutes ago'
+            } else if (days <= 1) {
+                format = Math.floor(hours) + ' hours ago'
             } else {
-                const dayHours = hours % 24
-
-                if (dayHours <= 2) {
-                    format = '1 day ago'
+                if (days > 2) {
+                    format = Math.floor(days) + ' days ago'
                 } else {
-                    format = '1 day and ' + Math.floor(dayHours) + ' hours ago'
+                    const dayHours = hours % 24
+
+                    if (dayHours <= 2) {
+                        format = '1 day ago'
+                    } else {
+                        format = '1 day and ' + Math.floor(dayHours) + ' hours ago'
+                    }
+                    
                 }
-                
             }
+
+            return format
         }
 
-        return format
-    }
-
-    if (lastSync) {
         $lastSync.innerHTML = formatSince(lastSync)
-    } else {
-        $lastSync.innerHTML = 'never'
     }
 
-    const $centerCoordsX = document.querySelector('#center-coords-x')
-    const $centerCoordsY = document.querySelector('#center-coords-y')
+    const setupDisplayPosition = function () {
+        const $displayPositionX = document.querySelector('#display-position-x')
+        const $displayPositionY = document.querySelector('#display-position-y')
 
-    map.onCenterCoordsUpdate(function (x, y) {
-        $centerCoordsX.innerHTML = x
-        $centerCoordsY.innerHTML = y
-    })
-
-    setupQuickJump()
-
-    if (development && marketId === 'br' && worldNumber === 48) {
-        Promise.all([dataLoader.loadTribes, dataLoader.loadPlayers]).then(function () {
-            map.addHighlight('tribes', 'OUT', '#0111af')
-            map.addHighlight('players', 'she-ra', '#e21f1f')
+        map.onCenterCoordsUpdate(function (x, y) {
+            $displayPositionX.innerHTML = x
+            $displayPositionY.innerHTML = y
         })
     }
-}
 
+    const setupCommonEvents = function () {
+        window.addEventListener('resize', map.recalcSize)
+
+        window.addEventListener('keydown', function (event) {
+            if (event.target.nodeName !== 'INPUT' && event.code === 'Space') {
+                map.moveTo(500, 500)
+            }
+        })
+    }
+
+    const mapSettings = {
+        hexagonVillages: false
+    }
+
+    const loader = new DataLoader(marketId, worldNumber)
+    const tooltip = new TW2MapTooltip('#tooltip')
+    const map = new TW2Map('#map', loader, tooltip, mapSettings)
+
+    setupQuickJump()
+    setupCustomHighlights()
+    setupColorPicker()
+    setupDisplayLastSync()
+    setupDisplayPosition()
+    setupCommonEvents()
+
+    if (development) {
+        if (marketId === 'br' && worldNumber === 48) {
+            await Promise.all([
+                loader.loadPlayers,
+                loader.loadTribes
+            ])
+
+            map.addHighlight('tribes', 'OUT', '#0111af')
+            map.addHighlight('players', 'she-ra', '#e21f1f')
+        }
+    }
+})()

@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global.autoComplete = factory());
+  (global.AutoComplete = factory());
 }(this, (function () { 'use strict';
 
   function _classCallCheck(instance, Constructor) {
@@ -253,9 +253,9 @@
     initElementClosestPolyfill: initElementClosestPolyfill
   };
 
-  var autoComplete = function () {
-    function autoComplete(config) {
-      _classCallCheck(this, autoComplete);
+  var AutoComplete = function () {
+    function AutoComplete(config) {
+      _classCallCheck(this, AutoComplete);
       var _config$selector = config.selector,
           selector = _config$selector === void 0 ? "#autoComplete" : _config$selector,
           _config$data = config.data,
@@ -343,7 +343,7 @@
       this.onSelection = onSelection;
       this.init();
     }
-    _createClass(autoComplete, [{
+    _createClass(AutoComplete, [{
       key: "search",
       value: function search(query, record) {
         var recordLowerCase = record.toLowerCase();
@@ -512,9 +512,9 @@
         Polyfill.initElementClosestPolyfill();
       }
     }]);
-    return autoComplete;
+    return AutoComplete;
   }();
 
-  return autoComplete;
+  return AutoComplete;
 
 })));
