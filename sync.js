@@ -157,7 +157,7 @@ Sync.registerWorlds = async function () {
 
             if (!worldEntryExists) {
                 console.log('Sync.registerWorlds: Creating world entry for', marketId + worldNumber)
-                await db.query(sql.addWorldEntry, [marketId, worldNumber, worldName])
+                await db.query(sql.addWorldEntry, [marketId, worldNumber, worldName, true])
             }
         }
     }

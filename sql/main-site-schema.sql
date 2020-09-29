@@ -18,7 +18,7 @@ CREATE TABLE main.worlds (
     num SMALLINT,
     name VARCHAR (255) NOT NULL,
     last_sync TIMESTAMP,
-    open BOOLEAN NOT NULL
+    open BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 INSERT INTO main.settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 30);
