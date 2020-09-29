@@ -27,6 +27,50 @@ ul {
     text-shadow: none;
 }
 
+button {
+    height: 22px;
+    cursor: pointer;
+    text-shadow: 0px 0px 1px #00000070;
+    border-radius: 1px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #794929;
+    background: url("/images/noise.png"), linear-gradient(#8d5b39, #583f2d);
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset -1px -1px 2px #000;
+}
+
+button:hover,
+button:focus {
+    background: url("/images/noise.png"), linear-gradient(#af7046, #583f2d);
+}
+
+button.red {
+    border-color: #923f32;
+    background-image: linear-gradient(#bd4646, #7d1616);
+}
+
+button.red:hover,
+button.red:focus {
+    background-image: linear-gradient(#c75f5f, #7d1616);
+}
+
+.input {
+    border-radius: 1px;
+    border: 1px solid #8d5b39;
+    background: url("/images/noise.png") #a07246;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset 1px 1px 3px #00000095;
+}
+
+.input:focus-within {
+    border: 1px solid #b17a55;
+}
+
 #map-wrapper {
     display: flex;
     flex-flow: row;
@@ -45,6 +89,7 @@ ul {
     z-index: 5;
     color: #ffeccc;
     background: url("/images/side-bar.jpg") repeat-y #413127;
+    position: relative;
 }
 
 
@@ -52,17 +97,13 @@ ul {
 
 #quick-jump {
     margin-top: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     height: 22px;
 }
 
-
-
 #quick-jump-coords {
     margin-left: 3px;
-
     color: #6d4f32;
-
     width: 71px;
     height: 18px;
     padding-left: 3px;
@@ -88,23 +129,6 @@ ul {
     text-shadow: 0px 0px 1px #00000070;
 }
 
-.button-border {
-    font-weight: bold;
-    height: 22px;
-    border-radius: 1px;
-    border: 1px solid #923f32;
-    background: url("/images/noise.png"), linear-gradient(#bd4646, #7d1616);
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000,
-                inset -1px -1px 2px #000;
-}
-
-.button-border:hover,
-.button-border:focus {
-    background: url("/images/noise.png"), linear-gradient(#ca5c5c, #7d1616);
-}
-
 #quick-jump-go {
     float: right;
     font-size: 11px;
@@ -113,21 +137,6 @@ ul {
     cursor: pointer;
 }
 
-
-
-.input {
-    border-radius: 1px;
-    border: 1px solid #8d5b39;
-    background: url("/images/noise.png") #a07246;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000,
-                inset 1px 1px 3px #00000095;
-}
-
-.input:focus-within {
-    border: 1px solid #b17a55;
-}
 
 
 
@@ -196,16 +205,6 @@ ul {
 #highlight-items .item {
     line-height: 16px;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
