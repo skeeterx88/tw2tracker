@@ -7,6 +7,11 @@ const db = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
 
+const MAP_SHARE_TYPES = {
+    static: 'static',
+    dynamic: 'dynamic'
+}
+
 const checkWorldSchemaExists = async function (marketId, worldNumber) {
     const worldSchema = await db.one(sql.schemaExists, [marketId + worldNumber])
     return worldSchema.exists
@@ -120,6 +125,44 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId', async function 
     .catch(function () {
         res.end('{}')
     })
+})
+
+router.post('/api/create-share', async function (req, res) {
+    const response = {}
+    const {
+        marketId,
+        worldNumber,
+        highlights,
+        type
+    } = req.body
+
+    try {
+        const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
+
+        if (!worldExists) {
+            throw new Error('world does not exist')
+        }
+
+        if (!MAP_SHARE_TYPES.hasOwnProperty(type)) {
+            throw new Error('invalid share type')
+        }
+
+        if (!highlights || !Array.isArray(highlights) || !highlights.length) {
+            throw new Error('invalid highlights data')
+        }
+
+        const highlightsString = JSON.stringify(highlights)
+
+        const { id } = await db.one(sql.addMapShare, [marketId, worldNumber, type, highlightsString])
+
+        response.success = true
+        response.url = `/maps/${marketId}/${worldNumber}/share/${id}`
+    } catch (error) {
+        response.success = false
+        response.message = error.message
+    }
+
+    res.end(JSON.stringify(response))
 })
 
 module.exports = router

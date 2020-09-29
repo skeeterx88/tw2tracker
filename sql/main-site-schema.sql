@@ -21,4 +21,14 @@ CREATE TABLE main.worlds (
     open BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE TABLE main.shared_maps (
+    id SERIAL PRIMARY KEY,
+    world_market VARCHAR (10) REFERENCES main.markets(id),
+    world_number SMALLINT,
+    highlights TEXT NOT NULL,
+    type VARCHAR (7) NOT NULL,
+    creation_date TIMESTAMP DEFAULT NOW(),
+    last_access TIMESTAMP DEFAULT NOW()
+);
+
 INSERT INTO main.settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 30);
