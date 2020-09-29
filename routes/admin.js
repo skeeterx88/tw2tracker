@@ -7,7 +7,7 @@ const db = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
 
-if (process.env.NODE_ENV === 'development') {
+// if (process.env.NODE_ENV === 'development') {
     router.get('/', ensureLoggedIn, async function (req, res) {
         const worlds = await db.any(sql.worlds)
         const markets = await db.any(sql.markets)
@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'development') {
             settings: settings
         })
     })
-}
+// }
 
 
 router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (req, res) {
