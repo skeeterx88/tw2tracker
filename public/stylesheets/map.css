@@ -210,6 +210,21 @@ button.red:focus {
 
 
 
+#map-share-wrapper {
+    position: absolute;
+    bottom: 5px;
+}
+
+#map-share,
+#map-save {
+    margin-left: 3px;
+    width: 52px;
+    font-size: 11px;
+}
+
+
+
+
 
 #tooltip {
     opacity: 0;

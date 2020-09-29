@@ -1186,6 +1186,10 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
+    const setupMapShare = function () {
+        
+    }
+
     const mapSettings = {
         hexagonVillages: false
     }
