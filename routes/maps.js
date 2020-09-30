@@ -140,15 +140,19 @@ router.post('/api/create-share', async function (req, res) {
         const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
 
         if (!worldExists) {
-            throw new Error('world does not exist')
+            throw new Error('World does not exist')
         }
 
         if (!MAP_SHARE_TYPES.hasOwnProperty(type)) {
-            throw new Error('invalid share type')
+            throw new Error('Invalid share type')
         }
 
-        if (!highlights || !Array.isArray(highlights) || !highlights.length) {
-            throw new Error('invalid highlights data')
+        if (!highlights || !Array.isArray(highlights)) {
+            throw new Error('Invalid highlights data')
+        }
+
+        if (!highlights.length) {
+            throw new Error('No highlights specified')
         }
 
         const highlightsString = JSON.stringify(highlights)
