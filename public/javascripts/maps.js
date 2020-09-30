@@ -1227,13 +1227,14 @@ const TW2MapTooltip = function (selector) {
 
     const setupMapShare = function () {
         const $mapShare = document.querySelector('#map-share')
+        const $mapSave = document.querySelector('#map-save')
 
         $mapShare.addEventListener('click', async function () {
             const result = await map.shareMap('dynamic')
 
             if (result.success) {
                 notif({
-                    title: 'Dynamic map share',
+                    title: 'Dynamic map',
                     link: location.host + result.url,
                     timeout: 0
                 })
@@ -1243,6 +1244,13 @@ const TW2MapTooltip = function (selector) {
                     content: result.message
                 })
             }
+        })
+
+        $mapSave.addEventListener('click', async function () {
+            notif({
+                title: 'Static map',
+                content: 'Static maps are not available yet!'
+            })
         })
     }
 
