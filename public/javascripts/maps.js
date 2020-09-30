@@ -498,21 +498,23 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     this.addHighlight = function (category, id, color) {
-        if (typeof id !== 'string') {
+        let realId
+        let displayName
+
+        if (typeof id === 'number') {
+            realId = id
+        } else if (typeof id === 'string') {
+            try {
+                realId = highlightGetRealId(category, id)
+            } catch (error) {
+                return console.log(error)
+            }
+        } else {
             throw new Error('Highlights: Invalid id')
         }
 
         if (!color) {
             color = arrayRandom(colorPalette.flat())
-        }
-
-        let realId
-        let displayName
-
-        try {
-            realId = highlightGetRealId(category, id)
-        } catch (error) {
-            return console.log(error)
         }
 
         const redrawVillages = getVillagesToDraw(category, realId)
