@@ -1227,7 +1227,7 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
-    const setupMapShare = function () {
+    const setupMapShare = async function () {
         const $mapShare = document.querySelector('#map-share')
         const $mapSave = document.querySelector('#map-save')
 
@@ -1254,6 +1254,26 @@ const TW2MapTooltip = function (selector) {
                 content: 'Static maps are not available yet!'
             })
         })
+
+        if (mapShareId) {
+            const getMapShare = await ajaxPost('/maps/api/get-share/', {
+                mapShareId,
+                marketId,
+                worldNumber
+            })
+
+            const mapShare = getMapShare.data
+            const highlights = JSON.parse(mapShare.highlights)
+
+            await Promise.all([
+                loader.loadPlayers,
+                loader.loadTribes
+            ])
+
+            for (let [category, id, color] of highlights) {
+                map.addHighlight(category, id, color)
+            }
+        }
     }
 
     const setupNotif = function () {
@@ -1322,16 +1342,4 @@ const TW2MapTooltip = function (selector) {
     setupCommonEvents()
     setupMapShare()
     setupNotif()
-
-    if (development) {
-        if (marketId === 'br' && worldNumber === 48) {
-            await Promise.all([
-                loader.loadPlayers,
-                loader.loadTribes
-            ])
-
-            map.addHighlight('tribes', 'OUT', '#0111af')
-            map.addHighlight('players', 'she-ra', '#e21f1f')
-        }
-    }
 })()
