@@ -829,6 +829,7 @@ const TW2MapTooltip = function (selector) {
 
 ;(async function () {
     let colorPicker
+    let notif
 
     const setupQuickJump = function () {
         const $quickJumpX = document.querySelector('#quick-jump-x')
@@ -1187,7 +1188,54 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupMapShare = function () {
-        
+    const setupNotif = function () {
+        const $notif = document.querySelector('#notif')
+        const $notifTitle = $notif.querySelector('#notif-title')
+        const $notifContent = $notif.querySelector('#notif-content')
+        const $notifLink = $notif.querySelector('#notif-link')
+        const $notifClose = $notif.querySelector('#notif-close')
+
+        let activeTimeout
+
+        $notif.addEventListener('click', () => $notif.classList.add('hidden'))
+        $notifClose.addEventListener('click', () => $notif.classList.add('hidden'))
+
+        notif = function ({ title = '', content = '', timeout = 3000, link = false }) {
+            clearTimeout(activeTimeout)
+
+            title = String(title)
+
+            if (title.length) {
+                $notifTitle.innerText = title
+                $notifTitle.classList.remove('hidden')
+            } else {
+                $notifTitle.classList.add('hidden')
+            }
+
+            if (link) {
+                $notifLink.href = link
+                $notifLink.innerText = link
+                $notifLink.classList.remove('hidden')
+            } else {
+                $notifLink.classList.add('hidden')
+            }
+
+            if (content.length) {
+                $notifContent.innerHTML = content
+                $notifContent.classList.remove('hidden')
+            } else {
+                $notifContent.classList.add('hidden')
+            }
+
+            $notifContent.innerHTML = content
+            $notif.classList.remove('hidden')
+
+            if (typeof timeout === 'number' && timeout !== 0) {
+                activeTimeout = setTimeout(function () {
+                    $notif.classList.add('hidden')
+                }, timeout)
+            }
+        }
     }
 
     const mapSettings = {
@@ -1204,6 +1252,7 @@ const TW2MapTooltip = function (selector) {
     setupDisplayLastSync()
     setupDisplayPosition()
     setupCommonEvents()
+    setupNotif()
 
     if (development) {
         if (marketId === 'br' && worldNumber === 48) {

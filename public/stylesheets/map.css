@@ -457,3 +457,85 @@ button.red:focus {
     color: #824300;
     background-color: #f4dec666;
 }
+
+
+
+
+
+
+
+
+#notif {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    min-width: 200px;
+    max-width: 300px;
+    max-height: 200px;
+    padding-bottom: 10px;
+    z-index: 15;
+    border-radius: 1px;
+    border: 1px solid #6b635e;
+    background: url(/images/noise.png) #351908;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240E,
+                2px 2px 5px #000,
+                inset 3px 3px 2px #ffffff10,
+                inset -3px -3px 2px #00000010;
+    padding: 2px 6px;
+    color: #ffeccc;
+    text-shadow: 1px 1px 0px #00000090;
+
+
+    transition: visibility 0.1s linear,
+                opacity 0.1s linear,
+                right 0.15s ease-out;
+}
+
+#notif-wrapper {
+    margin: 5px;
+}
+
+#notif.hidden {
+    visibility: hidden;
+    opacity: 0;
+    right: -240px;
+}
+
+#notif-link.hidden,
+#notif-content.hidden {
+    display: none;
+}
+
+#notif-content {
+    word-break: break-word;
+    margin: 0px;
+}
+
+#notif-title {
+    font-size: 13px;
+    text-align: center;
+    margin: 3px;
+    text-shadow: 1px 1px 3px #000;
+    border-bottom: 1px solid #ffeccc50;
+    padding-bottom: 5px;
+    margin-bottom: 0px;
+}
+
+#notif-link {
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+#notif-close {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    width: 11px;
+    height: 11px;
+    background: url(/images/close.png);
+    display: inline-block;
+    cursor: pointer;
+}
