@@ -468,11 +468,26 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             return
         }
 
+        const oldPositionX = positionX
+        const oldPositionY = positionY
+
         positionX = boundNumber(x, 0, 999) * tileSize
         positionY = boundNumber(y, 0, 999) * tileSize
+
+        if (oldPositionX === positionX && oldPositionY === positionY) {
+            return
+        }
+
         updateCenter()
+
+        if (tooltip) {
+            tooltip.hide()
+        }
+
         loadVisibleContinents()
         renderViewport()
+        activeVillage = false
+        renderOverlay()
     }
 
     this.getCoords = function () {
