@@ -1237,7 +1237,7 @@ const TW2MapTooltip = function (selector) {
             if (result.success) {
                 notif({
                     title: 'Dynamic map',
-                    link: location.host + result.url,
+                    link: location.origin + result.url,
                     timeout: 0
                 })
             } else {
