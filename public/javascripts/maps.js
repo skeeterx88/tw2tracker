@@ -550,6 +550,29 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderVillages(redrawVillages)
     }
 
+    this.shareMap = async function (type) {
+        const highlightsExport = []
+
+        for (let [id, data] of Object.entries(highlights.players)) {
+            highlightsExport.push(['players', parseInt(id, 10), data.color])
+        }
+
+        for (let [id, data] of Object.entries(highlights.tribes)) {
+            highlightsExport.push(['tribes', parseInt(id, 10), data.color])
+        }
+
+        if (!highlightsExport.length) {
+            throw new Error('TW2Map: No highlights to create a share')
+        }
+
+        return await ajaxPost('/maps/api/create-share', {
+            marketId,
+            worldNumber,
+            highlights: highlightsExport,
+            type
+        })
+    }
+
     this.onAddHighlight = function (fn) {
         if (typeof fn === 'function') {
             onAddHighlight = fn
@@ -1188,6 +1211,26 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupMapShare = function () {
+        const $mapShare = document.querySelector('#map-share')
+
+        $mapShare.addEventListener('click', async function () {
+            const result = await map.shareMap('dynamic')
+
+            if (result.success) {
+                notif({
+                    title: 'Dynamic map share',
+                    link: location.host + result.url,
+                    timeout: 0
+                })
+            } else {
+                notif({
+                    title: 'Error generating map',
+                    content: result.message
+                })
+            }
+        })
+    }
+
     const setupNotif = function () {
         const $notif = document.querySelector('#notif')
         const $notifTitle = $notif.querySelector('#notif-title')
@@ -1252,6 +1295,7 @@ const TW2MapTooltip = function (selector) {
     setupDisplayLastSync()
     setupDisplayPosition()
     setupCommonEvents()
+    setupMapShare()
     setupNotif()
 
     if (development) {
