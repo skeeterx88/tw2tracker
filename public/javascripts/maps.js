@@ -77,13 +77,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     let onCenterCoordsUpdate = noop
 
     const COLORS = {
-        neutral: '#823c0a',
-        barbarian: '#4c6f15',
+        neutral: '#823C0A',
+        barbarian: '#4C6F15',
         background: '#436213',
-        highlightPlayer: '#ffffff',
-        activeVillageBorder: 'rgba(255, 255, 255, 0.5)',
-        continentDemarcation: 'rgba(0,0,0,0.15)',
-        provinceDemarcation: 'rgba(0,0,0,0.05)'
+        highlightPlayer: '#FFFFFF',
+        activeVillageBorder: '#FFFFFF80',
+        continentDemarcation: '#00000025',
+        provinceDemarcation: '#0000000D'
     }
 
     const setupElements = function () {

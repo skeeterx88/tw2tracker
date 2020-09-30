@@ -1,6 +1,6 @@
 body {
     padding: 50px;
-    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    font: 14px 'Lucida Grande', Helvetica, Arial, sans-serif;
 }
 
 a {
@@ -14,7 +14,7 @@ li {
 .flag {
     height: 12px;
     width: 18px;
-    background: url("/images/flags.png") no-repeat top left;
+    background: url(/images/flags.png) no-repeat top left;
     display: inline-block;
 }
 

@@ -36,7 +36,7 @@ button {
     border-width: 1px;
     border-style: solid;
     border-color: #794929;
-    background: url("/images/noise.png"), linear-gradient(#8d5b39, #583f2d);
+    background: url(/images/noise.png), linear-gradient(#8d5b39, #583f2d);
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000,
@@ -45,7 +45,7 @@ button {
 
 button:hover,
 button:focus {
-    background: url("/images/noise.png"), linear-gradient(#af7046, #583f2d);
+    background: url(/images/noise.png), linear-gradient(#af7046, #583f2d);
 }
 
 button.red {
@@ -61,7 +61,7 @@ button.red:focus {
 .input {
     border-radius: 1px;
     border: 1px solid #8d5b39;
-    background: url("/images/noise.png") #a07246;
+    background: url(/images/noise.png) #a07246;
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000,
@@ -89,7 +89,7 @@ button.red:focus {
     box-shadow: 5px 0px 6px #00000080;
     z-index: 5;
     color: #ffeccc;
-    background: url("/images/side-bar.jpg") repeat-y #413127;
+    background: url(/images/side-bar.jpg) repeat-y #413127;
     position: relative;
 }
 
@@ -182,7 +182,7 @@ button.red:focus {
     position: relative;
     border-radius: 1px;
     border: 1px solid #8d5b39;
-    background: url('/images/noise.png') #a07246;
+    background: url(/images/noise.png) #a07246;
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 1px 1px 2px #000;
@@ -194,12 +194,12 @@ button.red:focus {
 }
 
 #highlight-items .players {
-    background: url('/images/player.png') left center no-repeat;
+    background: url(/images/player.png) left center no-repeat;
     padding-left: 19px;
 }
 
 #highlight-items .tribes {
-    background: url('/images/tribe.png') left center no-repeat;
+    background: url(/images/tribe.png) left center no-repeat;
     padding-left: 19px;
 }
 
@@ -238,21 +238,21 @@ button.red:focus {
     top: 0px;
     left: 0px;
     margin-top: 3px;
-    background: url("/images/tooltip-background.png") #d0ac86;
+    background: url(/images/tooltip-background.png) #d0ac86;
 }
 
 #tooltip table {
     width: 100%;
     border-spacing: 1px;
     border-collapse: separate;
-    box-shadow: 0 0 0 2px rgba(124,54,0,0.4);
-    background: url("/images/tooltip-background-2.png") #d1ad86;
+    box-shadow: 0 0 0 2px #7c360066;
+    background: url(/images/tooltip-background-2.png) #d1ad86;
 }
 
 #tooltip td {
-    border: 1px solid rgba(124,54,0,0.3);
+    border: 1px solid #7c36004d;
     box-shadow: none;
-    background: url("/images/tooltip-background-2.png") #c39c72;
+    background: url(/images/tooltip-background-2.png) #c39c72;
     padding: 1px;
 }
 
@@ -295,12 +295,12 @@ button.red:focus {
     position: absolute;
     left: 0px;
     top: 0px;
-    background: linear-gradient(rgba(2,3,3,0.45), rgba(2,3,3,0)),
-                url("/images/background_noise_icon_black.png");
+    background: linear-gradient(#02030373, #02030300),
+                url(/images/background_noise_icon_black.png);
 }
 
 .icon:before {
-    content: " ";
+    content: ' ';
     display: inline-block;
     width: 24px;
     height: 24px;
@@ -310,23 +310,23 @@ button.red:focus {
 }
 
 .icon.village:before {
-    background-image: url("/images/village-icon.png");
+    background-image: url(/images/village-icon.png);
 }
 
 .icon.player:before {
-    background-image: url("/images/player-icon.png");
+    background-image: url(/images/player-icon.png);
 }
 
 .icon.tribe:before {
-    background-image: url("/images/tribe-icon.png");
+    background-image: url(/images/tribe-icon.png);
 }
 
 .icon.tribe-points-x:before {
-    background-image: url("/images/tribe-points-icon.png");
+    background-image: url(/images/tribe-points-icon.png);
 }
 
 .icon.points:before {
-    background-image: url("/images/points-icon.png");
+    background-image: url(/images/points-icon.png);
 }
 
 
@@ -406,7 +406,7 @@ button.red:focus {
     z-index: 10;
     border-radius: 1px;
     border: 1px solid #6b635e;
-    background: url("/images/noise.png") #413127;
+    background: url(/images/noise.png) #413127;
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000;
@@ -426,7 +426,7 @@ button.red:focus {
 #autoComplete_list {
     color: #000;
     line-height: 15px;
-    background: url("/images/bg2.png") top left #ceab84;
+    background: url(/images/bg2.png) top left #ceab84;
     box-shadow: inset 0 0 0 1px #533a1f,
                 inset 0 0 0 2px #dcba94,
                 5px 5px 5px #00000080;
