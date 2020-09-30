@@ -43,6 +43,46 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
         worldNumber,
         worldName: worldInfo.name,
         lastSync,
+        mapShareId: false,
+        development: process.env.NODE_ENV === 'development'
+    })
+})
+
+router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res) {
+    const settings = await db.one(sql.settings)
+    const mapShareId = parseInt(req.params.mapShareId, 10)
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+
+    let worldInfo
+    let mapShare
+
+    try {
+        worldInfo = await db.one(sql.world, [marketId, worldNumber])
+    } catch (error) {
+        res.status(404)
+        res.send('World does not exist')
+        return false
+    }
+
+    try {
+        mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+    } catch (error) {
+        res.status(404)
+        res.send('Map share does not exist')
+        return false
+    }
+
+    const worldId = marketId + worldNumber
+    const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
+
+    res.render('map', {
+        title: 'Map ' + worldId + ' - ' + settings.site_name,
+        marketId,
+        worldNumber,
+        worldName: worldInfo.name,
+        lastSync,
+        mapShareId,
         development: process.env.NODE_ENV === 'development'
     })
 })
@@ -165,6 +205,43 @@ router.post('/api/create-share', async function (req, res) {
         response.success = false
         response.message = error.message
     }
+
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(response))
+})
+
+router.post('/api/get-share', async function (req, res) {
+    const response = {}
+
+    let {
+        mapShareId,
+        marketId,
+        worldNumber
+    } = req.body
+
+    let worldInfo
+    let mapShare
+
+    res.setHeader('Content-Type', 'application/json')
+
+    try {
+        worldInfo = await db.one(sql.world, [marketId, worldNumber])
+    } catch (error) {
+        response.success = false
+        response.message = 'World does not exist'
+        return res.end(JSON.stringify(response))
+    }
+
+    try {
+        mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+    } catch (error) {
+        response.success = false
+        response.message = 'Map share does not exist'
+        return res.end(JSON.stringify(response))
+    }
+
+    response.success = true
+    response.data = mapShare
 
     res.end(JSON.stringify(response))
 })
