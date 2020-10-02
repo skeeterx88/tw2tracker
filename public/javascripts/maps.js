@@ -134,7 +134,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         $overlay.addEventListener('mousemove', (event) => {
             if (draggable) {
                 if (!dragging) {
-                    $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
+                    clearOverlay()
                     renderEnabled = true
                     $overlay.style.cursor = 'move'
                 }
@@ -216,7 +216,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         this.trigger('inactive village', [activeVillage])
         activeVillage = false
-        $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
+        clearOverlay()
     }
 
     const loadVisibleContinents = () => {
@@ -321,7 +321,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const renderOverlay = () => {
-        $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
+        clearOverlay()
 
         if (!activeVillage) {
             return
@@ -376,6 +376,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 $overlayContext.fillRect(x, y, villageSize, villageSize)
             }
         }
+    }
+
+    const clearOverlay = function () {
+        $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
     }
 
     const continuousRender = () => {
