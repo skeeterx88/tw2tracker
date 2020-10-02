@@ -40,50 +40,37 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     let middleViewportOffsetX = Math.floor(viewportWidth / 2)
     let middleViewportOffsetY = Math.floor(viewportHeight / 2)
 
-    let villageSize
-    let provinceGrid
-    let continentGrid
-    let villageMargin
-    let mapWidth
-    let mapHeight
-    let tileSize
-    let villageRenderOffset
-    let allowHexagon
-    let activeVillageBorder
-
+    let zoomSettings
     const zoomCache = {}
 
     const zoomLevels = [{
         villageSize: 1,
         provinceGrid: false,
         continentGrid: true,
-        villageMargin: 0,
         mapWidth: 1000,
         mapHeight: 1000,
         tileSize: 1,
-        villageRenderOffset: 0,
+        villageOffset: 0,
         allowHexagon: false,
         activeVillageBorder: false
     }, {
         villageSize: 3,
         provinceGrid: true,
         continentGrid: true,
-        villageMargin: 1,
         mapWidth: 3000,
         mapHeight: 3000,
         tileSize: 4,
-        villageRenderOffset: 2,
+        villageOffset: 2,
         allowHexagon: false,
         activeVillageBorder: true
     }, {
         villageSize: 5,
         provinceGrid: true,
         continentGrid: true,
-        villageMargin: 1,
         mapWidth: 5000,
         mapHeight: 5000,
         tileSize: 6,
-        villageRenderOffset: 3,
+        villageOffset: 3,
         allowHexagon: true,
         activeVillageBorder: true
     }]
@@ -129,25 +116,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const setupZoom = function () {
-        ({
-            villageSize,
-            provinceGrid,
-            continentGrid,
-            villageMargin,
-            mapWidth,
-            mapHeight,
-            tileSize,
-            villageRenderOffset,
-            allowHexagon,
-            activeVillageBorder
-        } = zoomLevels[settings.zoomLevel])
+        zoomSettings = zoomLevels[settings.zoomLevel]
 
         if (!zoomCache.hasOwnProperty(settings.zoomLevel)) {
             const _$cache = document.createElement('canvas')
             const _$cacheContext = _$cache.getContext('2d')
 
-            _$cache.width = mapWidth
-            _$cache.height = mapHeight
+            _$cache.width = zoomSettings.mapWidth
+            _$cache.height = zoomSettings.mapHeight
 
             zoomCache[settings.zoomLevel] = {
                 $cache: _$cache,
@@ -238,9 +214,9 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 return
             }
 
-            mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / tileSize)
-            let off = mouseCoordY % 2 ? villageRenderOffset : 0
-            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / tileSize)
+            mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / zoomSettings.tileSize)
+            let off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
+            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / zoomSettings.tileSize)
 
             const villagesX = loader.villages[mouseCoordX]
 
@@ -276,8 +252,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             if (newZoom !== false) {
                 settings.zoomLevel = newZoom
 
-                const currentCenterX = Math.floor(positionX / tileSize)
-                const currentCenterY = Math.floor(positionY / tileSize)
+                const currentCenterX = Math.floor(positionX / zoomSettings.tileSize)
+                const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
 
                 setupZoom()
                 renderGrid()
@@ -325,10 +301,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const loadVisibleContinents = () => {
         const visibleContinents = []
 
-        let ax = boundNumber(((positionX - middleViewportOffsetX) / tileSize), 0, 999)
-        let ay = boundNumber(((positionY - middleViewportOffsetY) / tileSize), 0, 999)
-        let bx = boundNumber(((positionX + middleViewportOffsetX) / tileSize), 0, 999)
-        let by = boundNumber(((positionY + middleViewportOffsetY) / tileSize), 0, 999)
+        let ax = boundNumber(((positionX - middleViewportOffsetX) / zoomSettings.tileSize), 0, 999)
+        let ay = boundNumber(((positionY - middleViewportOffsetY) / zoomSettings.tileSize), 0, 999)
+        let bx = boundNumber(((positionX + middleViewportOffsetX) / zoomSettings.tileSize), 0, 999)
+        let by = boundNumber(((positionY + middleViewportOffsetY) / zoomSettings.tileSize), 0, 999)
 
         ax = ax < 100 ? 0 : String(ax)[0]
         ay = ay < 100 ? 0 : String(ay)[0]
@@ -347,13 +323,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             loader.loadContinent(continent).then(villages => {
                 renderedZoomContinents[settings.zoomLevel][continent] = true
                 renderVillages(villages)
+                renderViewport()
             })
         })
     }
 
     const updateCenter = () => {
-        const currentCenterX = Math.floor(positionX / tileSize)
-        const currentCenterY = Math.floor(positionY / tileSize)
+        const currentCenterX = Math.floor(positionX / zoomSettings.tileSize)
+        const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
 
         if (centerCoordX !== currentCenterX || centerCoordY !== currentCenterY) {
             centerCoordX = currentCenterX
@@ -370,29 +347,29 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         renderedZoomGrid[settings.zoomLevel] = true
 
-        if (continentGrid) {
+        if (zoomSettings.continentGrid) {
             $cacheContext.fillStyle = COLORS.continentDemarcation
 
-            $cacheContext.fillRect(0, 0, 1, mapWidth)
-            $cacheContext.fillRect(0, 0, mapWidth, 1)
+            $cacheContext.fillRect(0, 0, 1, zoomSettings.mapWidth)
+            $cacheContext.fillRect(0, 0, zoomSettings.mapWidth, 1)
 
             for (let i = 1; i < 11; i++) {
-                $cacheContext.fillRect(i * 100 * tileSize - 1, 0, 1, mapWidth)
-                $cacheContext.fillRect(0, i * 100 * tileSize - 1, mapWidth, 1)
+                $cacheContext.fillRect(i * 100 * zoomSettings.tileSize - 1, 0, 1, zoomSettings.mapWidth)
+                $cacheContext.fillRect(0, i * 100 * zoomSettings.tileSize - 1, zoomSettings.mapWidth, 1)
             }
         }
 
-        if (provinceGrid) {
+        if (zoomSettings.provinceGrid) {
             $cacheContext.fillStyle = COLORS.provinceDemarcation
 
             for (let i = 1; i < 100; i++) {
-                $cacheContext.fillRect(i * 10 * tileSize - 1, 0, 1, mapWidth)
-                $cacheContext.fillRect(0, i * 10 * tileSize - 1, mapWidth, 1)
+                $cacheContext.fillRect(i * 10 * zoomSettings.tileSize - 1, 0, 1, zoomSettings.mapWidth)
+                $cacheContext.fillRect(0, i * 10 * zoomSettings.tileSize - 1, zoomSettings.mapWidth, 1)
             }
         }
     }
 
-    const renderVillages = (villages) => {
+    const renderVillages = (villages, context = $cacheContext, zoomSettings = zoomLevels[settings.zoomLevel]) => {
         for (let x in villages) {
             for (let y in villages[x]) {
                 let [id, name, points, character_id] = villages[x][y]
@@ -400,30 +377,28 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 let tribeId = character_id ? loader.players[character_id][1] : false
 
                 if (!character_id) {
-                    $cacheContext.fillStyle = COLORS.barbarian
+                    context.fillStyle = COLORS.barbarian
                 } else if (character_id in highlights.players) {
-                    $cacheContext.fillStyle = highlights.players[character_id].color
+                    context.fillStyle = highlights.players[character_id].color
                 } else if (tribeId && tribeId in highlights.tribes) {
-                    $cacheContext.fillStyle = highlights.tribes[tribeId].color
+                    context.fillStyle = highlights.tribes[tribeId].color
                 } else {
-                    $cacheContext.fillStyle = COLORS.neutral
+                    context.fillStyle = COLORS.neutral
                 }
 
-                let off = y % 2 ? villageRenderOffset : 0
+                let off = y % 2 ? zoomSettings.villageOffset : 0
 
-                if (allowHexagon && settings.hexagonVillages) {
-                    $cacheContext.fillRect(x * tileSize + off + 1, y * tileSize, 3, 1)
-                    $cacheContext.fillRect(x * tileSize + off    , y * tileSize + 1, 5, 1)
-                    $cacheContext.fillRect(x * tileSize + off    , y * tileSize + 2, 5, 1)
-                    $cacheContext.fillRect(x * tileSize + off    , y * tileSize + 3, 5, 1)
-                    $cacheContext.fillRect(x * tileSize + off + 1, y * tileSize + 4, 3, 1)
+                if (zoomSettings.allowHexagon && settings.hexagonVillages) {
+                    context.fillRect(x * zoomSettings.tileSize + off + 1, y * zoomSettings.tileSize, 3, 1)
+                    context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 1, 5, 1)
+                    context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 2, 5, 1)
+                    context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 3, 5, 1)
+                    context.fillRect(x * zoomSettings.tileSize + off + 1, y * zoomSettings.tileSize + 4, 3, 1)
                 } else {
-                    $cacheContext.fillRect(x * tileSize + off, y * tileSize, villageSize, villageSize)
+                    context.fillRect(x * zoomSettings.tileSize + off, y * zoomSettings.tileSize, zoomSettings.villageSize, zoomSettings.villageSize)
                 }
             }
         }
-
-        renderViewport()
     }
 
     const renderViewport = () => {
@@ -443,16 +418,16 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             return
         }
 
-        if (activeVillageBorder) {
+        if (zoomSettings.activeVillageBorder) {
             $overlayContext.fillStyle = COLORS.activeVillageBorder
 
-            let off = activeVillage.y % 2 ? villageRenderOffset : 0
+            let off = activeVillage.y % 2 ? zoomSettings.villageOffset : 0
 
-            const borderX = Math.abs(positionX - (activeVillage.x * tileSize) - middleViewportOffsetX) - 1 + off
-            const borderY = Math.abs(positionY - (activeVillage.y * tileSize) - middleViewportOffsetY) - 1
-            const borderSize = villageSize + 2
+            const borderX = Math.abs(positionX - (activeVillage.x * zoomSettings.tileSize) - middleViewportOffsetX) - 1 + off
+            const borderY = Math.abs(positionY - (activeVillage.y * zoomSettings.tileSize) - middleViewportOffsetY) - 1
+            const borderSize = zoomSettings.villageSize + 2
 
-            if (allowHexagon && settings.hexagonVillages) {
+            if (zoomSettings.allowHexagon && settings.hexagonVillages) {
                 $overlayContext.fillRect(borderX + 1, borderY - 1, 5, 1)
                 $overlayContext.fillRect(borderX    , borderY    , 1, 1)
                 $overlayContext.fillRect(borderX + 6, borderY    , 1, 1)
@@ -478,19 +453,19 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         $overlayContext.fillStyle = COLORS.highlightPlayer
 
         for (let [x, y] of loader.playerVillages[characterId]) {
-            let off = y % 2 ? villageRenderOffset : 0
+            let off = y % 2 ? zoomSettings.villageOffset : 0
 
-            x = x * tileSize - positionX + middleViewportOffsetX + off
-            y = y * tileSize - positionY + middleViewportOffsetY
+            x = x * zoomSettings.tileSize - positionX + middleViewportOffsetX + off
+            y = y * zoomSettings.tileSize - positionY + middleViewportOffsetY
 
-            if (allowHexagon && settings.hexagonVillages) {
+            if (zoomSettings.allowHexagon && settings.hexagonVillages) {
                 $overlayContext.fillRect(x + 1, y, 3, 1)
                 $overlayContext.fillRect(x    , y + 1, 5, 1)
                 $overlayContext.fillRect(x    , y + 2, 5, 1)
                 $overlayContext.fillRect(x    , y + 3, 5, 1)
                 $overlayContext.fillRect(x + 1, y + 4, 3, 1)
             } else {
-                $overlayContext.fillRect(x, y, villageSize, villageSize)
+                $overlayContext.fillRect(x, y, zoomSettings.villageSize, zoomSettings.villageSize)
             }
         }
     }
@@ -596,8 +571,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         const oldPositionX = positionX
         const oldPositionY = positionY
 
-        positionX = boundNumber(x, 0, 999) * tileSize
-        positionY = boundNumber(y, 0, 999) * tileSize
+        positionX = boundNumber(x, 0, 999) * zoomSettings.tileSize
+        positionY = boundNumber(y, 0, 999) * zoomSettings.tileSize
 
         if (oldPositionX === positionX && oldPositionY === positionY) {
             return
@@ -617,8 +592,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     this.getCoords = () => {
         return {
-            x: Math.floor(positionX / tileSize),
-            y: Math.floor(positionY / tileSize)
+            x: Math.floor(positionX / zoomSettings.tileSize),
+            y: Math.floor(positionY / zoomSettings.tileSize)
         }
     }
 
@@ -673,6 +648,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
 
         renderVillages(redrawVillages)
+
+        for (let zoomLevel in zoomCache) {
+            if (zoomLevel !== settings.zoomLevel) {
+                renderVillages(redrawVillages, zoomCache[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
+            }
+        }
+
+        renderViewport()
     }
 
     this.removeHighlight = (category, id) => {
@@ -700,6 +683,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         this.trigger('remove highlight', [category, id])
         renderVillages(redrawVillages)
+        renderViewport()
     }
 
     this.shareMap = async (type) => {
@@ -743,8 +727,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     setupZoom()
 
-    positionX = 500 * tileSize
-    positionY = 500 * tileSize
+    positionX = 500 * zoomSettings.tileSize
+    positionY = 500 * zoomSettings.tileSize
 
     setupElements()
     mouseEvents()
