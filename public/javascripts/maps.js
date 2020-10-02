@@ -628,6 +628,20 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         continuousRender()
     })
 
+    this.on('click', function (activeVillage) {
+        if (!activeVillage) {
+            return
+        }
+
+        const category = HIGHLIGHT_CATEGORIES.players
+        const id = activeVillage.character_id
+        const color = arrayRandom(colorPalette.flat())
+
+        clearOverlay()
+
+        this.addHighlight(category, id, color)
+    })
+
     if (tooltip) {
         this.on('active village', (village) => {
             const {
