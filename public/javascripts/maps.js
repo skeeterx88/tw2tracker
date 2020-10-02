@@ -1031,6 +1031,7 @@ const TW2MapTooltip = function (selector) {
             
             $item.classList.add('highlight-' + normalizeString(id))
             $item.classList.add('item')
+            $item.classList.add(category)
             $item.dataset.category = category
             $item.dataset.id = id
             $item.dataset.color = color
@@ -1042,7 +1043,7 @@ const TW2MapTooltip = function (selector) {
             $name.className = 'name'
 
             $nameSpan.innerHTML = displayName
-            $nameSpan.className = category
+            $nameSpan.className = 'icon-' + category
 
             $color.className = 'color open-color-picker'
             $color.style.backgroundColor = color
