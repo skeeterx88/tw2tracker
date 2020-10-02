@@ -1347,7 +1347,7 @@ const TW2MapTooltip = function (selector) {
     }
 
     const mapSettings = {
-        hexagonVillages: false
+        hexagonVillages: true
     }
 
     const loader = new DataLoader(marketId, worldNumber)
