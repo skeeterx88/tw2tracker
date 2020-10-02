@@ -279,6 +279,13 @@ button.red:focus {
     white-space: nowrap;
 }
 
+#tooltip .village-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 54px);
+    display: inline-block;
+    vertical-align: top;
+}
 
 
 
