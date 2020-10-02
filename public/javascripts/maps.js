@@ -75,6 +75,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     let onInactiveVillage = noop
 
     let onCenterCoordsUpdate = noop
+    let onMapClick = noop
 
     const COLORS = {
         neutral: '#823C0A',
@@ -126,6 +127,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         })
 
         $overlay.addEventListener('mouseup', function () {
+            if (!dragging) {
+                onMapClick(activeVillage)
+            }
+
             dragging = false
             draggable = false
             dragStartX = 0
@@ -630,6 +635,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     this.onCenterCoordsUpdate = function (fn) {
         if (typeof fn === 'function') {
             onCenterCoordsUpdate = fn
+        }
+    }
+
+    this.onMapClick = function (fn) {
+        if (typeof fn === 'function') {
+            onMapClick = fn
         }
     }
 
