@@ -67,15 +67,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         [HIGHLIGHT_CATEGORIES.tribes]: {}
     }
 
-    let onAddHighlight = noop
-    let onRemoveHighlight = noop
-    let onUpdateHighlight = noop
-
-    let onActiveVillage = noop
-    let onInactiveVillage = noop
-
-    let onCenterCoordsUpdate = noop
-    let onMapClick = noop
+    const events = {}
 
     const COLORS = {
         neutral: '#823C0A',
@@ -87,7 +79,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         provinceDemarcation: '#0000000D'
     }
 
-    const setupElements = function () {
+    const setupElements = () => {
         $container.style.position = 'relative'
 
         $viewport.width = viewportWidth
@@ -114,21 +106,21 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         $container.appendChild($overlay)
     }
 
-    const mouseEvents = function () {
+    const mouseEvents = () => {
         let draggable = false
         let dragging = false
         let dragStartX = 0
         let dragStartY = 0
 
-        $overlay.addEventListener('mousedown', function (event) {
+        $overlay.addEventListener('mousedown', (event) => {
             draggable = true
             dragStartX = positionX + event.pageX
             dragStartY = positionY + event.pageY
         })
 
-        $overlay.addEventListener('mouseup', function () {
+        $overlay.addEventListener('mouseup', () => {
             if (!dragging) {
-                onMapClick(activeVillage)
+                this.trigger('click', [activeVillage])
             }
 
             dragging = false
@@ -139,7 +131,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             $overlay.style.cursor = 'default'
         })
 
-        $overlay.addEventListener('mousemove', function (event) {
+        $overlay.addEventListener('mousemove', (event) => {
             if (draggable) {
                 if (!dragging) {
                     $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
@@ -162,7 +154,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         })
 
-        $overlay.addEventListener('mousemove', function (event) {
+        $overlay.addEventListener('mousemove', (event) => {
             if (draggable) {
                 return
             }
@@ -184,7 +176,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             return unsetActiveVillage()
         })
 
-        $overlay.addEventListener('mouseleave', function (event) {
+        $overlay.addEventListener('mouseleave', (event) => {
             draggable = false
             dragStartX = 0
             dragStartY = 0
@@ -194,7 +186,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         })
     }
 
-    const setActiveVillage = function (village) {
+    const setActiveVillage = (village) => {
         if (activeVillage && activeVillage.x === mouseCoordX && activeVillage.y === mouseCoordY) {
             return
         }
@@ -214,20 +206,20 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         const tribe = player ? loader.tribes[player[1]] : false
 
         renderOverlay()
-        onActiveVillage(activeVillage)
+        this.trigger('active village', [activeVillage])
     }
 
-    const unsetActiveVillage = function () {
+    const unsetActiveVillage = () => {
         if (!activeVillage) {
             return
         }
 
-        onInactiveVillage(activeVillage)
+        this.trigger('inactive village', [activeVillage])
         activeVillage = false
         $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
     }
 
-    const loadVisibleContinents = function () {
+    const loadVisibleContinents = () => {
         const visibleContinents = []
 
         let ax = boundNumber(((positionX - middleViewportOffsetX) / tileSize), 0, 999)
@@ -246,12 +238,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
-        visibleContinents.forEach(function (continent) {
+        visibleContinents.forEach((continent) => {
             loader.loadContinent(continent).then(villages => renderVillages(villages))
         })
     }
 
-    const updateCenter = function () {
+    const updateCenter = () => {
         const currentCenterX = Math.floor(positionX / tileSize)
         const currentCenterY = Math.floor(positionY / tileSize)
 
@@ -259,11 +251,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             centerCoordX = currentCenterX
             centerCoordY = currentCenterY
 
-            onCenterCoordsUpdate(centerCoordX, centerCoordY)
+            this.trigger('center coords update', [centerCoordX, centerCoordY])
         }
     }
 
-    const renderGrid = function () {
+    const renderGrid = () => {
         $cacheContext.clearRect(0, 0, mapWidth, mapHeight)
 
         $cacheContext.fillStyle = COLORS.continentDemarcation
@@ -284,7 +276,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    const renderVillages = function (villages) {
+    const renderVillages = (villages) => {
         for (let x in villages) {
             for (let y in villages[x]) {
                 let [id, name, points, character_id] = villages[x][y]
@@ -318,7 +310,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderViewport()
     }
 
-    const renderViewport = function () {
+    const renderViewport = () => {
         $viewportContext.fillStyle = COLORS.background
         $viewportContext.fillRect(0, 0, mapWidth, mapHeight)
 
@@ -328,7 +320,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         $viewportContext.drawImage($cache, -positionXcenter, -positionYcenter)
     }
 
-    const renderOverlay = function () {
+    const renderOverlay = () => {
         $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
 
         if (!activeVillage) {
@@ -386,7 +378,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    const continuousRender = function () {
+    const continuousRender = () => {
         if (renderEnabled) {
             renderViewport()
         }
@@ -394,7 +386,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         requestAnimationFrame(continuousRender)
     }
 
-    const formatVillagesToDraw = function (villagesId, scope) {
+    const formatVillagesToDraw = (villagesId, scope) => {
         if (villagesId) {
             for (let [x, y] of villagesId) {
                 scope[x] = scope[x] || {}
@@ -403,7 +395,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    const highlightGetRealId = function (category, id) {
+    const highlightGetRealId = (category, id) => {
         const lowerId = id.toLowerCase()
 
         switch (category) {
@@ -433,7 +425,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    const getVillagesToDraw = function (category, realId) {
+    const getVillagesToDraw = (category, realId) => {
         let redrawVillages = {
             x: {}
         }
@@ -458,7 +450,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         return redrawVillages
     }
 
-    this.recalcSize = function () {        
+    this.recalcSize = () => {
         const { width, height } = $container.getBoundingClientRect()
         viewportWidth = width ? width : window.innerWidth
         viewportHeight = height ? height : window.innerHeight
@@ -475,7 +467,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderViewport()
     }
 
-    this.moveTo = function (x, y) {
+    this.moveTo = (x, y) => {
         if (x === '' || isNaN(x) || y === '' || isNaN(y)) {
             return
         }
@@ -502,14 +494,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderOverlay()
     }
 
-    this.getCoords = function () {
+    this.getCoords = () => {
         return {
             x: Math.floor(positionX / tileSize),
             y: Math.floor(positionY / tileSize)
         }
     }
 
-    this.addHighlight = function (category, id, color) {
+    this.addHighlight = (category, id, color) => {
         let realId
         let displayName
 
@@ -545,9 +537,9 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
 
         if (highlights[category].hasOwnProperty(realId)) {
-            onUpdateHighlight(category, id, displayName, color)
+            this.trigger('update highlight', [category, id, displayName, color])
         } else {
-            onAddHighlight(category, id, displayName, color)
+            this.trigger('add highlight', [category, id, displayName, color])
         }
 
         highlights[category][realId] = {
@@ -558,7 +550,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderVillages(redrawVillages)
     }
 
-    this.removeHighlight = function (category, id) {
+    this.removeHighlight = (category, id) => {
         if (typeof id !== 'string') {
             throw new Error('Highlights: Invalid id')
         }
@@ -575,11 +567,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         delete highlights[category][realId]
 
-        onRemoveHighlight(category, id)
+        this.trigger('remove highlight', [category, id])
         renderVillages(redrawVillages)
     }
 
-    this.shareMap = async function (type) {
+    this.shareMap = async (type) => {
         const highlightsExport = []
 
         for (let [id, data] of Object.entries(highlights.players)) {
@@ -602,45 +594,19 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         })
     }
 
-    this.onAddHighlight = function (fn) {
-        if (typeof fn === 'function') {
-            onAddHighlight = fn
+    this.on = (event, handler) => {
+        events[event] = events[event] || []
+
+        if (typeof handler === 'function') {
+            events[event].push(handler)
         }
     }
 
-    this.onRemoveHighlight = function (fn) {
-        if (typeof fn === 'function') {
-            onRemoveHighlight = fn
-        }
-    }
-
-    this.onUpdateHighlight = function (fn) {
-        if (typeof fn === 'function') {
-            onUpdateHighlight = fn
-        }
-    }
-
-    this.onActiveVillage = function (fn) {
-        if (typeof fn === 'function') {
-            onActiveVillage = fn
-        }
-    }
-
-    this.onInactiveVillage = function (fn) {
-        if (typeof fn === 'function') {
-            onInactiveVillage = fn
-        }
-    }
-
-    this.onCenterCoordsUpdate = function (fn) {
-        if (typeof fn === 'function') {
-            onCenterCoordsUpdate = fn
-        }
-    }
-
-    this.onMapClick = function (fn) {
-        if (typeof fn === 'function') {
-            onMapClick = fn
+    this.trigger = (event, args) => {
+        if (events.hasOwnProperty(event)) {
+            for (let handler of events[event]) {
+                handler.apply(this, args)
+            }
         }
     }
 
@@ -651,13 +617,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     Promise.all([
         loader.loadPlayers,
         loader.loadTribes
-    ]).then(function () {
+    ]).then(() => {
         loadVisibleContinents()
         continuousRender()
     })
 
     if (tooltip) {
-        this.onActiveVillage(function (village) {
+        this.on('active village', (village) => {
             const {
                 id,
                 name: villageName,
@@ -698,7 +664,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             tooltip.show()
         })
 
-        this.onInactiveVillage(function (village) {
+        this.on('inactive village', (village) => {
             tooltip.hide()
         })
     }
@@ -719,61 +685,61 @@ const DataLoader = function (marketId, worldNumber) {
     this.villages = {}
     this.villages.x = {}
 
-    const mergeVillages = function (villages) {
+    const mergeVillages = (villages) => {
         for (let x in villages) {
             for (let y in villages[x]) {
-                if (x in self.villages) {
-                    self.villages[x][y] = villages[x][y]
+                if (x in this.villages) {
+                    this.villages[x][y] = villages[x][y]
                 } else {
-                    self.villages[x] = {}
-                    self.villages[x][y] = villages[x][y]
+                    this.villages[x] = {}
+                    this.villages[x][y] = villages[x][y]
                 }
 
-                let village = self.villages[x][y]
+                let village = this.villages[x][y]
                 let character_id = village[3]
 
                 if (character_id) {
-                    if (character_id in self.playerVillages) {
-                        self.playerVillages[character_id].push([x, y])
+                    if (character_id in this.playerVillages) {
+                        this.playerVillages[character_id].push([x, y])
                     } else {
-                        self.playerVillages[character_id] = [[x, y]]
+                        this.playerVillages[character_id] = [[x, y]]
                     }
                 }
             }
         }
     }
 
-    this.loadPlayers = new Promise(async function (resolve) {
+    this.loadPlayers = new Promise(async (resolve) => {
         const players = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
-        self.players = await players.json()
+        this.players = await players.json()
 
-        for (let id in self.players) {
-            let [name, tribeId, points] = self.players[id]
-            self.playersByName[name.toLowerCase()] = parseInt(id, 10)
+        for (let id in this.players) {
+            let [name, tribeId, points] = this.players[id]
+            this.playersByName[name.toLowerCase()] = parseInt(id, 10)
 
             if (tribeId) {
-                self.tribePlayers[tribeId] = self.tribePlayers[tribeId] || []
-                self.tribePlayers[tribeId].push(parseInt(id, 10))
+                this.tribePlayers[tribeId] = this.tribePlayers[tribeId] || []
+                this.tribePlayers[tribeId].push(parseInt(id, 10))
             }
         }
 
         resolve()
     })
 
-    this.loadTribes = new Promise(async function (resolve) {
+    this.loadTribes = new Promise(async (resolve) => {
         const tribes = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
-        self.tribes = await tribes.json()
+        this.tribes = await tribes.json()
 
-        for (let id in self.tribes) {
-            let [name, tag, points] = self.tribes[id]
-            self.tribesByName[name.toLowerCase()] = parseInt(id, 10)
-            self.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
+        for (let id in this.tribes) {
+            let [name, tag, points] = this.tribes[id]
+            this.tribesByName[name.toLowerCase()] = parseInt(id, 10)
+            this.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
         }
 
         resolve()
     })
 
-    this.loadContinent = function (continent) {
+    this.loadContinent = (continent) => {
         if (typeof continent !== 'number' || continent < 0 || continent > 99) {
             throw new Error('Invalid continent value')
         }
@@ -782,10 +748,10 @@ const DataLoader = function (marketId, worldNumber) {
             return continentPromises[continent]
         }
 
-        continentPromises[continent] = new Promise(async function (resolve) {
+        continentPromises[continent] = new Promise(async (resolve) => {
             const load = await fetch(`/maps/api/${marketId}/${worldNumber}/continent/${continent}`)
             const villages = await load.json()
-            self.continents[continent] = villages
+            this.continents[continent] = villages
             mergeVillages(villages)
             resolve(villages)
         })
@@ -819,7 +785,7 @@ const TW2MapTooltip = function (selector) {
     let $tribeTag = $tooltip.querySelector('.tribe-tag')
     let $tribePoints = $tooltip.querySelector('.tribe-points')
 
-    const mouseMoveHandler = function (event) {
+    const mouseMoveHandler = (event) => {
         let x = event.pageX
         let y = event.pageY
 
@@ -840,15 +806,15 @@ const TW2MapTooltip = function (selector) {
         $tooltip.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)'
     }
 
-    const setEvents = function () {
+    const setEvents = () => {
         window.addEventListener('mousemove', mouseMoveHandler)
     }
 
-    const unsetEvents = function () {
+    const unsetEvents = () => {
         window.removeEventListener('mousemove', mouseMoveHandler)
     }
 
-    this.set = function ({
+    this.set = ({
         villageName,
         villageX,
         villageY,
@@ -858,7 +824,7 @@ const TW2MapTooltip = function (selector) {
         tribeName,
         tribeTag,
         tribePoints
-    }) {
+    }) => {
         $villageName.innerHTML = villageName
         $villageX.innerHTML = villageX
         $villageY.innerHTML = villageY
@@ -870,14 +836,14 @@ const TW2MapTooltip = function (selector) {
         $tribePoints.innerHTML = tribePoints ? tribePoints.toLocaleString('pt-BR') : 0
     }
 
-    this.show = function () {
+    this.show = () => {
         setEvents()
         $tooltip.style.visibility = 'visible'
         $tooltip.style.opacity = 1
         visible = true
     }
 
-    this.hide = function () {
+    this.hide = () => {
         unsetEvents()
         $tooltip.style.visibility = 'hidden'
         $tooltip.style.opacity = 0
@@ -885,16 +851,16 @@ const TW2MapTooltip = function (selector) {
     }
 }
 
-;(async function () {
+;(async () => {
     let colorPicker
     let notif
 
-    const setupQuickJump = function () {
+    const setupQuickJump = () => {
         const $quickJumpX = document.querySelector('#quick-jump-x')
         const $quickJumpY = document.querySelector('#quick-jump-y')
         const $quickJumpGo = document.querySelector('#quick-jump-go')
 
-        $quickJumpX.addEventListener('keydown', function (event) {
+        $quickJumpX.addEventListener('keydown', (event) => {
             if (event.code === 'Enter') {
                 map.moveTo($quickJumpX.value, $quickJumpY.value)
             }
@@ -903,8 +869,8 @@ const TW2MapTooltip = function (selector) {
         const rnondigit = /[^\d]/g
         const rloosecoords = /(\d{1,3})[^\d](\d{1,3})/
 
-        const coordsInputFactory = function ($input) {
-            return function (event) {
+        const coordsInputFactory = ($input) => {
+            return (event) => {
                 if (event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrag') {
                     const coords = $input.value.match(rloosecoords)
 
@@ -928,25 +894,25 @@ const TW2MapTooltip = function (selector) {
         $quickJumpX.addEventListener('input', coordsInputFactory($quickJumpX))
         $quickJumpY.addEventListener('input', coordsInputFactory($quickJumpY))
 
-        $quickJumpY.addEventListener('keydown', function (event) {
+        $quickJumpY.addEventListener('keydown', (event) => {
             if (event.code === 'Enter') {
                 map.moveTo($quickJumpX.value, $quickJumpY.value)
             }
         })
 
-        $quickJumpGo.addEventListener('click', function (event) {
+        $quickJumpGo.addEventListener('click', (event) => {
             map.moveTo($quickJumpX.value, $quickJumpY.value)
         })
     }
 
-    const setupCustomHighlights = function () {
+    const setupCustomHighlights = () => {
         const $highlightId = document.getElementById('highlight-id')
         const $highlightItems = document.getElementById('highlight-items')
 
-        const setupAutoComplete = function () {
+        const setupAutoComplete = () => {
             const autoComplete = new AutoComplete({
                 data: {
-                    src: async function () {
+                    src: async () => {
                         await Promise.all([
                             loader.loadPlayers,
                             loader.loadTribes
@@ -984,18 +950,18 @@ const TW2MapTooltip = function (selector) {
                 trigger: {
                     event: ['input', 'keypress', 'focusin']
                 },
-                sort: function (a, b) {
+                sort: (a, b) => {
                     if (a.match < b.match) return -1
                     if (a.match > b.match) return 1
                     return 0
                 },
-                noResults: function () {
+                noResults: () => {
                     const $item = document.createElement('li')
                     $item.innerHTML = 'no results'
                     autoComplete.resultsList.view.appendChild($item)
                 },
                 highlight: true,
-                onSelection: function (feedback) {
+                onSelection: (feedback) => {
                     const { search, id, type } = feedback.selection.value
                     const color = arrayRandom(colorPalette.flat())
 
@@ -1004,24 +970,24 @@ const TW2MapTooltip = function (selector) {
                 }
             })
 
-            $highlightId.addEventListener('blur', function () {
+            $highlightId.addEventListener('blur', () => {
                 autoComplete.resultsList.view.style.display = 'none'
             })
 
-            $highlightId.addEventListener('focus', function () {
+            $highlightId.addEventListener('focus', () => {
                 autoComplete.resultsList.view.style.display = ''
             })
 
-            $highlightId.addEventListener('keydown', async function (event) {
+            $highlightId.addEventListener('keydown', async (event) => {
                 if (event.key === 'Escape') {
                     $highlightId.value = ''
                     $highlightId.dispatchEvent(new Event('input'))
                 }
             })
 
-            $highlightId.addEventListener('autoComplete', function ({ detail }) {
+            $highlightId.addEventListener('autoComplete', ({ detail }) => {
                 if (detail.event.key == 'Enter' && detail.matches > 0) {
-                    autoComplete.listMatchedResults(autoComplete.dataStream).then(function () {
+                    autoComplete.listMatchedResults(autoComplete.dataStream).then(() => {
                         const first = autoComplete.resultsList.view.children.item(0)
                         first.dispatchEvent(new Event('mousedown'))
                     })
@@ -1029,7 +995,7 @@ const TW2MapTooltip = function (selector) {
             })
         }
 
-        map.onAddHighlight(function (category, id, displayName, color) {
+        map.on('add highlight', (category, id, displayName, color) => {
             const $item = document.createElement('li')
             const $name = document.createElement('div')
             const $nameSpan = document.createElement('span')
@@ -1041,7 +1007,7 @@ const TW2MapTooltip = function (selector) {
             $item.dataset.id = id
             $item.dataset.color = color
 
-            $name.addEventListener('click', function () {
+            $name.addEventListener('click', () => {
                 map.removeHighlight(category, id)
             })
 
@@ -1054,8 +1020,8 @@ const TW2MapTooltip = function (selector) {
             $color.style.backgroundColor = color
             $color.dataset.color = color
 
-            $color.addEventListener('click', function () {
-                colorPicker($color, $color.dataset.color, function (pickedColor) {
+            $color.addEventListener('click', () => {
+                colorPicker($color, $color.dataset.color, (pickedColor) => {
                     $color.dataset.color = pickedColor
                     map.addHighlight(category, id, pickedColor)
                 })
@@ -1067,7 +1033,7 @@ const TW2MapTooltip = function (selector) {
             $highlightItems.appendChild($item)
         })
 
-        map.onUpdateHighlight(function (category, id, displayName, color) {
+        map.on('update highlight', (category, id, displayName, color) => {
             const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
 
             if (!$item) {
@@ -1080,7 +1046,7 @@ const TW2MapTooltip = function (selector) {
             $item.dataset.color = color
         })
 
-        map.onRemoveHighlight(function (category, id) {
+        map.on('remove highlight', (category, id) => {
             const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
 
             if ($item) {
@@ -1091,7 +1057,7 @@ const TW2MapTooltip = function (selector) {
         setupAutoComplete()
     }
 
-    const setupColorPicker = function () {
+    const setupColorPicker = () => {
         let activeColorPicker = false
 
         const $colorPicker = document.querySelector('#color-picker')
@@ -1115,7 +1081,7 @@ const TW2MapTooltip = function (selector) {
 
         const $colors = $colorPicker.querySelectorAll('div')
 
-        colorPicker = function ($reference, selectedColor, callback) {
+        colorPicker = ($reference, selectedColor, callback) => {
             if (!$reference) {
                 throw new Error('Color Picker: Invalid reference element')
             }
@@ -1149,8 +1115,8 @@ const TW2MapTooltip = function (selector) {
             $colorPicker.style.visibility = 'visible'
             $colorPicker.style.opacity = 1
 
-            setTimeout(function () {
-                activeColorPicker = function (event) {
+            setTimeout(() => {
+                activeColorPicker = (event) => {
                     if (event.target.classList.contains('color')) {
                         callback(event.target.dataset.color)
                         closeColorPicker()
@@ -1161,14 +1127,14 @@ const TW2MapTooltip = function (selector) {
             }, 25)
         }
 
-        const closeColorPicker = function () {
+        const closeColorPicker = () => {
             $colorPicker.removeEventListener('click', activeColorPicker)
             $colorPicker.style.visibility = 'hidden'
             $colorPicker.style.opacity = 0
             activeColorPicker = false
         }
 
-        window.addEventListener('click', function (event) {
+        window.addEventListener('click', (event) => {
             if (!activeColorPicker || event.target.classList.contains('open-color-picker')) {
                 return
             }
@@ -1179,7 +1145,7 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
-    const setupDisplayLastSync = function () {
+    const setupDisplayLastSync = () => {
         const $lastSync = document.querySelector('#last-sync-date')
 
         if (!lastSync) {
@@ -1188,7 +1154,7 @@ const TW2MapTooltip = function (selector) {
             return
         }
 
-        const formatSince = function (lastSync) {
+        const formatSince = (lastSync) => {
             const elapsedTime = Date.now() - lastSync
 
             const seconds = elapsedTime / 1000
@@ -1225,31 +1191,31 @@ const TW2MapTooltip = function (selector) {
         $lastSync.innerHTML = formatSince(lastSync)
     }
 
-    const setupDisplayPosition = function () {
+    const setupDisplayPosition = () => {
         const $displayPositionX = document.querySelector('#display-position-x')
         const $displayPositionY = document.querySelector('#display-position-y')
 
-        map.onCenterCoordsUpdate(function (x, y) {
+        map.on('center coords update', (x, y) => {
             $displayPositionX.innerHTML = x
             $displayPositionY.innerHTML = y
         })
     }
 
-    const setupCommonEvents = function () {
+    const setupCommonEvents = () => {
         window.addEventListener('resize', map.recalcSize)
 
-        window.addEventListener('keydown', function (event) {
+        window.addEventListener('keydown', (event) => {
             if (event.target.nodeName !== 'INPUT' && event.code === 'Space') {
                 map.moveTo(500, 500)
             }
         })
     }
 
-    const setupMapShare = async function () {
+    const setupMapShare = async () => {
         const $mapShare = document.querySelector('#map-share')
         const $mapSave = document.querySelector('#map-save')
 
-        $mapShare.addEventListener('click', async function () {
+        $mapShare.addEventListener('click', async () => {
             const result = await map.shareMap('dynamic')
 
             if (result.success) {
@@ -1266,7 +1232,7 @@ const TW2MapTooltip = function (selector) {
             }
         })
 
-        $mapSave.addEventListener('click', async function () {
+        $mapSave.addEventListener('click', async () => {
             notif({
                 title: 'Static map',
                 content: 'Static maps are not available yet!'
@@ -1294,7 +1260,7 @@ const TW2MapTooltip = function (selector) {
         }
     }
 
-    const setupNotif = function () {
+    const setupNotif = () => {
         const $notif = document.querySelector('#notif')
         const $notifTitle = $notif.querySelector('#notif-title')
         const $notifContent = $notif.querySelector('#notif-content')
@@ -1306,7 +1272,7 @@ const TW2MapTooltip = function (selector) {
         $notif.addEventListener('click', () => $notif.classList.add('hidden'))
         $notifClose.addEventListener('click', () => $notif.classList.add('hidden'))
 
-        notif = function ({ title = '', content = '', timeout = 3000, link = false }) {
+        notif = ({ title = '', content = '', timeout = 3000, link = false }) => {
             clearTimeout(activeTimeout)
 
             title = String(title)
@@ -1337,7 +1303,7 @@ const TW2MapTooltip = function (selector) {
             $notif.classList.remove('hidden')
 
             if (typeof timeout === 'number' && timeout !== 0) {
-                activeTimeout = setTimeout(function () {
+                activeTimeout = setTimeout(() => {
                     $notif.classList.add('hidden')
                 }, timeout)
             }
