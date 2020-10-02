@@ -54,6 +54,16 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         allowHexagon: false,
         activeVillageBorder: false
     }, {
+        villageSize: 2,
+        provinceGrid: false,
+        continentGrid: true,
+        mapWidth: 2000,
+        mapHeight: 2000,
+        tileSize: 3,
+        villageOffset: 0,
+        allowHexagon: false,
+        activeVillageBorder: false
+    }, {
         villageSize: 3,
         provinceGrid: true,
         continentGrid: true,
