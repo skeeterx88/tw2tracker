@@ -115,19 +115,18 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     const mouseEvents = function () {
         let draggable = false
+        let dragging = false
         let dragStartX = 0
         let dragStartY = 0
 
         $overlay.addEventListener('mousedown', function (event) {
-            $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
             draggable = true
             dragStartX = positionX + event.pageX
             dragStartY = positionY + event.pageY
-            renderEnabled = true
-            $overlay.style.cursor = 'move'
         })
 
         $overlay.addEventListener('mouseup', function () {
+            dragging = false
             draggable = false
             dragStartX = 0
             dragStartY = 0
@@ -137,6 +136,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         $overlay.addEventListener('mousemove', function (event) {
             if (draggable) {
+                if (!dragging) {
+                    $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
+                    renderEnabled = true
+                    $overlay.style.cursor = 'move'
+                }
+
+                dragging = true
+
                 positionX = dragStartX - event.pageX
                 positionY = dragStartY - event.pageY
 
