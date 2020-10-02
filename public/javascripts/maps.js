@@ -57,6 +57,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     let activeVillage = false
 
+    const renderedContinents = {}
+
     const HIGHLIGHT_CATEGORIES = {
         players: 'players',
         tribes: 'tribes'
@@ -238,8 +240,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
-        visibleContinents.forEach((continent) => {
-            loader.loadContinent(continent).then(villages => renderVillages(villages))
+        visibleContinents
+        .filter((continent) => !renderedContinents.hasOwnProperty(continent))
+        .forEach((continent) => {
+            loader.loadContinent(continent).then(villages => {
+                renderedContinents[continent] = true
+                renderVillages(villages)
+            })
         })
     }
 
