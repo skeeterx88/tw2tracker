@@ -21,13 +21,15 @@ const mapsRouter = require('./routes/maps')
 
 const app = express()
 
-app.use(function (req, res, next) {
-    if (req.headers['x-forwarded-proto'] === 'https') {
-        next()
-    } else {
-        res.redirect('https://' + req.hostname + req.url)
-    }
-})
+if (process.env.NODE_DEV === 'production') {
+    app.use(function (req, res, next) {
+        if (req.headers['x-forwarded-proto'] === 'https') {
+            next()
+        } else {
+            res.redirect('https://' + req.hostname + req.url)
+        }
+    })
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
