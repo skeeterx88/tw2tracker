@@ -551,16 +551,18 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     this.removeHighlight = (category, id) => {
-        if (typeof id !== 'string') {
-            throw new Error('Highlights: Invalid id')
-        }
-
         let realId
 
-        try {
-            realId = highlightGetRealId(category, id)
-        } catch (error) {
-            return console.log(error)
+        if (typeof id === 'number') {
+            realId = id
+        } else if (typeof id === 'string') {
+            try {
+                realId = highlightGetRealId(category, id)
+            } catch (error) {
+                return console.log(error)
+            }
+        } else {
+            throw new Error('Highlights: Invalid id')
         }
 
         const redrawVillages = getVillagesToDraw(category, realId)
