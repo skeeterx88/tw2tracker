@@ -757,8 +757,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             return
         }
 
-        const category = HIGHLIGHT_CATEGORIES.players
         const id = activeVillage.character_id
+
+        if (!id) {
+            return
+        }
+
+        const category = HIGHLIGHT_CATEGORIES.players
         const color = arrayRandom(colorPalette.flat())
 
         clearOverlay()
