@@ -509,7 +509,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         let realId
         let displayName
 
-        if (typeof id === 'number') {
+        if (!HIGHLIGHT_CATEGORIES.hasOwnProperty(category)) {
+            throw new Error('Highlights: Invalid category')
+        }
+
+        if (typeof id === 'number' && loader[category].hasOwnProperty(id)) {
             realId = id
         } else if (typeof id === 'string') {
             try {
@@ -557,7 +561,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     this.removeHighlight = (category, id) => {
         let realId
 
-        if (typeof id === 'number') {
+        if (!HIGHLIGHT_CATEGORIES.hasOwnProperty(category)) {
+            throw new Error('Highlights: Invalid category')
+        }
+
+        if (typeof id === 'number' && loader[category].hasOwnProperty(id)) {
             realId = id
         } else if (typeof id === 'string') {
             try {
