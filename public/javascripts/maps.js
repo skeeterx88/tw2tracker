@@ -1315,7 +1315,11 @@ const TW2MapTooltip = function (selector) {
             } else if (hours <= 1) {
                 format = Math.floor(minutes) + ' minutes ago'
             } else if (days <= 1) {
-                format = Math.floor(hours) + ' hours ago'
+                if (hours < 2) {
+                    format = '1 hour ago'
+                } else {
+                    format = Math.floor(hours) + ' hours ago'
+                }
             } else {
                 if (days > 2) {
                     format = Math.floor(days) + ' days ago'
