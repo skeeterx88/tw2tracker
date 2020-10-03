@@ -577,7 +577,7 @@ header h1 {
     bottom: 40px;
     right: 40px;
     min-width: 200px;
-    max-width: 300px;
+    max-width: 400px;
     max-height: 200px;
     padding-bottom: 10px;
     z-index: 15;
@@ -634,6 +634,7 @@ header h1 {
     text-align: center;
     display: inline-block;
     margin-top: 2px;
+    word-break: break-word;
 }
 
 #notif-close {
