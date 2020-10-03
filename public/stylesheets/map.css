@@ -107,7 +107,7 @@ button.red:focus {
 #quick-jump-coords {
     margin-left: 4px;
     color: #6d4f32;
-    width: 70px;
+    width: 69px;
     height: 18px;
     padding-left: 3px;
     padding-right: 3px;
@@ -116,9 +116,7 @@ button.red:focus {
     font-weight: bold;
     position: relative;
     float: left;
-
     text-align: center;
-
 }
 
 #quick-jump-x,
@@ -138,7 +136,7 @@ button.red:focus {
     margin-left: 5px;
     outline: none;
     cursor: pointer;
-    width: 26px;
+    width: 27px;
 }
 
 
@@ -442,8 +440,8 @@ header h1 {
 }
 
 #current-world {
-    margin-left: 5px;
-    width: 57px;
+    margin-left: 4px;
+    width: 55px;
 }
 
 #current-world .flag {
@@ -452,6 +450,7 @@ header h1 {
 
 #world-settings {
     margin-left: 2px;
+    width: 49px;
 }
 
 #all-worlds {
