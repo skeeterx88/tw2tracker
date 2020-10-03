@@ -202,8 +202,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
                 dragging = true
 
-                positionX = dragStartX - event.pageX
-                positionY = dragStartY - event.pageY
+                positionX = boundNumber(dragStartX - event.pageX, 0, zoomSettings.mapWidth)
+                positionY = boundNumber(dragStartY - event.pageY, 0, zoomSettings.mapHeight)
 
                 updateCenter()
 
