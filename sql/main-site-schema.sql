@@ -21,8 +21,9 @@ CREATE TABLE main.worlds (
     open BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TABLE main.shared_maps (
+CREATE TABLE main.maps_share (
     id SERIAL PRIMARY KEY,
+    share_id VARCHAR (20) UNIQUE NOT NULL,
     world_market VARCHAR (10) REFERENCES main.markets(id),
     world_number SMALLINT,
     highlights TEXT NOT NULL,

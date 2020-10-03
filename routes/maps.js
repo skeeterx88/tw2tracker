@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const router = express.Router()
+const utils = require('../utils')
 
 const db = require('../db')
 const sql = require('../sql')
@@ -54,7 +55,7 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
 
 router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res) {
     const settings = await db.one(sql.settings)
-    const mapShareId = parseInt(req.params.mapShareId, 10)
+    const mapShareId = req.params.mapShareId
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const allWorlds = await db.any(sql.openWorlds)
@@ -204,11 +205,12 @@ router.post('/api/create-share', async function (req, res) {
         }
 
         const highlightsString = JSON.stringify(highlights)
+        const shareId = utils.makeid(20)
 
-        const { id } = await db.one(sql.addMapShare, [marketId, worldNumber, type, highlightsString])
+        await db.query(sql.addMapShare, [shareId, marketId, worldNumber, type, highlightsString])
 
         response.success = true
-        response.url = `/maps/${marketId}/${worldNumber}/share/${id}`
+        response.url = `/maps/${marketId}/${worldNumber}/share/${shareId}`
     } catch (error) {
         response.success = false
         response.message = error.message

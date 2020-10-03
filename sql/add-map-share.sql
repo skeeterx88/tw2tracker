@@ -1,2 +1,2 @@
-INSERT INTO main.shared_maps (world_market, world_number, type, highlights)
-VALUES ($1, $2, $3, $4) RETURNING id
+INSERT INTO main.maps_share (share_id, world_market, world_number, type, highlights)
+VALUES ($1, $2, $3, $4, $5)

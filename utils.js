@@ -18,9 +18,21 @@ const extractNumbers = function (value) {
     return num ? parseInt(num[0], 10) : value
 }
 
+const makeid = function (length) {
+    let result = ''
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+
+    return result
+}
+
 module.exports = {
     noop,
     schemaExists,
     worldEntryExists,
-    extractNumbers
+    extractNumbers,
+    makeid
 }
