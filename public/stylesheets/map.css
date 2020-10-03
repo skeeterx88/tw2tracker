@@ -12,7 +12,8 @@ body {
     overflow: hidden;
 }
 
-input {
+input,
+button {
     outline: none;
     font: 11px Arial, Helvetica, sans-serif;
 }
@@ -29,6 +30,7 @@ ul {
 
 button {
     height: 22px;
+    padding: 0px 3px;
     outline: none;
     cursor: pointer;
     color: #e0bfbf;
@@ -136,6 +138,7 @@ button.red:focus {
     margin-left: 5px;
     outline: none;
     cursor: pointer;
+    width: 26px;
 }
 
 
@@ -425,34 +428,100 @@ div.text-container {
     text-shadow: 1px 1px 0px #00000090;
 }
 
-#all-worlds {
+header {
     margin-top: 10px;
     margin-bottom: 10px;
 }
 
-#current-world {
-    color: #e0bfbf;
-    text-shadow: 1px 1px 0px #000;
-    width: 48px;
-    float: left;
-    margin-left: 4px;
-    padding: 2px;
-    height: 16px;
-    line-height: 17px;
+header h1 {
+    font-size: 13px;
+    width: 114px;
     text-align: center;
-    background: url(/images/noise.png) #8e5430;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000;
+    padding: 0 2px;
+    text-shadow: 1px 1px 0px #000;
+}
+
+#current-world {
+    margin-left: 5px;
+    width: 57px;
 }
 
 #current-world .flag {
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
-#change-world {
-    font-size: 11px;
-    margin-left: 5px;
+#world-settings {
+    margin-left: 2px;
+}
+
+#all-worlds {
+    position: absolute;
+    left: 80px;
+    top: 50px;
+    width: 200px;
+    background: url(/images/noise.png) #6f4327;
+    color: #e0bfbf;
+    padding: 3px;
+    text-shadow: 1px 1px 0px #00000090;
+    z-index: 7;
+    transition: visibility 0.02s linear, opacity 0.02s linear;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
+    border: 1px solid #5e351b;
+    border-radius: 1px;
+}
+
+#all-worlds.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
+#all-worlds a {
+    text-decoration: none;
+}
+
+#all-market-worlds {
+    width: 70%;
+    float: left;
+}
+
+#all-market-worlds .world {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    overflow: hidden;
+    max-width: 134px;
+    margin: 5px 1px;
+    padding: 0 5px;
+}
+
+#all-market-worlds .world.selected {
+    background: url(/images/noise.png), linear-gradient(#6d5546, #422612);
+    border-color: #8a6d58;
+    font-weight: bold;
+}
+
+#all-markets {
+    width: 30%;
+    float: left;
+}
+
+#all-markets li {
+    cursor: pointer;
+}
+
+#all-markets div.market {
+    padding: 1px 0px;
+    text-align: center;
+    margin: 3px 2px;
+}
+
+#all-markets div.market.selected {
+    background: #6d5546;
+    border-color: #b18e76;
+}
+
+#all-markets li:hover {
+    background: #865333;
 }
 
 

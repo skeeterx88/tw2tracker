@@ -1461,8 +1461,82 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupWorldList = () => {
+        const $allWorlds = document.querySelector('#all-worlds')
+        const $allMarkets = document.querySelector('#all-markets')
         const $currentWorld = document.querySelector('#current-world')
-        
+        const $allMarketWorlds = document.querySelector('#all-market-worlds')
+
+        $currentWorld.addEventListener('click', function () {
+            $allWorlds.classList.toggle('hidden')
+        })
+
+        for (let market of allMarkets) {
+            const $marketContainer = document.createElement('li')
+            const $button = document.createElement('div')
+            const $flag = document.createElement('span')
+            const $text = document.createElement('span')
+
+            $button.dataset.market = market
+            $button.appendChild($flag)
+
+            if (market === marketId) {
+                $button.classList.add('selected')
+            }
+
+            $button.classList.add('market')
+            $button.classList.add('text-container')
+            $text.innerText = ' ' + market
+            $flag.classList.add('flag')
+            $flag.classList.add('flag-' + market)
+
+            $button.appendChild($flag)
+            $button.appendChild($text)
+
+            $button.addEventListener('mouseenter', function () {
+                $selectedmarket = $allWorlds.querySelector('.market.selected')
+                
+                if ($selectedmarket) {
+                    $selectedmarket.classList.remove('selected')
+                }
+
+                this.classList.add('selected')
+
+                changeWorldList(this.dataset.market)
+            })
+
+            $marketContainer.appendChild($button)
+            $allMarkets.appendChild($marketContainer)
+        }
+
+        const changeWorldList = function (newMarket) {
+            const marketWorlds = allWorlds.filter((world) => world.market === newMarket)
+
+            while ($allMarketWorlds.firstChild) {
+                $allMarketWorlds.removeChild($allMarketWorlds.lastChild)
+            }
+
+            for (let {market, num, name} of marketWorlds) {
+                const $world = document.createElement('li')
+                const $archor = document.createElement('a')
+                const $button = document.createElement('button')
+
+                $archor.href = location.origin + '/maps/' + market + '/' + num + '/'
+
+                $button.classList.add('world')
+
+                if (worldNumber === num && marketId === market) {
+                    $button.classList.add('selected')
+                }
+
+                $button.innerText = market + num + ' ' + name
+
+                $archor.appendChild($button)
+                $world.appendChild($archor)
+                $allMarketWorlds.appendChild($world)
+            }
+        }
+
+        changeWorldList(marketId)
     }
 
     const mapSettings = {
