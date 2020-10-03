@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "autoreload": "TZ=UTC nodemon ./bin/www",
-    "start": "TZ=UTC node ./bin/www"
+    "autoreload": "TZ=UTC nodemon ./bin/www --tw2tracker",
+    "start": "TZ=UTC node ./bin/www --tw2tracker"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
