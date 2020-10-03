@@ -12,11 +12,20 @@
             const worldName = '<%= worldName %>'
             const lastSync = <%= lastSync %>
             const mapShareId = <%= mapShareId %>
+            const allWorlds = <%- allWorlds %>
         </script>
     </head>
     <body>
         <div id="map-wrapper">
             <div id="side-panel">
+                <div id="all-worlds">
+                    <div id="current-world" class="text-container">
+                        <span class="flag flag-<%= marketId %>"></span>
+                        <%= marketId %><%= worldNumber %>
+                    </div>
+                    <button id="change-world">change</button>
+                </div>
+
                 <div id="quick-jump">
                     <div id="quick-jump-coords" class="input">
                         x:<input type="text" id="quick-jump-x" placeholder="500">
@@ -119,12 +128,12 @@
             <table></table>
         </div>
 
-        <div id="last-sync">
+        <div id="last-sync" class="text-container">
             <span>Last update:</span>
             <span id="last-sync-date"></span>
         </div>
 
-        <div id="display-position">
+        <div id="display-position" class="text-container">
             <span id="display-position-x">500</span>|<span id="display-position-y">500</span>
         </div>
 

@@ -16,6 +16,8 @@ li {
     width: 18px;
     background: url(/images/flags.png) no-repeat top left;
     display: inline-block;
+    vertical-align: top;
+    margin-top: 1px;
 }
 
 .flag-de {

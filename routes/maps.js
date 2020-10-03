@@ -36,6 +36,7 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
     const worldId = marketId + worldNumber
     const worldInfo = await db.one(sql.world, [marketId, worldNumber])
     const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
+    const allWorlds = await db.any(sql.openWorlds)
 
     res.render('map', {
         title: 'Map ' + worldId + ' - ' + settings.site_name,
@@ -44,6 +45,7 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
         worldName: worldInfo.name,
         lastSync,
         mapShareId: false,
+        allWorlds: JSON.stringify(allWorlds),
         development: process.env.NODE_ENV === 'development'
     })
 })
@@ -53,6 +55,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
     const mapShareId = parseInt(req.params.mapShareId, 10)
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
+    const allWorlds = await db.any(sql.openWorlds)
 
     let worldInfo
     let mapShare
@@ -83,6 +86,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
         worldName: worldInfo.name,
         lastSync,
         mapShareId,
+        allWorlds: JSON.stringify(allWorlds),
         development: process.env.NODE_ENV === 'development'
     })
 })

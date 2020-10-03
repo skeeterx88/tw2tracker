@@ -31,7 +31,8 @@ button {
     height: 22px;
     outline: none;
     cursor: pointer;
-    text-shadow: 0px 0px 1px #00000070;
+    color: #e0bfbf;
+    text-shadow: 1px 1px 0px #000;
     border-radius: 1px;
     border-width: 1px;
     border-style: solid;
@@ -99,13 +100,12 @@ button.red:focus {
 #quick-jump {
     margin-top: 5px;
     margin-bottom: 5px;
-    height: 22px;
 }
 
 #quick-jump-coords {
-    margin-left: 3px;
+    margin-left: 4px;
     color: #6d4f32;
-    width: 71px;
+    width: 70px;
     height: 18px;
     padding-left: 3px;
     padding-right: 3px;
@@ -131,9 +131,9 @@ button.red:focus {
 }
 
 #quick-jump-go {
-    float: right;
+    float: left;
     font-size: 11px;
-    margin-right: 11px;
+    margin-left: 5px;
     outline: none;
     cursor: pointer;
 }
@@ -142,11 +142,10 @@ button.red:focus {
 
 
 #highlight-id {
-    margin-left: 3px;
-    margin-right: 11px;
+    margin-left: 4px;
     margin-top: 5px;
     margin-bottom: 5px;
-    width: 82%;
+    width: 101px;
     height: 18px;
     padding-left: 3px;
     padding-right: 3px;
@@ -396,11 +395,8 @@ button.red:focus {
 
 
 
-#last-sync {
-    position: absolute;
-    right: 5px;
-    bottom: 5px;
-    z-index: 10;
+
+div.text-container {
     border-radius: 1px;
     border: 1px solid #6b635e;
     background: url(/images/noise.png) #413127;
@@ -408,31 +404,56 @@ button.red:focus {
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000;
     padding: 2px 6px;
-    color: #a59a8a;
-    text-shadow: 1px 1px 0px #00000090;
 }
 
 
-
-
+#last-sync {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    z-index: 10;
+    color: #a59a8a;
+    text-shadow: 1px 1px 0px #00000090;
+}
 
 #display-position {
     position: absolute;
     left: 128px;
     bottom: 5px;
     z-index: 10;
-    border-radius: 1px;
-    border: 1px solid #6b635e;
-    background: url(/images/noise.png) #413127;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000;
-    padding: 2px 6px;
     color: #a59a8a;
     text-shadow: 1px 1px 0px #00000090;
 }
 
+#all-worlds {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
+#current-world {
+    color: #e0bfbf;
+    text-shadow: 1px 1px 0px #000;
+    width: 48px;
+    float: left;
+    margin-left: 4px;
+    padding: 2px;
+    height: 16px;
+    line-height: 17px;
+    text-align: center;
+    background: url(/images/noise.png) #8e5430;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000;
+}
+
+#current-world .flag {
+    margin-top: 2px;
+}
+
+#change-world {
+    font-size: 11px;
+    margin-left: 5px;
+}
 
 
 

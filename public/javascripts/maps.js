@@ -1460,6 +1460,11 @@ const TW2MapTooltip = function (selector) {
         }
     }
 
+    const setupWorldList = () => {
+        const $currentWorld = document.querySelector('#current-world')
+        
+    }
+
     const mapSettings = {
         hexagonVillages: true,
         zoomLevel: 2
@@ -1477,4 +1482,5 @@ const TW2MapTooltip = function (selector) {
     setupCommonEvents()
     setupMapShare()
     setupNotif()
+    setupWorldList()
 })()
