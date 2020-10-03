@@ -47,9 +47,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         villageSize: 1,
         provinceGrid: false,
         continentGrid: true,
-        mapWidth: 1000,
-        mapHeight: 1000,
-        tileSize: 1,
+        villageMargin: 0,
         villageOffset: 0,
         allowHexagon: false,
         activeVillageBorder: false
@@ -57,9 +55,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         villageSize: 2,
         provinceGrid: false,
         continentGrid: true,
-        mapWidth: 2000,
-        mapHeight: 2000,
-        tileSize: 3,
+        villageMargin: 1,
         villageOffset: 0,
         allowHexagon: false,
         activeVillageBorder: false
@@ -67,9 +63,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         villageSize: 3,
         provinceGrid: true,
         continentGrid: true,
-        mapWidth: 3000,
-        mapHeight: 3000,
-        tileSize: 4,
+        villageMargin: 1,
         villageOffset: 2,
         allowHexagon: false,
         activeVillageBorder: true
@@ -77,9 +71,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         villageSize: 5,
         provinceGrid: true,
         continentGrid: true,
-        mapWidth: 5000,
-        mapHeight: 5000,
-        tileSize: 6,
+        villageMargin: 1,
         villageOffset: 3,
         allowHexagon: true,
         activeVillageBorder: true
@@ -127,6 +119,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     const setupZoom = function () {
         zoomSettings = zoomLevels[settings.zoomLevel]
+
+        zoomSettings.tileSize = zoomSettings.villageSize + zoomSettings.villageMargin
+        zoomSettings.mapWidth = 1000 * zoomSettings.tileSize
+        zoomSettings.mapHeight = 1000 * zoomSettings.tileSize
 
         if (!zoomCache.hasOwnProperty(settings.zoomLevel)) {
             const _$cache = document.createElement('canvas')
