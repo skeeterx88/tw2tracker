@@ -180,16 +180,19 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         })
 
         $overlay.addEventListener('mouseup', () => {
+            draggable = false
+
             if (!dragging) {
                 this.trigger('click', [activeVillage])
             }
 
             dragging = false
-            draggable = false
             dragStartX = 0
             dragStartY = 0
             renderEnabled = false
             $overlay.style.cursor = 'default'
+
+            renderViewport()
         })
 
         $overlay.addEventListener('mousemove', (event) => {
