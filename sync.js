@@ -67,7 +67,7 @@ Sync.daemon = async function () {
 
     const CronJob = require('cron').CronJob
 
-    const scrappeJob = new CronJob('0 */2 * * *', async function () {
+    const scrappeJob = new CronJob('0 */1 * * *', async function () {
         await Sync.scrappeAllWorlds()
     })
 
