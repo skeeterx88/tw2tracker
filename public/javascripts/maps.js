@@ -33,6 +33,9 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     let $cache
     let $cacheContext
 
+    let $grid
+    let $gridContext
+
     const $overlay = document.createElement('canvas')
     const $overlayContext = $overlay.getContext('2d')
 
@@ -145,22 +148,32 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         zoomSettings.mapHeight = 1000 * zoomSettings.tileSize
 
         if (!zoomCache.hasOwnProperty(settings.zoomLevel)) {
-            const _$cache = document.createElement('canvas')
-            const _$cacheContext = _$cache.getContext('2d')
+            $cache = document.createElement('canvas')
+            $cacheContext = $cache.getContext('2d')
 
-            _$cache.width = zoomSettings.mapWidth
-            _$cache.height = zoomSettings.mapHeight
+            $grid = document.createElement('canvas')
+            $gridContext = $grid.getContext('2d')
+
+            $cache.width = zoomSettings.mapWidth
+            $cache.height = zoomSettings.mapHeight
+
+            $grid.width = zoomSettings.mapWidth
+            $grid.height = zoomSettings.mapHeight
 
             zoomCache[settings.zoomLevel] = {
-                $cache: _$cache,
-                $cacheContext: _$cacheContext
+                $cache,
+                $cacheContext,
+                $grid,
+                $gridContext
             }
+        } else {
+            ({
+                $cache,
+                $cacheContext,
+                $grid,
+                $gridContext
+            } = zoomCache[settings.zoomLevel])
         }
-
-        ({
-            $cache,
-            $cacheContext
-        } = zoomCache[settings.zoomLevel])
     }
 
     const setupElements = () => {
@@ -170,6 +183,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         $viewport.height = viewportHeight
         $overlay.width = viewportWidth
         $overlay.height = viewportHeight
+
 
         $viewport.classList.add('map')
         $overlay.classList.add('overlay')
@@ -391,6 +405,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
             for (let x = startX; x < endX; x++) {
                 for (let y = startY; y < endY; y++) {
+                    
                     const tilePos = y + MAP_SIZE * x
                     const fiveBits = readBitsAt(loader.struct, tilePos)
 
@@ -400,13 +415,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
                         if (isContinentBorder) {
                             if (zoomSettings.drawContinents) {
-                                $cacheContext.fillStyle = COLORS.demarcations + (zoomSettings.continentOpacity ? zoomSettings.continentOpacity : '')
+                                $gridContext.fillStyle = COLORS.demarcations + (zoomSettings.continentOpacity ? zoomSettings.continentOpacity : '')
                             } else {
-                                $cacheContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
+                                $gridContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
                             }
                         } else {
                             if (zoomSettings.drawProvinces) {
-                                $cacheContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
+                                $gridContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
                             } else {
                                 continue
                             }
@@ -418,11 +433,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                             const neighbourTile = readBitsAt(loader.struct, borders[i])
 
                             if (neighbourTile >>> 4) {
-                                $cacheContext.fillRect(x * zoomSettings.tileSize + borderOffsets[i].x, y * zoomSettings.tileSize + borderOffsets[i].y, 1, 1)
+                                $gridContext.fillRect(x * zoomSettings.tileSize + borderOffsets[i].x, y * zoomSettings.tileSize + borderOffsets[i].y, 1, 1)
                             }
                         }
 
-                        $cacheContext.fillRect(x * zoomSettings.tileSize, y * zoomSettings.tileSize, 1, 1)
+                        $gridContext.fillRect(x * zoomSettings.tileSize, y * zoomSettings.tileSize, 1, 1)
                     }
                 }
             }
@@ -525,12 +540,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const renderViewport = () => {
-        $viewportContext.fillStyle = COLORS.background
-        $viewportContext.fillRect(0, 0, $viewport.width, $viewport.height)
+        $viewportContext.clearRect(0, 0, $viewport.width, $viewport.height)
 
         const positionXcenter = Math.floor(positionX - middleViewportOffsetX)
         const positionYcenter = Math.floor(positionY - middleViewportOffsetY)
 
+        $viewportContext.drawImage($grid, -positionXcenter, -positionYcenter)
         $viewportContext.drawImage($cache, -positionXcenter, -positionYcenter)
     }
 
@@ -858,12 +873,15 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     setupElements()
     mouseEvents()
 
+    loader.loadStruct.then(() => {
+        drawVisibleContinentsDemarcations()
+        renderViewport()
+    })
+
     Promise.all([
         loader.loadPlayers,
-        loader.loadTribes,
-        loader.loadStruct
+        loader.loadTribes
     ]).then(() => {
-        drawVisibleContinentsDemarcations()
         loadVisibleContinents()
         continuousRender()
     })
