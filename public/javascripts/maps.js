@@ -248,8 +248,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                     tooltip.hide()
                 }
 
-                drawVisibleContinentsDemarcations()
-                loadVisibleContinents()
+                renderVisibleDemarcations()
+                renderVisibleContinents()
             }
         })
 
@@ -300,8 +300,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
 
                 setupZoom()
-                drawVisibleContinentsDemarcations()
-                loadVisibleContinents()
+                renderVisibleDemarcations()
+                renderVisibleContinents()
                 renderViewport()
 
                 this.moveTo(currentCenterX, currentCenterY)
@@ -364,7 +364,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         return visibleContinents
     }
 
-    const loadVisibleContinents = () => {
+    const renderVisibleContinents = () => {
         getVisibleContinents()
         .filter((continent) => !renderedZoomContinents[settings.zoomLevel].hasOwnProperty(continent))
         .forEach((continent) => {
@@ -388,7 +388,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    const drawVisibleContinentsDemarcations = () => {
+    const renderVisibleDemarcations = () => {
         if (!zoomSettings.drawContinents && !zoomSettings.drawProvinces) {
             return
         }
@@ -697,8 +697,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         $overlay.width = viewportWidth
         $overlay.height = viewportHeight
 
-        drawVisibleContinentsDemarcations()
-        loadVisibleContinents()
+        renderVisibleDemarcations()
+        renderVisibleContinents()
         renderViewport()
     }
 
@@ -723,8 +723,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             tooltip.hide()
         }
 
-        drawVisibleContinentsDemarcations()
-        loadVisibleContinents()
+        renderVisibleDemarcations()
+        renderVisibleContinents()
         renderViewport()
         activeVillage = false
         renderOverlay()
@@ -873,17 +873,17 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     setupElements()
     mouseEvents()
 
-    loader.loadStruct.then(() => {
-        drawVisibleContinentsDemarcations()
-        renderViewport()
-    })
-
     Promise.all([
         loader.loadPlayers,
         loader.loadTribes
     ]).then(() => {
-        loadVisibleContinents()
+        renderVisibleContinents()
         continuousRender()
+    })
+
+    loader.loadStruct.then(() => {
+        renderVisibleDemarcations()
+        renderViewport()
     })
 
     this.on('click', function (activeVillage) {
