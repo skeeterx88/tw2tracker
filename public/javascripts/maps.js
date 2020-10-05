@@ -56,7 +56,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         villageOffset: 0,
         hexagonShape: false,
         activeVillageBorder: false,
-        continentOpacity: '10'
+        continentOpacity: '20'
     }, {
         villageSize: 2,
         drawProvinces: false,
@@ -65,7 +65,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         villageOffset: 0,
         hexagonShape: false,
         activeVillageBorder: false,
-        continentOpacity: '30'
+        continentOpacity: '40'
     }, {
         villageSize: 3,
         drawProvinces: true,
@@ -74,8 +74,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         villageOffset: 2,
         hexagonShape: false,
         activeVillageBorder: true,
-        continentOpacity: '70',
-        provinceOpacity: '35'
+        continentOpacity: '80',
+        provinceOpacity: '45'
     }, {
         villageSize: 5,
         drawProvinces: true,
@@ -85,7 +85,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         hexagonShape: true,
         activeVillageBorder: true,
         continentOpacity: '95',
-        provinceOpacity: '50'
+        provinceOpacity: '60'
     }]
 
     let positionX
