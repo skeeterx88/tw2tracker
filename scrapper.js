@@ -4,56 +4,6 @@
 module.exports = function (marketId, worldNumber) {
     console.log('Scrapper: Start scrapping', marketId + worldNumber)
 
-    const readyState = function (callback) {
-        return new Promise(function (resolve, reject) {
-            let injectorTimeout
-            let timeout
-
-            timeout = setTimeout(function () {
-                clearTimeout(injectorTimeout)
-
-                if (document.querySelector('.modal-establish-village')) {
-                    console.log('Scrapper: Ready to fetch villages')
-
-                    return resolve()
-                }
-
-                const transferredSharedDataService = injector.get('transferredSharedDataService')
-                const mapScope = transferredSharedDataService.getSharedData('MapController')
-
-                if (mapScope && mapScope.isInitialized) {
-                    console.log('Scrapper: Ready to fetch villages')
-
-                    resolve()
-                } else {
-                    reject()
-                }
-            }, 10000)
-
-            const waitForInjector = function (callback) {
-                if (typeof injector === 'undefined') {
-                    setTimeout(waitForInjector, 100)
-                } else {
-                    callback()
-                }
-            }
-
-            waitForInjector(function () {
-                const $rootScope = injector.get('$rootScope')
-                const eventTypeProvider = injector.get('eventTypeProvider')
-
-                $rootScope.$on(eventTypeProvider.CHARACTER_INFO, function () {
-                    clearTimeout(timeout)
-                    clearTimeout(injectorTimeout)
-
-                    console.log('Scrapper: Ready to fetch villages')
-
-                    resolve()
-                })
-            })
-        })
-    }
-
     const Scrapper = async function () {
         const $rootScope = injector.get('$rootScope')
         const socketService = injector.get('socketService')
@@ -366,14 +316,6 @@ module.exports = function (marketId, worldNumber) {
     }
 
     return new Promise(async function (resolve, reject) {
-        try {
-            await readyState()
-        } catch (error) {
-            return reject('Scrapper: Couldn\'t get ready state.')
-        }
-
-        const worldData = await Scrapper()
-
-        resolve(worldData)
+        resolve(await Scrapper())
     })
 }

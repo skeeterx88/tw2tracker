@@ -2,14 +2,16 @@ const db = require('./db')
 const sql = require('./sql')
 const utils = require('./utils')
 const Scrapper = require('./scrapper.js')
+const readyState = require('./ready-state.js')
+const getStructPath = require('./get-struct-path.js')
 const fs = require('fs')
+const https = require('https')
 const authenticatedMarkets = {}
 
 let browser = null
 
 const getHTML = function (url) {
     return new Promise(function (resolve) {
-        const https = require('https')
         const HTMLParser = require('fast-html-parser')
 
         https.get(url, function (res) {
@@ -301,6 +303,22 @@ Sync.scrappeAllWorlds = async function () {
     console.log('Sync.scrappeAllWorlds: Finished')
 }
 
+const downloadStruct = function (url, marketId, worldNumber) {
+    return new Promise(function (resolve) {
+        https.get(url, function (res) {
+            let data = []
+
+            res.on('data', function (chunk) {
+                data.push(chunk)
+            })
+
+            res.on('end', async function () {
+                fs.promises.writeFile(`./data/${marketId}${worldNumber}/struct.bin`, Buffer.concat(data)).then(resolve)
+            })
+        })
+    })
+}
+
 Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = false) {
     console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
@@ -343,6 +361,16 @@ Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = fals
 
 
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
+        await page.evaluate(readyState)
+
+        try {
+            await fs.promises.access(`./data/${marketId}${worldNumber}/struct.bin`)
+        } catch (_) {
+            console.log('Sync.scrappeWorld: Downloading map structure')
+            const structPath = await page.evaluate(getStructPath)
+            await downloadStruct(`https://${urlId}.tribalwars2.com/${structPath}`, marketId, worldNumber)
+        }
+
         const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
         await page.close()
 
