@@ -20,6 +20,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         ...settings
     }
 
+    const MAP_SIZE = 1000
+    const TILE_COUNT = Math.pow(MAP_SIZE, 2)
+    const BITS_IN_TILE = 5
+    const BITS_IN_TILE_PER_BYTE = BITS_IN_TILE / 8
+
     let renderEnabled = false
 
     const $viewport = document.createElement('canvas')
@@ -45,36 +50,42 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     const zoomLevels = [{
         villageSize: 1,
-        provinceGrid: false,
-        continentGrid: true,
+        drawProvinces: false,
+        drawContinents: true,
         villageMargin: 0,
         villageOffset: 0,
-        allowHexagon: false,
-        activeVillageBorder: false
+        hexagonShape: false,
+        activeVillageBorder: false,
+        continentOpacity: '10'
     }, {
         villageSize: 2,
-        provinceGrid: false,
-        continentGrid: true,
+        drawProvinces: false,
+        drawContinents: true,
         villageMargin: 1,
         villageOffset: 0,
-        allowHexagon: false,
-        activeVillageBorder: false
+        hexagonShape: false,
+        activeVillageBorder: false,
+        continentOpacity: '30'
     }, {
         villageSize: 3,
-        provinceGrid: true,
-        continentGrid: true,
+        drawProvinces: true,
+        drawContinents: true,
         villageMargin: 1,
         villageOffset: 2,
-        allowHexagon: false,
-        activeVillageBorder: true
+        hexagonShape: false,
+        activeVillageBorder: true,
+        continentOpacity: '70',
+        provinceOpacity: '35'
     }, {
         villageSize: 5,
-        provinceGrid: true,
-        continentGrid: true,
+        drawProvinces: true,
+        drawContinents: true,
         villageMargin: 1,
         villageOffset: 3,
-        allowHexagon: true,
-        activeVillageBorder: true
+        hexagonShape: true,
+        activeVillageBorder: true,
+        continentOpacity: '95',
+        provinceOpacity: '50'
     }]
 
     let positionX
@@ -88,13 +99,23 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     let activeVillage = false
 
+    const borderOffsets = [
+        {x: -1, y: 0},
+        {x: -1, y: -1},
+        {x: +1, y: -1},
+        {x: +1, y: 0},
+        {x: +1, y: +1},
+        {x: -1, y: +1}
+    ]
+
     const events = {}
 
     const renderedZoomContinents = []
-    const renderedZoomGrid = {}
+    const renderedZoomGrid = []
 
     for (let i = 0; i < zoomLevels.length; i++) {
         renderedZoomContinents.push({})
+        renderedZoomGrid.push({})
     }
 
     const HIGHLIGHT_CATEGORIES = {
@@ -113,8 +134,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         background: '#436213',
         highlightPlayer: '#FFFFFF',
         activeVillageBorder: '#FFFFFF80',
-        continentDemarcation: '#00000025',
-        provinceDemarcation: '#0000000D'
+        demarcations: '#000000'
     }
 
     const setupZoom = function () {
@@ -214,6 +234,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                     tooltip.hide()
                 }
 
+                drawVisibleContinentsDemarcations()
                 loadVisibleContinents()
             }
         })
@@ -265,7 +286,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
 
                 setupZoom()
-                renderGrid()
+                drawVisibleContinentsDemarcations()
                 loadVisibleContinents()
                 renderViewport()
 
@@ -307,7 +328,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         clearOverlay()
     }
 
-    const loadVisibleContinents = () => {
+    const getVisibleContinents = () => {
         const visibleContinents = []
 
         let ax = boundNumber(((positionX - middleViewportOffsetX) / zoomSettings.tileSize), 0, 999)
@@ -326,7 +347,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
-        visibleContinents
+        return visibleContinents
+    }
+
+    const loadVisibleContinents = () => {
+        getVisibleContinents()
         .filter((continent) => !renderedZoomContinents[settings.zoomLevel].hasOwnProperty(continent))
         .forEach((continent) => {
             loader.loadContinent(continent).then(villages => {
@@ -349,33 +374,122 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    const renderGrid = () => {
-        if (renderedZoomGrid.hasOwnProperty(settings.zoomLevel)) {
+    const drawVisibleContinentsDemarcations = () => {
+        if (!zoomSettings.drawContinents && !zoomSettings.drawProvinces) {
             return
         }
 
-        renderedZoomGrid[settings.zoomLevel] = true
+        const visibleContinents = getVisibleContinents()
+        const nonRenderedContinents = visibleContinents.filter((k) => !renderedZoomGrid[settings.zoomLevel].hasOwnProperty(k))
 
-        if (zoomSettings.continentGrid) {
-            $cacheContext.fillStyle = COLORS.continentDemarcation
+        for (let k of nonRenderedContinents) {
+            k = String(k)
+            const startX = k < 10 ? k * 100 : k[1] * 100
+            const startY = k < 10 ? 0 : k[0] * 100
+            const endX = startX + 100
+            const endY = startY + 100
 
-            $cacheContext.fillRect(0, 0, 1, zoomSettings.mapWidth)
-            $cacheContext.fillRect(0, 0, zoomSettings.mapWidth, 1)
+            for (let x = startX; x < endX; x++) {
+                for (let y = startY; y < endY; y++) {
+                    const tilePos = y + MAP_SIZE * x
+                    const fiveBits = readBitsAt(loader.struct, tilePos)
 
-            for (let i = 1; i < 11; i++) {
-                $cacheContext.fillRect(i * 100 * zoomSettings.tileSize - 1, 0, 1, zoomSettings.mapWidth)
-                $cacheContext.fillRect(0, i * 100 * zoomSettings.tileSize - 1, zoomSettings.mapWidth, 1)
+                    // has border
+                    if (fiveBits >>> 4) {
+                        const isContinentBorder = (fiveBits >> 3) & 1
+
+                        if (isContinentBorder) {
+                            if (zoomSettings.drawContinents) {
+                                $cacheContext.fillStyle = COLORS.demarcations + (zoomSettings.continentOpacity ? zoomSettings.continentOpacity : '')
+                            } else {
+                                $cacheContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
+                            }
+                        } else {
+                            if (zoomSettings.drawProvinces) {
+                                $cacheContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
+                            } else {
+                                continue
+                            }
+                        }
+
+                        const borders = getRowNeighbourTilePosition(x, y)
+
+                        for (let i = 0; i < 6; i++) {
+                            const neighbourTile = readBitsAt(loader.struct, borders[i])
+
+                            if (neighbourTile >>> 4) {
+                                $cacheContext.fillRect(x * zoomSettings.tileSize + borderOffsets[i].x, y * zoomSettings.tileSize + borderOffsets[i].y, 1, 1)
+                            }
+                        }
+
+                        $cacheContext.fillRect(x * zoomSettings.tileSize, y * zoomSettings.tileSize, 1, 1)
+                    }
+                }
             }
+
+            renderedZoomGrid[settings.zoomLevel][k] = true
+        }
+    }
+
+    const readBitsAt = (view, tilePos) => {
+        if (tilePos < 0 || tilePos >= TILE_COUNT) {
+            return;
         }
 
-        if (zoomSettings.provinceGrid) {
-            $cacheContext.fillStyle = COLORS.provinceDemarcation
+        var bytePosInSegment    = tilePos % 8,
+            byteOffset          = (tilePos - bytePosInSegment) * BITS_IN_TILE_PER_BYTE,
+            result;
 
-            for (let i = 1; i < 100; i++) {
-                $cacheContext.fillRect(i * 10 * zoomSettings.tileSize - 1, 0, 1, zoomSettings.mapWidth)
-                $cacheContext.fillRect(0, i * 10 * zoomSettings.tileSize - 1, zoomSettings.mapWidth, 1)
-            }
+        switch (bytePosInSegment) {
+
+        case 0:
+            result = (view.getUint8(byteOffset) >> 3);
+            break;
+        case 1:
+            result = ((view.getUint8(byteOffset) << 2) + (view.getUint8(byteOffset + 1) >> 6));
+            break;
+        case 2:
+            result = view.getUint8(byteOffset + 1) >> 1;
+            break;
+        case 3:
+            result = ((view.getUint8(byteOffset + 1) << 4) + (view.getUint8(byteOffset + 2) >> 4));
+            break;
+        case 4:
+            result = ((view.getUint8(byteOffset + 2) << 1) + (view.getUint8(byteOffset + 3) >> 7));
+            break;
+        case 5:
+            result = (view.getUint8(byteOffset + 3) >> 2);
+            break;
+        case 6:
+            result = ((view.getUint8(byteOffset + 3) << 3) + (view.getUint8(byteOffset + 4) >> 5));
+            break;
+        case 7:
+            result = view.getUint8(byteOffset + 4);
+            break;
         }
+
+        // As every tile exists from out of 5 bits, after swtich break to make sure
+        // the result read will be surely relevant to that 5 bit, we bitwise and it
+        // with 00011111 (31)
+        return result & 31;
+    }
+
+    const getRowNeighbourTilePosition = (x, y) => {
+        return y & 1 ? [
+            (MAP_SIZE * (x - 1)) + y,
+            (MAP_SIZE * x) + y - 1,
+            (MAP_SIZE * (x + 1)) + y - 1,
+            (MAP_SIZE * (x + 1)) + y,
+            (MAP_SIZE * (x + 1)) + y + 1,
+            (MAP_SIZE * x) + y + 1
+        ] : [
+            (MAP_SIZE * (x - 1)) + y,
+            (MAP_SIZE * (x - 1)) + y - 1,
+            (MAP_SIZE * x) + y - 1,
+            (MAP_SIZE * (x + 1)) + y,
+            (MAP_SIZE * x) + y + 1,
+            (MAP_SIZE * (x - 1)) + y + 1
+        ];
     }
 
     const renderVillages = (villages, context = $cacheContext, zoomSettings = zoomLevels[settings.zoomLevel]) => {
@@ -397,7 +511,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
                 let off = y % 2 ? zoomSettings.villageOffset : 0
 
-                if (zoomSettings.allowHexagon && settings.hexagonVillages) {
+                if (zoomSettings.hexagonShape && settings.hexagonVillages) {
                     context.fillRect(x * zoomSettings.tileSize + off + 1, y * zoomSettings.tileSize, 3, 1)
                     context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 1, 5, 1)
                     context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 2, 5, 1)
@@ -436,7 +550,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             const borderY = Math.abs(positionY - (activeVillage.y * zoomSettings.tileSize) - middleViewportOffsetY) - 1
             const borderSize = zoomSettings.villageSize + 2
 
-            if (zoomSettings.allowHexagon && settings.hexagonVillages) {
+            if (zoomSettings.hexagonShape && settings.hexagonVillages) {
                 $overlayContext.fillRect(borderX + 1, borderY - 1, 5, 1)
                 $overlayContext.fillRect(borderX    , borderY    , 1, 1)
                 $overlayContext.fillRect(borderX + 6, borderY    , 1, 1)
@@ -467,7 +581,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             x = x * zoomSettings.tileSize - positionX + middleViewportOffsetX + off
             y = y * zoomSettings.tileSize - positionY + middleViewportOffsetY
 
-            if (zoomSettings.allowHexagon && settings.hexagonVillages) {
+            if (zoomSettings.hexagonShape && settings.hexagonVillages) {
                 $overlayContext.fillRect(x + 1, y, 3, 1)
                 $overlayContext.fillRect(x    , y + 1, 5, 1)
                 $overlayContext.fillRect(x    , y + 2, 5, 1)
@@ -568,6 +682,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         $overlay.width = viewportWidth
         $overlay.height = viewportHeight
 
+        drawVisibleContinentsDemarcations()
         loadVisibleContinents()
         renderViewport()
     }
@@ -593,6 +708,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             tooltip.hide()
         }
 
+        drawVisibleContinentsDemarcations()
         loadVisibleContinents()
         renderViewport()
         activeVillage = false
@@ -741,12 +857,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     setupElements()
     mouseEvents()
-    renderGrid()
 
     Promise.all([
         loader.loadPlayers,
-        loader.loadTribes
+        loader.loadTribes,
+        loader.loadStruct
     ]).then(() => {
+        drawVisibleContinentsDemarcations()
         loadVisibleContinents()
         continuousRender()
     })
@@ -832,6 +949,7 @@ const DataLoader = function (marketId, worldNumber) {
     this.continents = {}
     this.villages = {}
     this.villages.x = {}
+    this.struct = {}
 
     const mergeVillages = (villages) => {
         for (let x in villages) {
@@ -906,6 +1024,15 @@ const DataLoader = function (marketId, worldNumber) {
 
         return continentPromises[continent]
     }
+
+    this.loadStruct = new Promise(async (resolve) => {
+        const loadStruct = await fetch(`/maps/api/${marketId}/${worldNumber}/struct`)
+        const buffer = await loadStruct.arrayBuffer()
+        
+        this.struct = new DataView(buffer)
+
+        resolve()
+    })
 }
 
 const TW2MapTooltip = function (selector) {
@@ -1544,7 +1671,7 @@ const TW2MapTooltip = function (selector) {
 
     const mapSettings = {
         hexagonVillages: true,
-        zoomLevel: 2
+        zoomLevel: 3
     }
 
     const loader = new DataLoader(marketId, worldNumber)
