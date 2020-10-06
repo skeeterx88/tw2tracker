@@ -448,7 +448,7 @@ header h1 {
     margin-top: 1px;
 }
 
-#world-settings {
+#change-settings {
     margin-left: 2px;
     width: 49px;
 }
@@ -521,6 +521,56 @@ header h1 {
 
 #all-markets li:hover {
     background: #865333;
+}
+
+
+
+
+#settings {
+    position: absolute;
+    left: 120px;
+    top: 50px;
+    width: 160px;
+    background: url(/images/noise.png) #6f4327;
+    color: #e0bfbf;
+    padding: 3px;
+    text-shadow: 1px 1px 0px #00000090;
+    z-index: 7;
+    transition: visibility 0.02s linear, opacity 0.02s linear;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
+    border: 1px solid #5e351b;
+    border-radius: 1px;
+}
+
+#settings.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
+#settings .color-option {
+    display: block;
+    padding: 2px 0px;
+}
+
+#settings .color {
+    float: right;
+    display: inline-block;
+    padding: 1px;
+    width: 11px;
+    height: 10px;
+    position: relative;
+    border-radius: 1px;
+    border: 1px solid #8d5b39;
+    background: url(/images/noise.png) #a07246;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                1px 1px 2px #000;
+    cursor: pointer;
+    vertical-align: top;
+}
+
+#settings .color:hover {
+    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #d8bfb0;
 }
 
 

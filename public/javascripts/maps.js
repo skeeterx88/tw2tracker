@@ -16,9 +16,49 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     settings = {
         ...{
             hexagonVillages: false,
-            zoomLevel: 2
+            zoomLevel: 2,
+            neutralColor: '#823C0A',
+            barbarianColor: '#4C6F15',
+            backgroundColor: '#436213',
+            highlightPlayerColor: '#FFFFFF',
+            activeVillageBorderColor: '#FFFFFF80',
+            demarcationsColor: '#000000'
         },
         ...settings
+    }
+
+    const settingTriggers = {
+        neutralColor: () => {
+            renderedZoomContinents = []
+
+            for (let i = 0; i < zoomLevels.length; i++) {
+                renderedZoomContinents.push({})
+            }
+
+            renderVisibleContinents()
+        },
+        barbarianColor: () => {
+            renderedZoomContinents = []
+
+            for (let i = 0; i < zoomLevels.length; i++) {
+                renderedZoomContinents.push({})
+            }
+
+            renderVisibleContinents()
+        },
+        backgroundColor: () => {
+            $container.style.backgroundColor = settings.backgroundColor
+        },
+        demarcationsColor: () => {
+            renderedZoomGrid = []
+
+            for (let i = 0; i < zoomLevels.length; i++) {
+                renderedZoomGrid.push({})
+            }
+
+            renderVisibleDemarcations()
+            renderViewport()
+        }
     }
 
     const MAP_SIZE = 1000
@@ -114,8 +154,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     const events = {}
 
-    const renderedZoomContinents = []
-    const renderedZoomGrid = []
+    let renderedZoomContinents = []
+    let renderedZoomGrid = []
 
     for (let i = 0; i < zoomLevels.length; i++) {
         renderedZoomContinents.push({})
@@ -130,15 +170,6 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const highlights = {
         [HIGHLIGHT_CATEGORIES.players]: {},
         [HIGHLIGHT_CATEGORIES.tribes]: {}
-    }
-
-    const COLORS = {
-        neutral: '#823C0A',
-        barbarian: '#4C6F15',
-        background: '#436213',
-        highlightPlayer: '#FFFFFF',
-        activeVillageBorder: '#FFFFFF80',
-        demarcations: '#000000'
     }
 
     const setupZoom = function () {
@@ -416,13 +447,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
                         if (isContinentBorder) {
                             if (zoomSettings.drawContinents) {
-                                $gridContext.fillStyle = COLORS.demarcations + (zoomSettings.continentOpacity ? zoomSettings.continentOpacity : '')
+                                $gridContext.fillStyle = settings.demarcationsColor + (zoomSettings.continentOpacity ? zoomSettings.continentOpacity : '')
                             } else {
-                                $gridContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
+                                $gridContext.fillStyle = settings.demarcationsColor + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
                             }
                         } else {
                             if (zoomSettings.drawProvinces) {
-                                $gridContext.fillStyle = COLORS.demarcations + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
+                                $gridContext.fillStyle = settings.demarcationsColor + (zoomSettings.provinceOpacity ? zoomSettings.provinceOpacity : '')
                             } else {
                                 continue
                             }
@@ -516,13 +547,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 let tribeId = character_id ? loader.players[character_id][1] : false
 
                 if (!character_id) {
-                    context.fillStyle = COLORS.barbarian
+                    context.fillStyle = settings.barbarianColor
                 } else if (character_id in highlights.players) {
                     context.fillStyle = highlights.players[character_id].color
                 } else if (tribeId && tribeId in highlights.tribes) {
                     context.fillStyle = highlights.tribes[tribeId].color
                 } else {
-                    context.fillStyle = COLORS.neutral
+                    context.fillStyle = settings.neutralColor
                 }
 
                 let off = y % 2 ? zoomSettings.villageOffset : 0
@@ -558,7 +589,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
 
         if (zoomSettings.activeVillageBorder) {
-            $overlayContext.fillStyle = COLORS.activeVillageBorder
+            $overlayContext.fillStyle = settings.activeVillageBorderColor
 
             let off = activeVillage.y % 2 ? zoomSettings.villageOffset : 0
 
@@ -589,7 +620,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             return
         }
 
-        $overlayContext.fillStyle = COLORS.highlightPlayer
+        $overlayContext.fillStyle = settings.highlightPlayerColor
 
         for (let [x, y] of loader.playerVillages[characterId]) {
             let off = y % 2 ? zoomSettings.villageOffset : 0
@@ -863,6 +894,22 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             for (let handler of events[event]) {
                 handler.apply(this, args)
             }
+        }
+    }
+
+    this.getSetting = function (id) {
+        return settings[id]
+    }
+
+    this.changeSetting = function (id, value) {
+        if (!settings.hasOwnProperty(id)) {
+            throw new Error('Setting "' + id + '" does not exist')
+        }
+
+        settings[id] = value
+
+        if (settingTriggers.hasOwnProperty(id)) {
+            settingTriggers[id]()
         }
     }
 
@@ -1708,6 +1755,59 @@ const TW2MapTooltip = function (selector) {
         changeWorldList(marketId)
     }
 
+    const setupSettings = () => {
+        let visible = false
+
+        const $settings = document.querySelector('#settings')
+        const $changeSettings = document.querySelector('#change-settings')
+        const $colorOptions = document.querySelectorAll('#settings .color-option')
+
+        const closeHandler = function (event) {
+
+
+            if (!event.target.closest('#settings') && !event.target.closest('#change-settings')) {
+                $settings.classList.add('hidden')
+                removeEventListener('mousedown', closeHandler)
+                visible = false
+            }
+        }
+
+        $changeSettings.addEventListener('mouseup', () => {
+            if (visible) {
+                $settings.classList.add('hidden')
+                visible = false
+                return
+            }
+
+            $settings.classList.toggle('hidden')
+
+            if (visible = !visible) {
+                addEventListener('mousedown', closeHandler)
+            }
+        })
+
+        for (let $option of $colorOptions) {
+            const id = $option.dataset.settingId
+            const color = map.getSetting(id)
+
+            const $color = document.createElement('div')
+            $color.classList.add('color')
+            $color.classList.add('open-color-picker')
+            $color.dataset.color = color
+            $color.style.backgroundColor = color
+
+            $option.appendChild($color)
+
+            $color.addEventListener('click', () => {
+                colorPicker($color, color, (pickedColor) => {
+                    $color.dataset.color = pickedColor
+                    $color.style.backgroundColor = pickedColor
+                    map.changeSetting(id, pickedColor)
+                })
+            })
+        }
+    }
+
     const mapSettings = {
         hexagonVillages: true,
         zoomLevel: 3
@@ -1726,4 +1826,5 @@ const TW2MapTooltip = function (selector) {
     setupMapShare()
     setupNotif()
     setupWorldList()
+    setupSettings()
 })()

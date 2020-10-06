@@ -25,7 +25,7 @@
                         <span class="flag flag-<%= marketId %>"></span>
                         <%= marketId %><%= worldNumber %>
                     </button>
-                    <button id="world-settings">Settings</button>
+                    <button id="change-settings">Settings</button>
                 </header>
 
                 <div id="quick-jump">
@@ -142,6 +142,14 @@
         <div id="all-worlds" class="hidden">
             <ul id="all-market-worlds"></ul>
             <ul id="all-markets"></ul>
+        </div>
+
+        <div id="settings" class="hidden">
+            <div class="color-option" data-setting-id="backgroundColor"><label>Background color</label></div>
+            <div class="color-option" data-setting-id="neutralColor"><label>Neutral villages color</label></div>
+            <div class="color-option" data-setting-id="barbarianColor"><label>Barbarian villages color</label></div>
+            <div class="color-option" data-setting-id="highlightPlayerColor"><label>Highlight player color</label></div>
+            <div class="color-option" data-setting-id="demarcationsColor"><label>Demarcations color</label></div>
         </div>
 
         <script type="text/javascript" src="/javascripts/utils.js"></script>
