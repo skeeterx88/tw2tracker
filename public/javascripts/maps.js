@@ -1195,6 +1195,7 @@ const TW2MapTooltip = function (selector) {
 ;(async () => {
     let colorPicker
     let notif
+    const KEEP_COLORPICKER_OPEN = 'keep_colorpicker_open'
 
     const setupQuickJump = () => {
         const $quickJumpX = document.querySelector('#quick-jump-x')
@@ -1423,7 +1424,7 @@ const TW2MapTooltip = function (selector) {
 
         const $colors = $colorPicker.querySelectorAll('div')
 
-        colorPicker = ($reference, selectedColor, callback) => {
+        colorPicker = ($reference, selectedColor, callback, flag) => {
             if (!$reference) {
                 throw new Error('Color Picker: Invalid reference element')
             }
@@ -1461,7 +1462,10 @@ const TW2MapTooltip = function (selector) {
                 activeColorPicker = (event) => {
                     if (event.target.classList.contains('color')) {
                         callback(event.target.dataset.color)
-                        closeColorPicker()
+
+                        if (flag !== KEEP_COLORPICKER_OPEN) {
+                            closeColorPicker()
+                        }
                     }
                 }
 
@@ -1731,7 +1735,11 @@ const TW2MapTooltip = function (selector) {
         }
 
         const closeHandler = function (event) {
-            if (!event.target.closest('#all-worlds') && !event.target.closest('#current-world')) {
+            const keep = ['#all-worlds', '#current-world'].some((selector) => {
+                return event.target.closest(selector)
+            })
+
+            if (!keep) {
                 $allWorlds.classList.add('hidden')
                 removeEventListener('mousedown', closeHandler)
                 visible = false
@@ -1763,9 +1771,11 @@ const TW2MapTooltip = function (selector) {
         const $colorOptions = document.querySelectorAll('#settings .color-option')
 
         const closeHandler = function (event) {
+            const keep = ['#color-picker', '#settings', '#change-settings'].some((selector) => {
+                return event.target.closest(selector)
+            })
 
-
-            if (!event.target.closest('#settings') && !event.target.closest('#change-settings')) {
+            if (!keep) {
                 $settings.classList.add('hidden')
                 removeEventListener('mousedown', closeHandler)
                 visible = false
@@ -1803,7 +1813,7 @@ const TW2MapTooltip = function (selector) {
                     $color.dataset.color = pickedColor
                     $color.style.backgroundColor = pickedColor
                     map.changeSetting(id, pickedColor)
-                })
+                }, KEEP_COLORPICKER_OPEN)
             })
         }
     }
