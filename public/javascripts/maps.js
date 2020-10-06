@@ -1609,14 +1609,12 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupWorldList = () => {
+        let visible = false
+
         const $allWorlds = document.querySelector('#all-worlds')
         const $allMarkets = document.querySelector('#all-markets')
         const $currentWorld = document.querySelector('#current-world')
         const $allMarketWorlds = document.querySelector('#all-market-worlds')
-
-        $currentWorld.addEventListener('click', function () {
-            $allWorlds.classList.toggle('hidden')
-        })
 
         for (let market of allMarkets) {
             const $marketContainer = document.createElement('li')
@@ -1683,6 +1681,28 @@ const TW2MapTooltip = function (selector) {
                 $allMarketWorlds.appendChild($world)
             }
         }
+
+        const closeHandler = function (event) {
+            if (!event.target.closest('#all-worlds') && !event.target.closest('#current-world')) {
+                $allWorlds.classList.add('hidden')
+                removeEventListener('mousedown', closeHandler)
+                visible = false
+            }
+        }
+
+        $currentWorld.addEventListener('mouseup', () => {
+            if (visible) {
+                $allWorlds.classList.add('hidden')
+                visible = false
+                return
+            }
+
+            $allWorlds.classList.toggle('hidden')
+
+            if (visible = !visible) {
+                addEventListener('mousedown', closeHandler)
+            }
+        })
 
         changeWorldList(marketId)
     }
