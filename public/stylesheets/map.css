@@ -455,8 +455,8 @@ header h1 {
 
 #all-worlds {
     position: absolute;
-    left: 80px;
-    top: 50px;
+    left: 57px;
+    top: 53px;
     width: 200px;
     background: url(/images/noise.png) #6f4327;
     color: #e0bfbf;
@@ -528,7 +528,7 @@ header h1 {
 
 #settings {
     position: absolute;
-    left: 120px;
+    left: 110px;
     top: 50px;
     width: 160px;
     background: url(/images/noise.png) #6f4327;
