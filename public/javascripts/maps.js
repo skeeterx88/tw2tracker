@@ -1,9 +1,9 @@
 const colorPalette = [
     ["#ffffff", "#ebebeb", "#d7d7d7", "#c3c3c3", "#afafaf", "#9b9b9b", "#878787", "#737373", "#5f5f5f", "#4b4b4b", "#373737", "#232323", "#0f0f0f", "#000000"],
-    ["#6b8e23", "#FF0000", "#0075FF", "#00FF41", "#FF8000", "#ffee00", "#FF008A", "#ffd5b6", "#5800FF", "#0075FF", "#00FFE1", "#A400FF", "#2f4f4f", "#ff4b4b"],
-    ["#1e90ff", "#D83333", "#03709d", "#0a8028", "#aa6b2b", "#f0c800", "#b2146b", "#d96a19", "#5c32a9", "#47617f", "#0111af", "#d315b6", "#8888fc", "#ce8856"],
-    ["#e0ff4c", "#980e0e", "#014a69", "#04571a", "#7f5122", "#7b730c", "#870d50", "#a44c0b", "#452483", "#2a3e55", "#000b74", "#9d0886", "#00a0f4", "#969696"],
-    ["#00fa9a", "#730202", "#00293a", "#02350f", "#572412", "#494500", "#6a043e", "#723305", "#2f1460", "#152232", "#000645", "#6c055b", "#c766c7", "#00FF83"]
+    ["#4c6f15", "#ff0000", "#0075ff", "#00ff41", "#ff8000", "#ffee00", "#ff008a", "#ffd5b6", "#5800ff", "#5d7fa6", "#00ffe1", "#a400ff", "#2f4f4f", "#ff4b4b"],
+    ["#436213", "#d83333", "#03709d", "#0a8028", "#aa6b2b", "#f0c800", "#b2146b", "#d96a19", "#5c32a9", "#47617f", "#0111af", "#d315b6", "#8888fc", "#ce8856"],
+    ["#e0ff4c", "#980e0e", "#014a69", "#04571a", "#823c0a", "#7b730c", "#870d50", "#a44c0b", "#452483", "#2a3e55", "#000b74", "#9d0886", "#00a0f4", "#969696"],
+    ["#00fa9a", "#730202", "#00293a", "#02350f", "#572412", "#494500", "#6a043e", "#723305", "#2f1460", "#152232", "#000645", "#6c055b", "#c766c7", "#00ff83"]
 ]
 
 const TW2Map = function (containerSelector, loader, tooltip, settings) {
@@ -17,11 +17,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         ...{
             hexagonVillages: false,
             zoomLevel: 2,
-            neutralColor: '#823C0A',
-            barbarianColor: '#4C6F15',
+            neutralColor: '#823c0a',
+            barbarianColor: '#4c6f15',
             backgroundColor: '#436213',
-            highlightPlayerColor: '#FFFFFF',
-            activeVillageBorderColor: '#FFFFFF80',
+            highlightPlayerColor: '#ffffff',
+            activeVillageBorderColor: '#ffffff',
+            activeVillageBorderOpacity: '80',
             demarcationsColor: '#000000'
         },
         ...settings
@@ -594,7 +595,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
 
         if (zoomSettings.activeVillageBorder) {
-            $overlayContext.fillStyle = settings.activeVillageBorderColor
+            $overlayContext.fillStyle = settings.activeVillageBorderColor + settings.activeVillageBorderOpacity
 
             let off = activeVillage.y % 2 ? zoomSettings.villageOffset : 0
 
