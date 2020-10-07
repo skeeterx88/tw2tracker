@@ -1846,7 +1846,7 @@ const TW2MapTooltip = function (selector) {
             $option.appendChild($color)
 
             $color.addEventListener('click', () => {
-                colorPicker($color, color, (pickedColor) => {
+                colorPicker($color, $color.dataset.color, (pickedColor) => {
                     $color.dataset.color = pickedColor
                     $color.style.backgroundColor = pickedColor
                     map.changeSetting(id, pickedColor)
