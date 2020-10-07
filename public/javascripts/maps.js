@@ -56,6 +56,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 renderedZoomGrid.push({})
             }
 
+            clearDemarcations()
             renderVisibleDemarcations()
             renderViewport()
         }
@@ -418,6 +419,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
             this.trigger('center coords update', [centerCoordX, centerCoordY])
         }
+    }
+
+    const clearDemarcations = () => {
+        $gridContext.clearRect(0, 0, $grid.width, $grid.height)
     }
 
     const renderVisibleDemarcations = () => {
