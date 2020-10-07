@@ -427,7 +427,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const renderVisibleDemarcations = () => {
-        if (!zoomSettings.drawContinents && !zoomSettings.drawProvinces) {
+        if (!zoomSettings.drawContinents && !zoomSettings.drawProvinces || !loader.struct) {
             return
         }
 
@@ -1021,7 +1021,7 @@ const DataLoader = function (marketId, worldNumber) {
     this.continents = {}
     this.villages = {}
     this.villages.x = {}
-    this.struct = {}
+    this.struct = false
 
     const mergeVillages = (villages) => {
         for (let x in villages) {
