@@ -7,6 +7,8 @@ const getStructPath = require('./get-struct-path.js')
 const fs = require('fs')
 const https = require('https')
 const authenticatedMarkets = {}
+const zlib = require('zlib')
+const path = require('path')
 
 let browser = null
 
@@ -313,7 +315,9 @@ const downloadStruct = function (url, marketId, worldNumber) {
             })
 
             res.on('end', async function () {
-                fs.promises.writeFile(`./data/${marketId}${worldNumber}/struct.bin`, Buffer.concat(data)).then(resolve)
+                const gzipped = zlib.gzipSync(Buffer.concat(data))
+                await fs.promises.writeFile(path.join('.', 'data', marketId + worldNumber, 'struct'), gzipped)
+                resolve()
             })
         })
     })
@@ -364,7 +368,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = fals
         await page.evaluate(readyState)
 
         try {
-            await fs.promises.access(`./data/${marketId}${worldNumber}/struct.bin`)
+            await fs.promises.access(path.join('.', 'data', marketId + worldNumber, 'struct'))
         } catch (_) {
             console.log('Sync.scrappeWorld: Downloading map structure')
             const structPath = await page.evaluate(getStructPath)
@@ -479,8 +483,6 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
     const parsedTribes = {}
     const continents = {}
 
-    const fs = require('fs')
-    const path = require('path')
     const dataPath = path.join('.', 'data', worldId)
 
     await fs.promises.mkdir(dataPath, { recursive: true })
@@ -518,7 +520,7 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 
     for (let k in continents) {
         const data = JSON.stringify(continents[k])
-        await fs.promises.writeFile(path.join(dataPath, k + '.json'), data)
+        await fs.promises.writeFile(path.join(dataPath, k), zlib.gzipSync(data))
     }
 
     for (let { id, name, tribe_id, points } of players) {
@@ -529,8 +531,11 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
         parsedTribes[id] = [name, tag, points]
     }
 
-    await fs.promises.writeFile(path.join(dataPath, 'players.json'), JSON.stringify(parsedPlayers))
-    await fs.promises.writeFile(path.join(dataPath, 'tribes.json'), JSON.stringify(parsedTribes))
+    const gzippedPlayers = zlib.gzipSync(JSON.stringify(parsedPlayers))
+    const gzippedTribes = zlib.gzipSync(JSON.stringify(parsedTribes))
+
+    await fs.promises.writeFile(path.join(dataPath, 'players'), gzippedPlayers)
+    await fs.promises.writeFile(path.join(dataPath, 'tribes'), gzippedTribes)
 
     console.log('Sync.genWorldBlocks:', worldId, 'finished')
 

@@ -109,9 +109,9 @@ router.get('/api/:marketId/:worldNumber/players', async function (req, res) {
         return false
     }
 
-    fs.promises.readFile(path.join('.', 'data', worldId, 'players.json'))
+    fs.promises.readFile(path.join('.', 'data', worldId, 'players'))
     .then(function (data) {
-        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Content-Encoding', 'zlib')
         res.end(data)
     })
     .catch(function () {
@@ -133,9 +133,9 @@ router.get('/api/:marketId/:worldNumber/tribes', async function (req, res) {
         return false
     }
 
-    fs.promises.readFile(path.join('.', 'data', worldId, 'tribes.json'))
+    fs.promises.readFile(path.join('.', 'data', worldId, 'tribes'))
     .then(function (data) {
-        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Content-Encoding', 'zlib')
         res.end(data)
     })
     .catch(function () {
@@ -149,7 +149,7 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId', async function 
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
-    const continentId = parseInt(req.params.continentId, 10)
+    const continentId = req.params.continentId
 
     const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
 
@@ -159,19 +159,19 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId', async function 
         return false
     }
 
-    if (continentId < 0 || continentId > 99) {
+    if (continentId < 0 || continentId > 99 || isNaN(continentId)) {
         res.status(400)
         res.send('Invalid API call')
         return false
     }
 
-    res.setHeader('Content-Type', 'application/json')
-
-    fs.promises.readFile(path.join('.', 'data', worldId, continentId + '.json'))
+    fs.promises.readFile(path.join('.', 'data', worldId, continentId))
     .then(function (data) {
+        res.setHeader('Content-Encoding', 'zlib')
         res.end(data)
     })
     .catch(function () {
+        res.setHeader('Content-Type', 'application/json')
         res.end('{}')
     })
 })
@@ -189,8 +189,9 @@ router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
         return false
     }
 
-    fs.promises.readFile(path.join('.', 'data', worldId, 'struct.bin'))
+    fs.promises.readFile(path.join('.', 'data', worldId, 'struct'))
     .then(function (data) {
+        res.setHeader('Content-Encoding', 'zlib')
         res.end(data)
     })
     .catch(function () {

@@ -1048,8 +1048,9 @@ const DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadPlayers = new Promise(async (resolve) => {
-        const players = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
-        this.players = await players.json()
+        const load = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
+        const gzipped = await load.arrayBuffer()
+        this.players = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
 
         for (let id in this.players) {
             let [name, tribeId, points] = this.players[id]
@@ -1065,8 +1066,9 @@ const DataLoader = function (marketId, worldNumber) {
     })
 
     this.loadTribes = new Promise(async (resolve) => {
-        const tribes = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
-        this.tribes = await tribes.json()
+        const load = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
+        const gzipped = await load.arrayBuffer()
+        this.tribes = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
 
         for (let id in this.tribes) {
             let [name, tag, points] = this.tribes[id]
@@ -1088,8 +1090,11 @@ const DataLoader = function (marketId, worldNumber) {
 
         continentPromises[continent] = new Promise(async (resolve) => {
             const load = await fetch(`/maps/api/${marketId}/${worldNumber}/continent/${continent}`)
-            const villages = await load.json()
+            const gzipped = await load.arrayBuffer()
+            const villages = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
+            
             this.continents[continent] = villages
+
             mergeVillages(villages)
             resolve(villages)
         })
@@ -1098,9 +1103,11 @@ const DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadStruct = new Promise(async (resolve) => {
-        const loadStruct = await fetch(`/maps/api/${marketId}/${worldNumber}/struct`)
-        const buffer = await loadStruct.arrayBuffer()
-        
+        const load = await fetch(`/maps/api/${marketId}/${worldNumber}/struct`)
+        const gzipped = await load.arrayBuffer()
+        const array = pako.inflate(gzipped)
+        const buffer = array.buffer.slice(array.byteOffset, array.byteLength + array.byteOffset)
+
         this.struct = new DataView(buffer)
 
         resolve()
