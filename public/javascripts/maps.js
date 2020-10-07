@@ -1431,13 +1431,15 @@ const TW2MapTooltip = function (selector) {
 
         const $colors = $colorPicker.querySelectorAll('div')
 
-        const updateActiveColor = (newColor) => {
+        const clearActiveColor = () => {
             const $active = $colorPicker.querySelector('.active')
 
             if ($active) {
                 $active.classList.remove('active')
             }
+        }
 
+        const updateActiveColor = (newColor) => {
             for (let $color of $colors) {
                 if ($color.dataset.color === newColor) {
                     $color.classList.add('active')
@@ -1451,8 +1453,10 @@ const TW2MapTooltip = function (selector) {
             }
 
             if (activeColorPicker) {
-                $colorPicker.removeEventListener('click', activeColorPicker)
+                $colorPicker.removeEventListener('mouseup', activeColorPicker)
             }
+
+            clearActiveColor()
 
             let { x, y, width, height } = $reference.getBoundingClientRect()
 
@@ -1472,39 +1476,32 @@ const TW2MapTooltip = function (selector) {
             $colorPicker.style.visibility = 'visible'
             $colorPicker.style.opacity = 1
 
-            setTimeout(() => {
-                activeColorPicker = (event) => {
-                    if (event.target.classList.contains('color')) {
-                        const color = event.target.dataset.color
-                        const confirmUpdate = callback(color)
+            activeColorPicker = (event) => {
+                if (event.target.classList.contains('color')) {
+                    const color = event.target.dataset.color
+                    const confirmUpdate = callback(color)
 
-                        if (confirmUpdate) {
-                            updateActiveColor(color)
-                        }
+                    clearActiveColor()
+                    updateActiveColor(color)
 
-                        if (flag !== KEEP_COLORPICKER_OPEN) {
-                            closeColorPicker()
-                        }
+                    if (flag !== KEEP_COLORPICKER_OPEN) {
+                        closeColorPicker()
                     }
                 }
+            }
 
-                $colorPicker.addEventListener('click', activeColorPicker)
-            }, 25)
+            $colorPicker.addEventListener('mouseup', activeColorPicker)
         }
 
         const closeColorPicker = () => {
-            $colorPicker.removeEventListener('click', activeColorPicker)
+            $colorPicker.removeEventListener('mousedown', activeColorPicker)
             $colorPicker.style.visibility = 'hidden'
             $colorPicker.style.opacity = 0
             activeColorPicker = false
         }
 
-        window.addEventListener('click', (event) => {
-            if (!activeColorPicker || event.target.classList.contains('open-color-picker')) {
-                return
-            }
-
-            if (!event.target.closest('#color-picker')) {
+        window.addEventListener('mousedown', (event) => {
+            if (activeColorPicker && !event.target.classList.contains('open-color-picker') && !event.target.closest('#color-picker')) {
                 closeColorPicker()
             }
         })
