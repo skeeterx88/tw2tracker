@@ -1373,7 +1373,8 @@ const TW2MapTooltip = function (selector) {
                 colorPicker($color, $color.dataset.color, (pickedColor) => {
                     $color.dataset.color = pickedColor
                     map.addHighlight(category, id, pickedColor)
-                })
+                    return true
+                }, KEEP_COLORPICKER_OPEN)
             })
 
             $name.appendChild($nameSpan)
@@ -1430,6 +1431,20 @@ const TW2MapTooltip = function (selector) {
 
         const $colors = $colorPicker.querySelectorAll('div')
 
+        const updateActiveColor = (newColor) => {
+            const $active = $colorPicker.querySelector('.active')
+
+            if ($active) {
+                $active.classList.remove('active')
+            }
+
+            for (let $color of $colors) {
+                if ($color.dataset.color === newColor) {
+                    $color.classList.add('active')
+                }
+            }
+        }
+
         colorPicker = ($reference, selectedColor, callback, flag) => {
             if (!$reference) {
                 throw new Error('Color Picker: Invalid reference element')
@@ -1437,13 +1452,6 @@ const TW2MapTooltip = function (selector) {
 
             if (activeColorPicker) {
                 $colorPicker.removeEventListener('click', activeColorPicker)
-            }
-
-            for (let $color of $colors) {
-                if ($color.classList.contains('active')) {
-                    $color.classList.remove('active')
-                    break
-                }
             }
 
             let { x, y, width, height } = $reference.getBoundingClientRect()
@@ -1467,7 +1475,12 @@ const TW2MapTooltip = function (selector) {
             setTimeout(() => {
                 activeColorPicker = (event) => {
                     if (event.target.classList.contains('color')) {
-                        callback(event.target.dataset.color)
+                        const color = event.target.dataset.color
+                        const confirmUpdate = callback(color)
+
+                        if (confirmUpdate) {
+                            updateActiveColor(color)
+                        }
 
                         if (flag !== KEEP_COLORPICKER_OPEN) {
                             closeColorPicker()
@@ -1819,6 +1832,7 @@ const TW2MapTooltip = function (selector) {
                     $color.dataset.color = pickedColor
                     $color.style.backgroundColor = pickedColor
                     map.changeSetting(id, pickedColor)
+                    return true
                 }, KEEP_COLORPICKER_OPEN)
             })
         }
