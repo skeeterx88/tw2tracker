@@ -1507,7 +1507,7 @@ const TW2MapTooltip = function (selector) {
         }
 
         const closeColorPicker = () => {
-            $colorPicker.removeEventListener('mousedown', activeColorPicker)
+            $colorPicker.removeEventListener('mouseup', activeColorPicker)
             $colorPicker.style.visibility = 'hidden'
             $colorPicker.style.opacity = 0
             activeColorPicker = false
