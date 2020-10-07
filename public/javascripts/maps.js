@@ -1210,6 +1210,15 @@ const TW2MapTooltip = function (selector) {
     let notif
     const KEEP_COLORPICKER_OPEN = 'keep_colorpicker_open'
 
+    const getElemPosition = function ($ref) {
+        let { x, y, width, height } = $ref.getBoundingClientRect()
+
+        x = Math.floor(x + width + 5)
+        y = Math.floor(y + height + 5)
+
+        return { x, y }
+    }
+
     const setupQuickJump = () => {
         const $quickJumpX = document.querySelector('#quick-jump-x')
         const $quickJumpY = document.querySelector('#quick-jump-y')
@@ -1465,10 +1474,7 @@ const TW2MapTooltip = function (selector) {
 
             clearActiveColor()
 
-            let { x, y, width, height } = $reference.getBoundingClientRect()
-
-            x = Math.floor(x + width + 5)
-            y = Math.floor(y + height + 5)
+            let { x, y } = getElemPosition($reference)
 
             $colorPicker.style.visibility = 'visible'
             $colorPicker.style.opacity = 1
@@ -1779,6 +1785,10 @@ const TW2MapTooltip = function (selector) {
             $allWorlds.classList.toggle('hidden')
 
             if (visible = !visible) {
+                const { x, y } = getElemPosition($currentWorld)
+                $allWorlds.style.left = x + 'px'
+                $allWorlds.style.top = y + 'px'
+
                 addEventListener('mousedown', closeHandler)
             }
         })
@@ -1815,6 +1825,10 @@ const TW2MapTooltip = function (selector) {
             $settings.classList.toggle('hidden')
 
             if (visible = !visible) {
+                const { x, y } = getElemPosition($changeSettings)
+                $settings.style.left = x + 'px'
+                $settings.style.top = y + 'px'
+
                 addEventListener('mousedown', closeHandler)
             }
         })
