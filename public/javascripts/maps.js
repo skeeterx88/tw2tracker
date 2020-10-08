@@ -931,6 +931,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         if (settingTriggers.hasOwnProperty(id)) {
             settingTriggers[id]()
         }
+
+        this.trigger('change setting', [id, value])
     }
 
     setupZoom()
@@ -1604,6 +1606,75 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
+    const setupSettings = () => {
+        let visible = false
+
+        const $settings = document.querySelector('#settings')
+        const $changeSettings = document.querySelector('#change-settings')
+        const $colorOptions = document.querySelectorAll('#settings .color-option')
+
+        const closeHandler = function (event) {
+            const keep = ['#color-picker', '#settings', '#change-settings'].some((selector) => {
+                return event.target.closest(selector)
+            })
+
+            if (!keep) {
+                $settings.classList.add('hidden')
+                removeEventListener('mousedown', closeHandler)
+                visible = false
+            }
+        }
+
+        $changeSettings.addEventListener('mouseup', () => {
+            if (visible) {
+                $settings.classList.add('hidden')
+                visible = false
+                return
+            }
+
+            $settings.classList.toggle('hidden')
+
+            if (visible = !visible) {
+                const { x, y } = getElemPosition($changeSettings)
+                $settings.style.left = x + 'px'
+                $settings.style.top = y + 'px'
+
+                addEventListener('mousedown', closeHandler)
+            }
+        })
+
+        for (let $option of $colorOptions) {
+            const id = $option.dataset.settingId
+            const color = map.getSetting(id)
+
+            const $color = document.createElement('div')
+            $color.classList.add('color')
+            $color.classList.add('open-color-picker')
+            $color.dataset.color = color
+            $color.style.backgroundColor = color
+
+            $option.appendChild($color)
+
+            $color.addEventListener('click', () => {
+                colorPicker($color, $color.dataset.color, (pickedColor) => {
+                    $color.dataset.color = pickedColor
+                    $color.style.backgroundColor = pickedColor
+                    map.changeSetting(id, pickedColor)
+                    return true
+                }, KEEP_COLORPICKER_OPEN)
+            })
+        }
+
+        map.on('change setting', (id, value) => {
+            const $color = $settings.querySelector('div[data-setting-id="' + id + '"] .color')
+
+            if ($color) {
+                $color.dataset.color = value
+                $color.style.backgroundColor = value
+            }
+        })
+    }
+
     const setupMapShare = async () => {
         const $mapShare = document.querySelector('#map-share')
         const $mapSave = document.querySelector('#map-save')
@@ -1821,66 +1892,6 @@ const TW2MapTooltip = function (selector) {
         changeWorldList(marketId)
     }
 
-    const setupSettings = () => {
-        let visible = false
-
-        const $settings = document.querySelector('#settings')
-        const $changeSettings = document.querySelector('#change-settings')
-        const $colorOptions = document.querySelectorAll('#settings .color-option')
-
-        const closeHandler = function (event) {
-            const keep = ['#color-picker', '#settings', '#change-settings'].some((selector) => {
-                return event.target.closest(selector)
-            })
-
-            if (!keep) {
-                $settings.classList.add('hidden')
-                removeEventListener('mousedown', closeHandler)
-                visible = false
-            }
-        }
-
-        $changeSettings.addEventListener('mouseup', () => {
-            if (visible) {
-                $settings.classList.add('hidden')
-                visible = false
-                return
-            }
-
-            $settings.classList.toggle('hidden')
-
-            if (visible = !visible) {
-                const { x, y } = getElemPosition($changeSettings)
-                $settings.style.left = x + 'px'
-                $settings.style.top = y + 'px'
-
-                addEventListener('mousedown', closeHandler)
-            }
-        })
-
-        for (let $option of $colorOptions) {
-            const id = $option.dataset.settingId
-            const color = map.getSetting(id)
-
-            const $color = document.createElement('div')
-            $color.classList.add('color')
-            $color.classList.add('open-color-picker')
-            $color.dataset.color = color
-            $color.style.backgroundColor = color
-
-            $option.appendChild($color)
-
-            $color.addEventListener('click', () => {
-                colorPicker($color, $color.dataset.color, (pickedColor) => {
-                    $color.dataset.color = pickedColor
-                    $color.style.backgroundColor = pickedColor
-                    map.changeSetting(id, pickedColor)
-                    return true
-                }, KEEP_COLORPICKER_OPEN)
-            })
-        }
-    }
-
     const mapSettings = {
         hexagonVillages: true,
         zoomLevel: 3
@@ -1896,8 +1907,8 @@ const TW2MapTooltip = function (selector) {
     setupDisplayLastSync()
     setupDisplayPosition()
     setupCommonEvents()
-    setupMapShare()
     setupNotif()
     setupWorldList()
     setupSettings()
+    setupMapShare()
 })()
