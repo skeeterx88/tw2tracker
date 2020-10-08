@@ -208,7 +208,9 @@ router.post('/api/create-share', async function (req, res) {
         marketId,
         worldNumber,
         highlights,
-        type
+        type,
+        settings,
+        center
     } = req.body
 
     try {
@@ -233,7 +235,9 @@ router.post('/api/create-share', async function (req, res) {
         const highlightsString = JSON.stringify(highlights)
         const shareId = utils.makeid(20)
 
-        await db.query(sql.addMapShare, [shareId, marketId, worldNumber, type, highlightsString])
+        const settingsString = JSON.stringify(settings)
+
+        await db.query(sql.addMapShare, [shareId, marketId, worldNumber, type, highlightsString, settingsString, center.x, center.y])
 
         response.success = true
         response.url = `/maps/${marketId}/${worldNumber}/share/${shareId}`

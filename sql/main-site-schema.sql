@@ -28,6 +28,9 @@ CREATE TABLE main.maps_share (
     world_number SMALLINT,
     highlights TEXT NOT NULL,
     type VARCHAR (7) NOT NULL,
+    center_x SMALLINT DEFAULT 500,
+    center_y SMALLINT DEFAULT 500,
+    settings TEXT NOT NULL,
     creation_date TIMESTAMP DEFAULT NOW(),
     last_access TIMESTAMP DEFAULT NOW()
 );

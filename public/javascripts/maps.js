@@ -60,6 +60,17 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             clearDemarcations()
             renderVisibleDemarcations()
             renderViewport()
+        },
+        zoomLevel: () => {
+            const currentCenterX = Math.floor(positionX / zoomSettings.tileSize)
+            const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
+
+            setupZoom()
+            renderVisibleDemarcations()
+            renderVisibleContinents()
+            renderViewport()
+
+            this.moveTo(currentCenterX, currentCenterY)
         }
     }
 
@@ -329,16 +340,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
             if (newZoom !== false) {
                 settings.zoomLevel = newZoom
-
-                const currentCenterX = Math.floor(positionX / zoomSettings.tileSize)
-                const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
-
-                setupZoom()
-                renderVisibleDemarcations()
-                renderVisibleContinents()
-                renderViewport()
-
-                this.moveTo(currentCenterX, currentCenterY)
+                settingTriggers.zoomLevel()
             }
         })
     }
@@ -883,7 +885,19 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             marketId,
             worldNumber,
             highlights: highlightsExport,
-            type
+            type,
+            center: {
+                x: centerCoordX,
+                y: centerCoordY
+            },
+            settings: {
+                zoomLevel: settings.zoomLevel,
+                neutralColor: settings.neutralColor,
+                barbarianColor: settings.barbarianColor,
+                backgroundColor: settings.backgroundColor,
+                highlightPlayerColor: settings.highlightPlayerColor,
+                demarcationsColor: settings.demarcationsColor
+            }
         })
     }
 
@@ -1627,6 +1641,17 @@ const TW2MapTooltip = function (selector) {
 
             const mapShare = getMapShare.data
             const highlights = JSON.parse(mapShare.highlights)
+            const settings = JSON.parse(mapShare.settings)
+            const x = mapShare.center_x
+            const y = mapShare.center_y
+
+            map.moveTo(x, y)
+
+            if (settings) {
+                for (let [id, value] of Object.entries(settings)) {
+                    map.changeSetting(id, value)
+                }
+            }
 
             await Promise.all([
                 loader.loadPlayers,

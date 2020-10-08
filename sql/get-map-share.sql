@@ -1,4 +1,4 @@
-SELECT highlights, type, creation_date
+SELECT highlights, type, creation_date, settings, center_x, center_y
 FROM main.maps_share
 WHERE share_id = $1
 AND world_market = $2
