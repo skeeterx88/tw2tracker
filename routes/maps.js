@@ -98,9 +98,10 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
     })
 })
 
-router.get('/api/:marketId/:worldNumber/players', async function (req, res) {
+router.get('/api/:marketId/:worldNumber/players/:mapShareId?', async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
+    const mapShareId = req.params.mapShareId
     const worldId = marketId + worldNumber
 
     const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
@@ -111,7 +112,17 @@ router.get('/api/:marketId/:worldNumber/players', async function (req, res) {
         return false
     }
 
-    fs.promises.readFile(path.join('.', 'data', worldId, 'players'))
+    let dataPath
+
+    if (mapShareId) {
+        const mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        const dateId = utils.getHourlyDir(mapShare.creation_date)
+        dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'players')
+    } else {
+        dataPath = path.join('.', 'data', worldId, 'players')
+    }
+
+    fs.promises.readFile(dataPath)
     .then(function (data) {
         res.setHeader('Content-Encoding', 'zlib')
         res.end(data)
@@ -122,9 +133,10 @@ router.get('/api/:marketId/:worldNumber/players', async function (req, res) {
     })
 })
 
-router.get('/api/:marketId/:worldNumber/tribes', async function (req, res) {
+router.get('/api/:marketId/:worldNumber/tribes/:mapShareId?', async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
+    const mapShareId = req.params.mapShareId
     const worldId = marketId + worldNumber
 
     const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
@@ -135,7 +147,17 @@ router.get('/api/:marketId/:worldNumber/tribes', async function (req, res) {
         return false
     }
 
-    fs.promises.readFile(path.join('.', 'data', worldId, 'tribes'))
+    let dataPath
+
+    if (mapShareId) {
+        const mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        const dateId = utils.getHourlyDir(mapShare.creation_date)
+        dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'tribes')
+    } else {
+        dataPath = path.join('.', 'data', worldId, 'tribes')
+    }
+
+    fs.promises.readFile(dataPath)
     .then(function (data) {
         res.setHeader('Content-Encoding', 'zlib')
         res.end(data)
@@ -147,11 +169,12 @@ router.get('/api/:marketId/:worldNumber/tribes', async function (req, res) {
 })
 
 
-router.get('/api/:marketId/:worldNumber/continent/:continentId', async function (req, res) {
+router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
     const continentId = req.params.continentId
+    const mapShareId = req.params.mapShareId
 
     const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
 
@@ -167,7 +190,17 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId', async function 
         return false
     }
 
-    fs.promises.readFile(path.join('.', 'data', worldId, continentId))
+    let dataPath
+
+    if (mapShareId) {
+        const mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        const dateId = utils.getHourlyDir(mapShare.creation_date)
+        dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, continentId)
+    } else {
+        dataPath = path.join('.', 'data', worldId, continentId)
+    }
+
+    fs.promises.readFile(dataPath)
     .then(function (data) {
         res.setHeader('Content-Encoding', 'zlib')
         res.end(data)
@@ -236,8 +269,30 @@ router.post('/api/create-share', async function (req, res) {
         const shareId = utils.makeid(20)
 
         const settingsString = JSON.stringify(settings)
+        const mapShare = await db.one(sql.addMapShare, [shareId, marketId, worldNumber, type, highlightsString, settingsString, center.x, center.y])
 
-        await db.query(sql.addMapShare, [shareId, marketId, worldNumber, type, highlightsString, settingsString, center.x, center.y])
+        if (type === MAP_SHARE_TYPES.static) {
+            const dateId = utils.getHourlyDir(mapShare.creation_date)
+            const worldId = marketId + worldNumber
+            const copyDestination = path.join('.', 'data', 'static-maps', worldId, dateId)
+
+            try {
+                await fs.promises.access(copyDestination)
+            } catch {
+                const worldDataLocation = path.join('.', 'data', worldId)
+                const worldData = await fs.promises.readdir(worldDataLocation)
+                const toCopy = worldData.filter((file) => file !== 'struct')
+
+                await fs.promises.mkdir(copyDestination, { recursive: true })
+
+                for (let file of toCopy) {
+                    await fs.promises.copyFile(
+                        path.join(worldDataLocation, file),
+                        path.join(copyDestination, file)
+                    )
+                }
+            }
+        }
 
         response.success = true
         response.url = `/maps/${marketId}/${worldNumber}/share/${shareId}`

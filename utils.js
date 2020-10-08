@@ -29,10 +29,18 @@ const makeid = function (length) {
     return result
 }
 
+const getHourlyDir = function (now) {
+    const rawNow = (now || new Date()).toISOString()
+    const [date, rawTime] = rawNow.split('T')
+    const [hour] = rawTime.split(':')
+    return date + '-' + hour
+}
+
 module.exports = {
     noop,
     schemaExists,
     worldEntryExists,
     extractNumbers,
-    makeid
+    makeid,
+    getHourlyDir
 }

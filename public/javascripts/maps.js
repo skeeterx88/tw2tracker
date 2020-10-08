@@ -1064,7 +1064,11 @@ const DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadPlayers = new Promise(async (resolve) => {
-        const load = await fetch(`/maps/api/${marketId}/${worldNumber}/players`)
+        const url = mapShareId
+            ? `/maps/api/${marketId}/${worldNumber}/players/${mapShareId}`
+            : `/maps/api/${marketId}/${worldNumber}/players`
+
+        const load = await fetch(url)
         const gzipped = await load.arrayBuffer()
         this.players = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
 
@@ -1082,6 +1086,10 @@ const DataLoader = function (marketId, worldNumber) {
     })
 
     this.loadTribes = new Promise(async (resolve) => {
+        const url = mapShareId
+            ? `/maps/api/${marketId}/${worldNumber}/tribes/${mapShareId}`
+            : `/maps/api/${marketId}/${worldNumber}/tribes`
+
         const load = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
         const gzipped = await load.arrayBuffer()
         this.tribes = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
@@ -1105,7 +1113,11 @@ const DataLoader = function (marketId, worldNumber) {
         }
 
         continentPromises[continent] = new Promise(async (resolve) => {
-            const load = await fetch(`/maps/api/${marketId}/${worldNumber}/continent/${continent}`)
+            const url = mapShareId
+                ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShareId}`
+                : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`
+
+            const load = await fetch(url)
             const gzipped = await load.arrayBuffer()
             const villages = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
             
@@ -1697,10 +1709,20 @@ const TW2MapTooltip = function (selector) {
         })
 
         $mapSave.addEventListener('click', async () => {
-            notif({
-                title: 'Static map',
-                content: 'Static maps are not available yet!'
-            })
+            const result = await map.shareMap('static')
+
+            if (result.success) {
+                notif({
+                    title: 'Static map',
+                    link: location.origin + result.url,
+                    timeout: 0
+                })
+            } else {
+                notif({
+                    title: 'Error generating map',
+                    content: result.message
+                })
+            }
         })
 
         if (mapShareId) {
