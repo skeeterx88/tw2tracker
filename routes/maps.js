@@ -3,6 +3,8 @@ const path = require('path')
 const express = require('express')
 const router = express.Router()
 const utils = require('../utils')
+const zlib = require('zlib')
+const EMPTY_CONTINENT = zlib.gzipSync('{}')
 
 const db = require('../db')
 const sql = require('../sql')
@@ -171,8 +173,8 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId', async function 
         res.end(data)
     })
     .catch(function () {
-        res.setHeader('Content-Type', 'application/json')
-        res.end('{}')
+        res.setHeader('Content-Encoding', 'zlib')
+        res.end(EMPTY_CONTINENT)
     })
 })
 
