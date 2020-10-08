@@ -1,4 +1,11 @@
-const settings = require('./settings')
+let settings
+
+try {
+    settings = require('./settings.json')
+} catch {
+    settings = require('./settings.defaults.json')
+}
+
 const pgp = require('pg-promise')()
 const db = pgp({
     user: settings.db_user,
