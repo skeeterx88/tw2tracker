@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "autoreload": "TZ=UTC nodemon ./bin/www --tw2tracker",
-    "start": "TZ=UTC node ./bin/www --tw2tracker"
+    "start": "TZ=UTC node ./bin/www --tw2tracker",
+    "install": "node ./install.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -23,6 +24,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.3.3",
     "pg-promise": "^10.6.1",
-    "puppeteer-core": "^5.2.1"
+    "puppeteer-core": "^5.2.1",
+    "xdg-basedir": "^4.0.0"
   }
 }

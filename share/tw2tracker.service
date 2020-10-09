@@ -5,10 +5,10 @@ After=network.target
 [Service]
 Environment=PORT=3000
 Environment=TZ=UTC
-Environment=NODE_ENV=production
+Environment=NODE_ENV=${tw2tracker.environment}
 Type=simple
-User=arch
-WorkingDirectory=/var/www/tw2tracker
+${tw2tracker.user}
+WorkingDirectory=${tw2tracker.directory}
 ExecStart=npm start
 Restart=always
 
