@@ -43,6 +43,11 @@ const puppeteerBrowser = async function () {
 const Sync = {}
 
 Sync.init = async function () {
+    process.on('SIGTERM', async function () {
+        console.log('Stopping tw2tracker')
+        process.exit()
+    })
+
     try {
         await Sync.createInitialStructure()
 
