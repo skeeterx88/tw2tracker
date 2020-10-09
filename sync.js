@@ -276,7 +276,7 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
     }
 }
 
-Sync.scrappeAllWorlds = async function () {
+Sync.scrappeAllWorlds = async function (ignoreLastSync = false) {
     console.log('Sync.scrappeAllWorlds()')
 
     let worlds
@@ -298,7 +298,7 @@ Sync.scrappeAllWorlds = async function () {
 
     for (let world of worlds) {
         try {
-            await Sync.scrappeWorld(world.market, world.num)
+            await Sync.scrappeWorld(world.market, world.num, ignoreLastSync)
         } catch (error) {
             console.log(error.message)
         }
