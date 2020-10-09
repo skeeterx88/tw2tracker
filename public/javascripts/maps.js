@@ -13,85 +13,37 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         throw new Error('Invalid map element')
     }
 
+    const defaults = {
+        hexagonVillages: false,
+        zoomLevel: 2,
+        neutralColor: '#823c0a',
+        barbarianColor: '#4c6f15',
+        backgroundColor: '#436213',
+        highlightPlayerColor: '#ffffff',
+        activeVillageBorderColor: '#ffffff',
+        activeVillageBorderOpacity: '80',
+        demarcationsColor: '#000000'
+    }
+
     settings = {
-        ...{
-            hexagonVillages: false,
-            zoomLevel: 2,
-            neutralColor: '#823c0a',
-            barbarianColor: '#4c6f15',
-            backgroundColor: '#436213',
-            highlightPlayerColor: '#ffffff',
-            activeVillageBorderColor: '#ffffff',
-            activeVillageBorderOpacity: '80',
-            demarcationsColor: '#000000'
-        },
+        ...defaults,
         ...settings
     }
 
-    const settingTriggers = {
-        neutralColor: () => {
-            renderedZoomContinents = []
-
-            for (let i = 0; i < zoomLevels.length; i++) {
-                renderedZoomContinents.push({})
-            }
-
-            renderVisibleContinents()
-        },
-        barbarianColor: () => {
-            renderedZoomContinents = []
-
-            for (let i = 0; i < zoomLevels.length; i++) {
-                renderedZoomContinents.push({})
-            }
-
-            renderVisibleContinents()
-        },
-        backgroundColor: () => {
-            $container.style.backgroundColor = settings.backgroundColor
-        },
-        demarcationsColor: () => {
-            renderedZoomGrid = []
-
-            for (let i = 0; i < zoomLevels.length; i++) {
-                renderedZoomGrid.push({})
-            }
-
-            clearDemarcations()
-            renderVisibleDemarcations()
-            renderViewport()
-        },
-        zoomLevel: () => {
-            const currentCenterX = Math.floor(positionX / zoomSettings.tileSize)
-            const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
-
-            setupZoom()
-            renderVisibleDemarcations()
-            renderVisibleContinents()
-            renderViewport()
-
-            this.moveTo(currentCenterX, currentCenterY)
-        }
-    }
-
-    const MAP_SIZE = 1000
-    const TILE_COUNT = Math.pow(MAP_SIZE, 2)
-    const BITS_IN_TILE = 5
-    const BITS_IN_TILE_PER_BYTE = BITS_IN_TILE / 8
-
+    let activeVillage = false
     let renderEnabled = false
+    let zoomSettings
 
+    const $zoomElements = {}
     const $viewport = document.createElement('canvas')
     const $viewportContext = $viewport.getContext('2d')
+    const $overlay = document.createElement('canvas')
+    const $overlayContext = $overlay.getContext('2d')
 
     let $cache
     let $cacheContext
-
     let $grid
     let $gridContext
-
-    const $overlay = document.createElement('canvas')
-    const $overlayContext = $overlay.getContext('2d')
 
     const { x, y, width, height } = $container.getBoundingClientRect()
     let viewportWidth = width ? width : window.innerWidth
@@ -102,8 +54,17 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     let middleViewportOffsetX = Math.floor(viewportWidth / 2)
     let middleViewportOffsetY = Math.floor(viewportHeight / 2)
 
-    let zoomSettings
-    const zoomCache = {}
+    let positionX
+    let positionY
+    let centerCoordX
+    let centerCoordY
+    let mouseCoordX
+    let mouseCoordY
+
+    const events = {}
+
+    let renderedZoomContinents
+    let renderedZoomGrid
 
     const zoomLevels = [{
         villageSize: 1,
@@ -145,16 +106,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         provinceOpacity: '60'
     }]
 
-    let positionX
-    let positionY
-    let centerCoordX
-    let centerCoordY
-    let mouseCoordX
-    let mouseCoordY
-
-    let activeVillage = false
-
-    const borderOffsets = [
+    const BORDERS_OFFSET = [
         {x: -1, y: 0},
         {x: -1, y: -1},
         {x: +1, y: -1},
@@ -162,16 +114,6 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         {x: +1, y: +1},
         {x: -1, y: +1}
     ]
-
-    const events = {}
-
-    let renderedZoomContinents = []
-    let renderedZoomGrid = []
-
-    for (let i = 0; i < zoomLevels.length; i++) {
-        renderedZoomContinents.push({})
-        renderedZoomGrid.push({})
-    }
 
     const HIGHLIGHT_CATEGORIES = {
         players: 'players',
@@ -183,6 +125,49 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         [HIGHLIGHT_CATEGORIES.tribes]: {}
     }
 
+    const settingTriggers = {}
+
+    settingTriggers.neutralColor = () => {
+        resetZoomContinents()
+        renderVisibleContinents()
+    }
+
+    settingTriggers.barbarianColor = () => {
+        resetZoomContinents()
+        renderVisibleContinents()
+    }
+
+    settingTriggers.backgroundColor = () => {
+        $container.style.backgroundColor = settings.backgroundColor
+    }
+
+    settingTriggers.demarcationsColor = () => {
+        resetZoomGrid()
+        clearDemarcations()
+        renderVisibleDemarcations()
+        renderViewport()
+    }
+
+    settingTriggers.zoomLevel = () => {
+        const currentCenterX = Math.floor(positionX / zoomSettings.tileSize)
+        const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
+
+        setupZoom()
+        renderVisibleDemarcations()
+        renderVisibleContinents()
+        renderViewport()
+
+        this.moveTo(currentCenterX, currentCenterY)
+    }
+
+    const resetZoomContinents = () => {
+        renderedZoomContinents = Array.from({ length: zoomLevels.length }).map(zoom => Object())
+    }
+
+    const resetZoomGrid = () => {
+        renderedZoomGrid = Array.from({ length: zoomLevels.length }).map(zoom => Object())
+    }
+
     const setupZoom = function () {
         zoomSettings = zoomLevels[settings.zoomLevel]
 
@@ -190,7 +175,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         zoomSettings.mapWidth = 1000 * zoomSettings.tileSize
         zoomSettings.mapHeight = 1000 * zoomSettings.tileSize
 
-        if (!zoomCache.hasOwnProperty(settings.zoomLevel)) {
+        if (!$zoomElements.hasOwnProperty(settings.zoomLevel)) {
             $cache = document.createElement('canvas')
             $cacheContext = $cache.getContext('2d')
 
@@ -203,7 +188,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             $grid.width = zoomSettings.mapWidth
             $grid.height = zoomSettings.mapHeight
 
-            zoomCache[settings.zoomLevel] = {
+            $zoomElements[settings.zoomLevel] = {
                 $cache,
                 $cacheContext,
                 $grid,
@@ -215,7 +200,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 $cacheContext,
                 $grid,
                 $gridContext
-            } = zoomCache[settings.zoomLevel])
+            } = $zoomElements[settings.zoomLevel])
         }
     }
 
@@ -444,7 +429,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             for (let x = startX; x < endX; x++) {
                 for (let y = startY; y < endY; y++) {
                     
-                    const tilePos = y + MAP_SIZE * x
+                    const tilePos = y + 1000 * x
                     const fiveBits = readBitsAt(loader.struct, tilePos)
 
                     // has border
@@ -471,7 +456,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                             const neighbourTile = readBitsAt(loader.struct, borders[i])
 
                             if (neighbourTile >>> 4) {
-                                $gridContext.fillRect(x * zoomSettings.tileSize + borderOffsets[i].x, y * zoomSettings.tileSize + borderOffsets[i].y, 1, 1)
+                                $gridContext.fillRect(x * zoomSettings.tileSize + BORDERS_OFFSET[i].x, y * zoomSettings.tileSize + borderOffsets[i].y, 1, 1)
                             }
                         }
 
@@ -485,12 +470,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const readBitsAt = (view, tilePos) => {
-        if (tilePos < 0 || tilePos >= TILE_COUNT) {
+        if (tilePos < 0 || tilePos >= 1000000) {
             return;
         }
 
         var bytePosInSegment    = tilePos % 8,
-            byteOffset          = (tilePos - bytePosInSegment) * BITS_IN_TILE_PER_BYTE,
+            byteOffset          = (tilePos - bytePosInSegment) * 0.625,
             result;
 
         switch (bytePosInSegment) {
@@ -529,19 +514,19 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     const getRowNeighbourTilePosition = (x, y) => {
         return y & 1 ? [
-            (MAP_SIZE * (x - 1)) + y,
-            (MAP_SIZE * x) + y - 1,
-            (MAP_SIZE * (x + 1)) + y - 1,
-            (MAP_SIZE * (x + 1)) + y,
-            (MAP_SIZE * (x + 1)) + y + 1,
-            (MAP_SIZE * x) + y + 1
+            (1000 * (x - 1)) + y,
+            (1000 * x) + y - 1,
+            (1000 * (x + 1)) + y - 1,
+            (1000 * (x + 1)) + y,
+            (1000 * (x + 1)) + y + 1,
+            (1000 * x) + y + 1
         ] : [
-            (MAP_SIZE * (x - 1)) + y,
-            (MAP_SIZE * (x - 1)) + y - 1,
-            (MAP_SIZE * x) + y - 1,
-            (MAP_SIZE * (x + 1)) + y,
-            (MAP_SIZE * x) + y + 1,
-            (MAP_SIZE * (x - 1)) + y + 1
+            (1000 * (x - 1)) + y,
+            (1000 * (x - 1)) + y - 1,
+            (1000 * x) + y - 1,
+            (1000 * (x + 1)) + y,
+            (1000 * x) + y + 1,
+            (1000 * (x - 1)) + y + 1
         ];
     }
 
@@ -827,9 +812,9 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         renderVillages(redrawVillages)
 
-        for (let zoomLevel in zoomCache) {
+        for (let zoomLevel in $zoomElements) {
             if (zoomLevel !== settings.zoomLevel) {
-                renderVillages(redrawVillages, zoomCache[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
+                renderVillages(redrawVillages, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
             }
         }
 
@@ -942,6 +927,9 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     setupElements()
     mouseEvents()
+
+    resetZoomContinents()
+    resetZoomGrid()
 
     Promise.all([
         loader.loadPlayers,
