@@ -11,6 +11,7 @@ const zlib = require('zlib')
 const path = require('path')
 
 let browser = null
+let page = null
 
 const getHTML = function (url) {
     return new Promise(function (resolve) {
@@ -37,6 +38,16 @@ const puppeteerBrowser = async function () {
             headless: true,
             executablePath: '/usr/bin/chromium'
         })
+    }
+}
+
+const puppeteerPage = async function () {
+    if (!browser) {
+        await puppeteerBrowser()
+    }
+
+    if (!page) {
+        page = await browser.newPage()
     }
 }
 
@@ -179,8 +190,7 @@ Sync.registerWorlds = async function () {
 Sync.registerCharacter = async function (marketId, worldNumber) {
     console.log('Sync.registerCharacter() market:' + marketId + ', world:' + worldNumber)
 
-    await puppeteerBrowser()
-    const page = await browser.newPage()
+    await puppeteerPage()
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
 
     await page.evaluate(function (marketId, worldNumber) {
@@ -196,7 +206,6 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
 
     await page.waitFor(3000)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
-    await page.close()
 
     console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
 }
@@ -210,8 +219,7 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
 
     console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
 
-    await puppeteerBrowser()
-    const page = await browser.newPage()
+    await puppeteerPage()
 
     try {
         const urlId = marketId === 'zz' ? 'beta' : marketId
@@ -267,16 +275,13 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
         try {
             await page.waitForSelector('.player-worlds', { timeout: 3000 })
         } catch (error) {
-            await page.close()
             throw new Error('Sync.auth: Authentication to market:' + marketId + ' failed "unknown reason"')
         }
 
         authenticatedMarkets[marketId] = account
 
-        await page.close()
         return account
     } catch (error) {
-        await page.close()
         throw new Error(error.message)
     }
 }
@@ -351,8 +356,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = fals
         }
     }
 
-    await puppeteerBrowser()
-    const page = await browser.newPage()
+    await puppeteerPage()
 
     page.on('console', function (msg) {
         if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
@@ -384,7 +388,6 @@ Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = fals
         }
 
         const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
-        await page.close()
 
         const schema = marketId + worldNumber
 
@@ -453,7 +456,6 @@ Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = fals
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
     } catch (error) {
-        await page.close()
         throw new Error('Sync.scrappeWorld: Failed to synchronize ' + marketId + worldNumber + ' (' + error.message + ')')
     }
 }
