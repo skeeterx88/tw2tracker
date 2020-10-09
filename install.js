@@ -3,6 +3,7 @@
     let runAs = 'arch'
     let environmentType
 
+    const os = require('os')
     const { exec } = require('child_process')
     const fs = require('fs').promises
     const path = require('path')
@@ -12,6 +13,11 @@
         input: process.stdin,
         output: process.stdout
     })
+
+    if (os.platform() !== 'linux') {
+        process.stdout.write('This installer only works on Linux.\n')
+        process.exit(1)
+    }
 
     async function install () {
         try {
