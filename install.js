@@ -60,7 +60,7 @@
             if (process.env.SUDO_UID) {
                 resolve()
             } else {
-                rl.question('You need root access to run this.\nDo you want to install with the current user? [y/n] ', function (response) {
+                rl.question('You need root access to run this.\nDo you want to install with the current user? [Y/n] ', function (response) {
                     if (!response || /y|/i.test(response)) {
                         isUser = true
                         resolve()
@@ -77,7 +77,7 @@
             if (process.env.SUDO_UID) {
                 resolve()
             } else {
-                rl.question('You need root access to run this.\nDo you want to install with the current user? [y/n] ', function (response) {
+                rl.question('You need root access to run this.\nDo you want to install with the current user? [Y/n] ', function (response) {
                     if (!/^y|$/i.test(response)) {
                         isUser = true
                         resolve()
@@ -127,7 +127,7 @@
                     await fs.access('/etc/systemd/system/tw2tracker.service')
                 }
 
-                rl.question('Systemd unit already exists, replace it? [y/n] ', function (response) {
+                rl.question('Systemd unit already exists, replace it? [Y/n] ', function (response) {
                     if (/^y|$/i.test(response)) {
                         resolve()
                     } else {
@@ -158,7 +158,7 @@
         return new Promise(function (resolve, reject) {
             const command = isUser ? 'systemctl --user enable tw2tracker.service' : 'systemctl enable tw2tracker.service'
 
-            rl.question('Enable unit to init on system start-up automatically? [y/n] ', function (response) {
+            rl.question('Enable unit to init on system start-up automatically? [Y/n] ', function (response) {
                 if (/^y|$/i.test(response)) {
                     exec(command, function (error) {
                         if (error) {
@@ -176,7 +176,7 @@
 
     function setEnvironment () {
         return new Promise(function (resolve, reject) {
-            rl.question('Is this a development environment? [y/n] ', async function (response) {
+            rl.question('Is this a development environment? [Y/n] ', async function (response) {
                 environmentType = /n/i.test(response) ? 'production' : 'development'
                 resolve()
             })
