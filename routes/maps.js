@@ -49,6 +49,8 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
         worldName: worldInfo.name,
         lastSync,
         mapShareId: '',
+        mapShareType: '',
+        mapShareCreationDate: '',
         allWorlds: JSON.stringify(allWorlds),
         allMarkets: JSON.stringify(allMarkets),
         development: process.env.NODE_ENV === 'development'
@@ -84,6 +86,8 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
 
     const worldId = marketId + worldNumber
     const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
+    const mapShareType = mapShare ? mapShare.type : ''
+    const mapShareCreationDate = mapShare ? new Date(mapShare.creation_date).getTime() : '0'
 
     res.render('map', {
         title: 'Map ' + worldId + ' - ' + settings.site_name,
@@ -92,6 +96,8 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
         worldName: worldInfo.name,
         lastSync,
         mapShareId,
+        mapShareType,
+        mapShareCreationDate,
         allWorlds: JSON.stringify(allWorlds),
         allMarkets: JSON.stringify(allMarkets),
         development: process.env.NODE_ENV === 'development'

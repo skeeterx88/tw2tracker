@@ -415,6 +415,23 @@ div.text-container {
     text-shadow: 1px 1px 0px #00000090;
 }
 
+#last-sync.hidden {
+    display: none;
+}
+
+#share-date {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    z-index: 10;
+    color: #a59a8a;
+    text-shadow: 1px 1px 0px #00000090;
+}
+
+#share-date.hidden {
+    display: none;
+}
+
 #display-position {
     position: absolute;
     left: 128px;

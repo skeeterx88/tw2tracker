@@ -1549,53 +1549,25 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupDisplayLastSync = () => {
-        const $lastSync = document.querySelector('#last-sync-date')
+        const $lastSync = document.querySelector('#last-sync')
+        const $lastSyncDate = document.querySelector('#last-sync-date')
 
         if (!lastSync) {
-            $lastSync.innerHTML = 'never'
+            $lastSyncDate.innerHTML = 'never'
 
             return
         }
 
-        const formatSince = (lastSync) => {
-            const elapsedTime = Date.now() - lastSync
+        $lastSyncDate.innerHTML = formatSince(lastSync)
+        $lastSync.classList.remove('hidden')
+    }
 
-            const seconds = elapsedTime / 1000
-            const minutes = seconds / 60
-            const hours = minutes / 60
-            const days = hours / 24
+    const setupDisplayShareDate =  () => {
+        const $shareDate = document.querySelector('#share-date')
+        const $shareDateDate = document.querySelector('#share-date-date')
 
-            let format = ''
-
-            if (minutes <= 1) {
-                format = 'just now'
-            } else if (hours <= 1) {
-                format = Math.floor(minutes) + ' minutes ago'
-            } else if (days <= 1) {
-                if (hours < 2) {
-                    format = '1 hour ago'
-                } else {
-                    format = Math.floor(hours) + ' hours ago'
-                }
-            } else {
-                if (days > 2) {
-                    format = Math.floor(days) + ' days ago'
-                } else {
-                    const dayHours = hours % 24
-
-                    if (dayHours <= 2) {
-                        format = '1 day ago'
-                    } else {
-                        format = '1 day and ' + Math.floor(dayHours) + ' hours ago'
-                    }
-                    
-                }
-            }
-
-            return format
-        }
-
-        $lastSync.innerHTML = formatSince(lastSync)
+        $shareDateDate.innerHTML = formatSince(mapShareCreationDate)
+        $shareDate.classList.remove('hidden')
     }
 
     const setupDisplayPosition = () => {
@@ -1926,7 +1898,13 @@ const TW2MapTooltip = function (selector) {
     setupQuickJump()
     setupCustomHighlights()
     setupColorPicker()
-    setupDisplayLastSync()
+
+    if (mapShareId && mapShareType === 'static') {
+        setupDisplayShareDate()
+    } else {
+        setupDisplayLastSync()
+    }
+
     setupDisplayPosition()
     setupCommonEvents()
     setupNotif()

@@ -12,6 +12,8 @@
             const worldName = '<%= worldName %>'
             const lastSync = <%= lastSync %>
             const mapShareId = '<%= mapShareId %>'
+            const mapShareType = '<%= mapShareType %>'
+            const mapShareCreationDate = <%= mapShareCreationDate %>
             const allWorlds = <%- allWorlds %>
             const allMarkets = <%- allMarkets %>
         </script>
@@ -130,9 +132,14 @@
             <table></table>
         </div>
 
-        <div id="last-sync" class="text-container">
+        <div id="last-sync" class="text-container hidden">
             <span>Last update:</span>
             <span id="last-sync-date"></span>
+        </div>
+
+        <div id="share-date" class="text-container hidden">
+            <span>Share date:</span>
+            <span id="share-date-date"></span>
         </div>
 
         <div id="display-position" class="text-container">

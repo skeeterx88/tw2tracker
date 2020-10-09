@@ -31,8 +31,8 @@ CREATE TABLE main.maps_share (
     center_x SMALLINT DEFAULT 500,
     center_y SMALLINT DEFAULT 500,
     settings TEXT NOT NULL,
-    creation_date TIMESTAMP DEFAULT NOW(),
-    last_access TIMESTAMP DEFAULT NOW()
+    creation_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    last_access TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 INSERT INTO main.settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 30);
