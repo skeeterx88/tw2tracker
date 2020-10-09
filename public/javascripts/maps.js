@@ -1064,7 +1064,7 @@ const DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadPlayers = new Promise(async (resolve) => {
-        const url = mapShareId
+        const url = mapShareId && mapShareType === 'static'
             ? `/maps/api/${marketId}/${worldNumber}/players/${mapShareId}`
             : `/maps/api/${marketId}/${worldNumber}/players`
 
@@ -1086,7 +1086,7 @@ const DataLoader = function (marketId, worldNumber) {
     })
 
     this.loadTribes = new Promise(async (resolve) => {
-        const url = mapShareId
+        const url = mapShareId && mapShareType === 'static'
             ? `/maps/api/${marketId}/${worldNumber}/tribes/${mapShareId}`
             : `/maps/api/${marketId}/${worldNumber}/tribes`
 
@@ -1113,7 +1113,7 @@ const DataLoader = function (marketId, worldNumber) {
         }
 
         continentPromises[continent] = new Promise(async (resolve) => {
-            const url = mapShareId
+            const url = mapShareId && mapShareType === 'static'
                 ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShareId}`
                 : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`
 

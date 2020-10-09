@@ -50,7 +50,7 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
         lastSync,
         mapShareId: '',
         mapShareType: '',
-        mapShareCreationDate: '',
+        mapShareCreationDate: '0',
         allWorlds: JSON.stringify(allWorlds),
         allMarkets: JSON.stringify(allMarkets),
         development: process.env.NODE_ENV === 'development'
