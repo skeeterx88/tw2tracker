@@ -156,19 +156,22 @@
 
     function enableDaemon () {
         return new Promise(function (resolve, reject) {
-            const command = isUser ? 'systemctl --user enable tw2tracker.service' : 'systemctl enable tw2tracker.service'
+            const enableCommand = isUser ? 'systemctl --user enable tw2tracker.service' : 'systemctl enable tw2tracker.service'
+            const disableCommand = isUser ? 'systemctl --user disable tw2tracker.service' : 'systemctl disable tw2tracker.service'
 
             rl.question('Enable unit to init on system start-up automatically? [Y/n] ', function (response) {
+                const finish = function (error) {
+                    if (error) {
+                        reject(error)
+                    } else {
+                        resolve()
+                    }
+                }
+
                 if (/^y|$/i.test(response)) {
-                    exec(command, function (error) {
-                        if (error) {
-                            reject(error)
-                        } else {
-                            resolve()
-                        }
-                    })
+                    exec(enableCommand, finish)
                 } else {
-                    resolve()
+                    exec(disableCommand, finish)
                 }
             })
         })
