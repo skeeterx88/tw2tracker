@@ -48,10 +48,17 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
+
 app.use(session({
+    store: new (require('connect-pg-simple')(session))({
+        pgPromise: db,
+        schemaName: 'main',
+        tableName: 'session'
+    }),
     secret: 'neko loli pantsu',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }
 }))
 
 passport.use(new LocalStrategy(async function (username, password, callback) {

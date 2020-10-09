@@ -36,4 +36,13 @@ CREATE TABLE main.maps_share (
     last_access TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+CREATE TABLE main.session (
+    sid VARCHAR NOT NULL COLLATE "default",
+    sess JSON NOT NULL,
+    expire TIMESTAMP (6) NOT NULL
+) WITH (OIDS=FALSE);
+
+ALTER TABLE main.session ADD CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX IDX_session_expire ON main.session (expire);
+
 INSERT INTO main.settings (site_name, admin_password, scrapper_interval_minutes) VALUES ('tw2tracker', '123', 30);
