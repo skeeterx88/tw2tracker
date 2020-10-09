@@ -147,12 +147,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     let positionX
     let positionY
-
-    let mouseCoordX = 0
-    let mouseCoordY = 0
-
-    let centerCoordX = 0
-    let centerCoordY = 0
+    let centerCoordX
+    let centerCoordY
+    let mouseCoordX
+    let mouseCoordY
 
     let activeVillage = false
 
@@ -939,6 +937,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     positionX = 500 * zoomSettings.tileSize
     positionY = 500 * zoomSettings.tileSize
+    centerCoordX = 500
+    centerCoordY = 500
 
     setupElements()
     mouseEvents()
@@ -1707,10 +1707,8 @@ const TW2MapTooltip = function (selector) {
             const mapShare = getMapShare.data
             const highlights = JSON.parse(mapShare.highlights)
             const settings = JSON.parse(mapShare.settings)
-            const x = mapShare.center_x
-            const y = mapShare.center_y
 
-            map.moveTo(x, y)
+            map.moveTo(mapShare.center_x, mapShare.center_y)
 
             if (settings) {
                 for (let [id, value] of Object.entries(settings)) {
