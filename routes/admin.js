@@ -68,23 +68,6 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     res.end(JSON.stringify(response))
 })
 
-router.get('/scrapper/all/:flag', ensureLoggedIn, async function (req, res) {
-    const response = {}
-    const flag = req.params.flag
-
-    try {
-        await Sync.scrappeAllWorlds(flag === 'force')
-        response.message = 'worlds synchronized successfully'
-        response.success = true
-    } catch (error) {
-        response.message = error.message
-        response.success = false
-    }
-
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(response))
-})
-
 router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
@@ -108,22 +91,6 @@ router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async funct
             response.message = error.message
             response.success = false
         }
-    }
-
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(response))
-})
-
-router.get('/scrapper/all', ensureLoggedIn, async function (req, res) {
-    const response = {}
-
-    try {
-        await Sync.scrappeAllWorlds()
-        response.message = 'worlds synchronized successfully'
-        response.success = true
-    } catch (error) {
-        response.message = error.message
-        response.success = false
     }
 
     res.setHeader('Content-Type', 'application/json')
