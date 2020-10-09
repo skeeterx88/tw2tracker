@@ -87,7 +87,7 @@
         return new Promise(function (resolve, reject) {
             rl.question('Which user would you like the unit to run as? [Default: arch] ', async function (response) {
                 if (response === 'root') {
-                    process.stdout.write('Not allowed to run as root.')
+                    process.stdout.write('Not allowed to run as root.\n')
                     await selectUser()
                 } else if (!response) {
                     runAs = 'arch'
