@@ -11,6 +11,14 @@ const db = require('./db')
 const sql = require('./sql')
 const Sync = require('./sync')
 
+let settings
+
+try {
+    settings = require('./settings')
+} catch {
+    settings = require('./settings.defaults.json')
+}
+
 // console.log(sql)
 
 const indexRouter = require('./routes/index')
@@ -21,7 +29,7 @@ const mapsRouter = require('./routes/maps')
 
 const app = express()
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && settings.force_ssl) {
     app.use(function (req, res, next) {
         if (req.headers['x-forwarded-proto'] === 'https') {
             next()
