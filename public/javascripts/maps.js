@@ -1734,7 +1734,6 @@ const TW2MapTooltip = function (selector) {
 
         let activeTimeout
 
-        $notif.addEventListener('click', () => $notif.classList.add('hidden'))
         $notifClose.addEventListener('click', () => $notif.classList.add('hidden'))
 
         notif = ({ title = '', content = '', timeout = 3000, link = false }) => {

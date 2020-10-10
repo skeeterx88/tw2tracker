@@ -694,6 +694,7 @@ header {
 }
 
 #notif-content {
+    text-align: center;
     word-break: break-word;
     margin: 0px;
 }
