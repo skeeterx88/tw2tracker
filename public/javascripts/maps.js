@@ -1918,10 +1918,7 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
-    const mapSettings = {
-        hexagonVillages: true,
-        zoomLevel: 3
-    }
+    const mapSettings = {}
 
     const loader = new DataLoader(marketId, worldNumber)
     const tooltip = new TW2MapTooltip('#tooltip')
