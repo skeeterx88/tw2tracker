@@ -92,10 +92,10 @@ button.red:focus {
     box-shadow: 5px 0px 6px #00000080;
     z-index: 5;
     color: #ffeccc;
-    background-color: #413127;
     background: url(/images/side-bar-left.jpg) left repeat-y,
                 url(/images/side-bar-right.jpg) right repeat-y,
-                url(/images/side-bar-middle.jpg);
+                url(/images/side-bar-middle.jpg),
+                #413127;
     position: relative;
 }
 
