@@ -71,6 +71,12 @@ passport.deserializeUser(function(username, callback) {
 app.use(passport.initialize())
 app.use(passport.session())
 
+if (process.env.NODE_ENV === 'development') {
+    app.use(function (req, res, next) {
+        setTimeout(next, 1000)
+    })
+}
+
 app.use('/', indexRouter)
 app.use('/admin', adminRouter)
 app.use('/login', loginRouter)
