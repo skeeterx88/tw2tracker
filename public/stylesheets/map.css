@@ -636,7 +636,7 @@ header h1 {
     position: absolute;
     bottom: 40px;
     right: 40px;
-    min-width: 200px;
+    min-width: 300px;
     max-width: 400px;
     max-height: 200px;
     padding-bottom: 10px;

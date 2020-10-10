@@ -858,10 +858,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
 
         if (!highlightsExport.length) {
-            throw new Error('TW2Map: No highlights to create a share')
+            throw new Error('No highlights to create a share')
         }
 
-        return await ajaxPost('/maps/api/create-share', {
+        const result = await ajaxPost('/maps/api/create-share', {
             marketId,
             worldNumber,
             highlights: highlightsExport,
@@ -879,6 +879,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 demarcationsColor: settings.demarcationsColor
             }
         })
+
+        if (!result.success) {
+            throw new Error(result.message)
+        }
+
+        return result
     }
 
     this.on = (event, handler) => {
@@ -1648,35 +1654,35 @@ const TW2MapTooltip = function (selector) {
         const $mapSave = document.querySelector('#map-save')
 
         $mapShare.addEventListener('click', async () => {
-            const result = await map.shareMap(mapShareTypes.DYNAMIC)
+            try {
+                const result = await map.shareMap(mapShareTypes.DYNAMIC)
 
-            if (result.success) {
                 notif({
                     title: 'Dynamic map',
                     link: location.origin + result.url,
                     timeout: 0
                 })
-            } else {
+            } catch (error) {
                 notif({
                     title: 'Error generating map',
-                    content: result.message
+                    content: error.message
                 })
             }
         })
 
         $mapSave.addEventListener('click', async () => {
-            const result = await map.shareMap(mapShareTypes.STATIC)
+            try {
+                const result = await map.shareMap(mapShareTypes.STATIC)
 
-            if (result.success) {
                 notif({
                     title: 'Static map',
                     link: location.origin + result.url,
                     timeout: 0
                 })
-            } else {
+            } catch (error) {
                 notif({
                     title: 'Error generating map',
-                    content: result.message
+                    content: error.message
                 })
             }
         })
