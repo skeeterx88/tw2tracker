@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title><%= title %></title>
+        <meta name="viewport" content="width=800 initial-scale=1"/>
+        <meta name="description" content="Interactive world map for Tribal Wars 2">
         <link rel='stylesheet' href='/stylesheets/style.css' />
         <link rel='stylesheet' href='/stylesheets/map.css' />
         <script type="text/javascript">
@@ -29,14 +31,19 @@
 
                 <div id="quick-jump">
                     <div id="quick-jump-coords" class="input">
-                        x:<input type="text" id="quick-jump-x" placeholder="500">
-                        y:<input type="text" id="quick-jump-y" placeholder="500">
+                        <label>x:<input type="text" id="quick-jump-x" placeholder="500"></label>
+                        <label>y:<input type="text" id="quick-jump-y" placeholder="500"></label>
                     </div>
                     <button id="quick-jump-go" class="red">Go</button>
                 </div>
 
-                <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="Search...">
-                <ul id="highlight-items"></ul>
+                <div id="highlights">
+                    <label>
+                        <h2 id="highlights-title">Highlights</h2>
+                        <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="Search...">
+                    </label>
+                    <ul id="highlight-items"></ul>
+                </div>
 
                 <div id="map-share-wrapper">
                     <button id="map-share" class="">Generate dynamic map</button>

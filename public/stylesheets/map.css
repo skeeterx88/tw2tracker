@@ -28,6 +28,22 @@ ul {
     text-shadow: none;
 }
 
+h1 {
+    font-size: 14px;
+}
+
+h2 {
+    font-size: 12px;
+}
+
+h3 {
+    font-size: 11px;
+}
+
+h1, h2, h3 {
+    text-shadow: 1px 1px 0px #000;
+}
+
 button {
     height: 22px;
     padding: 0px 3px;
@@ -116,8 +132,8 @@ button.red:focus {
     padding-bottom: 1px;
     font-weight: bold;
     position: relative;
-    float: left;
     text-align: center;
+    display: inline-block;
 }
 
 #quick-jump-x,
@@ -132,12 +148,12 @@ button.red:focus {
 }
 
 #quick-jump-go {
-    float: left;
     font-size: 11px;
-    margin-left: 5px;
+    margin-left: 2px;
     outline: none;
     cursor: pointer;
     width: 42px;
+    display: inline-block;
 }
 
 
@@ -145,14 +161,17 @@ button.red:focus {
 
 #highlight-id {
     margin-left: 4px;
-    margin-top: 5px;
-    margin-bottom: 5px;
     width: 117px;
     height: 18px;
     padding-left: 8px;
     padding-right: 8px;
     position: relative;
     text-shadow: 0px 0px 1px #00000070;
+}
+
+#highlights-title {
+    text-align: center;
+    padding: 0 2px;
 }
 
 #highlight-items {
@@ -450,10 +469,8 @@ header {
 }
 
 #world-name {
-    font-size: 13px;
     text-align: center;
     padding: 0 2px;
-    text-shadow: 1px 1px 0px #000;
 }
 
 #current-world {
