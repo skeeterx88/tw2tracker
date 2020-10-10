@@ -21,13 +21,15 @@ CREATE TABLE main.worlds (
     open BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE TYPE map_share_type AS ENUM ('static', 'dynamic');
+
 CREATE TABLE main.maps_share (
     id SERIAL PRIMARY KEY,
     share_id VARCHAR (20) UNIQUE NOT NULL,
     world_market VARCHAR (10) REFERENCES main.markets(id),
     world_number SMALLINT,
     highlights TEXT NOT NULL,
-    type VARCHAR (7) NOT NULL,
+    type map_share_type,
     center_x SMALLINT DEFAULT 500,
     center_y SMALLINT DEFAULT 500,
     settings TEXT NOT NULL,
