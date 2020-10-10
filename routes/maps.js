@@ -32,6 +32,18 @@ router.get('/', async function (req, res) {
     })
 })
 
+router.get('/api/get-worlds', async function (req, res) {
+    const allWorlds = await db.any(sql.openWorlds)
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(allWorlds))
+})
+
+router.get('/api/get-markets', async function (req, res) {
+    const allMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(allMarkets))
+})
+
 router.get('/:marketId/:worldNumber', async function (req, res) {
     const settings = await db.one(sql.settings)
     const marketId = req.params.marketId
