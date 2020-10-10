@@ -21,7 +21,7 @@ const mapsRouter = require('./routes/maps')
 
 const app = express()
 
-if (process.env.NODE_DEV === 'production') {
+if (process.env.NODE_ENV === 'production') {
     app.use(function (req, res, next) {
         if (req.headers['x-forwarded-proto'] === 'https') {
             next()

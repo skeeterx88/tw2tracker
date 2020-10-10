@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Environment=PORT=3000
 Environment=TZ=UTC
+Environment=NODE_ENV=production
 Type=simple
 User=arch
 WorkingDirectory=/var/www/tw2tracker
