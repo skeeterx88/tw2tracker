@@ -846,7 +846,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderViewport()
     }
 
-    this.shareMap = async (type) => {
+    this.shareMap = async (shareType) => {
         const highlightsExport = []
 
         for (let [id, data] of Object.entries(highlights.players)) {
@@ -865,7 +865,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             marketId,
             worldNumber,
             highlights: highlightsExport,
-            type,
+            shareType,
             center: {
                 x: centerCoordX,
                 y: centerCoordY
