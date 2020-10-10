@@ -24,7 +24,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const defaults = {
-        hexagonVillages: false,
+        hexagonVillages: true,
         zoomLevel: 2,
         neutralColor: '#823c0a',
         barbarianColor: '#4c6f15',
