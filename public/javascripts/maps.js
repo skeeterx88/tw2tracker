@@ -1917,6 +1917,27 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
+    const setupAbout = () => {
+        const $contact = document.querySelector('#contact')
+        const $about = document.querySelector('#about')
+
+        $contact.addEventListener('click', () => {
+            notif({
+                title: 'Contact',
+                content: 'contact@tw2tracker.com',
+                timeout: 0
+            })
+        })
+
+        $about.addEventListener('click', () => {
+            notif({
+                title: 'About',
+                content: 'This site is an interactive world map for Tribal Wars 2 created in 2020 by <i>anonymous</i>.',
+                timeout: 0
+            })
+        })
+    }
+
     const mapSettings = {}
 
     const loader = new DataLoader(marketId, worldNumber)
@@ -1939,4 +1960,5 @@ const TW2MapTooltip = function (selector) {
     setupWorldList()
     setupSettings()
     setupMapShare()
+    setupAbout()
 })()

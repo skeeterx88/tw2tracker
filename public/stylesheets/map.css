@@ -239,11 +239,14 @@ button.red:focus {
 
 
 
+#side-panel footer {
+    position: absolute;
+    bottom: 0px;
+}
 
 
 #map-share-wrapper {
-    position: absolute;
-    bottom: 5px;
+    margin-bottom: 10px;
 }
 
 #map-share,
@@ -727,6 +730,28 @@ header {
     display: inline-block;
     cursor: pointer;
 }
+
+
+
+
+#site-info {
+    font-size: 9px;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+#site-info p {
+    margin: 2px 0px;
+}
+
+#site-info a {
+    cursor: pointer;
+}
+
+
+
+
+
 
 .loading {
     margin: auto;
