@@ -6,6 +6,11 @@ const colorPalette = [
     ["#00fa9a", "#730202", "#00293a", "#02350f", "#572412", "#494500", "#6a043e", "#723305", "#2f1460", "#152232", "#000645", "#6c055b", "#c766c7", "#00ff83"]
 ]
 
+const mapShareTypes = {
+    STATIC: 'static',
+    DYNAMIC: 'dynamic'
+}
+
 const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const $container = document.querySelector(containerSelector)
 
@@ -115,15 +120,15 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         {x: -1, y: +1}
     ]
 
-    const HIGHLIGHT_CATEGORIES = {
-        players: 'players',
-        tribes: 'tribes'
+    const highlightTypes = {
+        PLAYERS: 'players',
+        TRIBES: 'tribes'
     }
 
-    const highlights = {
-        [HIGHLIGHT_CATEGORIES.players]: {},
-        [HIGHLIGHT_CATEGORIES.tribes]: {}
-    }
+    const highlights = {}
+
+    highlights[highlightTypes.PLAYERS] = {}
+    highlights[highlightTypes.TRIBES] = {}
 
     const settingTriggers = {}
 
@@ -456,7 +461,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                             const neighbourTile = readBitsAt(loader.struct, borders[i])
 
                             if (neighbourTile >>> 4) {
-                                $gridContext.fillRect(x * zoomSettings.tileSize + BORDERS_OFFSET[i].x, y * zoomSettings.tileSize + borderOffsets[i].y, 1, 1)
+                                $gridContext.fillRect(x * zoomSettings.tileSize + BORDERS_OFFSET[i].x, y * zoomSettings.tileSize + BORDERS_OFFSET[i].y, 1, 1)
                             }
                         }
 
@@ -652,11 +657,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    const highlightGetRealId = (category, id) => {
+    const highlightGetRealId = (highlightType, id) => {
         const lowerId = id.toLowerCase()
 
-        switch (category) {
-            case HIGHLIGHT_CATEGORIES.players: {
+        switch (highlightType) {
+            case highlightTypes.PLAYERS: {
                 if (loader.playersByName.hasOwnProperty(lowerId)) {
                     return loader.playersByName[lowerId]
                 } else {
@@ -665,7 +670,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
                 break
             }
-            case HIGHLIGHT_CATEGORIES.tribes: {
+            case highlightTypes.TRIBES: {
                 if (loader.tribesByTag.hasOwnProperty(lowerId)) {
                     return loader.tribesByTag[lowerId]
                 } else if (loader.tribesByName.hasOwnProperty(lowerId)) {
@@ -677,22 +682,22 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 break
             }
             default: {
-                throw new Error('Highlights: Invalid category')
+                throw new Error('Highlights: Invalid highlightType')
             }
         }
     }
 
-    const getVillagesToDraw = (category, realId) => {
+    const getVillagesToDraw = (highlightType, realId) => {
         let redrawVillages = {
             x: {}
         }
 
-        switch (category) {
-            case HIGHLIGHT_CATEGORIES.players: {
+        switch (highlightType) {
+            case highlightTypes.PLAYERS: {
                 formatVillagesToDraw(loader.playerVillages[realId], redrawVillages)
                 break
             }
-            case HIGHLIGHT_CATEGORIES.tribes: {
+            case highlightTypes.TRIBES: {
                 for (let playerId of loader.tribePlayers[realId]) {
                     formatVillagesToDraw(loader.playerVillages[playerId], redrawVillages)
                 }
@@ -700,7 +705,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 break
             }
             default: {
-                throw new Error('Highlights: Invalid category')
+                throw new Error('Highlights: Invalid highlightType')
             }
         }
 
@@ -760,19 +765,15 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    this.addHighlight = (category, id, color) => {
+    this.addHighlight = (highlightType, id, color) => {
         let realId
         let displayName
 
-        if (!HIGHLIGHT_CATEGORIES.hasOwnProperty(category)) {
-            throw new Error('Highlights: Invalid category')
-        }
-
-        if (typeof id === 'number' && loader[category].hasOwnProperty(id)) {
+        if (typeof id === 'number' && loader[highlightType].hasOwnProperty(id)) {
             realId = id
         } else if (typeof id === 'string') {
             try {
-                realId = highlightGetRealId(category, id)
+                realId = highlightGetRealId(highlightType, id)
             } catch (error) {
                 return console.log(error)
             }
@@ -784,28 +785,28 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             color = arrayRandom(colorPalette.flat())
         }
 
-        const redrawVillages = getVillagesToDraw(category, realId)
+        const redrawVillages = getVillagesToDraw(highlightType, realId)
 
-        switch (category) {
-            case HIGHLIGHT_CATEGORIES.tribes: {
+        switch (highlightType) {
+            case highlightTypes.TRIBES: {
                 const [name, tag] = loader.tribes[realId]
                 displayName = tag + ' (' + name + ')'
                 break
             }
-            case HIGHLIGHT_CATEGORIES.players: {
+            case highlightTypes.PLAYERS: {
                 const [name] = loader.players[realId]
                 displayName = name
                 break
             }
         }
 
-        if (highlights[category].hasOwnProperty(realId)) {
-            this.trigger('update highlight', [category, id, displayName, color])
+        if (highlights[highlightType].hasOwnProperty(realId)) {
+            this.trigger('update highlight', [highlightType, id, displayName, color])
         } else {
-            this.trigger('add highlight', [category, id, displayName, color])
+            this.trigger('add highlight', [highlightType, id, displayName, color])
         }
 
-        highlights[category][realId] = {
+        highlights[highlightType][realId] = {
             display: displayName,
             color: color
         }
@@ -821,18 +822,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderViewport()
     }
 
-    this.removeHighlight = (category, id) => {
+    this.removeHighlight = (highlightType, id) => {
         let realId
 
-        if (!HIGHLIGHT_CATEGORIES.hasOwnProperty(category)) {
-            throw new Error('Highlights: Invalid category')
-        }
-
-        if (typeof id === 'number' && loader[category].hasOwnProperty(id)) {
+        if (typeof id === 'number' && loader[highlightType].hasOwnProperty(id)) {
             realId = id
         } else if (typeof id === 'string') {
             try {
-                realId = highlightGetRealId(category, id)
+                realId = highlightGetRealId(highlightType, id)
             } catch (error) {
                 return console.log(error)
             }
@@ -840,11 +837,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             throw new Error('Highlights: Invalid id')
         }
 
-        const redrawVillages = getVillagesToDraw(category, realId)
+        const redrawVillages = getVillagesToDraw(highlightType, realId)
 
-        delete highlights[category][realId]
+        delete highlights[highlightType][realId]
 
-        this.trigger('remove highlight', [category, id])
+        this.trigger('remove highlight', [highlightType, id])
         renderVillages(redrawVillages)
         renderViewport()
     }
@@ -955,12 +952,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             return
         }
 
-        const category = HIGHLIGHT_CATEGORIES.players
         const color = arrayRandom(colorPalette.flat())
 
         clearOverlay()
 
-        this.addHighlight(category, id, color)
+        this.addHighlight(highlightTypes.PLAYERS, id, color)
     })
 
     if (tooltip) {
@@ -1052,7 +1048,7 @@ const DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadPlayers = new Promise(async (resolve) => {
-        const url = mapShareId && mapShareType === 'static'
+        const url = mapShareId && mapShareType === mapShareTypes.STATIC
             ? `/maps/api/${marketId}/${worldNumber}/players/${mapShareId}`
             : `/maps/api/${marketId}/${worldNumber}/players`
 
@@ -1074,7 +1070,7 @@ const DataLoader = function (marketId, worldNumber) {
     })
 
     this.loadTribes = new Promise(async (resolve) => {
-        const url = mapShareId && mapShareType === 'static'
+        const url = mapShareId && mapShareType === mapShareTypes.STATIC
             ? `/maps/api/${marketId}/${worldNumber}/tribes/${mapShareId}`
             : `/maps/api/${marketId}/${worldNumber}/tribes`
 
@@ -1101,7 +1097,7 @@ const DataLoader = function (marketId, worldNumber) {
         }
 
         continentPromises[continent] = new Promise(async (resolve) => {
-            const url = mapShareId && mapShareType === 'static'
+            const url = mapShareId && mapShareType === mapShareTypes.STATIC
                 ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShareId}`
                 : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`
 
@@ -1342,10 +1338,10 @@ const TW2MapTooltip = function (selector) {
                 },
                 highlight: true,
                 onSelection: (feedback) => {
-                    const { search, id, type } = feedback.selection.value
+                    const { search, id, highlightType } = feedback.selection.value
                     const color = arrayRandom(colorPalette.flat())
 
-                    map.addHighlight(type, id, color)
+                    map.addHighlight(highlightType, id, color)
                     $highlightId.value = ''
                 }
             })
@@ -1375,7 +1371,7 @@ const TW2MapTooltip = function (selector) {
             })
         }
 
-        map.on('add highlight', (category, id, displayName, color) => {
+        map.on('add highlight', (highlightType, id, displayName, color) => {
             const $item = document.createElement('li')
             const $name = document.createElement('div')
             const $nameSpan = document.createElement('span')
@@ -1383,19 +1379,19 @@ const TW2MapTooltip = function (selector) {
             
             $item.classList.add('highlight-' + normalizeString(id))
             $item.classList.add('item')
-            $item.classList.add(category)
-            $item.dataset.category = category
+            $item.classList.add(highlightType)
+            $item.dataset.highlightType = highlightType
             $item.dataset.id = id
             $item.dataset.color = color
 
             $name.addEventListener('click', () => {
-                map.removeHighlight(category, id)
+                map.removeHighlight(highlightType, id)
             })
 
             $name.className = 'name'
 
             $nameSpan.innerHTML = displayName
-            $nameSpan.className = 'icon-' + category
+            $nameSpan.className = 'icon-' + highlightType
 
             $color.className = 'color open-color-picker'
             $color.style.backgroundColor = color
@@ -1404,7 +1400,7 @@ const TW2MapTooltip = function (selector) {
             $color.addEventListener('click', () => {
                 colorPicker($color, $color.dataset.color, (pickedColor) => {
                     $color.dataset.color = pickedColor
-                    map.addHighlight(category, id, pickedColor)
+                    map.addHighlight(highlightType, id, pickedColor)
                     return true
                 }, KEEP_COLORPICKER_OPEN)
             })
@@ -1415,7 +1411,7 @@ const TW2MapTooltip = function (selector) {
             $highlightItems.appendChild($item)
         })
 
-        map.on('update highlight', (category, id, displayName, color) => {
+        map.on('update highlight', (highlightType, id, displayName, color) => {
             const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
 
             if (!$item) {
@@ -1428,7 +1424,7 @@ const TW2MapTooltip = function (selector) {
             $item.dataset.color = color
         })
 
-        map.on('remove highlight', (category, id) => {
+        map.on('remove highlight', (highlightType, id) => {
             const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
 
             if ($item) {
@@ -1652,7 +1648,7 @@ const TW2MapTooltip = function (selector) {
         const $mapSave = document.querySelector('#map-save')
 
         $mapShare.addEventListener('click', async () => {
-            const result = await map.shareMap('dynamic')
+            const result = await map.shareMap(mapShareTypes.DYNAMIC)
 
             if (result.success) {
                 notif({
@@ -1669,7 +1665,7 @@ const TW2MapTooltip = function (selector) {
         })
 
         $mapSave.addEventListener('click', async () => {
-            const result = await map.shareMap('static')
+            const result = await map.shareMap(mapShareTypes.STATIC)
 
             if (result.success) {
                 notif({
@@ -1709,8 +1705,8 @@ const TW2MapTooltip = function (selector) {
                 loader.loadTribes
             ])
 
-            for (let [category, id, color] of highlights) {
-                map.addHighlight(category, id, color)
+            for (let [highlightType, id, color] of highlights) {
+                map.addHighlight(highlightType, id, color)
             }
         }
     }
@@ -1885,7 +1881,7 @@ const TW2MapTooltip = function (selector) {
     setupCustomHighlights()
     setupColorPicker()
 
-    if (mapShareId && mapShareType === 'static') {
+    if (mapShareId && mapShareType === mapShareTypes.STATIC) {
         setupDisplayShareDate()
     } else {
         setupDisplayLastSync()

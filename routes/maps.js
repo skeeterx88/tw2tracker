@@ -10,9 +10,9 @@ const db = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
 
-const MAP_SHARE_TYPES = {
-    static: 'static',
-    dynamic: 'dynamic'
+const mapShareTypes = {
+    STATIC: 'static',
+    DYNAMIC: 'dynamic'
 }
 
 const checkWorldSchemaExists = async function (marketId, worldNumber) {
@@ -247,7 +247,7 @@ router.post('/api/create-share', async function (req, res) {
         marketId,
         worldNumber,
         highlights,
-        type,
+        shareType,
         settings,
         center
     } = req.body
@@ -257,10 +257,6 @@ router.post('/api/create-share', async function (req, res) {
 
         if (!worldExists) {
             throw new Error('World does not exist')
-        }
-
-        if (!MAP_SHARE_TYPES.hasOwnProperty(type)) {
-            throw new Error('Invalid share type')
         }
 
         if (!highlights || !Array.isArray(highlights)) {
@@ -275,9 +271,9 @@ router.post('/api/create-share', async function (req, res) {
         const shareId = utils.makeid(20)
 
         const settingsString = JSON.stringify(settings)
-        const mapShare = await db.one(sql.addMapShare, [shareId, marketId, worldNumber, type, highlightsString, settingsString, center.x, center.y])
+        const mapShare = await db.one(sql.addMapShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y])
 
-        if (type === MAP_SHARE_TYPES.static) {
+        if (shareType === mapShareTypes.STATIC) {
             const dateId = utils.getHourlyDir(mapShare.creation_date)
             const worldId = marketId + worldNumber
             const copyDestination = path.join('.', 'data', 'static-maps', worldId, dateId)
