@@ -88,11 +88,14 @@ button.red:focus {
 }
 
 #side-panel {
-    flex: 0 0 125px;
+    flex: 0 0 150px;
     box-shadow: 5px 0px 6px #00000080;
     z-index: 5;
     color: #ffeccc;
-    background: url(/images/side-bar.jpg) repeat-y #413127;
+    background-color: #413127;
+    background: url(/images/side-bar-left.jpg) left repeat-y,
+                url(/images/side-bar-right.jpg) right repeat-y,
+                url(/images/side-bar-middle.jpg);
     position: relative;
 }
 
@@ -107,10 +110,8 @@ button.red:focus {
 #quick-jump-coords {
     margin-left: 4px;
     color: #6d4f32;
-    width: 69px;
+    width: 86px;
     height: 18px;
-    padding-left: 3px;
-    padding-right: 3px;
     padding-top: 1px;
     padding-bottom: 1px;
     font-weight: bold;
@@ -122,7 +123,7 @@ button.red:focus {
 #quick-jump-x,
 #quick-jump-y {
     border: none;
-    width: 22px;
+    width: 24px;
     background: none;
     text-align: center;
     padding: 0px;
@@ -136,7 +137,7 @@ button.red:focus {
     margin-left: 5px;
     outline: none;
     cursor: pointer;
-    width: 27px;
+    width: 42px;
 }
 
 
@@ -146,10 +147,10 @@ button.red:focus {
     margin-left: 4px;
     margin-top: 5px;
     margin-bottom: 5px;
-    width: 101px;
+    width: 117px;
     height: 18px;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 8px;
+    padding-right: 8px;
     position: relative;
     text-shadow: 0px 0px 1px #00000070;
 }
@@ -180,7 +181,7 @@ button.red:focus {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    width: 97px;
+    width: 120px;
     cursor: pointer;
 }
 
@@ -228,9 +229,11 @@ button.red:focus {
 
 #map-share,
 #map-save {
+    width: 136px;
     margin-left: 3px;
-    width: 52px;
+    margin-top: 5px;
     font-size: 11px;
+    display: block;
 }
 
 
@@ -408,7 +411,7 @@ div.text-container {
 
 #last-sync {
     position: absolute;
-    right: 5px;
+    right: 6px;
     bottom: 5px;
     z-index: 10;
     color: #a59a8a;
@@ -434,7 +437,7 @@ div.text-container {
 
 #display-position {
     position: absolute;
-    left: 128px;
+    left: 5px;
     bottom: 5px;
     z-index: 10;
     color: #a59a8a;
@@ -446,9 +449,8 @@ header {
     margin-bottom: 10px;
 }
 
-header h1 {
+#world-name {
     font-size: 13px;
-    width: 114px;
     text-align: center;
     padding: 0 2px;
     text-shadow: 1px 1px 0px #000;
@@ -456,7 +458,7 @@ header h1 {
 
 #current-world {
     margin-left: 4px;
-    width: 55px;
+    width: 60px;
 }
 
 #current-world .flag {
@@ -535,7 +537,7 @@ header h1 {
 
 #change-settings {
     margin-left: 2px;
-    width: 49px;
+    width: 70px;
 }
 
 #settings {
@@ -599,10 +601,10 @@ header h1 {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 3px;
-    width: 107px;
+    width: 130px;
     position: fixed;
     margin: 0;
-    margin-left: 3px;
+    margin-left: 4px;
     margin-top: 4px;
     z-index: 10;
 }
