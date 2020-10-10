@@ -11,6 +11,11 @@ const mapShareTypes = {
     DYNAMIC: 'dynamic'
 }
 
+const highlightTypes = {
+    PLAYERS: 'players',
+    TRIBES: 'tribes'
+}
+
 const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const $container = document.querySelector(containerSelector)
 
@@ -119,11 +124,6 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         {x: +1, y: +1},
         {x: -1, y: +1}
     ]
-
-    const highlightTypes = {
-        PLAYERS: 'players',
-        TRIBES: 'tribes'
-    }
 
     const highlights = {}
 
@@ -850,11 +850,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         const highlightsExport = []
 
         for (let [id, data] of Object.entries(highlights.players)) {
-            highlightsExport.push(['players', parseInt(id, 10), data.color])
+            highlightsExport.push([highlightTypes.PLAYERS, parseInt(id, 10), data.color])
         }
 
         for (let [id, data] of Object.entries(highlights.tribes)) {
-            highlightsExport.push(['tribes', parseInt(id, 10), data.color])
+            highlightsExport.push([highlightTypes.TRIBES, parseInt(id, 10), data.color])
         }
 
         if (!highlightsExport.length) {
@@ -1306,7 +1306,7 @@ const TW2MapTooltip = function (selector) {
                             matches.push({
                                 search: name,
                                 id: name,
-                                type: 'players'
+                                highlightType: highlightTypes.PLAYERS
                             })
                         }
 
@@ -1314,7 +1314,7 @@ const TW2MapTooltip = function (selector) {
                             matches.push({
                                 search: tag + ' (' + name + ')',
                                 id: tag,
-                                type: 'tribes'
+                                highlightType: highlightTypes.TRIBES
                             })
                         }
 
