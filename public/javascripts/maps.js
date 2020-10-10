@@ -540,7 +540,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             for (let y in villages[x]) {
                 let [id, name, points, character_id] = villages[x][y]
 
-                let tribeId = character_id ? loader.players[character_id][1] : false
+                let tribeId = loader.players && character_id ? loader.players[character_id][1] : false
 
                 if (!character_id) {
                     context.fillStyle = settings.barbarianColor
@@ -934,13 +934,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     resetZoomContinents()
     resetZoomGrid()
 
-    Promise.all([
-        loader.loadPlayers,
-        loader.loadTribes
-    ]).then(() => {
-        renderVisibleContinents()
-        continuousRender()
-    })
+    renderVisibleContinents()
+    continuousRender()
 
     loader.loadStruct.then(() => {
         renderVisibleDemarcations()
@@ -967,6 +962,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     if (tooltip) {
         this.on('active village', (village) => {
+            if (!loader.players) {
+                return
+            }
+
             const {
                 id,
                 name: villageName,
@@ -1017,10 +1016,10 @@ const DataLoader = function (marketId, worldNumber) {
     const self = this
     let continentPromises = {}
 
-    this.players = {}
+    this.players = false
     this.playersByName = {}
     this.playerVillages = {}
-    this.tribes = {}
+    this.tribes = false
     this.tribesByTag = {}
     this.tribesByName = {}
     this.tribePlayers = {}
