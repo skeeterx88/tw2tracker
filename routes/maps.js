@@ -48,24 +48,18 @@ router.get('/:marketId/:worldNumber', async function (req, res) {
     const settings = await db.one(sql.settings)
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
-    const worldId = marketId + worldNumber
     const worldInfo = await db.one(sql.world, [marketId, worldNumber])
     const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
-    const allWorlds = await db.any(sql.openWorlds)
-    const allMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
 
     res.render('map', {
-        title: 'Map ' + worldId + ' - ' + settings.site_name,
-        marketId,
-        worldNumber,
-        worldName: worldInfo.name,
-        lastSync,
-        mapShareId: '',
-        mapShareType: '',
-        mapShareCreationDate: '0',
-        allWorlds: JSON.stringify(allWorlds),
-        allMarkets: JSON.stringify(allMarkets),
-        development: process.env.NODE_ENV === 'development'
+        title: 'Map ' + marketId + worldNumber + ' - ' + settings.site_name,
+        exportValues: {
+            marketId,
+            worldNumber,
+            worldName: worldInfo.name,
+            lastSync,
+            development: process.env.NODE_ENV === 'development'
+        }
     })
 })
 
@@ -74,8 +68,6 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
     const mapShareId = req.params.mapShareId
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
-    const allWorlds = await db.any(sql.openWorlds)
-    const allMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
 
     let worldInfo
     let mapShare
@@ -88,31 +80,29 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
         return false
     }
 
+    const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
+
     try {
-        mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        mapShare = await db.one(sql.getMapShareInfo, [mapShareId, marketId, worldNumber])
     } catch (error) {
         res.status(404)
         res.send('Map share does not exist')
         return false
     }
 
-    const worldId = marketId + worldNumber
-    const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
-    const mapShareType = mapShare ? mapShare.type : ''
-    const mapShareCreationDate = mapShare ? new Date(mapShare.creation_date).getTime() : '0'
+    mapShare.creation_date = new Date(mapShare.creation_date).getTime()
+    mapShare.settings = JSON.parse(mapShare.settings)
 
     res.render('map', {
-        title: 'Map ' + worldId + ' - ' + settings.site_name,
-        marketId,
-        worldNumber,
-        worldName: worldInfo.name,
-        lastSync,
-        mapShareId,
-        mapShareType,
-        mapShareCreationDate,
-        allWorlds: JSON.stringify(allWorlds),
-        allMarkets: JSON.stringify(allMarkets),
-        development: process.env.NODE_ENV === 'development'
+        title: 'Map ' + marketId + worldNumber + ' - ' + settings.site_name,
+        exportValues: {
+            marketId,
+            worldNumber,
+            worldName: worldInfo.name,
+            lastSync,
+            mapShare,
+            development: process.env.NODE_ENV === 'development'
+        }
     })
 })
 
@@ -133,7 +123,7 @@ router.get('/api/:marketId/:worldNumber/players/:mapShareId?', async function (r
     let dataPath
 
     if (mapShareId) {
-        const mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        const mapShare = await db.one(sql.getMapShareInfo, [mapShareId, marketId, worldNumber])
         const dateId = utils.getHourlyDir(mapShare.creation_date)
         dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'players')
     } else {
@@ -168,7 +158,7 @@ router.get('/api/:marketId/:worldNumber/tribes/:mapShareId?', async function (re
     let dataPath
 
     if (mapShareId) {
-        const mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        const mapShare = await db.one(sql.getMapShareInfo, [mapShareId, marketId, worldNumber])
         const dateId = utils.getHourlyDir(mapShare.creation_date)
         dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'tribes')
     } else {
@@ -211,7 +201,7 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
     let dataPath
 
     if (mapShareId) {
-        const mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        const mapShare = await db.one(sql.getMapShareInfo, [mapShareId, marketId, worldNumber])
         const dateId = utils.getHourlyDir(mapShare.creation_date)
         dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, continentId)
     } else {
@@ -319,13 +309,14 @@ router.post('/api/create-share', async function (req, res) {
     res.end(JSON.stringify(response))
 })
 
-router.post('/api/get-share', async function (req, res) {
+router.post('/api/get-share/', async function (req, res) {
     const response = {}
 
     let {
         mapShareId,
         marketId,
-        worldNumber
+        worldNumber,
+        highlightsOnly
     } = req.body
 
     let worldInfo
@@ -342,7 +333,8 @@ router.post('/api/get-share', async function (req, res) {
     }
 
     try {
-        mapShare = await db.one(sql.getMapShare, [mapShareId, marketId, worldNumber])
+        const shareSql = highlightsOnly ? sql.getMapShareHighlights : sql.getMapShareInfo
+        mapShare = await db.one(shareSql, [mapShareId, marketId, worldNumber])
     } catch (error) {
         response.success = false
         response.message = 'Map share does not exist'

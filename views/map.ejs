@@ -4,28 +4,25 @@
         <title><%= title %></title>
         <link rel='stylesheet' href='/stylesheets/style.css' />
         <link rel='stylesheet' href='/stylesheets/map.css' />
-        <!-- <link rel='stylesheet' href='/stylesheets/autoComplete.css' /> -->
         <script type="text/javascript">
-            const marketId = '<%= marketId %>'
-            const worldNumber = <%= worldNumber %>
-            const development = <%= development %>
-            const worldName = '<%= worldName %>'
-            const lastSync = <%= lastSync %>
-            const mapShareId = '<%= mapShareId %>'
-            const mapShareType = '<%= mapShareType %>'
-            const mapShareCreationDate = <%= mapShareCreationDate %>
-            const allWorlds = <%- allWorlds %>
-            const allMarkets = <%- allMarkets %>
+            const {
+                marketId,
+                worldNumber,
+                development,
+                worldName,
+                lastSync,
+                mapShare
+            } = <%- JSON.stringify(exportValues) %>
         </script>
     </head>
     <body>
         <div id="map-wrapper">
             <div id="side-panel">
                 <header>
-                    <h1 id="world-name"><%= worldName %></h1>
+                    <h1 id="world-name"><%= exportValues.worldName %></h1>
                     <button id="current-world">
-                        <span class="flag flag-<%= marketId %>"></span>
-                        <%= marketId %><%= worldNumber %>
+                        <span class="flag flag-<%= exportValues.marketId %>"></span>
+                        <%= exportValues.marketId %><%= exportValues.worldNumber %>
                     </button>
                     <button id="change-settings">Settings</button>
                 </header>
@@ -147,6 +144,11 @@
         </div>
 
         <div id="all-worlds" class="hidden">
+            <div class="loading">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
             <ul id="all-market-worlds"></ul>
             <ul id="all-markets"></ul>
         </div>

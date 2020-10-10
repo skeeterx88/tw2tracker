@@ -707,3 +707,37 @@ header h1 {
     display: inline-block;
     cursor: pointer;
 }
+
+.loading {
+    margin: auto;
+    text-align: center;
+}
+
+.loading.hidden {
+    display: none;
+}
+
+.loading > div {
+    width: 10px;
+    height: 10px;
+    background-color: #9b724a;
+    border-radius: 100%;
+    display: inline-block;
+    animation: sk-bouncedelay 1s infinite ease-in-out both;
+}
+
+.loading .bounce1 {
+    animation-delay: -0.25s;
+}
+
+.loading .bounce2 {
+    animation-delay: -0.1s;
+}
+
+@keyframes sk-bouncedelay {
+    0%, 80%, 100% { 
+        transform: scale(0);
+    } 40% { 
+        transform: scale(1.0);
+    }
+}

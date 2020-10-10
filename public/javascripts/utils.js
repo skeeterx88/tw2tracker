@@ -8,7 +8,7 @@ const ajaxPost = async function (url = '', data = {}) {
         body: JSON.stringify(data)
     })
 
-    return response.json()
+    return await response.json()
 }
 
 const boundNumber = function (value, min, max) {

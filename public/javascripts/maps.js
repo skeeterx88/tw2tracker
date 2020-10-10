@@ -1048,8 +1048,8 @@ const DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadPlayers = new Promise(async (resolve) => {
-        const url = mapShareId && mapShareType === mapShareTypes.STATIC
-            ? `/maps/api/${marketId}/${worldNumber}/players/${mapShareId}`
+        const url = mapShare && mapShare.type === mapShareTypes.STATIC
+            ? `/maps/api/${marketId}/${worldNumber}/players/${mapShare.share_id}`
             : `/maps/api/${marketId}/${worldNumber}/players`
 
         const load = await fetch(url)
@@ -1070,8 +1070,8 @@ const DataLoader = function (marketId, worldNumber) {
     })
 
     this.loadTribes = new Promise(async (resolve) => {
-        const url = mapShareId && mapShareType === mapShareTypes.STATIC
-            ? `/maps/api/${marketId}/${worldNumber}/tribes/${mapShareId}`
+        const url = mapShare && mapShare.type === mapShareTypes.STATIC
+            ? `/maps/api/${marketId}/${worldNumber}/tribes/${mapShare.share_id}`
             : `/maps/api/${marketId}/${worldNumber}/tribes`
 
         const load = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
@@ -1097,8 +1097,8 @@ const DataLoader = function (marketId, worldNumber) {
         }
 
         continentPromises[continent] = new Promise(async (resolve) => {
-            const url = mapShareId && mapShareType === mapShareTypes.STATIC
-                ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShareId}`
+            const url = mapShare && mapShare.type === mapShareTypes.STATIC
+                ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShare.share_id}`
                 : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`
 
             const load = await fetch(url)
@@ -1550,7 +1550,7 @@ const TW2MapTooltip = function (selector) {
         const $shareDate = document.querySelector('#share-date')
         const $shareDateDate = document.querySelector('#share-date-date')
 
-        $shareDateDate.innerHTML = formatSince(mapShareCreationDate)
+        $shareDateDate.innerHTML = formatSince(mapShare.creation_date)
         $shareDate.classList.remove('hidden')
     }
 
@@ -1681,24 +1681,33 @@ const TW2MapTooltip = function (selector) {
             }
         })
 
-        if (mapShareId) {
-            const getMapShare = await ajaxPost('/maps/api/get-share/', {
-                mapShareId,
-                marketId,
-                worldNumber
-            })
-
-            const mapShare = getMapShare.data
-            const highlights = JSON.parse(mapShare.highlights)
-            const settings = JSON.parse(mapShare.settings)
-
+        if (mapShare) {
             map.moveTo(mapShare.center_x, mapShare.center_y)
 
-            if (settings) {
-                for (let [id, value] of Object.entries(settings)) {
+            if (mapShare.settings) {
+                for (let [id, value] of Object.entries(mapShare.settings)) {
                     map.changeSetting(id, value)
                 }
             }
+
+            const loadShare = await ajaxPost('/maps/api/get-share/', {
+                mapShareId: mapShare.share_id,
+                marketId,
+                worldNumber,
+                highlightsOnly: true
+            })
+
+            if (!loadShare.success) {
+                notif({
+                    title: 'Failed to load shared map highlights',
+                    content: loadShare.message,
+                    timeout: 0
+                })
+
+                return
+            }
+
+            const highlights = JSON.parse(loadShare.data.highlights)
 
             await Promise.all([
                 loader.loadPlayers,
@@ -1764,47 +1773,83 @@ const TW2MapTooltip = function (selector) {
     const setupWorldList = () => {
         let visible = false
 
+        let loadWorldsPromise = null
+        let allWorlds = null
+        let allMarkets = null
+
         const $allWorlds = document.querySelector('#all-worlds')
         const $allMarkets = document.querySelector('#all-markets')
         const $currentWorld = document.querySelector('#current-world')
         const $allMarketWorlds = document.querySelector('#all-market-worlds')
+        const $loading = $allWorlds.querySelector('.loading')
 
-        for (let market of allMarkets) {
-            const $marketContainer = document.createElement('li')
-            const $button = document.createElement('div')
-            const $flag = document.createElement('span')
-            const $text = document.createElement('span')
-
-            $button.dataset.market = market
-            $button.appendChild($flag)
-
-            if (market === marketId) {
-                $button.classList.add('selected')
+        const loadWorlds = () => {
+            if (loadWorldsPromise) {
+                return loadWorldsPromise
             }
 
-            $button.classList.add('market')
-            $button.classList.add('text-container')
-            $text.innerText = ' ' + market
-            $flag.classList.add('flag')
-            $flag.classList.add('flag-' + market)
+            loadWorldsPromise = new Promise(async (resolve) => {
+                const loadWorlds = fetch('/maps/api/get-worlds')
+                const loadMarkets = fetch('/maps/api/get-markets')
 
-            $button.appendChild($flag)
-            $button.appendChild($text)
+                const [responseWorlds, responseMarkets] = await Promise.all([
+                    loadWorlds,
+                    loadMarkets
+                ])
 
-            $button.addEventListener('mouseenter', function () {
-                $selectedmarket = $allWorlds.querySelector('.market.selected')
-                
-                if ($selectedmarket) {
-                    $selectedmarket.classList.remove('selected')
+                const [worlds, markets] = await Promise.all([
+                    responseWorlds.json(),
+                    responseMarkets.json()
+                ])
+
+                allWorlds = worlds
+                allMarkets = markets
+
+                buildWorldList()
+                changeWorldList(marketId)
+                $loading.classList.add('hidden')
+                resolve()
+            })
+        }
+
+        const buildWorldList = () => {
+            for (let market of allMarkets) {
+                const $marketContainer = document.createElement('li')
+                const $button = document.createElement('div')
+                const $flag = document.createElement('span')
+                const $text = document.createElement('span')
+
+                $button.dataset.market = market
+                $button.appendChild($flag)
+
+                if (market === marketId) {
+                    $button.classList.add('selected')
                 }
 
-                this.classList.add('selected')
+                $button.classList.add('market')
+                $button.classList.add('text-container')
+                $text.innerText = ' ' + market
+                $flag.classList.add('flag')
+                $flag.classList.add('flag-' + market)
 
-                changeWorldList(this.dataset.market)
-            })
+                $button.appendChild($flag)
+                $button.appendChild($text)
 
-            $marketContainer.appendChild($button)
-            $allMarkets.appendChild($marketContainer)
+                $button.addEventListener('mouseenter', function () {
+                    $selectedmarket = $allWorlds.querySelector('.market.selected')
+
+                    if ($selectedmarket) {
+                        $selectedmarket.classList.remove('selected')
+                    }
+
+                    this.classList.add('selected')
+
+                    changeWorldList(this.dataset.market)
+                })
+
+                $marketContainer.appendChild($button)
+                $allMarkets.appendChild($marketContainer)
+            }
         }
 
         const changeWorldList = function (newMarket) {
@@ -1847,7 +1892,9 @@ const TW2MapTooltip = function (selector) {
             }
         }
 
-        $currentWorld.addEventListener('mouseup', () => {
+        $currentWorld.addEventListener('mouseup', async () => {
+            await loadWorlds()
+
             if (visible) {
                 $allWorlds.classList.add('hidden')
                 visible = false
@@ -1864,8 +1911,6 @@ const TW2MapTooltip = function (selector) {
                 addEventListener('mousedown', closeHandler)
             }
         })
-
-        changeWorldList(marketId)
     }
 
     const mapSettings = {
@@ -1881,7 +1926,7 @@ const TW2MapTooltip = function (selector) {
     setupCustomHighlights()
     setupColorPicker()
 
-    if (mapShareId && mapShareType === mapShareTypes.STATIC) {
+    if (mapShare && mapShare.type === mapShareTypes.STATIC) {
         setupDisplayShareDate()
     } else {
         setupDisplayLastSync()
