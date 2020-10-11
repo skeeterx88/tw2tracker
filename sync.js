@@ -317,6 +317,7 @@ const downloadStruct = function (url, marketId, worldNumber) {
             })
 
             res.on('end', async function () {
+                await fs.promises.mkdir(path.join('.', 'data', marketId + worldNumber), { recursive: true })
                 const gzipped = zlib.gzipSync(Buffer.concat(data))
                 await fs.promises.writeFile(path.join('.', 'data', marketId + worldNumber, 'struct'), gzipped)
                 resolve()
