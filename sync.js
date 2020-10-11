@@ -62,6 +62,7 @@ Sync.createInitialStructure = async function () {
         await db.query(sql.mainSiteSchema)
         await Sync.markets()
         await Sync.registerWorlds()
+        await Sync.scrappeAllWorlds()
     }
 }
 
