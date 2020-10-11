@@ -58,6 +58,7 @@ Sync.createInitialStructure = async function () {
     const mainSchamaExists = await utils.schemaExists('main')
 
     if (!mainSchamaExists) {
+        await fs.promises.mkdir(path.join('.', 'data'), { recursive: true })
         await db.query(sql.mainSiteSchema)
         await Sync.markets()
         await Sync.registerWorlds()
