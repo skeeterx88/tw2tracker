@@ -48,6 +48,12 @@ const puppeteerPage = async function () {
 
     if (!page) {
         page = await browser.newPage()
+
+        page.on('console', function (msg) {
+            if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
+                console.log(msg._text)
+            }
+        })
     }
 }
 
@@ -357,12 +363,6 @@ Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = fals
     }
 
     await puppeteerPage()
-
-    page.on('console', function (msg) {
-        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
-            console.log(msg._text)
-        }
-    })
 
     try {
         const account = await Sync.auth(marketId, accountCredentials)
