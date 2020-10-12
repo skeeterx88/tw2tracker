@@ -10,6 +10,8 @@ const authenticatedMarkets = {}
 const zlib = require('zlib')
 const path = require('path')
 
+const IGNORE_LAST_SYNC = 'ignore_last_sync'
+
 let browser = null
 let page = null
 
@@ -292,7 +294,7 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
     }
 }
 
-Sync.scrappeAllWorlds = async function (ignoreLastSync = false) {
+Sync.scrappeAllWorlds = async function (flag) {
     console.log('Sync.scrappeAllWorlds()')
 
     let worlds
@@ -314,7 +316,7 @@ Sync.scrappeAllWorlds = async function (ignoreLastSync = false) {
 
     for (let world of worlds) {
         try {
-            await Sync.scrappeWorld(world.market, world.num, ignoreLastSync)
+            await Sync.scrappeWorld(world.market, world.num, flag)
         } catch (error) {
             console.log(error.message)
         }
@@ -342,7 +344,7 @@ const downloadStruct = function (url, marketId, worldNumber) {
     })
 }
 
-Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = false) {
+Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
     console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
     const accountCredentials = await db.one(sql.enabledMarket, [marketId])
@@ -353,7 +355,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, ignoreLastSync = fals
         throw new Error('Sync.scrappeWorld: World ' + marketId + worldNumber + ' is closed')
     }
 
-    if (!ignoreLastSync && worldInfo.last_sync) {
+    if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
         const settings = await db.one(sql.settings)
 
