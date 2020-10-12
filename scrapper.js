@@ -14,8 +14,11 @@ module.exports = function (marketId, worldNumber) {
             villages: {},
             villagesByPlayer: {},
             players: {},
-            tribes: {}
+            tribes: {},
+            provinces: {}
         }
+
+        let provinceId = 0
 
         const BLOCK_SIZE = 50
 
@@ -247,8 +250,17 @@ module.exports = function (marketId, worldNumber) {
                 v.id,
                 v.name,
                 v.points,
-                v.character_id || 0
+                v.character_id || 0,
+                v.province_id
             ]
+        }
+
+        const setProvince = function (provinceName) {
+            if (!worldData.provinces.hasOwnProperty(provinceName)) {
+                worldData.provinces[provinceName] = provinceId++
+            }
+
+            return worldData.provinces[provinceName]
         }
 
         const processVillages = function (blockData) {
@@ -259,6 +271,8 @@ module.exports = function (marketId, worldNumber) {
             blockData.villages.forEach(function (v) {
                 const pid = v.character_id
                 const tid = v.tribe_id
+
+                v.province_id = setProvince(v.province_name)
 
                 setVillage(v)
 

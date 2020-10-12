@@ -16,13 +16,19 @@ CREATE TABLE IF NOT EXISTS ${schema:name}.players (
     points INT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS ${schema:name}.provinces (
+    id INT PRIMARY KEY,
+    name VARCHAR (255) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS ${schema:name}.villages (
     id INT PRIMARY KEY,
     x SMALLINT NOT NULL,
     y SMALLINT NOT NULL,
     name VARCHAR (255) NOT NULL,
     points SMALLINT NOT NULL,
-    character_id INT REFERENCES ${schema:name}.players(id) NULL
+    character_id INT REFERENCES ${schema:name}.players(id) NULL,
+    province_id INT REFERENCES ${schema:name}.provinces(id)
 );
 
 CREATE TABLE IF NOT EXISTS ${schema:name}.villages_by_player (

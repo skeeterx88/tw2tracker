@@ -243,6 +243,30 @@ router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
     })
 })
 
+router.get('/api/:marketId/:worldNumber/provinces', async function (req, res) {
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const worldId = marketId + worldNumber
+    
+    const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
+
+    if (!worldExists) {
+        res.status(404)
+        res.send('Invalid API call')
+        return false
+    }
+
+    fs.promises.readFile(path.join('.', 'data', worldId, 'provinces'))
+    .then(function (data) {
+        res.setHeader('Content-Encoding', 'zlib')
+        res.end(data)
+    })
+    .catch(function () {
+        res.status(400)
+        res.send('API call error')
+    })
+})
+
 router.post('/api/create-share', async function (req, res) {
     const response = {}
     const {

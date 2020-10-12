@@ -300,6 +300,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             if (villagesX) {
                 const village = villagesX[mouseCoordY]
 
+
                 if (village) {
                     return setActiveVillage(village)
                 }
@@ -338,7 +339,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             return
         }
 
-        const [id, name, points, character_id] = village
+        const [id, name, points, character_id, province_id] = village
 
         activeVillage = {
             id,
@@ -346,7 +347,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             points,
             character_id,
             x: mouseCoordX,
-            y: mouseCoordY
+            y: mouseCoordY,
+            province_id
         }
 
         const player = loader.players[character_id]
@@ -972,7 +974,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 points: villagePoints,
                 character_id: villageCharacterId,
                 x: villageX,
-                y: villageY
+                y: villageY,
+                province_id
             } = village
 
             let playerName
@@ -982,6 +985,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             let tribeName
             let tribeTag
             let tribePoints
+            let provinceName = loader.provinces[province_id]
 
             if (villageCharacterId) {
                 ([ playerName, tribeId, playerPoints ] = loader.players[villageCharacterId])
@@ -1000,7 +1004,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 playerPoints,
                 tribeName,
                 tribeTag,
-                tribePoints
+                tribePoints,
+                provinceName
             })
 
             tooltip.show()
@@ -1024,6 +1029,7 @@ const DataLoader = function (marketId, worldNumber) {
     this.tribesByName = {}
     this.tribePlayers = {}
     this.continents = {}
+    this.provinces = []
     this.villages = {}
     this.villages.x = {}
     this.struct = false
@@ -1129,6 +1135,14 @@ const DataLoader = function (marketId, worldNumber) {
 
         resolve()
     })
+
+    this.loadProvinces = new Promise(async (resolve) => {
+        const load = await fetch(`/maps/api/${marketId}/${worldNumber}/provinces`)
+        const gzipped = await load.arrayBuffer()
+        this.provinces = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
+
+        resolve()
+    })
 }
 
 const TW2MapTooltip = function (selector) {
@@ -1155,6 +1169,7 @@ const TW2MapTooltip = function (selector) {
     let $tribeName = $tooltip.querySelector('.tribe-name')
     let $tribeTag = $tooltip.querySelector('.tribe-tag')
     let $tribePoints = $tooltip.querySelector('.tribe-points')
+    let $provinceName = $tooltip.querySelector('.province-name')
 
     const mouseMoveHandler = (event) => {
         let x = event.pageX
@@ -1194,7 +1209,8 @@ const TW2MapTooltip = function (selector) {
         playerPoints,
         tribeName,
         tribeTag,
-        tribePoints
+        tribePoints,
+        provinceName
     }) => {
         $villageName.innerHTML = villageName
         $villageX.innerHTML = villageX
@@ -1205,6 +1221,7 @@ const TW2MapTooltip = function (selector) {
         $tribeName.innerHTML = tribeName || '-'
         $tribeTag.innerHTML = tribeTag || '-'
         $tribePoints.innerHTML = tribePoints ? tribePoints.toLocaleString('pt-BR') : 0
+        $provinceName.innerHTML = provinceName
     }
 
     this.show = () => {

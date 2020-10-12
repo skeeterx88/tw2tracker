@@ -371,6 +371,10 @@ button.red:focus {
     background-image: url(/images/points-icon.png);
 }
 
+.icon.province:before {
+    background-image: url(/images/province-icon.png);
+}
+
 
 
 

@@ -145,7 +145,16 @@ Sync.fetchAllWorlds = async function () {
 
     await puppeteerBrowser()
 
-    const markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
+    let markets
+
+    if (process.env.NODE_ENV === 'development') {
+        markets = [
+            { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
+        ]
+    } else {
+        markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
+    }
+
     const allWorlds = {}
     const availableWorlds = {}
 
@@ -399,6 +408,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         }
     }
 
+    await db.query(sql.worlds.updateSync, [marketId, worldNumber])
+
     const page = await puppeteerPage()
 
     try {
@@ -455,9 +466,19 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             })
         }
 
+        for (let province_name in worldData.provinces) {
+            const province_id = worldData.provinces[province_name]
+
+            await db.query(sql.worlds.insert.province, {
+                schema: schema,
+                id: province_id,
+                name: province_name
+            })
+        }
+
         for (let x in worldData.villages) {
             for (let y in worldData.villages[x]) {
-                const [id, name, points, character_id] = worldData.villages[x][y]
+                const [id, name, points, character_id, province_id] = worldData.villages[x][y]
 
                 await db.query(sql.worlds.insert.village, {
                     schema: schema,
@@ -466,7 +487,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
                     y: y,
                     name: name,
                     points: points,
-                    character_id: character_id || null
+                    character_id: character_id || null,
+                    province_id: province_id
                 })
             }
         }
@@ -489,7 +511,6 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             })
         }
 
-        await db.query(sql.worlds.updateSync, [marketId, worldNumber])
         await Sync.genWorldBlocks(marketId, worldNumber)
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
@@ -527,17 +548,19 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
     const players = await db.any(sql.worlds.getData, { worldId, table: 'players' })
     const villages = await db.any(sql.worlds.getData, { worldId, table: 'villages' })
     const tribes = await db.any(sql.worlds.getData, { worldId, table: 'tribes' })
+    const provinces = await db.any(sql.worlds.getData, { worldId, table: 'provinces' })
 
     const parsedPlayers = {}
     const parsedTribes = {}
     const continents = {}
+    const parsedProvinces = []
 
     const dataPath = path.join('.', 'data', worldId)
 
     await fs.promises.mkdir(dataPath, { recursive: true })
 
     for (let village of villages) {
-        let { id, x, y, name, points, character_id } = village
+        let { id, x, y, name, points, character_id, province_id } = village
 
         let kx
         let ky
@@ -564,7 +587,7 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
             continents[k][x] = {}
         }
 
-        continents[k][x][y] = [id, name, points, character_id || 0]
+        continents[k][x][y] = [id, name, points, character_id || 0, province_id]
     }
 
     for (let k in continents) {
@@ -580,11 +603,17 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
         parsedTribes[id] = [name, tag, points]
     }
 
+    for (let { id, name } of provinces) {
+        parsedProvinces.push(name)
+    }
+
     const gzippedPlayers = zlib.gzipSync(JSON.stringify(parsedPlayers))
     const gzippedTribes = zlib.gzipSync(JSON.stringify(parsedTribes))
+    const gzippedProvinces = zlib.gzipSync(JSON.stringify(parsedProvinces))
 
     await fs.promises.writeFile(path.join(dataPath, 'players'), gzippedPlayers)
     await fs.promises.writeFile(path.join(dataPath, 'tribes'), gzippedTribes)
+    await fs.promises.writeFile(path.join(dataPath, 'provinces'), gzippedProvinces)
 
     console.log('Sync.genWorldBlocks:', worldId, 'finished')
 
