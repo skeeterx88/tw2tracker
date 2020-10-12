@@ -19,8 +19,6 @@ try {
     settings = require('./settings.defaults.json')
 }
 
-// console.log(sql)
-
 const indexRouter = require('./routes/index')
 const adminRouter = require('./routes/admin')
 const loginRouter = require('./routes/login')
@@ -62,7 +60,7 @@ app.use(session({
 }))
 
 passport.use(new LocalStrategy(async function (username, password, callback) {
-    const settings = await db.one(sql.settings, [])
+    const settings = await db.one(sql.settings.all, [])
 
     if (!settings || !settings.admin_password) {
         return callback(null, false)

@@ -6,7 +6,7 @@ const db = require('../db')
 const sql = require('../sql')
 
 router.get('/', async function (req, res, next) {
-    const settings = await db.one(sql.settings)
+    const settings = await db.one(sql.settings.all)
 
     res.render('login', {
         title: 'Admin login - ' + settings.site_name

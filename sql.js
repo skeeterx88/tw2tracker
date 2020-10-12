@@ -18,24 +18,27 @@ const readSqlFile = function (file) {
     })
 }
 
-const sql = {}
+const getSqlTree = function (from, sub, tree = {}) {
+    sub = sub || from
 
-fs.readdirSync('sql').forEach(function (item) {
-    const stat = fs.lstatSync('sql/' + item)
+    const items = fs.readdirSync(from)
 
-    if (stat.isFile()) {
-        const fileName = path.parse(item).name
-        const camelCaseName = fileName.replace(rcamelcase, (file) => file[1].toUpperCase())
-        sql[camelCaseName] = readSqlFile('sql/' + item)
-    } else if (stat.isDirectory()) {
-        sql[item] = {}
+    for (let item of items) {
+        const itemStat = fs.lstatSync(path.join(from, item))
 
-        fs.readdirSync('sql/' + item).forEach(function (sqlFile) {
-            const fileName = path.parse(sqlFile).name
+        if (itemStat.isFile()) {
+            const fileName = path.parse(item).name
             const camelCaseName = fileName.replace(rcamelcase, (file) => file[1].toUpperCase())
-            sql[item][camelCaseName] = readSqlFile('sql/' + item + '/' + sqlFile)
-        })
-    }
-})
+            const sqlPath = path.join(sub, item)
+            const sql = readSqlFile(sqlPath)
 
-module.exports = sql
+            tree[camelCaseName] = sql
+        } else if (itemStat.isDirectory()) {
+            tree[item] = getSqlTree(path.join(from, item), path.join(sub, item))
+        }
+    }
+
+    return tree
+}
+
+module.exports = getSqlTree('sql')

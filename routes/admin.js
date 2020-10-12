@@ -9,9 +9,9 @@ const Sync = require('../sync')
 
 // if (process.env.NODE_ENV === 'development') {
     router.get('/', ensureLoggedIn, async function (req, res) {
-        const worlds = await db.any(sql.worlds)
-        const markets = await db.any(sql.markets)
-        const settings = await db.one(sql.settings)
+        const worlds = await db.any(sql.worlds.all)
+        const markets = await db.any(sql.markets.all)
+        const settings = await db.one(sql.settings.all)
 
         res.render('admin', {
             title: 'Admin Panel - ' + settings.site_name,
@@ -42,8 +42,8 @@ router.get('/scrapper/all/:flag?', ensureLoggedIn, async function (req, res) {
 router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
-    const enabledMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
-    const worlds = await db.map(sql.worlds, [], world => world.num)
+    const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
+    const worlds = await db.map(sql.worlds.all, [], world => world.num)
 
     const response = {}
 
@@ -71,8 +71,8 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
 router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
-    const enabledMarkets = await db.map(sql.enabledMarkets, [], market => market.id)
-    const worlds = await db.map(sql.worlds, [], world => world.num)
+    const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
+    const worlds = await db.map(sql.worlds.all, [], world => world.num)
 
     const response = {}
 
@@ -109,16 +109,16 @@ router.post('/add-market', ensureLoggedIn, async function (req, res) {
 
     const response = {}
 
-    const marketCount = await db.any(sql.market, market)
+    const marketCount = await db.any(sql.markets.one, market)
     const query = marketCount.length
-        ? sql.updateMarket
+        ? sql.markets.update
         : sql.addMarket
 
     if (!marketCount.length) {
         await db.query(sql.addMarket, [market])
     }
 
-    await db.query(sql.updateMarket, [
+    await db.query(sql.markets.update, [
         market,
         accountName,
         accountPassword,
@@ -138,8 +138,8 @@ router.post('/add-market', ensureLoggedIn, async function (req, res) {
 
 router.get('/edit-market/:marketId', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
-    const market = await db.one(sql.market, [marketId])
-    const settings = await db.one(sql.settings)
+    const market = await db.one(sql.markets.one, [marketId])
+    const settings = await db.one(sql.settings.all)
 
     res.render('admin-edit-market', {
         title: `Edit market ${marketId} - Admin Panel - ${settings.site_name}`,
@@ -169,7 +169,7 @@ router.post('/change-settings', ensureLoggedIn, async function (req, res) {
         response.success = false
         response.message = 'invalid admin password'
     } else {
-        await db.query(sql.updateSettings, [
+        await db.query(sql.settings.update, [
             siteName,
             adminPassword,
             scrapperAllowBarbarians,
@@ -190,7 +190,7 @@ router.get('/test-account/:marketId', ensureLoggedIn, async function (req, res) 
 
     console.log('Account test on market', marketId)
 
-    const market = await db.one(sql.market, [marketId])
+    const market = await db.one(sql.markets.one, [marketId])
 
     if (!market.account_name || !market.account_password) {
         response.error = 'invalid market account'

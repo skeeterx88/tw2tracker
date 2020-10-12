@@ -82,7 +82,7 @@ Sync.createInitialStructure = async function () {
 
     if (!mainSchamaExists) {
         await fs.promises.mkdir(path.join('.', 'data'), { recursive: true })
-        await db.query(sql.mainSiteSchema)
+        await db.query(sql.mainSchema)
         await Sync.markets()
         await Sync.registerWorlds()
         await Sync.scrappeAllWorlds()
@@ -95,7 +95,7 @@ Sync.daemon = async function () {
     const {
         scrappe_all_interval,
         register_worlds_interval
-    } = await db.one(sql.intervalSettings)
+    } = await db.one(sql.settings.intervals)
 
     const SCRAPPE_ALL_INTERVAL = scrappe_all_interval * 60 * 1000
     const REGISTER_WORLDS_INTERVAL = register_worlds_interval * 60 * 1000
@@ -103,7 +103,7 @@ Sync.daemon = async function () {
     const {
         last_scrappe_all_time,
         last_register_worlds_time
-    } = await db.one(sql.stateLastSync)
+    } = await db.one(sql.state.lastSync)
 
     const lastScrappeAllTime = last_scrappe_all_time ? last_scrappe_all_time.getTime() : false
     const lastRegisterWorldsTime = last_register_worlds_time ? last_register_worlds_time.getTime() : false
@@ -145,7 +145,7 @@ Sync.fetchAllWorlds = async function () {
 
     await puppeteerBrowser()
 
-    const markets = (await db.any(sql.markets)).filter(market => market.account_name && market.account_password)
+    const markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
     const allWorlds = {}
     const availableWorlds = {}
 
@@ -195,7 +195,7 @@ Sync.fetchAllWorlds = async function () {
 Sync.registerWorlds = async function () {
     console.log('Sync.registerWorlds()')
 
-    await db.query(sql.stateUpdateRegisterWorldsTime)
+    await db.query(sql.state.update.registerWorldsTime)
 
     const [allWorlds, availableWorlds] = await Sync.fetchAllWorlds()
 
@@ -216,12 +216,12 @@ Sync.registerWorlds = async function () {
 
             if (!worldSchemaExists) {
                 console.log('Sync.registerWorlds: Creating schema for', marketId + worldNumber)
-                await db.query(sql.createWorldSchema, {schema: marketId + worldNumber})
+                await db.query(sql.worlds.createSchema, {schema: marketId + worldNumber})
             }
 
             if (!worldEntryExists) {
                 console.log('Sync.registerWorlds: Creating world entry for', marketId + worldNumber)
-                await db.query(sql.addWorldEntry, [marketId, worldNumber, worldName, true])
+                await db.query(sql.worlds.addEntry, [marketId, worldNumber, worldName, true])
             }
         }
     }
@@ -344,10 +344,10 @@ Sync.scrappeAllWorlds = async function (flag) {
             { market: 'en', num: 56 }
         ]
     } else {
-        worlds = await db.any(sql.openWorlds)
+        worlds = await db.any(sql.worlds.allOpen)
     }
 
-    await db.query(sql.stateUpdateLastScrappeAll)
+    await db.query(sql.state.update.lastScrappeAll)
 
     for (let world of worlds) {
         try {
@@ -382,8 +382,8 @@ const downloadStruct = function (url, marketId, worldNumber) {
 Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
     console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
-    const accountCredentials = await db.one(sql.enabledMarket, [marketId])
-    const worldInfo = await db.one(sql.world, [marketId, worldNumber])
+    const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
+    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
     const urlId = marketId === 'zz' ? 'beta' : marketId
 
     if (!worldInfo.open) {
@@ -392,7 +392,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 
     if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
-        const settings = await db.one(sql.settings)
+        const settings = await db.one(sql.settings.all)
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
             throw new Error('Sync.scrappeWorld: ' + marketId + worldNumber + ' already sincronized')
@@ -408,7 +408,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         })
 
         if (!worldCharacter.allow_login) {
-            await db.query(sql.updateWorldLocked, [marketId, worldNumber])
+            await db.query(sql.worlds.lock, [marketId, worldNumber])
             throw new Error('world is not open')
         }
 
@@ -434,7 +434,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         for (let id in worldData.tribes) {
             const [name, tag, points] = worldData.tribes[id]
 
-            await db.query(sql.insertWorldTribe, {
+            await db.query(sql.worlds.insert.tribe, {
                 schema: schema,
                 id: parseInt(id, 10),
                 name: name,
@@ -446,7 +446,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         for (let id in worldData.players) {
             const [name, points, tribe_id] = worldData.players[id]
 
-            await db.query(sql.insertWorldPlayer, {
+            await db.query(sql.worlds.insert.player, {
                 schema,
                 id: parseInt(id, 10),
                 name,
@@ -459,7 +459,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             for (let y in worldData.villages[x]) {
                 const [id, name, points, character_id] = worldData.villages[x][y]
 
-                await db.query(sql.insertWorldVillage, {
+                await db.query(sql.worlds.insert.village, {
                     schema: schema,
                     id: parseInt(id, 10),
                     x: x,
@@ -482,14 +482,14 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
                 playerVillages.push(villageId)
             }
 
-            await db.query(sql.insertWorldPlayerVillages, {
+            await db.query(sql.worlds.insert.playerVillages, {
                 schema: schema,
                 character_id: parseInt(character_id, 10),
                 villages_id: playerVillages
             })
         }
 
-        await db.query(sql.updateWorldSync, [marketId, worldNumber])
+        await db.query(sql.worlds.updateSync, [marketId, worldNumber])
         await Sync.genWorldBlocks(marketId, worldNumber)
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
@@ -502,7 +502,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 Sync.markets = async function () {
     console.log('Sync.markets()')
 
-    const storedMarkets = await db.map(sql.markets, [], market => market.id)
+    const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
     const $portalBar = await getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
     const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
     
@@ -514,7 +514,7 @@ Sync.markets = async function () {
     const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId))
 
     for (let missingMarket of missingMarkets) {
-        await db.query(sql.addMarketEntry, missingMarket)
+        await db.query(sql.markets.add, missingMarket)
     }
 
     return missingMarkets
@@ -524,9 +524,9 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
     console.log('Sync.genWorldBlocks()', marketId + worldNumber)
 
     const worldId = marketId + worldNumber
-    const players = await db.any(sql.worldData, { worldId, table: 'players' })
-    const villages = await db.any(sql.worldData, { worldId, table: 'villages' })
-    const tribes = await db.any(sql.worldData, { worldId, table: 'tribes' })
+    const players = await db.any(sql.worlds.getData, { worldId, table: 'players' })
+    const villages = await db.any(sql.worlds.getData, { worldId, table: 'villages' })
+    const tribes = await db.any(sql.worlds.getData, { worldId, table: 'tribes' })
 
     const parsedPlayers = {}
     const parsedTribes = {}

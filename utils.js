@@ -4,12 +4,12 @@ const sql = require('./sql')
 const noop = function () {}
 
 const schemaExists = async function (schameName) {
-    const schema = await db.one(sql.schemaExists, [schameName])
+    const schema = await db.one(sql.helpers.schemaExists, [schameName])
     return schema.exists
 }
 
 const worldEntryExists = async function (marketId, worldNumber) {
-    const worldEntry = await db.one(sql.worldEntryExists, [marketId, worldNumber])
+    const worldEntry = await db.one(sql.worlds.exists, [marketId, worldNumber])
     return worldEntry.exists
 }
 
