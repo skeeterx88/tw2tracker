@@ -193,12 +193,14 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const loadMapChunk = async function (x, y) {
-            const chunks = [
-                await loadVillages(x, y),
-                await loadVillages(x + BLOCK_SIZE, y),
-                await loadVillages(x, y + BLOCK_SIZE),
-                await loadVillages(x + BLOCK_SIZE, y + BLOCK_SIZE)
+            const loadChunks = [
+                loadVillages(x, y),
+                loadVillages(x + BLOCK_SIZE, y),
+                loadVillages(x, y + BLOCK_SIZE),
+                loadVillages(x + BLOCK_SIZE, y + BLOCK_SIZE)
             ]
+
+            const chunks = await Promise.all(loadChunks)
 
             let loadedVillages = 0
 
