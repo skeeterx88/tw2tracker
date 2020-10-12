@@ -13,7 +13,6 @@ const path = require('path')
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
 let browser = null
-let page = null
 
 const getHTML = function (url) {
     return new Promise(function (resolve) {
@@ -48,15 +47,15 @@ const puppeteerPage = async function () {
         await puppeteerBrowser()
     }
 
-    if (!page) {
-        page = await browser.newPage()
+    const page = await browser.newPage()
 
-        page.on('console', function (msg) {
-            if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
-                console.log(msg._text)
-            }
-        })
-    }
+    page.on('console', function (msg) {
+        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
+            console.log(msg._text)
+        }
+    })
+
+    return page
 }
 
 const Sync = {}
@@ -198,7 +197,7 @@ Sync.registerWorlds = async function () {
 Sync.registerCharacter = async function (marketId, worldNumber) {
     console.log('Sync.registerCharacter() market:' + marketId + ', world:' + worldNumber)
 
-    await puppeteerPage()
+    const page = await puppeteerPage()
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
 
     await page.evaluate(function (marketId, worldNumber) {
@@ -214,6 +213,8 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
 
     await page.waitFor(3000)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
+    await page.waitFor(1000)
+    await page.close()
 
     console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
 }
@@ -227,7 +228,7 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
 
     console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
 
-    await puppeteerPage()
+    const page = await puppeteerPage()
 
     try {
         const urlId = marketId === 'zz' ? 'beta' : marketId
@@ -286,10 +287,12 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
             throw new Error('Sync.auth: Authentication to market:' + marketId + ' failed "unknown reason"')
         }
 
+        await page.close()
         authenticatedMarkets[marketId] = account
 
         return account
     } catch (error) {
+        await page.close()
         throw new Error(error.message)
     }
 }
@@ -364,7 +367,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         }
     }
 
-    await puppeteerPage()
+    const page = await puppeteerPage()
 
     try {
         const account = await Sync.auth(marketId, accountCredentials)
@@ -390,6 +393,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         }
 
         const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
+        await page.close()
 
         const schema = marketId + worldNumber
 
