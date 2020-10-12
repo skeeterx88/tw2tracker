@@ -69,7 +69,7 @@ Sync.init = async function () {
     try {
         await Sync.createInitialStructure()
 
-        if (process.env.NODE_ENV !== 'development') {
+        if (process.env.NODE_ENV === 'production') {
             await Sync.daemon()
         }
     } catch (error) {
@@ -92,19 +92,52 @@ Sync.createInitialStructure = async function () {
 Sync.daemon = async function () {
     console.log('Sync.daemon()')
 
-    const CronJob = require('cron').CronJob
+    const {
+        scrappe_all_interval,
+        register_worlds_interval
+    } = await db.one(sql.intervalSettings)
 
-    const scrappeJob = new CronJob('0 */1 * * *', async function () {
+    const SCRAPPE_ALL_INTERVAL = scrappe_all_interval * 60 * 1000
+    const REGISTER_WORLDS_INTERVAL = register_worlds_interval * 60 * 1000
+
+    const {
+        last_scrappe_all_time,
+        last_register_worlds_time
+    } = await db.one(sql.stateLastSync)
+
+    const lastScrappeAllTime = last_scrappe_all_time ? last_scrappe_all_time.getTime() : false
+    const lastRegisterWorldsTime = last_register_worlds_time ? last_register_worlds_time.getTime() : false
+
+    let scrappeAllNext = 0
+    let registerWorldsNext = 0
+
+    if (lastScrappeAllTime) {
+        const elapsedTimeSinceLastCall = Date.now() - lastScrappeAllTime
+        scrappeAllNext = Math.max(0, SCRAPPE_ALL_INTERVAL - elapsedTimeSinceLastCall)
+    }
+
+    if (lastRegisterWorldsTime) {
+        const elapsedTimeSinceLastCall = Date.now() - lastRegisterWorldsTime
+        registerWorldsNext = Math.max(0, REGISTER_WORLDS_INTERVAL - elapsedTimeSinceLastCall)
+    }
+
+    setTimeout(async function () {
         await Sync.scrappeAllWorlds()
-    })
 
-    const marketsJob = new CronJob('0 1 * * *', async function () {
+        setInterval(async function () {
+            await Sync.scrappeAllWorlds()
+        }, SCRAPPE_ALL_INTERVAL)
+    }, scrappeAllNext)
+
+    setTimeout(async function () {
         await Sync.markets()
         await Sync.registerWorlds()
-    })
 
-    scrappeJob.start()
-    marketsJob.start()
+        setInterval(async function () {
+            await Sync.markets()
+            await Sync.registerWorlds()
+        }, REGISTER_WORLDS_INTERVAL)
+    }, registerWorldsNext)
 }
 
 Sync.fetchAllWorlds = async function () {
@@ -161,6 +194,8 @@ Sync.fetchAllWorlds = async function () {
 
 Sync.registerWorlds = async function () {
     console.log('Sync.registerWorlds()')
+
+    await db.query(sql.stateUpdateRegisterWorldsTime)
 
     const [allWorlds, availableWorlds] = await Sync.fetchAllWorlds()
 
@@ -303,19 +338,16 @@ Sync.scrappeAllWorlds = async function (flag) {
     let worlds
 
     if (process.env.NODE_ENV === 'development') {
-        worlds = [{
-            market: 'de',
-            num: 48
-        }, {
-            market: 'br',
-            num: 48
-        }, {
-            market: 'en',
-            num: 56
-        }]
+        worlds = [
+            { market: 'de', num: 48 },
+            { market: 'br', num: 48 },
+            { market: 'en', num: 56 }
+        ]
     } else {
         worlds = await db.any(sql.openWorlds)
     }
+
+    await db.query(sql.stateUpdateLastScrappeAll)
 
     for (let world of worlds) {
         try {
@@ -462,7 +494,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
     } catch (error) {
-        throw new Error('Sync.scrappeWorld: Failed to synchronize ' + marketId + worldNumber + ' (' + error.message + ')')
+        console.log('Sync.scrappeWorld: Failed to synchronize ' + marketId + worldNumber)
+        console.log(error.message)
     }
 }
 

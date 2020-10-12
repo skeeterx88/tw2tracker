@@ -1,0 +1,1 @@
+SELECT scrappe_all_interval, register_worlds_interval FROM main.settings
