@@ -1584,6 +1584,10 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupDisplayLastSync = () => {
+        if (mapShare && mapShare.type === mapShareTypes.STATIC) {
+            return
+        }
+
         const $lastSync = document.querySelector('#last-sync')
         const $lastSyncDate = document.querySelector('#last-sync-date')
 
@@ -1598,6 +1602,10 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupDisplayShareDate =  () => {
+        if (!mapShare || mapShare.type !== mapShareTypes.STATIC) {
+            return
+        }
+
         const $shareDate = document.querySelector('#share-date')
         const $shareDateDate = document.querySelector('#share-date-date')
 
@@ -1694,7 +1702,52 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
+    const loadMapShare = async () => {
+        if (!mapShare) {
+            return
+        }
+
+        mapShare.loadHighlights = new Promise(async (resolve) => {
+            const load = await ajaxPost('/maps/api/get-share/', {
+                mapShareId: mapShare.share_id,
+                marketId,
+                worldNumber,
+                highlightsOnly: true
+            })
+
+            if (!load.success) {
+                notif({
+                    title: 'Failed to load shared map highlights',
+                    content: load.message,
+                    timeout: 0
+                })
+
+                return
+            }
+
+            resolve(JSON.parse(load.data.highlights))
+        })
+    }
+
     const setupMapShare = async () => {
+        if (mapShare) {
+            map.moveTo(mapShare.center_x, mapShare.center_y)
+
+            if (mapShare.settings) {
+                for (let [id, value] of Object.entries(mapShare.settings)) {
+                    map.changeSetting(id, value, INITIAL_SETUP)
+                }
+            }
+
+            mapShare.loadHighlights.then(async (highlights) => {
+                await loader.loadInfo
+
+                for (let [highlightType, id, color] of highlights) {
+                    map.addHighlight(highlightType, id, color)
+                }
+            })
+        }
+
         const $mapShare = document.querySelector('#map-share')
         const $mapSave = document.querySelector('#map-save')
 
@@ -1731,41 +1784,6 @@ const TW2MapTooltip = function (selector) {
                 })
             }
         })
-
-        if (mapShare) {
-            map.moveTo(mapShare.center_x, mapShare.center_y)
-
-            if (mapShare.settings) {
-                for (let [id, value] of Object.entries(mapShare.settings)) {
-                    map.changeSetting(id, value, INITIAL_SETUP)
-                }
-            }
-
-            const loadShare = await ajaxPost('/maps/api/get-share/', {
-                mapShareId: mapShare.share_id,
-                marketId,
-                worldNumber,
-                highlightsOnly: true
-            })
-
-            if (!loadShare.success) {
-                notif({
-                    title: 'Failed to load shared map highlights',
-                    content: loadShare.message,
-                    timeout: 0
-                })
-
-                return
-            }
-
-            const highlights = JSON.parse(loadShare.data.highlights)
-
-            await loader.loadInfo
-
-            for (let [highlightType, id, color] of highlights) {
-                map.addHighlight(highlightType, id, color)
-            }
-        }
     }
 
     const setupNotif = () => {
@@ -1981,22 +1999,21 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
+    
+
     const mapSettings = {}
 
     const loader = new DataLoader(marketId, worldNumber)
     const tooltip = new TW2MapTooltip('#tooltip')
     const map = new TW2Map('#map', loader, tooltip, mapSettings)
 
+    loadMapShare()
+
     setupQuickJump()
     setupCustomHighlights()
     setupColorPicker()
-
-    if (mapShare && mapShare.type === mapShareTypes.STATIC) {
-        setupDisplayShareDate()
-    } else {
-        setupDisplayLastSync()
-    }
-
+    setupDisplayShareDate()
+    setupDisplayLastSync()
     setupDisplayPosition()
     setupCommonEvents()
     setupNotif()
