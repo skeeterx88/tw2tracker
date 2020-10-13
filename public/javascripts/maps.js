@@ -270,7 +270,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 if (activeVillage && activeVillage.character_id) {
                     clearOverlay()
                     const color = arrayRandom(colorPalette.flat())
-                    this.addHighlight(highlightTypes.PLAYERS, id, color)
+                    this.addHighlight(highlightTypes.PLAYERS, activeVillage.character_id, color)
                 }
             }
 
