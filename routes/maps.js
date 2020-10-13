@@ -106,7 +106,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
     })
 })
 
-router.get('/api/:marketId/:worldNumber/players/:mapShareId?', async function (req, res) {
+router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const mapShareId = req.params.mapShareId
@@ -125,9 +125,9 @@ router.get('/api/:marketId/:worldNumber/players/:mapShareId?', async function (r
     if (mapShareId) {
         const mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
         const dateId = utils.getHourlyDir(mapShare.creation_date)
-        dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'players')
+        dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'info')
     } else {
-        dataPath = path.join('.', 'data', worldId, 'players')
+        dataPath = path.join('.', 'data', worldId, 'info')
     }
 
     fs.promises.readFile(dataPath)
@@ -140,42 +140,6 @@ router.get('/api/:marketId/:worldNumber/players/:mapShareId?', async function (r
         res.send('Invalid API call')
     })
 })
-
-router.get('/api/:marketId/:worldNumber/tribes/:mapShareId?', async function (req, res) {
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const mapShareId = req.params.mapShareId
-    const worldId = marketId + worldNumber
-
-    const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
-
-    if (!worldExists) {
-        res.status(404)
-        res.send('Invalid API call')
-        return false
-    }
-
-    let dataPath
-
-    if (mapShareId) {
-        const mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
-        const dateId = utils.getHourlyDir(mapShare.creation_date)
-        dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'tribes')
-    } else {
-        dataPath = path.join('.', 'data', worldId, 'tribes')
-    }
-
-    fs.promises.readFile(dataPath)
-    .then(function (data) {
-        res.setHeader('Content-Encoding', 'zlib')
-        res.end(data)
-    })
-    .catch(function () {
-        res.status(404)
-        res.send('Invalid API call')
-    })
-})
-
 
 router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', async function (req, res) {
     const marketId = req.params.marketId
@@ -233,30 +197,6 @@ router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
     }
 
     fs.promises.readFile(path.join('.', 'data', worldId, 'struct'))
-    .then(function (data) {
-        res.setHeader('Content-Encoding', 'zlib')
-        res.end(data)
-    })
-    .catch(function () {
-        res.status(400)
-        res.send('API call error')
-    })
-})
-
-router.get('/api/:marketId/:worldNumber/provinces', async function (req, res) {
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const worldId = marketId + worldNumber
-    
-    const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
-
-    if (!worldExists) {
-        res.status(404)
-        res.send('Invalid API call')
-        return false
-    }
-
-    fs.promises.readFile(path.join('.', 'data', worldId, 'provinces'))
     .then(function (data) {
         res.setHeader('Content-Encoding', 'zlib')
         res.end(data)

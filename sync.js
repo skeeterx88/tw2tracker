@@ -633,13 +633,14 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
         parsedProvinces.push(name)
     }
 
-    const gzippedPlayers = zlib.gzipSync(JSON.stringify(parsedPlayers))
-    const gzippedTribes = zlib.gzipSync(JSON.stringify(parsedTribes))
-    const gzippedProvinces = zlib.gzipSync(JSON.stringify(parsedProvinces))
+    const info = {
+        players: parsedPlayers,
+        tribes: parsedTribes,
+        provinces: parsedProvinces
+    }
 
-    await fs.promises.writeFile(path.join(dataPath, 'players'), gzippedPlayers)
-    await fs.promises.writeFile(path.join(dataPath, 'tribes'), gzippedTribes)
-    await fs.promises.writeFile(path.join(dataPath, 'provinces'), gzippedProvinces)
+    const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
+    await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
 
     console.log('Sync.genWorldBlocks:', worldId, 'finished')
 

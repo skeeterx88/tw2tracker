@@ -1082,14 +1082,18 @@ const DataLoader = function (marketId, worldNumber) {
         }
     }
 
-    this.loadPlayers = new Promise(async (resolve) => {
+    this.loadInfo = new Promise(async (resolve) => {
         const url = mapShare && mapShare.type === mapShareTypes.STATIC
-            ? `/maps/api/${marketId}/${worldNumber}/players/${mapShare.share_id}`
-            : `/maps/api/${marketId}/${worldNumber}/players`
+            ? `/maps/api/${marketId}/${worldNumber}/info/${mapShare.share_id}`
+            : `/maps/api/${marketId}/${worldNumber}/info`
 
         const load = await fetch(url)
         const gzipped = await load.arrayBuffer()
-        this.players = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
+        const info = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
+
+        this.players = info.players
+        this.tribes = info.tribes
+        this.provinces = info.provinces
 
         for (let id in this.players) {
             let [name, tribeId, points] = this.players[id]
@@ -1100,18 +1104,6 @@ const DataLoader = function (marketId, worldNumber) {
                 this.tribePlayers[tribeId].push(parseInt(id, 10))
             }
         }
-
-        resolve()
-    })
-
-    this.loadTribes = new Promise(async (resolve) => {
-        const url = mapShare && mapShare.type === mapShareTypes.STATIC
-            ? `/maps/api/${marketId}/${worldNumber}/tribes/${mapShare.share_id}`
-            : `/maps/api/${marketId}/${worldNumber}/tribes`
-
-        const load = await fetch(`/maps/api/${marketId}/${worldNumber}/tribes`)
-        const gzipped = await load.arrayBuffer()
-        this.tribes = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
 
         for (let id in this.tribes) {
             let [name, tag, points] = this.tribes[id]
@@ -1156,14 +1148,6 @@ const DataLoader = function (marketId, worldNumber) {
         const buffer = array.buffer.slice(array.byteOffset, array.byteLength + array.byteOffset)
 
         this.struct = new DataView(buffer)
-
-        resolve()
-    })
-
-    this.loadProvinces = new Promise(async (resolve) => {
-        const load = await fetch(`/maps/api/${marketId}/${worldNumber}/provinces`)
-        const gzipped = await load.arrayBuffer()
-        this.provinces = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
 
         resolve()
     })
@@ -1341,10 +1325,7 @@ const TW2MapTooltip = function (selector) {
             const autoComplete = new AutoComplete({
                 data: {
                     src: async () => {
-                        await Promise.all([
-                            loader.loadPlayers,
-                            loader.loadTribes
-                        ])
+                        await loader.loadInfo
 
                         const matches = []
 
@@ -1779,10 +1760,7 @@ const TW2MapTooltip = function (selector) {
 
             const highlights = JSON.parse(loadShare.data.highlights)
 
-            await Promise.all([
-                loader.loadPlayers,
-                loader.loadTribes
-            ])
+            await loader.loadInfo
 
             for (let [highlightType, id, color] of highlights) {
                 map.addHighlight(highlightType, id, color)
