@@ -16,6 +16,8 @@ const highlightTypes = {
     TRIBES: 'tribes'
 }
 
+const INITIAL_SETUP = 'initial_setup'
+
 const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const $container = document.querySelector(containerSelector)
 
@@ -132,37 +134,50 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     const settingTriggers = {}
 
-    settingTriggers.neutralColor = () => {
+    settingTriggers.neutralColor = (flag) => {
+        if (flag === INITIAL_SETUP) {
+            return
+        }
+
         resetZoomContinents()
         renderVisibleContinents()
     }
 
-    settingTriggers.barbarianColor = () => {
+    settingTriggers.barbarianColor = (flag) => {
+        if (flag === INITIAL_SETUP) {
+            return
+        }
+
         resetZoomContinents()
         renderVisibleContinents()
     }
 
-    settingTriggers.backgroundColor = () => {
+    settingTriggers.backgroundColor = (flag) => {
         $container.style.backgroundColor = settings.backgroundColor
     }
 
-    settingTriggers.demarcationsColor = () => {
+    settingTriggers.demarcationsColor = (flag) => {
+        if (flag === INITIAL_SETUP) {
+            return
+        }
+
         resetZoomGrid()
         clearDemarcations()
         renderVisibleDemarcations()
         renderViewport()
     }
 
-    settingTriggers.zoomLevel = () => {
+    settingTriggers.zoomLevel = (flag) => {
         const currentCenterX = Math.floor(positionX / zoomSettings.tileSize)
         const currentCenterY = Math.floor(positionY / zoomSettings.tileSize)
 
         setupZoom()
+
+        this.moveTo(currentCenterX, currentCenterY)
+        
         renderVisibleDemarcations()
         renderVisibleContinents()
         renderViewport()
-
-        this.moveTo(currentCenterX, currentCenterY)
     }
 
     const resetZoomContinents = () => {
@@ -251,6 +266,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
             if (!dragging) {
                 this.trigger('click', [activeVillage])
+
+                if (activeVillage && activeVillage.character_id) {
+                    clearOverlay()
+                    const color = arrayRandom(colorPalette.flat())
+                    this.addHighlight(highlightTypes.PLAYERS, id, color)
+                }
             }
 
             dragging = false
@@ -332,6 +353,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 settingTriggers.zoomLevel()
             }
         })
+
+        // this.on('click', function (activeVillage) {
+            
+        // })
     }
 
     const setActiveVillage = (village) => {
@@ -391,11 +416,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const renderVisibleContinents = () => {
-        getVisibleContinents()
-        .filter((continent) => !renderedZoomContinents[settings.zoomLevel].hasOwnProperty(continent))
-        .forEach((continent) => {
+        let nonRenderedContinents = getVisibleContinents().filter((continent) => {
+            return !renderedZoomContinents[settings.zoomLevel][continent]
+        })
+
+        nonRenderedContinents.forEach((continent) => {
+            renderedZoomContinents[settings.zoomLevel][continent] = true
+
             loader.loadContinent(continent).then(villages => {
-                renderedZoomContinents[settings.zoomLevel][continent] = true
                 renderVillages(villages)
                 renderViewport()
             })
@@ -714,6 +742,68 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         return redrawVillages
     }
 
+    const setupTooltip = () => {
+        if (!tooltip) {
+            return
+        }
+
+        this.on('active village', (village) => {
+            if (!loader.players) {
+                return
+            }
+
+            const {
+                id,
+                name: villageName,
+                points: villagePoints,
+                character_id: villageCharacterId,
+                x: villageX,
+                y: villageY,
+                province_id
+            } = village
+
+            let playerName
+            let tribeId
+            let playerPoints
+            let playerVillages
+            let tribe
+            let tribeName
+            let tribeTag
+            let tribePoints
+            let tribeVillages
+            let provinceName = loader.provinces[province_id]
+
+            if (villageCharacterId) {
+                ([ playerName, tribeId, playerPoints, playerVillages ] = loader.players[villageCharacterId])
+
+                if (tribeId) {
+                    ([ tribeName, tribeTag, tribePoints, tribeVillages ] = loader.tribes[tribeId])
+                }
+            }
+
+            tooltip.set({
+                villageName,
+                villageX,
+                villageY,
+                villagePoints,
+                playerName,
+                playerPoints,
+                playerVillages,
+                tribeName,
+                tribeTag,
+                tribePoints,
+                tribeVillages,
+                provinceName
+            })
+
+            tooltip.show()
+        })
+
+        this.on('inactive village', (village) => {
+            tooltip.hide()
+        })
+    }
+
     this.recalcSize = () => {
         const { width, height } = $container.getBoundingClientRect()
         viewportWidth = width ? width : window.innerWidth
@@ -911,11 +1001,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
     }
 
-    this.getSetting = function (id) {
+    this.getSetting = (id) => {
         return settings[id]
     }
 
-    this.changeSetting = function (id, value) {
+    this.changeSetting = (id, value, flag) => {
         if (!settings.hasOwnProperty(id)) {
             throw new Error('Setting "' + id + '" does not exist')
         }
@@ -923,108 +1013,32 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         settings[id] = value
 
         if (settingTriggers.hasOwnProperty(id)) {
-            settingTriggers[id]()
+            settingTriggers[id](flag)
         }
 
         this.trigger('change setting', [id, value])
     }
 
-    setupZoom()
+    this.init = () => {
+        renderVisibleContinents()
+        continuousRender()
 
+        loader.loadStruct.then(() => {
+            renderVisibleDemarcations()
+            renderViewport()
+        })
+    }
+
+    setupZoom()
+    resetZoomContinents()
+    resetZoomGrid()
     positionX = 500 * zoomSettings.tileSize
     positionY = 500 * zoomSettings.tileSize
     centerCoordX = 500
     centerCoordY = 500
-
     setupElements()
     mouseEvents()
-
-    resetZoomContinents()
-    resetZoomGrid()
-
-    renderVisibleContinents()
-    continuousRender()
-
-    loader.loadStruct.then(() => {
-        renderVisibleDemarcations()
-        renderViewport()
-    })
-
-    this.on('click', function (activeVillage) {
-        if (!activeVillage) {
-            return
-        }
-
-        const id = activeVillage.character_id
-
-        if (!id) {
-            return
-        }
-
-        const color = arrayRandom(colorPalette.flat())
-
-        clearOverlay()
-
-        this.addHighlight(highlightTypes.PLAYERS, id, color)
-    })
-
-    if (tooltip) {
-        this.on('active village', (village) => {
-            if (!loader.players) {
-                return
-            }
-
-            const {
-                id,
-                name: villageName,
-                points: villagePoints,
-                character_id: villageCharacterId,
-                x: villageX,
-                y: villageY,
-                province_id
-            } = village
-
-            let playerName
-            let tribeId
-            let playerPoints
-            let playerVillages
-            let tribe
-            let tribeName
-            let tribeTag
-            let tribePoints
-            let tribeVillages
-            let provinceName = loader.provinces[province_id]
-
-            if (villageCharacterId) {
-                ([ playerName, tribeId, playerPoints, playerVillages ] = loader.players[villageCharacterId])
-
-                if (tribeId) {
-                    ([ tribeName, tribeTag, tribePoints, tribeVillages ] = loader.tribes[tribeId])
-                }
-            }
-
-            tooltip.set({
-                villageName,
-                villageX,
-                villageY,
-                villagePoints,
-                playerName,
-                playerPoints,
-                playerVillages,
-                tribeName,
-                tribeTag,
-                tribePoints,
-                tribeVillages,
-                provinceName
-            })
-
-            tooltip.show()
-        })
-
-        this.on('inactive village', (village) => {
-            tooltip.hide()
-        })
-    }
+    setupTooltip()
 }
 
 const DataLoader = function (marketId, worldNumber) {
@@ -1742,7 +1756,7 @@ const TW2MapTooltip = function (selector) {
 
             if (mapShare.settings) {
                 for (let [id, value] of Object.entries(mapShare.settings)) {
-                    map.changeSetting(id, value)
+                    map.changeSetting(id, value, INITIAL_SETUP)
                 }
             }
 
@@ -1991,9 +2005,9 @@ const TW2MapTooltip = function (selector) {
 
     const mapSettings = {}
 
-    loader = new DataLoader(marketId, worldNumber)
-    tooltip = new TW2MapTooltip('#tooltip')
-    map = new TW2Map('#map', loader, tooltip, mapSettings)
+    const loader = new DataLoader(marketId, worldNumber)
+    const tooltip = new TW2MapTooltip('#tooltip')
+    const map = new TW2Map('#map', loader, tooltip, mapSettings)
 
     setupQuickJump()
     setupCustomHighlights()
@@ -2012,4 +2026,6 @@ const TW2MapTooltip = function (selector) {
     setupSettings()
     setupMapShare()
     setupAbout()
+
+    map.init()
 })()
