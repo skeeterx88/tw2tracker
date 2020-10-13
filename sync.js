@@ -61,6 +61,8 @@ const puppeteerPage = async function () {
 const Sync = {}
 
 Sync.init = async function () {
+    console.log('Sync.init()')
+
     process.on('SIGTERM', async function () {
         console.log('Stopping tw2tracker')
         process.exit()
@@ -68,10 +70,7 @@ Sync.init = async function () {
 
     try {
         await Sync.createInitialStructure()
-
-        if (process.env.NODE_ENV === 'production') {
-            await Sync.daemon()
-        }
+        await Sync.daemon()
     } catch (error) {
         console.log(error)
     }

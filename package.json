@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "autoreload": "TZ=UTC nodemon ./bin/www --tw2tracker",
-    "start": "TZ=UTC node ./bin/www --tw2tracker",
-    "install": "node ./install.js"
+    "autoreload": "TZ=UTC node app.js",
+    "start": "TZ=UTC node app.js",
+    "install": "node install.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
