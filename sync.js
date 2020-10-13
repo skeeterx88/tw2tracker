@@ -263,7 +263,7 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
     console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
 }
 
-Sync.auth = async function (marketId, { account_name, account_password }) {
+Sync.auth = async function (marketId, { account_name, account_password }, retries = 0) {
     if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
         const account = authenticatedMarkets[marketId]
         console.log('Sync.auth() market:' + marketId + ', already authenticated with account', account.name)
@@ -302,9 +302,8 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
         }, account_name, account_password)
 
         if (!account) {
-            const errorMessage = await page.$eval('.login-error .error-message', $elem => $elem.textContent)
-
-            throw new Error('Sync.auth: Authentication to market:' + marketId + ' failed "' + errorMessage + '"')
+            const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent)
+            throw new Error(error)
         }
 
         await page.setCookie({
@@ -328,7 +327,7 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
         try {
             await page.waitForSelector('.player-worlds', { timeout: 3000 })
         } catch (error) {
-            throw new Error('Sync.auth: Authentication to market:' + marketId + ' failed "unknown reason"')
+            throw new Error('Authentication to market:' + marketId + ' failed "unknown reason"')
         }
 
         await page.close()
@@ -337,7 +336,20 @@ Sync.auth = async function (marketId, { account_name, account_password }) {
         return account
     } catch (error) {
         await page.close()
-        throw new Error(error.message)
+
+        if (retries < 2) {
+            retries++
+
+            console.log('Error when trying to authenticate (' + error.message + ')')
+            console.log('Retrying... (' + (retries) + ')')
+
+            return await Sync.auth(marketId, {
+                account_name,
+                account_password
+            }, retries)
+        } else {
+            throw new Error(error.message)
+        }
     }
 }
 
