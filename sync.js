@@ -566,13 +566,22 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
     const parsedTribes = {}
     const continents = {}
     const parsedProvinces = []
+    const tribeVillageCounter = {}
 
     const dataPath = path.join('.', 'data', worldId)
 
     await fs.promises.mkdir(dataPath, { recursive: true })
 
+    for (let { id, name, tribe_id, points } of players) {
+        parsedPlayers[id] = [name, tribe_id || 0, points, 0]
+    }
+
     for (let village of villages) {
         let { id, x, y, name, points, character_id, province_id } = village
+
+        if (character_id) {
+            parsedPlayers[character_id][3]++
+        }
 
         let kx
         let ky
@@ -602,17 +611,23 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
         continents[k][x][y] = [id, name, points, character_id || 0, province_id]
     }
 
+    for (let { id, tribe_id } of players) {
+        if (tribe_id) {
+            if (tribeVillageCounter.hasOwnProperty(tribe_id)) {
+                tribeVillageCounter[tribe_id] += parsedPlayers[id][3]
+            } else {
+                tribeVillageCounter[tribe_id] = parsedPlayers[id][3]
+            }
+        }
+    }
+
     for (let k in continents) {
         const data = JSON.stringify(continents[k])
         await fs.promises.writeFile(path.join(dataPath, k), zlib.gzipSync(data))
     }
 
-    for (let { id, name, tribe_id, points } of players) {
-        parsedPlayers[id] = [name, tribe_id || 0, points]
-    }
-
     for (let { id, name, tag, points } of tribes) {
-        parsedTribes[id] = [name, tag, points]
+        parsedTribes[id] = [name, tag, points, tribeVillageCounter[id]]
     }
 
     for (let { id, name } of provinces) {

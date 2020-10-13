@@ -981,17 +981,19 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             let playerName
             let tribeId
             let playerPoints
+            let playerVillages
             let tribe
             let tribeName
             let tribeTag
             let tribePoints
+            let tribeVillages
             let provinceName = loader.provinces[province_id]
 
             if (villageCharacterId) {
-                ([ playerName, tribeId, playerPoints ] = loader.players[villageCharacterId])
+                ([ playerName, tribeId, playerPoints, playerVillages ] = loader.players[villageCharacterId])
 
                 if (tribeId) {
-                    ([ tribeName, tribeTag, tribePoints ] = loader.tribes[tribeId])
+                    ([ tribeName, tribeTag, tribePoints, tribeVillages ] = loader.tribes[tribeId])
                 }
             }
 
@@ -1002,9 +1004,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 villagePoints,
                 playerName,
                 playerPoints,
+                playerVillages,
                 tribeName,
                 tribeTag,
                 tribePoints,
+                tribeVillages,
                 provinceName
             })
 
@@ -1165,10 +1169,12 @@ const TW2MapTooltip = function (selector) {
     let $villageY = $tooltip.querySelector('.village-y')
     let $villagePoints = $tooltip.querySelector('.village-points')
     let $playerName = $tooltip.querySelector('.player-name')
+    let $playerVillages = $tooltip.querySelector('.player-villages')
     let $playerPoints = $tooltip.querySelector('.player-points')
     let $tribeName = $tooltip.querySelector('.tribe-name')
     let $tribeTag = $tooltip.querySelector('.tribe-tag')
     let $tribePoints = $tooltip.querySelector('.tribe-points')
+    let $tribeVillages = $tooltip.querySelector('.tribe-villages')
     let $provinceName = $tooltip.querySelector('.province-name')
 
     const mouseMoveHandler = (event) => {
@@ -1207,9 +1213,11 @@ const TW2MapTooltip = function (selector) {
         villagePoints,
         playerName,
         playerPoints,
+        playerVillages,
         tribeName,
         tribeTag,
         tribePoints,
+        tribeVillages,
         provinceName
     }) => {
         $villageName.innerHTML = villageName
@@ -1218,9 +1226,11 @@ const TW2MapTooltip = function (selector) {
         $villagePoints.innerHTML = villagePoints.toLocaleString('pt-BR')
         $playerName.innerHTML = playerName || '-'
         $playerPoints.innerHTML = playerPoints ? playerPoints.toLocaleString('pt-BR') : 0
+        $playerVillages.innerHTML = playerVillages ? '(' + playerVillages.toLocaleString('pt-BR') + ' <span class="village mini-icon"></span>)' : ''
         $tribeName.innerHTML = tribeName || '-'
         $tribeTag.innerHTML = tribeTag || '-'
         $tribePoints.innerHTML = tribePoints ? tribePoints.toLocaleString('pt-BR') : 0
+        $tribeVillages.innerHTML = tribeVillages ? '(' + tribeVillages.toLocaleString('pt-BR') + ' <span class="village mini-icon"></span>)' : ''
         $provinceName.innerHTML = provinceName
     }
 
@@ -1398,7 +1408,9 @@ const TW2MapTooltip = function (selector) {
             const $name = document.createElement('div')
             const $nameSpan = document.createElement('span')
             const $color = document.createElement('div')
-            
+            const $villages = document.createElement('div')
+            const $icon = document.createElement('span')
+
             $item.classList.add('highlight-' + normalizeString(id))
             $item.classList.add('item')
             $item.classList.add(highlightType)
@@ -1410,12 +1422,13 @@ const TW2MapTooltip = function (selector) {
                 map.removeHighlight(highlightType, id)
             })
 
-            $name.className = 'name'
+            $name.classList.add('name')
+            $name.innerHTML = displayName
+            
+            $icon.classList.add('icon-' + highlightType)
 
-            $nameSpan.innerHTML = displayName
-            $nameSpan.className = 'icon-' + highlightType
-
-            $color.className = 'color open-color-picker'
+            $color.classList.add('color')
+            $color.classList.add('open-color-picker')
             $color.style.backgroundColor = color
             $color.dataset.color = color
 
@@ -1427,9 +1440,24 @@ const TW2MapTooltip = function (selector) {
                 }, KEEP_COLORPICKER_OPEN)
             })
 
-            $name.appendChild($nameSpan)
+            let realId
+            let villages
+
+            if (highlightType === highlightTypes.PLAYERS) {
+                realId = typeof id === 'number' ? id : loader.playersByName[id.toLowerCase()]
+                villages = loader.players[realId][3]
+            } else if (highlightType === highlightTypes.TRIBES) {
+                realId = typeof id === 'number' ? id : loader.tribesByName[id.toLowerCase()] || loader.tribesByTag[id.toLowerCase()]
+                villages = loader.tribes[realId][3]
+            }
+
+            $villages.classList.add('villages')
+            $villages.innerHTML = villages + ' villages'
+
+            $item.appendChild($icon)
             $item.appendChild($name)
             $item.appendChild($color)
+            $item.appendChild($villages)
             $highlightItems.appendChild($item)
         })
 
@@ -1957,9 +1985,9 @@ const TW2MapTooltip = function (selector) {
 
     const mapSettings = {}
 
-    const loader = new DataLoader(marketId, worldNumber)
-    const tooltip = new TW2MapTooltip('#tooltip')
-    const map = new TW2Map('#map', loader, tooltip, mapSettings)
+    loader = new DataLoader(marketId, worldNumber)
+    tooltip = new TW2MapTooltip('#tooltip')
+    map = new TW2Map('#map', loader, tooltip, mapSettings)
 
     setupQuickJump()
     setupCustomHighlights()

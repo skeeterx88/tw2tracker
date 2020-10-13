@@ -175,7 +175,7 @@ button.red:focus {
 }
 
 #highlight-items {
-    width: 90%;
+    width: calc(100% - 13px);
     margin-top: 5px;
     margin-left: 2px;
     text-shadow: 1px 1px 0px #000;
@@ -185,6 +185,7 @@ button.red:focus {
 
 #highlight-items .item {
     line-height: 16px;
+    height: 26px;
 }
 
 #highlight-items .item.tribes {
@@ -200,7 +201,7 @@ button.red:focus {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    width: 120px;
+    width: 102px;
     cursor: pointer;
 }
 
@@ -209,8 +210,9 @@ button.red:focus {
 }
 
 #highlight-items .item .color {
-    display: inline-block;
     padding: 1px;
+    margin-top: 5px;
+    float: right;
     width: 11px;
     height: 10px;
     position: relative;
@@ -221,6 +223,14 @@ button.red:focus {
                 inset 0 0 0 1px #47240e,
                 1px 1px 2px #000;
     cursor: pointer;
+}
+
+#highlight-items .item .villages {
+    width: 100%;
+    color: #bdaa89;
+    line-height: 0px;
+    padding-left: 19px;
+    font-size: 9px;
 }
 
 #highlight-items .item .color:hover {
@@ -322,8 +332,32 @@ button.red:focus {
     vertical-align: top;
 }
 
+#tooltip .tribe-villages,
+#tooltip .player-villages {
+    font-size: 9px;
+    color: #00000095;
+}
 
 
+.mini-icon {
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+    display: inline-block;
+    left: 0px;
+    top: 0px;
+    vertical-align: top;
+    background-size: 12px;
+    margin-top: 1px;
+}
+
+.mini-icon.village {
+    background-image: url(/images/village-icon.png);
+}
+
+.mini-icon.points {
+    background-image: url(/images/points-icon.png);
+}
 
 
 
