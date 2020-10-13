@@ -815,10 +815,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         renderVillages(redrawVillages)
 
-        for (let zoomLevel in $zoomElements) {
-            if (zoomLevel !== settings.zoomLevel) {
-                renderVillages(redrawVillages, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
-            }
+        const sortedZooms = Object.keys($zoomElements).sort((a, b) => a == settings.zoomLevel ? -1 : 0)
+
+        for (let zoomLevel of sortedZooms) {
+            renderVillages(redrawVillages, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
         }
 
         renderViewport()
@@ -843,8 +843,14 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         delete highlights[highlightType][realId]
 
+        const sortedZooms = Object.keys($zoomElements).sort((a, b) => a == settings.zoomLevel ? -1 : 0)
+
+        for (let zoomLevel of sortedZooms) {
+            renderVillages(redrawVillages, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
+        }
+
         this.trigger('remove highlight', [highlightType, id])
-        renderVillages(redrawVillages)
+
         renderViewport()
     }
 
