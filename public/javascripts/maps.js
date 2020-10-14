@@ -412,7 +412,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
-        return visibleContinents
+        const sorted = visibleContinents.sort(function(a, b){
+            return Math.abs(55 - a) - Math.abs(55 - b)
+        })
+
+        return sorted
     }
 
     const renderVisibleContinents = () => {
