@@ -1602,7 +1602,7 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupDisplayShareDate =  () => {
-        if (!mapShare || mapShare.type !== mapShareTypes.STATIC) {
+        if (!mapShare) {
             return
         }
 
