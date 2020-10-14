@@ -1702,35 +1702,29 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
-    const loadMapShare = async () => {
-        if (!mapShare) {
-            return
-        }
-
-        mapShare.loadHighlights = new Promise(async (resolve) => {
-            const load = await ajaxPost('/maps/api/get-share/', {
-                mapShareId: mapShare.share_id,
-                marketId,
-                worldNumber,
-                highlightsOnly: true
-            })
-
-            if (!load.success) {
-                notif({
-                    title: 'Failed to load shared map highlights',
-                    content: load.message,
-                    timeout: 0
-                })
-
-                return
-            }
-
-            resolve(JSON.parse(load.data.highlights))
-        })
-    }
-
     const setupMapShare = async () => {
         if (mapShare) {
+            mapShare.loadHighlights = new Promise(async (resolve) => {
+                const load = await ajaxPost('/maps/api/get-share/', {
+                    mapShareId: mapShare.share_id,
+                    marketId,
+                    worldNumber,
+                    highlightsOnly: true
+                })
+
+                if (!load.success) {
+                    notif({
+                        title: 'Failed to load shared map highlights',
+                        content: load.message,
+                        timeout: 0
+                    })
+
+                    return
+                }
+
+                resolve(JSON.parse(load.data.highlights))
+            })
+
             map.moveTo(mapShare.center_x, mapShare.center_y)
 
             if (mapShare.settings) {
@@ -1999,15 +1993,11 @@ const TW2MapTooltip = function (selector) {
         })
     }
 
-    
-
     const mapSettings = {}
 
     const loader = new DataLoader(marketId, worldNumber)
     const tooltip = new TW2MapTooltip('#tooltip')
     const map = new TW2Map('#map', loader, tooltip, mapSettings)
-
-    loadMapShare()
 
     setupQuickJump()
     setupCustomHighlights()
