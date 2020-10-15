@@ -5,10 +5,9 @@ module.exports = function (marketId, worldNumber) {
     console.log('Scrapper: Start scrapping', marketId + worldNumber)
 
     const Scrapper = async function () {
-        const $rootScope = injector.get('$rootScope')
         const socketService = injector.get('socketService')
-        const eventTypeProvider = injector.get('eventTypeProvider')
         const routeProvider = injector.get('routeProvider')
+        const hasOwn = Object.prototype.hasOwnProperty
 
         const worldData = {
             villages: {},
@@ -94,6 +93,12 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const init = async function () {
+            // const assert = function (conditionHandler) {
+            //     if (conditionHandler() !== true) {
+            //         throw new Error('Assertion failed');
+            //     }
+            // }
+
             // assert(function () {
             //     const result = filterBlocks({
             //         left: { x: 200 },
@@ -140,9 +145,9 @@ module.exports = function (marketId, worldNumber) {
 
             processFinish()
 
-            return worldData
-
             console.log('Scrapper: Finished scrapping', marketId + worldNumber)
+
+            return worldData
         }
 
         const getBoundaries = async function () {
@@ -176,12 +181,6 @@ module.exports = function (marketId, worldNumber) {
                 ...refCoords.bottomLeft.filter(([x, y]) => x >= boundaries.left  && y <= boundaries.bottom),
                 ...refCoords.bottomRight.filter(([x, y]) => x <= boundaries.right && y <= boundaries.bottom)
             ]
-        }
-
-        const assert = function (conditionHandler) {
-            if (conditionHandler() !== true) {
-                throw new Error('Assertion failed');
-            }
         }
 
         const loadVillages = function (x, y) {
@@ -218,11 +217,11 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const hasPlayer = function (pid) {
-            return !!worldData.players.hasOwnProperty(pid)
+            return !!hasOwn(worldData.players, pid)
         }
 
         const hasTribe = function (tid) {
-            return tid && !!worldData.tribes.hasOwnProperty(tid)
+            return tid && !!hasOwn(worldData.tribes, tid)
         }
 
         const setTribe = function (v) {
@@ -256,7 +255,7 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const setProvince = function (provinceName) {
-            if (!worldData.provinces.hasOwnProperty(provinceName)) {
+            if (!hasOwn(worldData.provinces, provinceName)) {
                 worldData.provinces[provinceName] = provinceId++
             }
 

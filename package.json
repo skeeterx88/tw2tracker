@@ -5,7 +5,8 @@
   "scripts": {
     "autoreload": "TZ=UTC node app.js",
     "start": "TZ=UTC node app.js",
-    "install": "node install.js"
+    "install": "node install.js",
+    "eslint": "eslint *.js routes/*.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -26,5 +27,8 @@
     "pg-promise": "^10.6.1",
     "puppeteer-core": "^5.2.1",
     "xdg-basedir": "^4.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.11.0"
   }
 }

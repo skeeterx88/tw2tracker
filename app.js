@@ -13,7 +13,7 @@ if (cluster.isMaster) {
         server()
         Sync.init()
 
-        cluster.on('exit', (worker, code, signal) => {
+        cluster.on('exit', () => {
             server()
             Sync.init()
         })

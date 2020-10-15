@@ -1,0 +1,36 @@
+---
+extends: eslint:recommended
+parserOptions:
+  ecmaVersion: 2018
+ignorePatterns:
+- src/header.js
+- src/footer.js
+env:
+  node: true
+  es6: true
+  browser: true
+rules:
+  no-async-promise-executor:
+  - off
+  indent:
+  - error
+  - 4
+  - SwitchCase: 1
+  quotes:
+  - error
+  - single
+  - allowTemplateLiterals: true
+  semi:
+  - error
+  - never
+  no-unused-vars:
+  - error
+  - vars: all
+    args: none
+  no-empty:
+  - error
+  - allowEmptyCatch: true
+globals:
+  injector: true
+  $rootScope: true
+  

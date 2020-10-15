@@ -2,7 +2,7 @@ let settings
 
 try {
     settings = require('./settings.json')
-} catch {
+} catch (e) {
     settings = require('./settings.defaults.json')
 }
 

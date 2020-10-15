@@ -7,7 +7,6 @@ const EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,1
 
 const db = require('../db')
 const sql = require('../sql')
-const Sync = require('../sync')
 
 const mapShareTypes = {
     STATIC: 'static',
@@ -130,14 +129,14 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req,
     }
 
     fs.promises.readFile(dataPath)
-    .then(function (data) {
-        res.setHeader('Content-Encoding', 'zlib')
-        res.end(data)
-    })
-    .catch(function () {
-        res.status(404)
-        res.send('Invalid API call')
-    })
+        .then(function (data) {
+            res.setHeader('Content-Encoding', 'zlib')
+            res.end(data)
+        })
+        .catch(function () {
+            res.status(404)
+            res.send('Invalid API call')
+        })
 })
 
 router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', async function (req, res) {
@@ -171,15 +170,15 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
         dataPath = path.join('.', 'data', worldId, continentId)
     }
 
+    res.setHeader('Content-Encoding', 'zlib')
+
     fs.promises.readFile(dataPath)
-    .then(function (data) {
-        res.setHeader('Content-Encoding', 'zlib')
-        res.end(data)
-    })
-    .catch(function () {
-        res.setHeader('Content-Encoding', 'zlib')
-        res.end(EMPTY_CONTINENT)
-    })
+        .then(function (data) {
+            res.end(data)
+        })
+        .catch(function () {
+            res.end(EMPTY_CONTINENT)
+        })
 })
 
 router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
@@ -196,14 +195,14 @@ router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
     }
 
     fs.promises.readFile(path.join('.', 'data', worldId, 'struct'))
-    .then(function (data) {
-        res.setHeader('Content-Encoding', 'zlib')
-        res.end(data)
-    })
-    .catch(function () {
-        res.status(400)
-        res.send('API call error')
-    })
+        .then(function (data) {
+            res.setHeader('Content-Encoding', 'zlib')
+            res.end(data)
+        })
+        .catch(function () {
+            res.status(400)
+            res.send('API call error')
+        })
 })
 
 router.post('/api/create-share', async function (req, res) {
@@ -245,7 +244,7 @@ router.post('/api/create-share', async function (req, res) {
 
             try {
                 await fs.promises.access(copyDestination)
-            } catch {
+            } catch (e) {
                 const worldDataLocation = path.join('.', 'data', worldId)
                 const worldData = await fs.promises.readdir(worldDataLocation)
                 const toCopy = worldData.filter((file) => file !== 'struct')
@@ -282,13 +281,12 @@ router.post('/api/get-share/', async function (req, res) {
         highlightsOnly
     } = req.body
 
-    let worldInfo
     let mapShare
 
     res.setHeader('Content-Type', 'application/json')
 
     try {
-        worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+        await db.one(sql.worlds.one, [marketId, worldNumber])
     } catch (error) {
         response.success = false
         response.message = 'World does not exist'

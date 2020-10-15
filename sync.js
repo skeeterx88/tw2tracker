@@ -9,6 +9,7 @@ const https = require('https')
 const authenticatedMarkets = {}
 const zlib = require('zlib')
 const path = require('path')
+const hasOwn = Object.prototype.hasOwnProperty
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
@@ -209,8 +210,7 @@ Sync.registerWorlds = async function () {
 
     for (let [marketId, marketWorlds] of Object.entries(availableWorlds)) {
         for (let i = 0; i < marketWorlds.length; i++) {
-            const {worldNumber, worldName} = marketWorlds[i]
-
+            const { worldNumber } = marketWorlds[i]
             await Sync.registerCharacter(marketId, worldNumber)
         }
     }
@@ -599,11 +599,11 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 
         const k = parseInt(ky + kx, 10)
 
-        if (!continents.hasOwnProperty(k)) {
+        if (!hasOwn(continents, k)) {
             continents[k] = {}
         }
 
-        if (!continents[k].hasOwnProperty(x)) {
+        if (!hasOwn(continents[k], x)) {
             continents[k][x] = {}
         }
 
@@ -612,7 +612,7 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 
     for (let { id, tribe_id } of players) {
         if (tribe_id) {
-            if (tribeVillageCounter.hasOwnProperty(tribe_id)) {
+            if (hasOwn(tribeVillageCounter, tribe_id)) {
                 tribeVillageCounter[tribe_id] += parsedPlayers[id][3]
             } else {
                 tribeVillageCounter[tribe_id] = parsedPlayers[id][3]
@@ -629,7 +629,7 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
         parsedTribes[id] = [name, tag, points, tribeVillageCounter[id]]
     }
 
-    for (let { id, name } of provinces) {
+    for (let { name } of provinces) {
         parsedProvinces.push(name)
     }
 

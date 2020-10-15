@@ -1,4 +1,3 @@
-const fs = require('fs')
 const express = require('express')
 const router = express.Router()
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
@@ -7,20 +6,18 @@ const db = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
 
-// if (process.env.NODE_ENV === 'development') {
-    router.get('/', ensureLoggedIn, async function (req, res) {
-        const worlds = await db.any(sql.worlds.all)
-        const markets = await db.any(sql.markets.all)
-        const settings = await db.one(sql.settings.all)
+router.get('/', ensureLoggedIn, async function (req, res) {
+    const worlds = await db.any(sql.worlds.all)
+    const markets = await db.any(sql.markets.all)
+    const settings = await db.one(sql.settings.all)
 
-        res.render('admin', {
-            title: 'Admin Panel - ' + settings.site_name,
-            worlds: worlds,
-            markets: markets,
-            settings: settings
-        })
+    res.render('admin', {
+        title: 'Admin Panel - ' + settings.site_name,
+        worlds: worlds,
+        markets: markets,
+        settings: settings
     })
-// }
+})
 
 router.get('/scrapper/all/:flag?', ensureLoggedIn, async function (req, res) {
     const response = {}
@@ -110,9 +107,6 @@ router.post('/add-market', ensureLoggedIn, async function (req, res) {
     const response = {}
 
     const marketCount = await db.any(sql.markets.one, market)
-    const query = marketCount.length
-        ? sql.markets.update
-        : sql.addMarket
 
     if (!marketCount.length) {
         await db.query(sql.addMarket, [market])

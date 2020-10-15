@@ -1,5 +1,5 @@
 module.exports = function () {
-    const readyState = function (callback) {
+    const readyState = function () {
         return new Promise(function (resolve, reject) {
             let injectorTimeout
             let timeout

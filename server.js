@@ -4,9 +4,7 @@ const session = require('express-session')
 const debug = require('debug')('tw2tracker:server')
 const http = require('http')
 const path = require('path')
-const url = require('url')
 const cookieParser = require('cookie-parser')
-const logger = require('morgan')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const db = require('./db')
@@ -17,7 +15,7 @@ let settings
 
 try {
     settings = require('./settings')
-} catch {
+} catch (e) {
     settings = require('./settings.defaults.json')
 }
 
@@ -43,7 +41,6 @@ if (process.env.NODE_ENV === 'production' && settings.force_ssl) {
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
-// app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())

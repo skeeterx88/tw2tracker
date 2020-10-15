@@ -6,7 +6,6 @@
     const os = require('os')
     const { exec } = require('child_process')
     const fs = require('fs').promises
-    const path = require('path')
     const xdgBasedir = require('xdg-basedir')
     const readline = require('readline')
     const rl = readline.createInterface({
@@ -72,25 +71,8 @@
         })
     }
 
-    function checkUserType () {
-        return new Promise(function (resolve, reject) {
-            if (process.env.SUDO_UID) {
-                resolve()
-            } else {
-                rl.question('You need root access to run this.\nDo you want to install with the current user? [Y/n] ', function (response) {
-                    if (!/^y|$/i.test(response)) {
-                        isUser = true
-                        resolve()
-                    } else {
-                        reject()
-                    }
-                })
-            }
-        })
-    }
-
     function selectUser () {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             rl.question('Which user would you like the unit to run as? [Default: arch] ', async function (response) {
                 if (response === 'root') {
                     process.stdout.write('Not allowed to run as root.\n')
@@ -108,7 +90,7 @@
 
     function checkSystemd () {
         return new Promise(function (resolve, reject) {
-            exec('systemctl', function (error, stdout, stderr) {
+            exec('systemctl', function (error) {
                 if (error) {
                     reject('Systemd is not installed.')
                 } else {
@@ -134,7 +116,7 @@
                         reject()
                     }
                 })
-            } catch {
+            } catch (e) {
                 resolve()
             }
         })
@@ -178,7 +160,7 @@
     }
 
     function setEnvironment () {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             rl.question('Is this a development environment? [Y/n] ', async function (response) {
                 environmentType = /n/i.test(response) ? 'production' : 'development'
                 resolve()
