@@ -8,7 +8,10 @@ CREATE TABLE main.settings (
     register_worlds_interval INT NOT NULL
 );
 
-INSERT INTO main.settings VALUES ('tw2tracker', '123', 60, 1440);
+-- 129600 = 60 days
+-- 1440 = 24 hours
+-- 60 = 1 hour
+INSERT INTO main.settings VALUES ('tw2tracker', '123', 60, 1440, 1440, 129600);
 
 CREATE TABLE main.state (
     last_scrappe_all_time TIMESTAMP DEFAULT NULL,
