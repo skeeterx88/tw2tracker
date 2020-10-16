@@ -5,7 +5,9 @@ CREATE TABLE main.settings (
     site_name VARCHAR (255) NOT NULL,
     admin_password VARCHAR (255) NOT NULL,
     scrappe_all_interval INT NOT NULL,
-    register_worlds_interval INT NOT NULL
+    register_worlds_interval INT NOT NULL,
+    clean_shares_check_interval INT NOT NULL,
+    static_share_expire_time INT NOT NULL
 );
 
 -- 129600 = 60 days

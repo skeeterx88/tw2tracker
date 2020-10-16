@@ -92,13 +92,15 @@ Sync.createInitialStructure = async function () {
 Sync.daemon = async function () {
     console.log('Sync.daemon()')
 
-    const {
+    let {
         scrappe_all_interval,
-        register_worlds_interval
+        register_worlds_interval,
+        clean_shares_check_interval
     } = await db.one(sql.settings.intervals)
 
-    const SCRAPPE_ALL_INTERVAL = scrappe_all_interval * 60 * 1000
-    const REGISTER_WORLDS_INTERVAL = register_worlds_interval * 60 * 1000
+    scrappe_all_interval = scrappe_all_interval * 60 * 1000
+    register_worlds_interval = register_worlds_interval * 60 * 1000
+    clean_shares_check_interval = clean_shares_check_interval * 60 * 1000
 
     const {
         last_scrappe_all_time,
@@ -113,12 +115,12 @@ Sync.daemon = async function () {
 
     if (lastScrappeAllTime) {
         const elapsedTimeSinceLastCall = Date.now() - lastScrappeAllTime
-        scrappeAllNext = Math.max(0, SCRAPPE_ALL_INTERVAL - elapsedTimeSinceLastCall)
+        scrappeAllNext = Math.max(0, scrappe_all_interval - elapsedTimeSinceLastCall)
     }
 
     if (lastRegisterWorldsTime) {
         const elapsedTimeSinceLastCall = Date.now() - lastRegisterWorldsTime
-        registerWorldsNext = Math.max(0, REGISTER_WORLDS_INTERVAL - elapsedTimeSinceLastCall)
+        registerWorldsNext = Math.max(0, register_worlds_interval - elapsedTimeSinceLastCall)
     }
 
     setTimeout(async function () {
@@ -126,7 +128,7 @@ Sync.daemon = async function () {
 
         setInterval(async function () {
             await Sync.scrappeAllWorlds()
-        }, SCRAPPE_ALL_INTERVAL)
+        }, scrappe_all_interval)
     }, scrappeAllNext)
 
     setTimeout(async function () {
@@ -136,8 +138,12 @@ Sync.daemon = async function () {
         setInterval(async function () {
             await Sync.markets()
             await Sync.registerWorlds()
-        }, REGISTER_WORLDS_INTERVAL)
+        }, register_worlds_interval)
     }, registerWorldsNext)
+
+    setInterval(async function () {
+        await Sync.cleanExpiredShares()
+    }, clean_shares_check_interval)
 }
 
 Sync.fetchAllWorlds = async function () {
@@ -152,7 +158,7 @@ Sync.fetchAllWorlds = async function () {
             { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
         ]
     } else {
-        markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
+        markets = (await db.any(sql.markets.all)).filter(market => market.account_86400name && market.account_password)
     }
 
     const allWorlds = {}
@@ -645,6 +651,20 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
     console.log('Sync.genWorldBlocks:', worldId, 'finished')
 
     return true
+}
+
+Sync.cleanExpiredShares = async function () {
+    const now = Date.now()
+    const shares = await db.any(sql.maps.getShareLastAccess)
+    let { static_share_expire_time } = await db.one(sql.settings.intervals)
+
+    static_share_expire_time = static_share_expire_time * 60 * 1000
+
+    for (let { share_id, last_access } of shares) {
+        if (now - last_access.getTime() < static_share_expire_time) {
+            await db.query(sql.maps.deleteStaticShare, [share_id])
+        }
+    }
 }
 
 module.exports = Sync
