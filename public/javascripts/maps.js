@@ -175,6 +175,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         this.moveTo(currentCenterX, currentCenterY)
         
+        resetZoomContinents()
         renderVisibleDemarcations()
         renderVisibleContinents()
         renderViewport()
