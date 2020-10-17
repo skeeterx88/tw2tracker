@@ -237,10 +237,10 @@ router.post('/api/create-share', async function (req, res) {
         const shareId = utils.makeid(20)
 
         const settingsString = JSON.stringify(settings)
-        const mapShare = await db.one(sql.maps.createShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y])
+        const { creation_date } = await db.one(sql.maps.createShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y])
 
         if (shareType === mapShareTypes.STATIC) {
-            const dateId = utils.getHourlyDir(mapShare.creation_date)
+            const dateId = utils.getHourlyDir(creation_date)
             const worldId = marketId + worldNumber
             const copyDestination = path.join('.', 'data', 'static-maps', worldId, dateId)
 
