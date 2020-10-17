@@ -91,6 +91,8 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
     mapShare.creation_date = new Date(mapShare.creation_date).getTime()
     mapShare.settings = JSON.parse(mapShare.settings)
 
+    db.query(sql.maps.updateShareAccess, [mapShareId])
+
     res.render('map', {
         title: 'Map ' + marketId + worldNumber + ' - ' + settings.site_name,
         exportValues: {
