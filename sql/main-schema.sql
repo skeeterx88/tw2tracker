@@ -28,11 +28,14 @@ CREATE TABLE main.markets (
     account_password VARCHAR (255) DEFAULT '7FONlraMpdnvrNIVE8aOgSGISVW00A'
 );
 
+CREATE TYPE map_sync_status AS ENUM ('success', 'fail');
+
 CREATE TABLE main.worlds (
     market VARCHAR (10) REFERENCES main.markets(id),
     num SMALLINT,
     name VARCHAR (255) NOT NULL,
     last_sync TIMESTAMP,
+    last_sync_status map_sync_status,
     open BOOLEAN NOT NULL DEFAULT TRUE
 );
 

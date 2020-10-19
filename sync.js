@@ -13,6 +13,12 @@ const hasOwn = Object.prototype.hasOwnProperty
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
+const SUCCESS = 'success'
+const FAIL = 'fail' 
+const SUCCESS_SYNC_ALL = 0
+const ERROR_SYNC_ALL = 1
+const ERROR_SYNC_SOME = 2
+
 let browser = null
 
 const getHTML = function (url) {
@@ -374,15 +380,41 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     await db.query(sql.state.update.lastScrappeAll)
 
+    const failedToSync = []
+
     for (let world of worlds) {
         try {
             await Sync.scrappeWorld(world.market, world.num, flag)
         } catch (error) {
             console.log(error.message)
+
+            failedToSync.push({
+                marketId: world.market,
+                worldNumber: world.num,
+                message: error.message
+            })
         }
     }
 
-    console.log('Sync.scrappeAllWorlds: Finished')
+    if (failedToSync.length) {
+        if (failedToSync.length === worlds.length) {
+            console.log('Sync.scrappeAllWorlds: All worlds failed to sync.')
+
+            return ERROR_SYNC_ALL
+        } else {
+            console.log('Sync.scrappeAllWorlds: Some worlds failed to sync:')
+
+            for (let fail of failedToSync) {
+                console.log(fail.marketId + fail.worldNumber + ':', fail.message)
+            }
+
+            return ERROR_SYNC_SOME
+        }
+    } else {
+        console.log('Sync.scrappeAllWorlds: Finished')
+
+        return SUCCESS_SYNC_ALL
+    }
 }
 
 const downloadStruct = function (url, marketId, worldNumber) {
@@ -536,10 +568,12 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             })
         }
 
+        await db.query(sql.worlds.updateSyncStatus, [SUCCESS, marketId, worldNumber])
         await Sync.genWorldBlocks(marketId, worldNumber)
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
     } catch (error) {
+        await db.query(sql.worlds.updateSyncStatus, [FAIL, marketId, worldNumber])
         console.log('Sync.scrappeWorld: Failed to synchronize ' + marketId + worldNumber)
         console.log(error.message)
     }
