@@ -605,11 +605,11 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 
         const k = parseInt(ky + kx, 10)
 
-        if (!hasOwn(continents, k)) {
+        if (!hasOwn.call(continents, k)) {
             continents[k] = {}
         }
 
-        if (!hasOwn(continents[k], x)) {
+        if (!hasOwn.call(continents[k], x)) {
             continents[k][x] = {}
         }
 
@@ -618,7 +618,7 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 
     for (let { id, tribe_id } of players) {
         if (tribe_id) {
-            if (hasOwn(tribeVillageCounter, tribe_id)) {
+            if (hasOwn.call(tribeVillageCounter, tribe_id)) {
                 tribeVillageCounter[tribe_id] += parsedPlayers[id][3]
             } else {
                 tribeVillageCounter[tribe_id] = parsedPlayers[id][3]

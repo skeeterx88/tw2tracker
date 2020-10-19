@@ -217,11 +217,11 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const hasPlayer = function (pid) {
-            return !!hasOwn(worldData.players, pid)
+            return !!hasOwn.call(worldData.players, pid)
         }
 
         const hasTribe = function (tid) {
-            return tid && !!hasOwn(worldData.tribes, tid)
+            return tid && !!hasOwn.call(worldData.tribes, tid)
         }
 
         const setTribe = function (v) {
@@ -255,7 +255,7 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const setProvince = function (provinceName) {
-            if (!hasOwn(worldData.provinces, provinceName)) {
+            if (!hasOwn.call(worldData.provinces, provinceName)) {
                 worldData.provinces[provinceName] = provinceId++
             }
 
