@@ -408,12 +408,21 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
     console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
     const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
-    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const urlId = marketId === 'zz' ? 'beta' : marketId
+
+    let worldInfo
+
+    try {
+        worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+    } catch (e) {
+        throw new Error('Sync.scrappeWorld: World ' + marketId + worldNumber + ' not found.')
+    }
 
     if (!worldInfo.open) {
         throw new Error('Sync.scrappeWorld: World ' + marketId + worldNumber + ' is closed')
     }
+
+    const urlId = marketId === 'zz' ? 'beta' : marketId
+
 
     if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
