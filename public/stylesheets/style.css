@@ -1,6 +1,27 @@
 body {
     padding: 50px;
     font: 14px 'Lucida Grande', Helvetica, Arial, sans-serif;
+    background: url(/images/side-bar-middle.jpg), #413127;
+}
+
+body.not-found .modal {
+    width: 630px;
+    margin: 0 auto;
+    background: url(/images/noise.png) #6f4327;
+    color: #e0bfbf;
+    padding: 3px;
+    text-shadow: 1px 1px 0px #00000090;
+    z-index: 7;
+    transition: visibility 0.02s linear, opacity 0.02s linear;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
+    border: 1px solid #5e351b;
+    border-radius: 1px;
+}
+
+code {
+    background: #00000050;
+    padding: 3px;
+    border-radius: 3px;
 }
 
 a {

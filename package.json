@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "autoreload": "TZ=UTC node app.js",
+    "autoreload": "TZ=UTC nodemon app.js",
     "start": "TZ=UTC node app.js",
     "install": "node install.js",
     "eslint": "eslint *.js routes/*.js"

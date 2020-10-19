@@ -1,3 +1,21 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%= title %></title>
+        <meta name="viewport" content="width=800 initial-scale=1"/>
+        <meta name="description" content="Interactive world map for Tribal Wars 2">
+        <link rel="icon" type="image/png" href="/images/favicon.png"/>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+    </head>
+    <body class="not-found">
+        <div class="modal">
+            <h1><%= locals.error_title || 'Something went wrong' %></h1>
+
+            <% if (locals.error_message) { %>
+                <p><%= locals.error_message %></p>
+            <% } %>
+
+            <p>If you believe you shouldn't been seing this page, send a message to us <code><a href="mailto:contact@tw2-tracker.com">contact@tw2-tracker.com</a></code></p>
+        </div>
+    </body>
+</html>
