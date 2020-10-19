@@ -282,9 +282,8 @@ Sync.auth = async function (marketId, { account_name, account_password }, retrie
     try {
         const urlId = marketId === 'zz' ? 'beta' : marketId
 
-        await page.goto(`https://${urlId}.tribalwars2.com/page`, {
-            waitUntil: ['domcontentloaded', 'networkidle0']
-        })
+        await page.goto(`https://${urlId}.tribalwars2.com/page`, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+        await page.waitFor(1000)
 
         const account = await page.evaluate(function (account_name, account_password) {
             return new Promise(function (resolve) {
