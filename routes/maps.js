@@ -30,22 +30,23 @@ router.get('/', async function (req, res) {
     })
 })
 
-router.get('/api/get-worlds', async function (req, res) {
-    const allWorlds = await db.any(sql.worlds.allOpen)
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(allWorlds))
-})
-
-router.get('/api/get-markets', async function (req, res) {
-    const allMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(allMarkets))
-})
-
 router.get('/:marketId/:worldNumber', async function (req, res) {
     const settings = await db.one(sql.settings.all)
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
+
+    const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
+
+    if (!worldExists) {
+        res.status(404)
+        res.render('error', {
+            title: 'Tw2-Tracker Error',
+            error_title: 'This world does not exist'
+        })
+
+        return false
+    }
+
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
     const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
 
@@ -67,24 +68,31 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
 
-    let worldInfo
     let mapShare
 
-    try {
-        worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-    } catch (error) {
+    const worldExists = await checkWorldSchemaExists(marketId, worldNumber)
+
+    if (!worldExists) {
         res.status(404)
-        res.send('World does not exist')
+        res.render('error', {
+            title: 'Tw2-Tracker Error',
+            error_title: 'This world does not exist'
+        })
+
         return false
     }
 
+    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
     const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
 
     try {
         mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
     } catch (error) {
         res.status(404)
-        res.send('Map share does not exist')
+        res.render('error', {
+            title: 'Tw2-Tracker Error',
+            error_title: 'This map share does not exist'
+        })
         return false
     }
 
@@ -139,6 +147,18 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req,
             res.status(404)
             res.send('Invalid API call')
         })
+})
+
+router.get('/api/get-worlds', async function (req, res) {
+    const allWorlds = await db.any(sql.worlds.allOpen)
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(allWorlds))
+})
+
+router.get('/api/get-markets', async function (req, res) {
+    const allMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(allMarkets))
 })
 
 router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', async function (req, res) {
