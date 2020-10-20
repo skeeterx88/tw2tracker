@@ -18,6 +18,8 @@ const highlightTypes = {
 
 const INITIAL_SETUP = 'initial_setup'
 
+const hasOwn = Object.prototype.hasOwnProperty
+
 const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const $container = document.querySelector(containerSelector)
 
@@ -199,7 +201,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         zoomSettings.mapWidth = 1000 * zoomSettings.tileSize
         zoomSettings.mapHeight = 1000 * zoomSettings.tileSize
 
-        if (!$zoomElements.hasOwnProperty(settings.zoomLevel)) {
+        if (!hasOwn.call($zoomElements, settings.zoomLevel)) {
             $cache = document.createElement('canvas')
             $cacheContext = $cache.getContext('2d')
 
@@ -449,7 +451,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         }
 
         const visibleContinents = getVisibleContinents()
-        const nonRenderedContinents = visibleContinents.filter((k) => !renderedZoomGrid[settings.zoomLevel].hasOwnProperty(k))
+        const nonRenderedContinents = visibleContinents.filter((k) => !hasOwn.call(renderedZoomGrid[settings.zoomLevel], k))
 
         for (let k of nonRenderedContinents) {
             k = String(k)
@@ -689,7 +691,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         switch (highlightType) {
             case highlightTypes.PLAYERS: {
-                if (loader.playersByName.hasOwnProperty(lowerId)) {
+                if (hasOwn.call(loader.playersByName, lowerId)) {
                     return loader.playersByName[lowerId]
                 } else {
                     throw new Error('Highlights: Player ' + id + ' not found')
@@ -698,9 +700,9 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 break
             }
             case highlightTypes.TRIBES: {
-                if (loader.tribesByTag.hasOwnProperty(lowerId)) {
+                if (hasOwn.call(loader.tribesByTag, lowerId)) {
                     return loader.tribesByTag[lowerId]
-                } else if (loader.tribesByName.hasOwnProperty(lowerId)) {
+                } else if (hasOwn.call(loader.tribesByName, lowerId)) {
                     return loader.tribesByName[lowerId]
                 } else {
                     throw new Error('Highlights: Tribe ' + id + ' not found')
@@ -872,7 +874,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         let realId
         let displayName
 
-        if (typeof id === 'number' && loader[highlightType].hasOwnProperty(id)) {
+        if (typeof id === 'number' && hasOwn.call(loader[highlightType], id)) {
             realId = id
         } else if (typeof id === 'string') {
             try {
@@ -903,7 +905,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
-        if (highlights[highlightType].hasOwnProperty(realId)) {
+        if (hasOwn.call(highlights[highlightType], realId)) {
             this.trigger('update highlight', [highlightType, id, displayName, color])
         } else {
             this.trigger('add highlight', [highlightType, id, displayName, color])
@@ -928,7 +930,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     this.removeHighlight = (highlightType, id) => {
         let realId
 
-        if (typeof id === 'number' && loader[highlightType].hasOwnProperty(id)) {
+        if (typeof id === 'number' && hasOwn.call(loader[highlightType], id)) {
             realId = id
         } else if (typeof id === 'string') {
             try {
@@ -1005,7 +1007,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     this.trigger = (event, args) => {
-        if (events.hasOwnProperty(event)) {
+        if (hasOwn.call(events, event)) {
             for (let handler of events[event]) {
                 handler.apply(this, args)
             }
@@ -1017,13 +1019,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     this.changeSetting = (id, value, flag) => {
-        if (!settings.hasOwnProperty(id)) {
+        if (!hasOwn.call(settings, id)) {
             throw new Error('Setting "' + id + '" does not exist')
         }
 
         settings[id] = value
 
-        if (settingTriggers.hasOwnProperty(id)) {
+        if (hasOwn.call(settingTriggers, id)) {
             settingTriggers[id](flag)
         }
 
@@ -1130,7 +1132,7 @@ const DataLoader = function (marketId, worldNumber) {
             throw new Error('Invalid continent value')
         }
 
-        if (continentPromises.hasOwnProperty(continent)) {
+        if (hasOwn.call(continentPromises, continent)) {
             return continentPromises[continent]
         }
 
