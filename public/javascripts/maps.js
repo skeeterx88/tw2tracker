@@ -1984,7 +1984,7 @@ const TW2MapTooltip = function (selector) {
         $contact.addEventListener('click', () => {
             notif({
                 title: 'Contact',
-                content: 'contact@tw2tracker.com',
+                content: 'contact@tw2-tracker.com',
                 timeout: 0
             })
         })
