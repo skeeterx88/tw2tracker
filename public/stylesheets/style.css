@@ -1,21 +1,13 @@
-body {
-    padding: 50px;
+html {
     font: 14px 'Lucida Grande', Helvetica, Arial, sans-serif;
-    background: url(/images/side-bar-middle.jpg), #413127;
+    background: url(/images/background-scene.webp) top no-repeat, url(/images/noise-2.png), #88785F;
+    margin: 0px;
 }
 
-body.not-found .modal {
-    width: 630px;
-    margin: 0 auto;
-    background: url(/images/noise.png) #6f4327;
-    color: #e0bfbf;
-    padding: 3px;
-    text-shadow: 1px 1px 0px #00000090;
-    z-index: 7;
-    transition: visibility 0.02s linear, opacity 0.02s linear;
-    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
-    border: 1px solid #5e351b;
-    border-radius: 1px;
+body {
+    width: 1000px;
+    margin: auto;
+    padding: 10px;
 }
 
 code {
@@ -33,127 +25,52 @@ li {
     list-style: none;
 }
 
-.flag {
-    height: 12px;
-    width: 18px;
-    background: url(/images/flags.png) no-repeat top left;
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 1px;
+header {
+    height: 230px;
+    background: url(/images/banner.png) no-repeat center;
+    margin-bottom: 10px;
 }
 
-.flag-de {
-    background-position: 0 -448px
+menu {
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
 }
-.flag-en {
-    background-position: 0 -64px
+
+.content-border {
+    box-shadow: 0 0 0 1px #00000090, 0 0 0 2px #5e351b, 0 0 0 5px #00000080, 2px 2px 5px 5px #00000095;
+    border: 1px solid #5e351b;
+    border-radius: 1px;
 }
-.flag-fr {
-    background-position: 0 -704px
+
+menu li {
+    width: 100px;
+    margin: 15px 10px;
+    display: inline-block;
+    background: url(/images/noise.png), #e8d5a5;
+    padding: 10px;
+    text-align: center;
 }
-.flag-es {
-    background-position: 0 -736px
+
+main {
+    height: 1000px;
+    margin: 0 auto;
+    background: url(/images/noise.png),
+                url(/images/content-border-left.webp) left repeat-y,
+                url(/images/content-border-right.webp) right repeat-y,
+                url(/images/content-border-top.webp) top repeat-x,
+                url(/images/content-border-bottom.webp) bottom repeat-x,
+                #e8d5a5;
+    padding: 10px;
 }
-.flag-it {
-    background-position: 0 -640px
-}
-.flag-gr {
-    background-position: 0 -96px
-}
-.flag-nl {
-    background-position: 0 -32px
-}
-.flag-ro {
-    background-position: 0 -320px
-}
-.flag-se {
-    background-position: 0 -384px
-}
-.flag-cz {
-    background-position: 0 -128px
-}
-.flag-pl {
-    background-position: 0 -544px
-}
-.flag-hu {
-    background-position: 0 -480px
-}
-.flag-sk {
-    background-position: 0 -160px
-}
-.flag-dk {
-    background-position: 0 -576px
-}
-.flag-no {
-    background-position: 0 -512px
-}
-.flag-pt {
-    background-position: 0 -192px
-}
-.flag-jp {
-    background-position: 0 -1056px
-}
-.flag-ru {
-    background-position: 0 -256px
-}
-.flag-br {
-    background-position: 0 -352px
-}
-.flag-tr {
-    background-position: 0 -672px
-}
-.flag-ch {
-    background-position: 0 -416px
-}
-.flag-kr {
-    background-position: 0 -224px
-}
-.flag-ae {
-    background-position: 0 -800px
-}
-.flag-bg {
-    background-position: 0 0
-}
-.flag-th {
-    background-position: 0 -1088px
-}
-.flag-ba {
-    background-position: 0 -608px
-}
-.flag-fi {
-    background-position: 0 -768px
-}
-.flag-hr {
-    background-position: 0 -992px
-}
-.flag-il {
-    background-position: 0 -928px
-}
-.flag-lt {
-    background-position: 0 -896px
-}
-.flag-si {
-    background-position: 0 -864px
-}
-.flag-us {
-    background-position: 0 -1120px
-}
-.flag-id {
-    background-position: 0 -960px
-}
-.flag-uk {
-    background-position: 0 -832px
-}
-.flag-ts {
-    background-position: 0 -1024px
-}
-.flag-zz,
-.flag-xx {
-    background-position: 0 -1152px
-}
-.flag-ar {
-    background-position: 0 -1217px
-}
-.flag-mx {
-    background-position: 0 -1184px
+
+div.modal {
+    width: 630px;
+    margin: 0 auto;
+    background: url(/images/noise.png) #6f4327;
+    color: #e0bfbf;
+    padding: 3px;
+    text-shadow: 1px 1px 0px #00000090;
+    z-index: 7;
+    transition: visibility 0.02s linear, opacity 0.02s linear;
 }

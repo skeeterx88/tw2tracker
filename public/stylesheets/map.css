@@ -18,6 +18,15 @@ button {
     font: 11px Arial, Helvetica, sans-serif;
 }
 
+a {
+    color: #00B7FF;
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
 ul {
     margin: 0;
     padding: 0;
@@ -291,13 +300,13 @@ button.red:focus {
     border-spacing: 1px;
     border-collapse: separate;
     box-shadow: 0 0 0 2px #7c360066;
-    background: url(/images/tooltip-background-2.png) #d1ad86;
+    background: url(/images/noise-4.png) #d1ad86;
 }
 
 #tooltip td {
     border: 1px solid #7c36004d;
     box-shadow: none;
-    background: url(/images/tooltip-background-2.png) #c39c72;
+    background: url(/images/noise-4.png) #c39c72;
     padding: 1px;
 }
 
@@ -372,7 +381,7 @@ button.red:focus {
     left: 0px;
     top: 0px;
     background: linear-gradient(#02030373, #02030300),
-                url(/images/background_noise_icon_black.png);
+                url(/images/background-icon-black.png);
 }
 
 .icon:before {
@@ -644,7 +653,7 @@ header {
 #autoComplete_list {
     color: #000;
     line-height: 15px;
-    background: url(/images/bg2.png) top left #ceab84;
+    background: url(/images/noise-3.png) top left #ceab84;
     box-shadow: inset 0 0 0 1px #533a1f,
                 inset 0 0 0 2px #dcba94,
                 5px 5px 5px #00000080;
