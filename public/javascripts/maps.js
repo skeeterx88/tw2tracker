@@ -341,23 +341,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         })
 
         $overlay.addEventListener('wheel', (event) => {
-            let newZoom = false
-
-            if (event.deltaY < 0 && zoomLevels[settings.zoomLevel + 1]) {
-                newZoom = settings.zoomLevel + 1
-            } else if (event.deltaY > 0 && zoomLevels[settings.zoomLevel - 1]) {
-                newZoom = settings.zoomLevel - 1
-            }
-
-            if (newZoom !== false) {
-                settings.zoomLevel = newZoom
-                settingTriggers.zoomLevel()
+            if (event.deltaY < 0) {
+                this.zoomIn()
+            } else if (event.deltaY > 0) {
+                this.zoomOut()
             }
         })
-
-        // this.on('click', function (activeVillage) {
-            
-        // })
     }
 
     const setActiveVillage = (village) => {
@@ -855,6 +844,20 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         renderOverlay()
     }
 
+    this.zoomIn = () => {
+        if (zoomLevels[settings.zoomLevel + 1]) {
+            settings.zoomLevel++
+            settingTriggers.zoomLevel()
+        }
+    }
+
+    this.zoomOut = () => {
+        if (zoomLevels[settings.zoomLevel - 1]) {
+            settings.zoomLevel--
+            settingTriggers.zoomLevel()
+        }
+    }
+
     this.getCoords = () => {
         return {
             x: Math.floor(positionX / zoomSettings.tileSize),
@@ -1208,7 +1211,7 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setEvents = () => {
-        window.addEventListener('mousemove', mouseMoveHandler)
+        addEventListener('mousemove', mouseMoveHandler)
     }
 
     const unsetEvents = () => {
@@ -1581,7 +1584,7 @@ const TW2MapTooltip = function (selector) {
             activeColorPicker = false
         }
 
-        window.addEventListener('mousedown', (event) => {
+        addEventListener('mousedown', (event) => {
             if (activeColorPicker && !event.target.classList.contains('open-color-picker') && !event.target.closest('#color-picker')) {
                 closeColorPicker()
             }
@@ -1629,11 +1632,26 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupCommonEvents = () => {
-        window.addEventListener('resize', map.recalcSize)
+        addEventListener('resize', map.recalcSize)
 
-        window.addEventListener('keydown', (event) => {
-            if (event.target.nodeName !== 'INPUT' && event.code === 'Space') {
-                map.moveTo(500, 500)
+        addEventListener('keydown', (event) => {
+            if (event.target.nodeName === 'INPUT') {
+                return
+            }
+
+            switch (event.code) {
+                case 'Space': {
+                    map.moveTo(500, 500)
+                    break
+                }
+                case 'Equal': {
+                    map.zoomIn()
+                    break
+                }
+                case 'Minus': {
+                    map.zoomOut()
+                    break
+                }
             }
         })
     }
