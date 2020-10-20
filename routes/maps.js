@@ -30,7 +30,11 @@ router.get('/', async function (req, res) {
     })
 })
 
-router.get('/:marketId/:worldNumber', async function (req, res) {
+router.get('/:marketId/:worldNumber', async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
     const settings = await db.one(sql.settings.all)
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
