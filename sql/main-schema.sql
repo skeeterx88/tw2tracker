@@ -4,16 +4,14 @@ SET TIMEZONE='UTC';
 CREATE TABLE main.settings (
     site_name VARCHAR (255) NOT NULL,
     admin_password VARCHAR (255) NOT NULL,
-    scrappe_all_interval INT NOT NULL,
-    register_worlds_interval INT NOT NULL,
-    clean_shares_check_interval INT NOT NULL,
+    scrappe_all_interval VARCHAR (50) NOT NULL,
+    register_worlds_interval VARCHAR (50) NOT NULL,
+    clean_shares_check_interval VARCHAR (50) NOT NULL,
     static_share_expire_time INT NOT NULL
 );
 
 -- 129600 = 60 days
--- 1440 = 24 hours
--- 60 = 1 hour
-INSERT INTO main.settings VALUES ('tw2tracker', '123', 60, 1440, 1440, 129600);
+INSERT INTO main.settings VALUES ('tw2tracker', '123', '0 * * * *', '0 */12 * * *', '0 */12 * * *', 129600);
 
 CREATE TABLE main.state (
     last_scrappe_all_time TIMESTAMP DEFAULT NULL,

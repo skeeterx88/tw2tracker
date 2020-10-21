@@ -6,6 +6,7 @@ const readyState = require('./ready-state.js')
 const getStructPath = require('./get-struct-path.js')
 const fs = require('fs')
 const https = require('https')
+const schedule = require('node-schedule')
 const authenticatedMarkets = {}
 const zlib = require('zlib')
 const path = require('path')
@@ -81,58 +82,24 @@ Sync.createInitialStructure = async function () {
 Sync.daemon = async function () {
     console.log('Sync.daemon()')
 
-    let {
+    const {
         scrappe_all_interval,
         register_worlds_interval,
         clean_shares_check_interval
     } = await db.one(sql.settings.intervals)
 
-    scrappe_all_interval = scrappe_all_interval * 60 * 1000
-    register_worlds_interval = register_worlds_interval * 60 * 1000
-    clean_shares_check_interval = clean_shares_check_interval * 60 * 1000
-
-    const {
-        last_scrappe_all_time,
-        last_register_worlds_time
-    } = await db.one(sql.state.lastSync)
-
-    const lastScrappeAllTime = last_scrappe_all_time ? last_scrappe_all_time.getTime() : false
-    const lastRegisterWorldsTime = last_register_worlds_time ? last_register_worlds_time.getTime() : false
-
-    let scrappeAllNext = 0
-    let registerWorldsNext = 0
-
-    if (lastScrappeAllTime) {
-        const elapsedTimeSinceLastCall = Date.now() - lastScrappeAllTime
-        scrappeAllNext = Math.max(0, scrappe_all_interval - elapsedTimeSinceLastCall)
-    }
-
-    if (lastRegisterWorldsTime) {
-        const elapsedTimeSinceLastCall = Date.now() - lastRegisterWorldsTime
-        registerWorldsNext = Math.max(0, register_worlds_interval - elapsedTimeSinceLastCall)
-    }
-
-    setTimeout(async function () {
+    const scrapeWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
         await Sync.scrappeAllWorlds()
+    })
 
-        setInterval(async function () {
-            await Sync.scrappeAllWorlds()
-        }, scrappe_all_interval)
-    }, scrappeAllNext)
-
-    setTimeout(async function () {
+    const registerWorldsJob = schedule.scheduleJob(register_worlds_interval, async function () {
         await Sync.markets()
         await Sync.registerWorlds()
+    })
 
-        setInterval(async function () {
-            await Sync.markets()
-            await Sync.registerWorlds()
-        }, register_worlds_interval)
-    }, registerWorldsNext)
-
-    setInterval(async function () {
+    const cleanSharesJob = schedule.scheduleJob(clean_shares_check_interval, async function () {
         await Sync.cleanExpiredShares()
-    }, clean_shares_check_interval)
+    })
 }
 
 Sync.fetchAllWorlds = async function () {
@@ -144,10 +111,12 @@ Sync.fetchAllWorlds = async function () {
 
     if (process.env.NODE_ENV === 'development') {
         markets = [
-            { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
+            { id: 'de', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' },
+            { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' },
+            { id: 'en', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
         ]
     } else {
-        markets = (await db.any(sql.markets.all)).filter(market => market.account_86400name && market.account_password)
+        markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
     }
 
     const allWorlds = {}
