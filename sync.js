@@ -62,8 +62,6 @@ Sync.init = async function () {
     try {
         await Sync.createInitialStructure()
         await Sync.daemon()
-
-        await Sync.scrappeAllWorlds()
     } catch (error) {
         console.log(error)
     }
