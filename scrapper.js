@@ -17,6 +17,7 @@ module.exports = function (marketId, worldNumber) {
             provinces: {}
         }
 
+        let totalVillages = 0
         let provinceId = 0
 
         const BLOCK_SIZE = 50
@@ -145,7 +146,7 @@ module.exports = function (marketId, worldNumber) {
 
             processFinish()
 
-            console.log('Scrapper: Finished scrapping', marketId + worldNumber)
+            console.log('Scrapper: Finished (fetched ' + totalVillages + ' villages)', marketId + worldNumber)
 
             return worldData
         }
@@ -211,8 +212,6 @@ module.exports = function (marketId, worldNumber) {
                 loadedVillages += chunk.villages.length
             }
 
-            console.log('Scrapper:', 'Fetched k' + coords2continent(x, y) + ', villages:', loadedVillages)
-
             return loadedVillages
         }
 
@@ -244,6 +243,7 @@ module.exports = function (marketId, worldNumber) {
         }
 
         const setVillage = function (v) {
+            totalVillages++
             worldData.villages[v.x] = worldData.villages[v.x] || {}
             worldData.villages[v.x][v.y] = [
                 v.id,

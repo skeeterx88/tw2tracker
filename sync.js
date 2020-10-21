@@ -62,6 +62,8 @@ Sync.init = async function () {
     try {
         await Sync.createInitialStructure()
         await Sync.daemon()
+
+        await Sync.scrappeAllWorlds()
     } catch (error) {
         console.log(error)
     }
@@ -206,6 +208,7 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
 
     const page = await puppeteerPage()
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
+    await page.waitFor(2000)
 
     await page.evaluate(function (marketId, worldNumber) {
         return new Promise(function (resolve) {
@@ -218,10 +221,9 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
         })
     }, marketId, worldNumber)
 
-    await page.waitFor(3000)
+    await page.waitFor(2000)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
-    await page.waitFor(1000)
-    await page.close()
+    await page.waitFor(2000)
 
     console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
 }
@@ -380,6 +382,7 @@ const downloadStruct = async function (url, marketId, worldNumber) {
 Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
     console.log('Sync.scrappeWorld()', marketId + worldNumber)
 
+    const worldId = marketId + worldNumber
     const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
 
     let worldInfo
@@ -387,22 +390,19 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
     try {
         worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
     } catch (e) {
-        throw new Error('Sync.scrappeWorld: World ' + marketId + worldNumber + ' not found.')
+        throw new Error('Sync.scrappeWorld: World ' + worldId + ' not found.')
     }
 
     if (!worldInfo.open) {
-        throw new Error('Sync.scrappeWorld: World ' + marketId + worldNumber + ' is closed')
+        throw new Error('Sync.scrappeWorld: World ' + worldId + ' is closed')
     }
-
-    const urlId = marketId === 'zz' ? 'beta' : marketId
-
 
     if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
         const settings = await db.one(sql.settings.all)
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-            throw new Error('Sync.scrappeWorld: ' + marketId + worldNumber + ' already sincronized')
+            throw new Error('Sync.scrappeWorld: ' + worldId + ' already sincronized')
         }
     }
 
@@ -412,21 +412,22 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 
     try {
         const account = await Sync.auth(marketId, accountCredentials)
-        const worldCharacter = account.characters.find(function ({ world_id }) {
-            return world_id === marketId + worldNumber
-        })
+        const worldCharacter = account.characters.find(({ world_id }) => world_id === worldId)
 
-        if (!worldCharacter.allow_login) {
+        if (!worldCharacter) {
+            await Sync.registerCharacter(marketId, worldNumber)
+        } else if (!worldCharacter.allow_login) {
             await db.query(sql.worlds.lock, [marketId, worldNumber])
             throw new Error('world is not open')
         }
 
-
+        const urlId = marketId === 'zz' ? 'beta' : marketId
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
+        await page.waitFor(2000)
         await page.evaluate(readyState)
 
         try {
-            await fs.promises.access(path.join('.', 'data', marketId + worldNumber, 'struct'))
+            await fs.promises.access(path.join('.', 'data', worldId, 'struct'))
         } catch (_) {
             console.log('Sync.scrappeWorld: Downloading map structure')
             const structPath = await page.evaluate(getStructPath)
@@ -436,15 +437,13 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
         await page.close()
 
-        const schema = marketId + worldNumber
-
-        console.log('Sync.scrappeWorld: Saving ' + marketId + worldNumber + ' data')
+        console.log('Sync.scrappeWorld: Saving ' + worldId + ' data')
 
         for (let id in worldData.tribes) {
             const [name, tag, points] = worldData.tribes[id]
 
             await db.query(sql.worlds.insert.tribe, {
-                schema: schema,
+                schema: worldId,
                 id: parseInt(id, 10),
                 name: name,
                 tag: tag,
@@ -456,7 +455,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             const [name, points, tribe_id] = worldData.players[id]
 
             await db.query(sql.worlds.insert.player, {
-                schema,
+                schema: worldId,
                 id: parseInt(id, 10),
                 name,
                 tribe_id,
@@ -468,7 +467,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             const province_id = worldData.provinces[province_name]
 
             await db.query(sql.worlds.insert.province, {
-                schema: schema,
+                schema: worldId,
                 id: province_id,
                 name: province_name
             })
@@ -479,7 +478,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
                 const [id, name, points, character_id, province_id] = worldData.villages[x][y]
 
                 await db.query(sql.worlds.insert.village, {
-                    schema: schema,
+                    schema: worldId,
                     id: parseInt(id, 10),
                     x: x,
                     y: y,
@@ -503,7 +502,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             }
 
             await db.query(sql.worlds.insert.playerVillages, {
-                schema: schema,
+                schema: worldId,
                 character_id: parseInt(character_id, 10),
                 villages_id: playerVillages
             })
