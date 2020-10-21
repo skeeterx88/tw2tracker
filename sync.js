@@ -21,23 +21,6 @@ const ERROR_SYNC_SOME = 2
 
 let browser = null
 
-const getHTML = function (url) {
-    return new Promise(function (resolve) {
-        const HTMLParser = require('fast-html-parser')
-
-        https.get(url, function (res) {
-            res.setEncoding('utf8')
-
-            let body = ''
-
-            res.on('data', data => { body += data })
-            res.on('end', async function () {
-                resolve(HTMLParser.parse(body))
-            })
-        })
-    })
-}
-
 const puppeteerBrowser = async function () {
     if (!browser) {
         const puppeteer = require('puppeteer-core')
@@ -417,23 +400,12 @@ Sync.scrappeAllWorlds = async function (flag) {
     }
 }
 
-const downloadStruct = function (url, marketId, worldNumber) {
-    return new Promise(function (resolve) {
-        https.get(url, function (res) {
-            let data = []
-
-            res.on('data', function (chunk) {
-                data.push(chunk)
-            })
-
-            res.on('end', async function () {
-                await fs.promises.mkdir(path.join('.', 'data', marketId + worldNumber), { recursive: true })
-                const gzipped = zlib.gzipSync(Buffer.concat(data))
-                await fs.promises.writeFile(path.join('.', 'data', marketId + worldNumber, 'struct'), gzipped)
-                resolve()
-            })
-        })
-    })
+const downloadStruct = async function (url, marketId, worldNumber) {
+    const buffer = await utils.getBuffer(url)
+    const gzipped = zlib.gzipSync(buffer)
+    
+    await fs.promises.mkdir(path.join('.', 'data', marketId + worldNumber), { recursive: true })
+    await fs.promises.writeFile(path.join('.', 'data', marketId + worldNumber, 'struct'), gzipped)
 }
 
 Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
@@ -583,7 +555,7 @@ Sync.markets = async function () {
     console.log('Sync.markets()')
 
     const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
-    const $portalBar = await getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
+    const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
     const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
     
     const marketList = $markets.map(function ($market) {

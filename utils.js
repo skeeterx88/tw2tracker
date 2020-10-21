@@ -1,5 +1,6 @@
 const db = require('./db')
 const sql = require('./sql')
+const https = require('https')
 
 const noop = function () {}
 
@@ -36,11 +37,46 @@ const getHourlyDir = function (now) {
     return date + '-' + hour
 }
 
+const getHTML = function (url) {
+    return new Promise(function (resolve) {
+        const HTMLParser = require('fast-html-parser')
+
+        https.get(url, function (res) {
+            res.setEncoding('utf8')
+
+            let body = ''
+
+            res.on('data', data => { body += data })
+            res.on('end', async function () {
+                resolve(HTMLParser.parse(body))
+            })
+        })
+    })
+}
+
+const getBuffer = function (url) {
+    return new Promise(function (resolve) {
+        https.get(url, function (res) {
+            let data = []
+
+            res.on('data', function (chunk) {
+                data.push(chunk)
+            })
+
+            res.on('end', async function () {
+                resolve(Buffer.concat(data))
+            })
+        })
+    })
+}
+
 module.exports = {
     noop,
     schemaExists,
     worldEntryExists,
     extractNumbers,
     makeid,
-    getHourlyDir
+    getHourlyDir,
+    getHTML,
+    getBuffer
 }
