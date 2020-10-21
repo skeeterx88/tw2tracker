@@ -434,7 +434,13 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
             await downloadStruct(`https://${urlId}.tribalwars2.com/${structPath}`, marketId, worldNumber)
         }
 
+        const evaluationExpire = setTimeout(async function () {
+            await page.close()
+            throw new Error('Evaluation failed: got stuck')
+        }, 60000)
+
         const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
+        clearTimeout(evaluationExpire)
         await page.close()
 
         console.log('Sync.scrappeWorld: Saving ' + worldId + ' data')
