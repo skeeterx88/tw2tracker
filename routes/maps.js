@@ -3,6 +3,7 @@ const path = require('path')
 const express = require('express')
 const router = express.Router()
 const utils = require('../utils')
+const getSettings = require('../settings')
 const EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
 
 const db = require('../db')
@@ -19,7 +20,7 @@ const checkWorldSchemaExists = async function (marketId, worldNumber) {
 }
 
 router.get('/', async function (req, res) {
-    const settings = await db.one(sql.settings.all)
+    const settings = await getSettings()
     const worlds = await db.any(sql.worlds.all)
     const markets = await db.any(sql.markets.all)
 
@@ -35,7 +36,7 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
         return next()
     }
 
-    const settings = await db.one(sql.settings.all)
+    const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
 
@@ -67,7 +68,7 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
 })
 
 router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res) {
-    const settings = await db.one(sql.settings.all)
+    const settings = await getSettings()
     const mapShareId = req.params.mapShareId
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)

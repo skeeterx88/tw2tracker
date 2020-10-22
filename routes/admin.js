@@ -5,11 +5,12 @@ const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 const db = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
+const getSettings = require('../settings')
 
 router.get('/', ensureLoggedIn, async function (req, res) {
     const worlds = await db.any(sql.worlds.all)
     const markets = await db.any(sql.markets.all)
-    const settings = await db.one(sql.settings.all)
+    const settings = await getSettings()
 
     res.render('admin', {
         title: 'Admin Panel - ' + settings.site_name,
@@ -133,7 +134,7 @@ router.post('/add-market', ensureLoggedIn, async function (req, res) {
 router.get('/edit-market/:marketId', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const market = await db.one(sql.markets.one, [marketId])
-    const settings = await db.one(sql.settings.all)
+    const settings = await getSettings()
 
     res.render('admin-edit-market', {
         title: `Edit market ${marketId} - Admin Panel - ${settings.site_name}`,

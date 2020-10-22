@@ -10,6 +10,7 @@ const LocalStrategy = require('passport-local').Strategy
 const db = require('./db')
 const sql = require('./sql')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
+const getSettings = require('./settings')
 
 const indexRouter = require('./routes/index')
 const adminRouter = require('./routes/admin')
@@ -51,7 +52,7 @@ app.use(session({
 }))
 
 passport.use(new LocalStrategy(async function (username, password, callback) {
-    const settings = await db.one(sql.settings.all, [])
+    const settings = getSettings()
 
     if (!settings || !settings.admin_password) {
         return callback(null, false)

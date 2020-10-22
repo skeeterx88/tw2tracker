@@ -4,6 +4,7 @@ const utils = require('./utils')
 const Scrapper = require('./scrapper.js')
 const readyState = require('./ready-state.js')
 const getStructPath = require('./get-struct-path.js')
+const getSettings = require('./settings')
 const fs = require('fs')
 const https = require('https')
 const schedule = require('node-schedule')
@@ -397,7 +398,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 
     if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
         const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
-        const settings = await db.one(sql.settings.all)
+        const settings = await getSettings()
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
             throw new Error('Sync.scrappeWorld: ' + worldId + ' already sincronized')
