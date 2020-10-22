@@ -11,7 +11,7 @@ CREATE TABLE main.settings (
 );
 
 -- 129600 = 60 days
-INSERT INTO main.settings VALUES ('tw2tracker', '123', '0 * * * *', '0 */12 * * *', '0 */12 * * *', 129600);
+INSERT INTO main.settings VALUES ('Tw2-Tracker', '123', '0 * * * *', '0 */12 * * *', '0 */12 * * *', 129600);
 
 CREATE TABLE main.state (
     last_scrappe_all_time TIMESTAMP DEFAULT NULL,
