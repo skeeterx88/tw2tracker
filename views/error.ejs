@@ -7,8 +7,8 @@
         <link rel="icon" type="image/png" href="/images/favicon.png"/>
         <link rel='stylesheet' href='/stylesheets/style.css' />
     </head>
-    <body class="not-found">
-        <div class="modal">
+    <body>
+        <main class="content-border">
             <h1><%= locals.error_title || 'Something went wrong' %></h1>
 
             <% if (locals.error_message) { %>
@@ -16,6 +16,6 @@
             <% } %>
 
             <p>If you believe you shouldn't been seing this page, send a message to us <code><a href="mailto:contact@tw2-tracker.com">contact@tw2-tracker.com</a></code></p>
-        </div>
+        </main>
     </body>
 </html>
