@@ -20,9 +20,15 @@ const checkWorldSchemaExists = async function (marketId, worldNumber) {
 }
 
 router.get('/', async function (req, res) {
-    const settings = await getSettings()
-    const worlds = await db.any(sql.worlds.all)
-    const markets = await db.any(sql.markets.all)
+    const [
+        settings,
+        worlds,
+        markets
+    ] = await Promise.all([
+        getSettings(),
+        db.any(sql.worlds.all),
+        db.any(sql.markets.all)
+    ])
 
     res.render('maps', {
         title: 'All Available Maps - ' + settings.site_name,
