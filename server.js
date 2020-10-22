@@ -11,14 +11,6 @@ const db = require('./db')
 const sql = require('./sql')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 
-let settings
-
-try {
-    settings = require('./settings')
-} catch (e) {
-    settings = require('./settings.defaults.json')
-}
-
 const indexRouter = require('./routes/index')
 const adminRouter = require('./routes/admin')
 const loginRouter = require('./routes/login')
@@ -27,7 +19,7 @@ const mapsRouter = require('./routes/maps')
 
 const app = express()
 
-if (process.env.NODE_ENV === 'production' && settings.force_ssl) {
+if (process.env.NODE_ENV === 'production') {
     app.use(function (req, res, next) {
         if (req.headers['x-forwarded-proto'] === 'https') {
             next()
