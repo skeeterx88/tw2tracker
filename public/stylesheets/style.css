@@ -2,6 +2,7 @@ html {
     font: 14px 'Lucida Grande', Helvetica, Arial, sans-serif;
     background: url(/images/background-scene.webp) top no-repeat, url(/images/noise-2.png), #88785F;
     margin: 0px;
+    color: #50311d;
 }
 
 body {
@@ -11,18 +12,26 @@ body {
 }
 
 code {
-    background: #00000050;
+    background: #a7532c38;
     padding: 3px;
     border-radius: 3px;
 }
 
 a {
-    color: #00B7FF;
+    color: #a7532c;
     text-decoration: none;
 }
 
 li {
     list-style: none;
+}
+
+h1 {
+    font-size: 21px;
+}
+
+h2 {
+    font-size: 18px;
 }
 
 header {
@@ -72,4 +81,8 @@ div.modal {
     text-shadow: 1px 1px 0px #00000090;
     z-index: 7;
     transition: visibility 0.02s linear, opacity 0.02s linear;
+}
+
+table {
+    background: #ab80455e;
 }

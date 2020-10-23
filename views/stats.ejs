@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel="icon" type="image/png" href="/images/favicon.png"/>
+    </head>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <h1><a href="/"><%= siteName %></a>: <%= worldName %> (<%= marketId %><%= worldNumber %>)</h1>
+
+            <section>
+                <h2>Players</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Rank</td>
+                            <td>Player</td>
+                            <td>Points</td>
+                            <td>Villages</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% let rank = 1 %>
+                        <% for (let player of players) { %>
+                            <tr>
+                                <td><%= rank %></td>
+                                <td><%= player.name %></td>
+                                <td><%= player.points.toLocaleString('pt-BR') %></td>
+                                <td><%= player.villages.toLocaleString('pt-BR') %></td>
+                            </tr>
+
+                            <% rank++ %>
+                        <% } %>
+                    </tbody>
+                </table>
+
+                <a href="players/">View complete players ranking</a>
+            </section>
+
+            <section>
+                <h2>Tribes</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Rank</td>
+                            <td>Tribe</td>
+                            <td>Points</td>
+                            <td>Villages</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% rank = 1 %>
+                        <% for (let tribe of tribes) { %>
+                            <tr>
+                                <td><%= rank %></td>
+                                <td><%= tribe.tag %></td>
+                                <td><%= tribe.points.toLocaleString('pt-BR') %></td>
+                                <td><%= tribe.villages.toLocaleString('pt-BR') %></td>
+                            </tr>
+
+                            <% rank++ %>
+                        <% } %>
+                    </tbody>
+                </table>
+
+                <a href="tribes/">View complete tribes ranking</a>
+            </section>
+        </main>
+    </body>
+</html>
