@@ -277,6 +277,11 @@ button.red:focus {
     display: block;
 }
 
+#map-share .hidden,
+#map-save .hidden {
+    display: none;
+}
+
 
 
 
@@ -810,11 +815,11 @@ header {
     animation: sk-bouncedelay 1s infinite ease-in-out both;
 }
 
-.loading .bounce1 {
+.loading .b1 {
     animation-delay: -0.25s;
 }
 
-.loading .bounce2 {
+.loading .b2 {
     animation-delay: -0.1s;
 }
 

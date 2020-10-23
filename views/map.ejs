@@ -48,8 +48,14 @@
 
                 <footer>
                     <div id="map-share-wrapper">
-                        <button id="map-share" class="">Generate dynamic map</button>
-                        <button id="map-save" class="">Generate static map</button>
+                        <button id="map-share">
+                            <span>Generate dynamic map</span>
+                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                        </button>
+                        <button id="map-save">
+                            <span>Generate static map</span>
+                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                        </button>
                     </div>
 
                     <div id="site-info">
@@ -178,11 +184,7 @@
         </div>
 
         <div id="all-worlds" class="hidden">
-            <div class="loading">
-                <div class="bounce1"></div>
-                <div class="bounce2"></div>
-                <div class="bounce3"></div>
-            </div>
+            <div class="loading"><div class="b1"></div><div class="b2"></div><div></div></div>
             <ul id="all-market-worlds"></ul>
             <ul id="all-markets"></ul>
         </div>

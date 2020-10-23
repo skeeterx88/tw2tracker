@@ -1731,6 +1731,8 @@ const TW2MapTooltip = function (selector) {
     }
 
     const setupMapShare = async () => {
+        let creatingShare = false
+
         if (mapShare) {
             mapShare.loadHighlights = new Promise(async (resolve) => {
                 const load = await ajaxPost('/maps/api/get-share/', {
@@ -1772,8 +1774,20 @@ const TW2MapTooltip = function (selector) {
 
         const $mapShare = document.querySelector('#map-share')
         const $mapSave = document.querySelector('#map-save')
+        const $mapShareLoading = $mapShare.querySelector('.loading')
+        const $mapSaveLoading = $mapSave.querySelector('.loading')
+        const $mapShareLabel = $mapShare.querySelector('span')
+        const $mapSaveLabel = $mapSave.querySelector('span')
 
         $mapShare.addEventListener('click', async () => {
+            if (creatingShare) {
+                return false
+            }
+
+            creatingShare = true
+            $mapShareLabel.classList.add('hidden')
+            $mapShareLoading.classList.remove('hidden')
+
             try {
                 const result = await map.shareMap(mapShareTypes.DYNAMIC)
 
@@ -1788,9 +1802,21 @@ const TW2MapTooltip = function (selector) {
                     content: error.message
                 })
             }
+
+            creatingShare = false
+            $mapShareLabel.classList.remove('hidden')
+            $mapShareLoading.classList.add('hidden')
         })
 
         $mapSave.addEventListener('click', async () => {
+            if (creatingShare) {
+                return false
+            }
+
+            creatingShare = true
+            $mapSaveLabel.classList.add('hidden')
+            $mapSaveLoading.classList.remove('hidden')
+
             try {
                 const result = await map.shareMap(mapShareTypes.STATIC)
 
@@ -1805,6 +1831,10 @@ const TW2MapTooltip = function (selector) {
                     content: error.message
                 })
             }
+
+            creatingShare = false
+            $mapSaveLabel.classList.remove('hidden')
+            $mapSaveLoading.classList.add('hidden')
         })
     }
 
