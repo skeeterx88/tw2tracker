@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS ${schema:name}.players (
     id INT PRIMARY KEY,
     name VARCHAR (255) NOT NULL,
     tribe_id INT REFERENCES ${schema:name}.tribes(id) NULL,
-    points INT NOT NULL
+    points INT NOT NULL,
+    villages INT DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS ${schema:name}.provinces (

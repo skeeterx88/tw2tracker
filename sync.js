@@ -55,6 +55,9 @@ const Sync = {}
 Sync.init = async function () {
     console.log('Sync.init()')
 
+    // const worldData = JSON.parse(await fs.promises.readFile('./dev-data/br48/worldData.json'))
+    // await inserWorldData(worldData, 'br', 48)
+
     process.on('SIGTERM', async function () {
         console.log('Stopping tw2tracker')
         process.exit()
@@ -442,79 +445,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         clearTimeout(evaluationExpire)
         await page.close()
 
-        console.log('Sync.scrappeWorld: Saving ' + worldId + ' data')
-
-        for (let id in worldData.tribes) {
-            const [name, tag, points] = worldData.tribes[id]
-
-            await db.query(sql.worlds.insert.tribe, {
-                schema: worldId,
-                id: parseInt(id, 10),
-                name: name,
-                tag: tag,
-                points: points
-            })
-        }
-
-        for (let id in worldData.players) {
-            const [name, points, tribe_id] = worldData.players[id]
-
-            await db.query(sql.worlds.insert.player, {
-                schema: worldId,
-                id: parseInt(id, 10),
-                name,
-                tribe_id,
-                points
-            })
-        }
-
-        for (let province_name in worldData.provinces) {
-            const province_id = worldData.provinces[province_name]
-
-            await db.query(sql.worlds.insert.province, {
-                schema: worldId,
-                id: province_id,
-                name: province_name
-            })
-        }
-
-        for (let x in worldData.villages) {
-            for (let y in worldData.villages[x]) {
-                const [id, name, points, character_id, province_id] = worldData.villages[x][y]
-
-                await db.query(sql.worlds.insert.village, {
-                    schema: worldId,
-                    id: parseInt(id, 10),
-                    x: x,
-                    y: y,
-                    name: name,
-                    points: points,
-                    character_id: character_id || null,
-                    province_id: province_id
-                })
-            }
-        }
-
-        for (let character_id in worldData.villagesByPlayer) {
-            const playerVillagesCoords = worldData.villagesByPlayer[character_id]
-            const playerVillages = []
-
-            for (let i = 0; i < playerVillagesCoords.length; i++) {
-                const [x, y] = playerVillagesCoords[i]
-                const villageId = worldData.villages[x][y][0]
-
-                playerVillages.push(villageId)
-            }
-
-            await db.query(sql.worlds.insert.playerVillages, {
-                schema: worldId,
-                character_id: parseInt(character_id, 10),
-                villages_id: playerVillages
-            })
-        }
-
+        await inserWorldData(worldData, marketId, worldNumber)
         await db.query(sql.worlds.updateSyncStatus, [SUCCESS, marketId, worldNumber])
-        await Sync.genWorldBlocks(marketId, worldNumber)
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
     } catch (error) {
@@ -522,6 +454,106 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         console.log('Sync.scrappeWorld: Failed to synchronize ' + marketId + worldNumber)
         console.log(error.message)
     }
+}
+
+const inserWorldData = async function (worldData, marketId, worldNumber) {
+    const worldId = marketId + worldNumber
+
+    console.log('Sync.scrappeWorld: Saving ' + worldId + ' data')
+
+    const playersByTribe = {}
+
+    for (let id in worldData.players) {
+        const [,, tribe_id] = worldData.players[id]
+
+        if (tribe_id) {
+            if (hasOwn.call(playersByTribe, tribe_id)) {
+                playersByTribe[tribe_id].push(id)
+            } else {
+                playersByTribe[tribe_id] = [id]
+            }
+        }
+    }
+
+    for (let id in worldData.tribes) {
+        const [name, tag, points] = worldData.tribes[id]
+
+        let villages = 0
+
+        for (let pid of playersByTribe[id]) {
+            villages += worldData.villagesByPlayer[pid].length
+        }
+
+        await db.query(sql.worlds.insert.tribe, {
+            schema: worldId,
+            id: parseInt(id, 10),
+            name: name,
+            tag: tag,
+            points: points,
+            villages
+        })
+    }
+
+    for (let id in worldData.players) {
+        const [name, points, tribe_id] = worldData.players[id]
+        const villages = worldData.villagesByPlayer[id].length
+
+        await db.query(sql.worlds.insert.player, {
+            schema: worldId,
+            id: parseInt(id, 10),
+            name,
+            tribe_id,
+            points,
+            villages
+        })
+    }
+
+    for (let province_name in worldData.provinces) {
+        const province_id = worldData.provinces[province_name]
+
+        await db.query(sql.worlds.insert.province, {
+            schema: worldId,
+            id: province_id,
+            name: province_name
+        })
+    }
+
+    for (let x in worldData.villages) {
+        for (let y in worldData.villages[x]) {
+            const [id, name, points, character_id, province_id] = worldData.villages[x][y]
+
+            await db.query(sql.worlds.insert.village, {
+                schema: worldId,
+                id: parseInt(id, 10),
+                x: x,
+                y: y,
+                name: name,
+                points: points,
+                character_id: character_id || null,
+                province_id: province_id
+            })
+        }
+    }
+
+    for (let character_id in worldData.villagesByPlayer) {
+        const playerVillagesCoords = worldData.villagesByPlayer[character_id]
+        const playerVillages = []
+
+        for (let i = 0; i < playerVillagesCoords.length; i++) {
+            const [x, y] = playerVillagesCoords[i]
+            const villageId = worldData.villages[x][y][0]
+
+            playerVillages.push(villageId)
+        }
+
+        await db.query(sql.worlds.insert.playerVillages, {
+            schema: worldId,
+            character_id: parseInt(character_id, 10),
+            villages_id: playerVillages
+        })
+    }
+
+    await Sync.genWorldBlocks(marketId, worldNumber)
 }
 
 Sync.markets = async function () {
