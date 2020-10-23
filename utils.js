@@ -4,8 +4,9 @@ const https = require('https')
 
 const noop = function () {}
 
-const schemaExists = async function (schameName) {
-    const schema = await db.one(sql.helpers.schemaExists, [schameName])
+const schemaExists = async function (marketId, worldNumber = false) {
+    let worldId = worldNumber ? marketId + worldNumber : marketId
+    const schema = await db.one(sql.helpers.schemaExists, [worldId])
     return schema.exists
 }
 
