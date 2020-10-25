@@ -122,8 +122,6 @@ Sync.daemon = async function () {
 Sync.fetchAllWorlds = async function () {
     console.log('Sync.fetchAllWorlds()')
 
-    await puppeteerBrowser()
-
     let markets
 
     if (process.env.NODE_ENV === 'development') {
@@ -364,6 +362,8 @@ Sync.scrappeAllWorlds = async function (flag) {
             })
         }
     }
+
+    await browser.close()
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
