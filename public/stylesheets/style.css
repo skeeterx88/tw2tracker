@@ -20,6 +20,12 @@ code {
 a {
     color: #a7532c;
     text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #bb5e33;
+    text-decoration: underline;
 }
 
 li {
@@ -28,10 +34,12 @@ li {
 
 h1 {
     font-size: 21px;
+    margin: 5px 0;
 }
 
 h2 {
     font-size: 18px;
+    margin: 5px 0;
 }
 
 header {
@@ -83,6 +91,61 @@ div.modal {
     transition: visibility 0.02s linear, opacity 0.02s linear;
 }
 
-table {
+.stats-home table {
     background: #ab80455e;
+    width: 100%;
+    border: 1px solid #5e351b;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #865130,
+                inset 0 0 0 1px #5e351b,
+                2px 2px 4px #00000050,
+                inset -2px -2px 2px #000;
+}
+
+.stats-home section .actions {
+    margin: 12px 0px;
+}
+
+.stats-home th {
+    background: #ab80455e;
+}
+
+.stats-home tr:nth-child(even) {
+    background: #bd9b6c4f;
+}
+
+.stats-home td {
+    text-align: center;
+}
+
+.stats-home {
+    display: flex;
+}
+
+.stats-home > div {
+    width: 50%;
+}
+
+.stats-home > div.left {
+    margin-right: 6px;
+}
+
+.stats-home > div.right {
+    margin-left: 6px;
+}
+
+.stats-home section {
+    margin-bottom: 15px;
+}
+
+.stats-home #map {
+    height: 479px;
+    background: #436213;
+    margin: 5px 0px;
+    border: 1px solid #5e351b;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #865130,
+                inset 0 0 0 1px #5e351b,
+                2px 2px 4px #00000050,
+                inset -2px -2px 2px #000;
 }
