@@ -63,8 +63,21 @@ Sync.init = async function () {
         process.exit()
     })
 
+    const state = await db.one(sql.state.all)
+
+    if (!state.last_fetch_markets_time) {
+        await Sync.markets()
+    }
+
+    if (!state.last_register_worlds_time) {
+        await Sync.registerWorlds()
+    }
+
+    if (!state.last_scrappe_all_time) {
+        await Sync.scrappeAllWorlds()
+    }
+
     try {
-        await Sync.createInitialStructure()
         await Sync.daemon()
     } catch (error) {
         console.log(error)
@@ -172,7 +185,7 @@ Sync.fetchAllWorlds = async function () {
 Sync.registerWorlds = async function () {
     console.log('Sync.registerWorlds()')
 
-    await db.query(sql.state.update.registerWorldsTime)
+    await db.query(sql.state.update.registerWorlds)
 
     const [allWorlds, availableWorlds] = await Sync.fetchAllWorlds()
 
@@ -558,6 +571,8 @@ const inserWorldData = async function (worldData, marketId, worldNumber) {
 
 Sync.markets = async function () {
     console.log('Sync.markets()')
+
+    await db.query(sql.state.update.lastFetchMarkets)
 
     const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
     const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')

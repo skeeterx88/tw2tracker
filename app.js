@@ -1,29 +1,42 @@
-const cluster = require('cluster')
-const cpus = require('os').cpus()
+(async function () {
+    const db = require('./db')
+    const sql = require('./sql')
+    const utils = require('./utils')
+    const fs = require('fs')
+    const path = require('path')
 
-if (cluster.isMaster) {
-    for (let i = 0; i < cpus.length; i++) {
-        cluster.fork()
+    if (!await utils.schemaExists('main')) {
+        await db.query(sql.mainSchema)
     }
-} else {
-    const server = require('./server')
-    const Sync = require('./sync')
 
-    if (cpus.length === 1) {
-        server()
-        Sync.init()
+    const cluster = require('cluster')
+    const cpus = require('os').cpus()
 
-        cluster.on('exit', () => {
-            server()
-            Sync.init()
-        })
+    if (cluster.isMaster) {
+        for (let i = 0; i < cpus.length; i++) {
+            cluster.fork()
+        }
     } else {
-        if (cluster.worker.id === cpus.length) {
-            Sync.init()
-            cluster.on('exit', Sync.init)
-        } else {
+        const server = require('./server')
+        const Sync = require('./sync')
+
+        if (cpus.length === 1) {
             server()
-            cluster.on('exit', server)
+            Sync.init()
+
+            cluster.on('exit', () => {
+                server()
+                Sync.init()
+            })
+        } else {
+            if (cluster.worker.id === cpus.length) {
+                Sync.init()
+                cluster.on('exit', Sync.init)
+            } else {
+                server()
+                cluster.on('exit', server)
+            }
         }
     }
-}
+
+})()

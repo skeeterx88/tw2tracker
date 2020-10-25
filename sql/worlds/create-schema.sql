@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS ${schema:name}.tribes (
     id INT PRIMARY KEY,
     name VARCHAR (255) NOT NULL,
     tag VARCHAR (3) NOT NULL,
-    points INT
+    points INT,
+    villages INT DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS ${schema:name}.players (

@@ -15,10 +15,11 @@ INSERT INTO main.settings VALUES ('Tw2-Tracker', '123', '0 * * * *', '0 */12 * *
 
 CREATE TABLE main.state (
     last_scrappe_all_time TIMESTAMP DEFAULT NULL,
-    last_register_worlds_time TIMESTAMP DEFAULT NULL
+    last_register_worlds_time TIMESTAMP DEFAULT NULL,
+    last_fetch_markets_time TIMESTAMP DEFAULT NULL
 );
 
-INSERT INTO main.state VALUES (NULL, NULL);
+INSERT INTO main.state VALUES (NULL, NULL, NULL);
 
 CREATE TABLE main.markets (
     id VARCHAR (10) PRIMARY KEY,
