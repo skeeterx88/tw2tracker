@@ -5,7 +5,17 @@
         <meta name="viewport" content="width=1000 initial-scale=1"/>
         <meta name="description" content="Detailed statistics for Tribal Wars 2">
         <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel='stylesheet' href='/stylesheets/stats.css' />
         <link rel="icon" type="image/png" href="/images/favicon.png"/>
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber,
+                mapShare,
+                players,
+                tribes
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
     </head>
     <body>
         <header></header>
@@ -14,45 +24,7 @@
 
             <div class="stats-home">
                 <div class="left">
-                    <section>
-                        <h2>Players</h2>
-
-                        <table>
-                            <colgroup>
-                                <col width="50px">
-                                <col width="*">
-                                <col width="120px">
-                                <col width="80px">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Player</th>
-                                    <th>Points</th>
-                                    <th>Villages</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% let rank = 1 %>
-                                <% for (let player of players) { %>
-                                    <tr>
-                                        <td><%= rank %></td>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>"><%= player.name %></a></td>
-                                        <td><%= player.points.toLocaleString('pt-BR') %></td>
-                                        <td><%= player.villages.toLocaleString('pt-BR') %></td>
-                                    </tr>
-
-                                    <% rank++ %>
-                                <% } %>
-                            </tbody>
-                        </table>
-
-                        <div class="actions">
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/">View complete players ranking</a>
-                        </div>
-                    </section>
-
-                    <section>
+                    <section id="tribes">
                         <h2>Tribes</h2>
 
                         <table>
@@ -71,11 +43,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% rank = 1 %>
+                                <% let rank = 1 %>
                                 <% for (let tribe of tribes) { %>
                                     <tr>
                                         <td><%= rank %></td>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %></a></td>
+                                        <td>
+                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
+                                            <% if (rank < 4) { %>
+                                                <div class="color"></div>
+                                            <% } %>
+                                        </td>
                                         <td><%= tribe.points.toLocaleString('pt-BR') %></td>
                                         <td><%= tribe.villages.toLocaleString('pt-BR') %></td>
                                     </tr>
@@ -87,6 +64,44 @@
 
                         <div class="actions">
                             <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/">View complete tribes ranking</a>
+                        </div>
+                    </section>
+
+                    <section id="players">
+                        <h2>Players</h2>
+
+                        <table>
+                            <colgroup>
+                                <col width="50px">
+                                <col width="*">
+                                <col width="120px">
+                                <col width="80px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Points</th>
+                                    <th>Villages</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% rank = 1 %>
+                                <% for (let player of players) { %>
+                                    <tr>
+                                        <td><%= rank %></td>
+                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>"><%= player.name %></a></td>
+                                        <td><%= player.points.toLocaleString('pt-BR') %></td>
+                                        <td><%= player.villages.toLocaleString('pt-BR') %></td>
+                                    </tr>
+
+                                    <% rank++ %>
+                                <% } %>
+                            </tbody>
+                        </table>
+
+                        <div class="actions">
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/">View complete players ranking</a>
                         </div>
                     </section>
 
@@ -123,5 +138,10 @@
                 </div>
             </div>
         </main>
+
+        <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/pako_inflate.min.js"></script>
+        <script type="text/javascript" src="/javascripts/map.js"></script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
     </body>
 </html>

@@ -46,6 +46,12 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
         tribes,
         siteName: settings.site_name,
         development: process.env.NODE_ENV === 'development',
+        exportValues: {
+            marketId,
+            worldNumber,
+            players,
+            tribes
+        }
     })
 })
 
