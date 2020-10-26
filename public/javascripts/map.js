@@ -9,6 +9,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         allowZoom: true,
         hexagonVillages: true,
         zoomLevel: 2,
+        quickHighlight: true,
         neutralColor: '#823c0a',
         barbarianColor: '#4c6f15',
         backgroundColor: '#436213',
@@ -292,28 +293,30 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         })
 
-        $overlay.addEventListener('mousemove', (event) => {
-            if (draggable) {
-                return
-            }
-
-            mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / zoomSettings.tileSize)
-            let off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
-            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / zoomSettings.tileSize)
-
-            const villagesX = loader.villages[mouseCoordX]
-
-            if (villagesX) {
-                const village = villagesX[mouseCoordY]
-
-
-                if (village) {
-                    return setActiveVillage(village)
+        if (settings.quickHighlight) {
+            $overlay.addEventListener('mousemove', (event) => {
+                if (draggable) {
+                    return
                 }
-            }
 
-            return unsetActiveVillage()
-        })
+                mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / zoomSettings.tileSize)
+                let off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
+                mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / zoomSettings.tileSize)
+
+                const villagesX = loader.villages[mouseCoordX]
+
+                if (villagesX) {
+                    const village = villagesX[mouseCoordY]
+
+
+                    if (village) {
+                        return setActiveVillage(village)
+                    }
+                }
+
+                return unsetActiveVillage()
+            })
+        }
 
         $overlay.addEventListener('mouseleave', (event) => {
             draggable = false
@@ -321,7 +324,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             dragStartY = 0
             renderEnabled = false
             $overlay.style.cursor = 'default'
-            unsetActiveVillage()
+
+            if (settings.quickHighlight) {
+                unsetActiveVillage()
+            }
         })
 
         if (settings.allowZoom) {
