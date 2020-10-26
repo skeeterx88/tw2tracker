@@ -6,6 +6,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     const defaults = {
+        allowZoom: true,
         hexagonVillages: true,
         zoomLevel: 2,
         neutralColor: '#823c0a',
@@ -323,13 +324,15 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             unsetActiveVillage()
         })
 
-        $overlay.addEventListener('wheel', (event) => {
-            if (event.deltaY < 0) {
-                this.zoomIn()
-            } else if (event.deltaY > 0) {
-                this.zoomOut()
-            }
-        })
+        if (settings.allowZoom) {
+            $overlay.addEventListener('wheel', (event) => {
+                if (event.deltaY < 0) {
+                    this.zoomIn()
+                } else if (event.deltaY > 0) {
+                    this.zoomOut()
+                }
+            })
+        }
     }
 
     const setActiveVillage = (village) => {
