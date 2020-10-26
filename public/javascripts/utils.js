@@ -1,3 +1,5 @@
+const hasOwn = Object.prototype.hasOwnProperty
+
 const ajaxPost = async function (url = '', data = {}) {
     const response = await fetch(url, {
         method: 'POST',

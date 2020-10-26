@@ -1,5 +1,3 @@
-const hasOwn = Object.prototype.hasOwnProperty
-
 ;(async () => {
     let colorPicker
     let notif
