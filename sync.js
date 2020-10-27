@@ -35,10 +35,7 @@ const puppeteerBrowser = async function () {
 }
 
 const puppeteerPage = async function () {
-    if (!browser) {
-        await puppeteerBrowser()
-    }
-
+    await puppeteerBrowser()
     const page = await browser.newPage()
 
     page.on('console', function (msg) {
@@ -438,7 +435,6 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 
         const urlId = marketId === 'zz' ? 'beta' : marketId
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
-        await page.waitFor(2000)
         await page.evaluate(readyState)
 
         try {
@@ -452,13 +448,14 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         const evaluationExpire = setTimeout(async function () {
             await page.close()
             throw new Error('Evaluation failed: got stuck')
-        }, 60000)
+        }, 120000)
 
-        const worldData = await page.evaluate(Scrapper, marketId, worldNumber)
+        const data = await page.evaluate(Scrapper)
         clearTimeout(evaluationExpire)
         await page.close()
 
-        await inserWorldData(worldData, marketId, worldNumber)
+
+        await queryData(data, marketId, worldNumber)
         await db.query(sql.worlds.updateSyncStatus, [SUCCESS, marketId, worldNumber])
 
         console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
@@ -469,101 +466,99 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
     }
 }
 
-const inserWorldData = async function (worldData, marketId, worldNumber) {
+const queryData = async function (data, marketId, worldNumber) {
     const worldId = marketId + worldNumber
 
     console.log('Sync.scrappeWorld: Saving ' + worldId + ' data')
 
-    const playersByTribe = {}
+    for (let [tribe_id, tribe] of data.tribes) {
+        await db.query(sql.worlds.insert.tribe, {worldId, tribe_id, ...tribe})
 
-    for (let id in worldData.players) {
-        const [,, tribe_id] = worldData.players[id]
+        const {
+            best_rank,
+            best_points,
+            best_villages
+        } = await db.any(sql.worlds.tribeBestValues, {
+            worldId,
+            tribe_id
+        })
 
-        if (tribe_id) {
-            if (hasOwn.call(playersByTribe, tribe_id)) {
-                playersByTribe[tribe_id].push(id)
-            } else {
-                playersByTribe[tribe_id] = [id]
-            }
-        }
-    }
-
-    for (let id in worldData.tribes) {
-        const [name, tag, points] = worldData.tribes[id]
-
-        let villages = 0
-
-        for (let pid of playersByTribe[id]) {
-            villages += worldData.villagesByPlayer[pid].length
+        if (!best_rank || tribe.rank > best_rank) {
+            await db.query(sql.worlds.update.tribeBestRank, {
+                worldId,
+                rank: tribe.rank,
+                tribe_id
+            })
         }
 
-        await db.query(sql.worlds.insert.tribe, {
-            schema: worldId,
-            id: parseInt(id, 10),
-            name: name,
-            tag: tag,
-            points: points,
-            villages
-        })
-    }
+        if (!best_points || tribe.points > best_points) {
+            await db.query(sql.worlds.update.tribeBestPoints, {
+                worldId,
+                points: tribe.points,
+                tribe_id
+            })
+        }
 
-    for (let id in worldData.players) {
-        const [name, points, tribe_id] = worldData.players[id]
-        const villages = worldData.villagesByPlayer[id].length
-
-        await db.query(sql.worlds.insert.player, {
-            schema: worldId,
-            id: parseInt(id, 10),
-            name,
-            tribe_id,
-            points,
-            villages
-        })
-    }
-
-    for (let province_name in worldData.provinces) {
-        const province_id = worldData.provinces[province_name]
-
-        await db.query(sql.worlds.insert.province, {
-            schema: worldId,
-            id: province_id,
-            name: province_name
-        })
-    }
-
-    for (let x in worldData.villages) {
-        for (let y in worldData.villages[x]) {
-            const [id, name, points, character_id, province_id] = worldData.villages[x][y]
-
-            await db.query(sql.worlds.insert.village, {
-                schema: worldId,
-                id: parseInt(id, 10),
-                x: x,
-                y: y,
-                name: name,
-                points: points,
-                character_id: character_id || null,
-                province_id: province_id
+        if (!best_villages || tribe.villages > best_villages) {
+            await db.query(sql.worlds.update.tribeBestVillages, {
+                worldId,
+                villages: tribe.villages,
+                tribe_id
             })
         }
     }
 
-    for (let character_id in worldData.villagesByPlayer) {
-        const playerVillagesCoords = worldData.villagesByPlayer[character_id]
-        const playerVillages = []
+    for (let [character_id, player] of data.players) {
+        await db.query(sql.worlds.insert.player, {worldId, character_id, ...player})
 
-        for (let i = 0; i < playerVillagesCoords.length; i++) {
-            const [x, y] = playerVillagesCoords[i]
-            const villageId = worldData.villages[x][y][0]
+        const {
+            best_rank,
+            best_points,
+            best_villages
+        } = await db.any(sql.worlds.playerBestValues, {
+            worldId,
+            character_id
+        })
 
-            playerVillages.push(villageId)
+        if (!best_rank || player.rank > best_rank) {
+            await db.query(sql.worlds.update.playerBestRank, {
+                worldId,
+                rank: player.rank,
+                character_id
+            })
         }
 
-        await db.query(sql.worlds.insert.playerVillages, {
-            schema: worldId,
-            character_id: parseInt(character_id, 10),
-            villages_id: playerVillages
+        if (!best_points || player.points > best_points) {
+            await db.query(sql.worlds.update.playerBestPoints, {
+                worldId,
+                points: player.points,
+                character_id
+            })
+        }
+
+        if (!best_villages || player.villages > best_villages) {
+            await db.query(sql.worlds.update.playerBestVillages, {
+                worldId,
+                villages: player.villages,
+                character_id
+            })
+        }
+    }
+
+    for (let [province_name, province_id] of data.provinces) {
+        await db.query(sql.worlds.insert.province, {
+            worldId,
+            province_id,
+            province_name
         })
+    }
+
+    for (let [village_id, village] of data.villages) {
+        await db.query(sql.worlds.insert.village, {worldId, village_id, ...village})
+    }
+
+    for (let [character_id, villages_id] of data.villagesByPlayer) {
+        await db.query(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
     }
 
     await Sync.genWorldBlocks(marketId, worldNumber)

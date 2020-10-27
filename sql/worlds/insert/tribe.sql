@@ -1,9 +1,42 @@
-INSERT INTO ${schema:name}.tribes
-    (id, name, tag, points, villages)
-VALUES
-    (${id}, ${name}, ${tag}, ${points}, ${villages})
+INSERT INTO ${worldId:name}.tribes (
+    id,
+    name,
+    tag,
+    points,
+    villages,
+    points_per_member,
+    points_per_villages,
+    victory_points,
+    rank,
+    members,
+    bash_points_off,
+    bash_points_def,
+    bash_points_total
+) VALUES (
+    ${tribe_id},
+    ${name},
+    ${tag},
+    ${points},
+    ${villages},
+    ${points_per_member},
+    ${points_per_villages},
+    ${victory_points},
+    ${rank},
+    ${members},
+    ${bash_points_off},
+    ${bash_points_def},
+    ${bash_points_total}
+)
 ON CONFLICT (id) DO UPDATE 
 SET name = excluded.name,
     tag = excluded.tag,
     points = excluded.points,
-    villages = excluded.villages;
+    villages = excluded.villages,
+    points_per_member = excluded.points_per_member,
+    points_per_villages = excluded.points_per_villages,
+    victory_points = excluded.victory_points,
+    rank = excluded.rank,
+    members = excluded.members,
+    bash_points_off = excluded.bash_points_off,
+    bash_points_def = excluded.bash_points_def,
+    bash_points_total = excluded.bash_points_total;
