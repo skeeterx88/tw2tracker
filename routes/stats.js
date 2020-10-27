@@ -55,4 +55,57 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
     })
 })
 
+router.get('/:marketId/:worldNumber/tribes/:tribeId', async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const tribeId = parseInt(req.params.tribeId, 10)
+
+    const worldExists = await utils.schemaExists(marketId, worldNumber)
+
+    if (!worldExists) {
+        res.status(404)
+        res.render('error', {
+            title: 'Tw2-Tracker Error',
+            error_title: 'This world does not exist'
+        })
+
+        return false
+    }
+
+    let tribe
+
+    try {
+        tribe = await db.one(sql.worlds.tribe, {
+            schema: marketId + worldNumber,
+            tribeId
+        })
+    } catch (error) {
+        res.status(404)
+        res.render('error', {
+            title: 'Tw2-Tracker Error',
+            error_title: 'This tribe does not exist'
+        })
+
+        return false
+    }
+
+    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const worldId = marketId + worldNumber
+
+    res.render('stats-tribe', {
+        title: 'Tribe ' + tribe.name + ' - ' + marketId + worldNumber + ' - ' + settings.site_name,
+        marketId,
+        worldNumber,
+        worldName: worldInfo.name,
+        tribe,
+        siteName: settings.site_name,
+        development: process.env.NODE_ENV === 'development'
+    })
+})
+
 module.exports = router
