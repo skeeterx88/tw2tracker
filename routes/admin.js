@@ -7,6 +7,8 @@ const sql = require('../sql')
 const Sync = require('../sync')
 const getSettings = require('../settings')
 
+const IGNORE_LAST_SYNC = 'ignore_last_sync'
+
 router.get('/', ensureLoggedIn, async function (req, res) {
     const worlds = await db.any(sql.worlds.all)
     const markets = await db.any(sql.markets.all)
@@ -22,10 +24,10 @@ router.get('/', ensureLoggedIn, async function (req, res) {
 
 router.get('/scrapper/all/:flag?', ensureLoggedIn, async function (req, res) {
     const response = {}
-    const flag = req.params.flag
+    const flag = req.params.flag === 'force' ? IGNORE_LAST_SYNC : false
 
     try {
-        await Sync.scrappeAllWorlds(flag === 'force')
+        await Sync.scrappeAllWorlds(flag)
         response.message = 'worlds synchronized successfully'
         response.success = true
     } catch (error) {
@@ -82,7 +84,7 @@ router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async funct
         response.message = `world ${worldNumber} is invalid`
     } else {
         try {
-            await Sync.scrappeWorld(marketId, worldNumber, true)
+            await Sync.scrappeWorld(marketId, worldNumber, IGNORE_LAST_SYNC)
             response.message = marketId + worldNumber + ' synchronized successfully'
             response.success = true
         } catch (error) {
