@@ -8,13 +8,13 @@ const getSettings = require('./settings')
 const fs = require('fs')
 const https = require('https')
 const schedule = require('node-schedule')
-const authenticatedMarkets = {}
 const zlib = require('zlib')
 const path = require('path')
 const hasOwn = Object.prototype.hasOwnProperty
 const colors = require('colors/safe')
 let logLevel = 0
 let fullSyncInProgress = false
+let authenticatedMarkets = {}
 
 const log = function () {
     console.log(
@@ -41,6 +41,14 @@ const puppeteerBrowser = async function () {
             headless: true,
             executablePath: '/usr/bin/chromium'
         })
+    }
+}
+
+const puppeteerClose = async function () {
+    if (browser) {
+        await browser.close()
+        browser = null
+        authenticatedMarkets = {}
     }
 }
 
@@ -328,6 +336,7 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     if (fullSyncInProgress) {
         log(colors.red('A sync is already in progress'))
+        logLevel--
         return false
     }
 
@@ -349,6 +358,8 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     await db.query(sql.state.update.lastScrappeAll)
 
+    await puppeteerBrowser()
+
     for (let world of worlds) {
         try {
             await Sync.scrappeWorld(world.market, world.num, flag)
@@ -365,7 +376,7 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     const time = perf.end()
 
-    await browser.close()
+    await puppeteerClose()
 
     fullSyncInProgress = false
 
@@ -414,6 +425,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
 
     const worldId = marketId + worldNumber
 
+    let page
+
     try {
         const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
 
@@ -440,7 +453,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
-        const page = await puppeteerPage()
+        page = await puppeteerPage()
+
         const perf = utils.perf()
 
         const account = await Sync.auth(marketId, accountCredentials)
@@ -489,6 +503,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
         log('Finished in ' + time)
     } catch (error) {
         log(colors.red('Failed to synchronize ' + worldId + ': ' + error.message))
+        await page.close()
 
         if (attempt < 3) {
             logLevel--
