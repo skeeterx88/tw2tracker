@@ -17,7 +17,7 @@ let logLevel = 0
 let fullSyncInProgress = false
 
 const log = function () {
-    console.log('    '.repeat(logLevel), ...arguments)
+    console.log(' ·'.repeat(logLevel), ...arguments)
 }
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
