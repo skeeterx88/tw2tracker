@@ -14,6 +14,7 @@ const path = require('path')
 const hasOwn = Object.prototype.hasOwnProperty
 const colors = require('colors/safe')
 let logLevel = 0
+let fullSyncInProgress = false
 
 const log = function () {
     console.log('    '.repeat(logLevel), ...arguments)
@@ -311,8 +312,12 @@ Sync.scrappeAllWorlds = async function (flag) {
     log('Sync.scrappeAllWorlds()')
     logLevel++
 
+    if (fullSyncInProgress) {
+        log(colors.red('A sync is already in progress'))
+        return false
     }
 
+    fullSyncInProgress = true
 
     let worlds
     const failedToSync = []
@@ -346,6 +351,8 @@ Sync.scrappeAllWorlds = async function (flag) {
     })
 
     await browser.close()
+
+    fullSyncInProgress = false
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
