@@ -72,12 +72,31 @@ const getBuffer = function (url) {
     })
 }
 
-const time = async function (handler) {
+const perf = function (type = perf.SECONDS) {
     const start = Date.now()
-    await handler()
-    const end = Date.now()
-    return (Math.round(((end - start) / 1000) * 10) / 10) + 's'
+
+    return {
+        end: function () {
+            const end = Date.now()
+
+            switch (type) {
+                case perf.MILLISECONDS: {
+                    return (Math.round(((end - start)) * 10) / 10) + 'ms'
+                }
+                case perf.SECONDS: {
+                    return (Math.round(((end - start) / 1000) * 10) / 10) + 's'
+                }
+                case perf.MINUTES: {
+                    return (Math.round(((end - start) / 1000 / 60) * 10) / 10) + 'm'
+                }
+            }
+        }
+    }
 }
+
+perf.MILLISECONDS = 'milliseconds'
+perf.SECONDS = 'seconds'
+perf.MINUTES = 'minutes'
 
 module.exports = {
     noop,
@@ -88,5 +107,5 @@ module.exports = {
     getHourlyDir,
     getHTML,
     getBuffer,
-    time
+    perf
 }
