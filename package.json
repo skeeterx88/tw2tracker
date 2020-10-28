@@ -5,7 +5,7 @@
   "scripts": {
     "autoreload": "TZ=UTC nodemon app.js",
     "start": "TZ=UTC node app.js",
-    "install": "node install.js",
+    "install-unit": "node install-unit.js",
     "eslint": "eslint *.js routes/*.js"
   },
   "dependencies": {
