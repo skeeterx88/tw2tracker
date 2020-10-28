@@ -311,46 +311,51 @@ Sync.scrappeAllWorlds = async function (flag) {
     log('Sync.scrappeAllWorlds()')
     logLevel++
 
-    let worlds
-
-    if (process.env.NODE_ENV === 'development') {
-        worlds = [
-            { market: 'de', num: 48 },
-            { market: 'br', num: 48 },
-            { market: 'en', num: 56 }
-        ]
-    } else {
-        worlds = await db.any(sql.worlds.allOpen)
     }
 
-    await db.query(sql.state.update.lastScrappeAll)
 
+    let worlds
     const failedToSync = []
 
-    for (let world of worlds) {
-        try {
-            await Sync.scrappeWorld(world.market, world.num, flag)
-        } catch (error) {
-            log(colors.red(error.message))
-
-            failedToSync.push({
-                marketId: world.market,
-                worldNumber: world.num,
-                message: error.message
-            })
+    const timeToSync = utils.time(async function () {
+        if (process.env.NODE_ENV === 'development') {
+            worlds = [
+                { market: 'de', num: 48 },
+                { market: 'br', num: 48 },
+                { market: 'en', num: 56 }
+            ]
+        } else {
+            worlds = await db.any(sql.worlds.allOpen)
         }
-    }
+
+        await db.query(sql.state.update.lastScrappeAll)
+
+        for (let world of worlds) {
+            try {
+                await Sync.scrappeWorld(world.market, world.num, flag)
+            } catch (error) {
+                log(colors.red(error.message))
+
+                failedToSync.push({
+                    marketId: world.market,
+                    worldNumber: world.num,
+                    message: error.message
+                })
+            }
+        }
+    })
 
     await browser.close()
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
             log(colors.red('All worlds failed to sync.'))
+            log('Finished in ' + timeToSync + 'ms')
 
             logLevel--
             return ERROR_SYNC_ALL
         } else {
-            log(color.orange('Sync.scrappeAllWorlds: Some worlds failed to sync:'))
+            log(color.orange('Some worlds failed to sync:'))
             logLevel++
 
             for (let fail of failedToSync) {
@@ -358,11 +363,14 @@ Sync.scrappeAllWorlds = async function (flag) {
             }
 
             logLevel--
+
+            log('Finished in ' + timeToSync + 'ms')
             logLevel--
+
             return ERROR_SYNC_SOME
         }
     } else {
-        log(colors.green('Finished'))
+        log('Finished in ' + timeToSync + 'ms')
         logLevel--
 
         return SUCCESS_SYNC_ALL
@@ -378,7 +386,7 @@ const downloadStruct = async function (url, marketId, worldNumber) {
 }
 
 Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
-    log('Sync.scrappeWorld()', marketId + worldNumber)
+    log('Sync.scrappeWorld()', colors.green(marketId + worldNumber))
     logLevel++
 
     const worldId = marketId + worldNumber
@@ -434,13 +442,12 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 
         const evaluationExpire = setTimeout(async function () {
             await page.close()
-            throw new Error('Evaluation failed: got stuck')
+            throw new Error('Scrappe evaluation timeout')
         }, 120000)
 
         const data = await page.evaluate(Scrapper)
         clearTimeout(evaluationExpire)
         await page.close()
-
 
         await queryData(data, marketId, worldNumber)
         await db.query(sql.worlds.updateSyncStatus, [SUCCESS, marketId, worldNumber])
@@ -449,8 +456,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         logLevel--
     } catch (error) {
         await db.query(sql.worlds.updateSyncStatus, [FAIL, marketId, worldNumber])
-        log('Failed to synchronize ' + marketId + worldNumber)
-        log(colors.red(error.message))
+        log(colors.red('Failed to synchronize ' + worldId + ': ' + error.message))
         logLevel--
     }
 }
@@ -458,96 +464,102 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 const queryData = async function (data, marketId, worldNumber) {
     const worldId = marketId + worldNumber
 
-    log('Saving ' + worldId + ' data')
+    log('Writing data ' + worldId + ' to database')
 
-    for (let [tribe_id, tribe] of data.tribes) {
-        await db.query(sql.worlds.insert.tribe, {worldId, tribe_id, ...tribe})
+    try {
+        for (let [tribe_id, tribe] of data.tribes) {
+            await db.query(sql.worlds.insert.tribe, {worldId, tribe_id, ...tribe})
 
-        const {
-            best_rank,
-            best_points,
-            best_villages
-        } = await db.any(sql.worlds.tribeBestValues, {
-            worldId,
-            tribe_id
-        })
-
-        if (!best_rank || tribe.rank > best_rank) {
-            await db.query(sql.worlds.update.tribeBestRank, {
+            const {
+                best_rank,
+                best_points,
+                best_villages
+            } = await db.any(sql.worlds.tribeBestValues, {
                 worldId,
-                rank: tribe.rank,
                 tribe_id
             })
+
+            if (!best_rank || tribe.rank > best_rank) {
+                await db.query(sql.worlds.update.tribeBestRank, {
+                    worldId,
+                    rank: tribe.rank,
+                    tribe_id
+                })
+            }
+
+            if (!best_points || tribe.points > best_points) {
+                await db.query(sql.worlds.update.tribeBestPoints, {
+                    worldId,
+                    points: tribe.points,
+                    tribe_id
+                })
+            }
+
+            if (!best_villages || tribe.villages > best_villages) {
+                await db.query(sql.worlds.update.tribeBestVillages, {
+                    worldId,
+                    villages: tribe.villages,
+                    tribe_id
+                })
+            }
         }
 
-        if (!best_points || tribe.points > best_points) {
-            await db.query(sql.worlds.update.tribeBestPoints, {
+        for (let [character_id, player] of data.players) {
+            await db.query(sql.worlds.insert.player, {worldId, character_id, ...player})
+
+            const {
+                best_rank,
+                best_points,
+                best_villages
+            } = await db.any(sql.worlds.playerBestValues, {
                 worldId,
-                points: tribe.points,
-                tribe_id
-            })
-        }
-
-        if (!best_villages || tribe.villages > best_villages) {
-            await db.query(sql.worlds.update.tribeBestVillages, {
-                worldId,
-                villages: tribe.villages,
-                tribe_id
-            })
-        }
-    }
-
-    for (let [character_id, player] of data.players) {
-        await db.query(sql.worlds.insert.player, {worldId, character_id, ...player})
-
-        const {
-            best_rank,
-            best_points,
-            best_villages
-        } = await db.any(sql.worlds.playerBestValues, {
-            worldId,
-            character_id
-        })
-
-        if (!best_rank || player.rank > best_rank) {
-            await db.query(sql.worlds.update.playerBestRank, {
-                worldId,
-                rank: player.rank,
                 character_id
             })
+
+            if (!best_rank || player.rank > best_rank) {
+                await db.query(sql.worlds.update.playerBestRank, {
+                    worldId,
+                    rank: player.rank,
+                    character_id
+                })
+            }
+
+            if (!best_points || player.points > best_points) {
+                await db.query(sql.worlds.update.playerBestPoints, {
+                    worldId,
+                    points: player.points,
+                    character_id
+                })
+            }
+
+            if (!best_villages || player.villages > best_villages) {
+                await db.query(sql.worlds.update.playerBestVillages, {
+                    worldId,
+                    villages: player.villages,
+                    character_id
+                })
+            }
         }
 
-        if (!best_points || player.points > best_points) {
-            await db.query(sql.worlds.update.playerBestPoints, {
+        for (let [province_name, province_id] of data.provinces) {
+            await db.query(sql.worlds.insert.province, {
                 worldId,
-                points: player.points,
-                character_id
+                province_id,
+                province_name
             })
         }
 
-        if (!best_villages || player.villages > best_villages) {
-            await db.query(sql.worlds.update.playerBestVillages, {
-                worldId,
-                villages: player.villages,
-                character_id
-            })
+        for (let [village_id, village] of data.villages) {
+            await db.query(sql.worlds.insert.village, {worldId, village_id, ...village})
         }
-    }
 
-    for (let [province_name, province_id] of data.provinces) {
-        await db.query(sql.worlds.insert.province, {
-            worldId,
-            province_id,
-            province_name
-        })
-    }
-
-    for (let [village_id, village] of data.villages) {
-        await db.query(sql.worlds.insert.village, {worldId, village_id, ...village})
-    }
-
-    for (let [character_id, villages_id] of data.villagesByPlayer) {
-        await db.query(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
+        for (let [character_id, villages_id] of data.villagesByPlayer) {
+            await db.query(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
+        }
+    } catch (error) {
+        logLevel++
+        log(colors.red('Failed to write to database: ' + error.message))
+        logLevel--
     }
 
     await Sync.genWorldBlocks(marketId, worldNumber)
@@ -577,96 +589,105 @@ Sync.markets = async function () {
 }
 
 Sync.genWorldBlocks = async function (marketId, worldNumber) {
-    log('Sync.genWorldBlocks()', marketId + worldNumber)
-
     const worldId = marketId + worldNumber
-    const players = await db.any(sql.worlds.getData, { worldId, table: 'players' })
-    const villages = await db.any(sql.worlds.getData, { worldId, table: 'villages' })
-    const tribes = await db.any(sql.worlds.getData, { worldId, table: 'tribes' })
-    const provinces = await db.any(sql.worlds.getData, { worldId, table: 'provinces' })
 
-    const parsedPlayers = {}
-    const parsedTribes = {}
-    const continents = {}
-    const parsedProvinces = []
-    const tribeVillageCounter = {}
+    log('Writing ' + worldId + ' data to filesystem')
 
-    const dataPath = path.join('.', 'data', worldId)
+    try {
+        const players = await db.any(sql.worlds.getData, { worldId, table: 'players' })
+        const villages = await db.any(sql.worlds.getData, { worldId, table: 'villages' })
+        const tribes = await db.any(sql.worlds.getData, { worldId, table: 'tribes' })
+        const provinces = await db.any(sql.worlds.getData, { worldId, table: 'provinces' })
 
-    await fs.promises.mkdir(dataPath, { recursive: true })
+        const parsedPlayers = {}
+        const parsedTribes = {}
+        const continents = {}
+        const parsedProvinces = []
+        const tribeVillageCounter = {}
 
-    for (let { id, name, tribe_id, points } of players) {
-        parsedPlayers[id] = [name, tribe_id || 0, points, 0]
-    }
+        const dataPath = path.join('.', 'data', worldId)
 
-    for (let village of villages) {
-        let { id, x, y, name, points, character_id, province_id } = village
+        await fs.promises.mkdir(dataPath, { recursive: true })
 
-        if (character_id) {
-            parsedPlayers[character_id][3]++
+        for (let { id, name, tribe_id, points } of players) {
+            parsedPlayers[id] = [name, tribe_id || 0, points, 0]
         }
 
-        let kx
-        let ky
+        for (let village of villages) {
+            let { id, x, y, name, points, character_id, province_id } = village
 
-        if (x < 100) {
-            kx = '0'
-        } else {
-            kx = String(x)[0]
-        }
+            if (character_id) {
+                parsedPlayers[character_id][3]++
+            }
 
-        if (y < 100) {
-            ky = '0'
-        } else {
-            ky = String(y)[0]
-        }
+            let kx
+            let ky
 
-        const k = parseInt(ky + kx, 10)
-
-        if (!hasOwn.call(continents, k)) {
-            continents[k] = {}
-        }
-
-        if (!hasOwn.call(continents[k], x)) {
-            continents[k][x] = {}
-        }
-
-        continents[k][x][y] = [id, name, points, character_id || 0, province_id]
-    }
-
-    for (let { id, tribe_id } of players) {
-        if (tribe_id) {
-            if (hasOwn.call(tribeVillageCounter, tribe_id)) {
-                tribeVillageCounter[tribe_id] += parsedPlayers[id][3]
+            if (x < 100) {
+                kx = '0'
             } else {
-                tribeVillageCounter[tribe_id] = parsedPlayers[id][3]
+                kx = String(x)[0]
+            }
+
+            if (y < 100) {
+                ky = '0'
+            } else {
+                ky = String(y)[0]
+            }
+
+            const k = parseInt(ky + kx, 10)
+
+            if (!hasOwn.call(continents, k)) {
+                continents[k] = {}
+            }
+
+            if (!hasOwn.call(continents[k], x)) {
+                continents[k][x] = {}
+            }
+
+            continents[k][x][y] = [id, name, points, character_id || 0, province_id]
+        }
+
+        for (let { id, tribe_id } of players) {
+            if (tribe_id) {
+                if (hasOwn.call(tribeVillageCounter, tribe_id)) {
+                    tribeVillageCounter[tribe_id] += parsedPlayers[id][3]
+                } else {
+                    tribeVillageCounter[tribe_id] = parsedPlayers[id][3]
+                }
             }
         }
+
+        for (let k in continents) {
+            const data = JSON.stringify(continents[k])
+            await fs.promises.writeFile(path.join(dataPath, k), zlib.gzipSync(data))
+        }
+
+        for (let { id, name, tag, points } of tribes) {
+            parsedTribes[id] = [name, tag, points, tribeVillageCounter[id]]
+        }
+
+        for (let { name } of provinces) {
+            parsedProvinces.push(name)
+        }
+
+        const info = {
+            players: parsedPlayers,
+            tribes: parsedTribes,
+            provinces: parsedProvinces
+        }
+
+        const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
+        await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
+
+        return true
+    } catch (error) {
+        logLevel++
+        log(colors.red('Failed to write to filesystem: ' + error.message))
+        logLevel--
     }
 
-    for (let k in continents) {
-        const data = JSON.stringify(continents[k])
-        await fs.promises.writeFile(path.join(dataPath, k), zlib.gzipSync(data))
-    }
-
-    for (let { id, name, tag, points } of tribes) {
-        parsedTribes[id] = [name, tag, points, tribeVillageCounter[id]]
-    }
-
-    for (let { name } of provinces) {
-        parsedProvinces.push(name)
-    }
-
-    const info = {
-        players: parsedPlayers,
-        tribes: parsedTribes,
-        provinces: parsedProvinces
-    }
-
-    const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
-    await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
-
-    return true
+    return false
 }
 
 Sync.cleanExpiredShares = async function () {

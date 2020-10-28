@@ -72,6 +72,13 @@ const getBuffer = function (url) {
     })
 }
 
+const time = async function (handler) {
+    const start = Date.now()
+    await handler()
+    const end = Date.now()
+    return end - start
+}
+
 module.exports = {
     noop,
     schemaExists,
@@ -80,5 +87,6 @@ module.exports = {
     makeid,
     getHourlyDir,
     getHTML,
-    getBuffer
+    getBuffer,
+    time
 }
