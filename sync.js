@@ -90,6 +90,7 @@ Sync.init = async function () {
 
 Sync.daemon = async function () {
     log('Sync.daemon()')
+    logLevel++
 
     const {
         scrappe_all_interval,
@@ -99,16 +100,24 @@ Sync.daemon = async function () {
 
     const scrapeWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
         await Sync.scrappeAllWorlds()
+        log('Next scrappeAllWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
     })
 
     const registerWorldsJob = schedule.scheduleJob(register_worlds_interval, async function () {
         await Sync.markets()
         await Sync.registerWorlds()
+        log('Next registerWorldsJob ' + colors.green(registerWorldsJob.nextInvocation()._date.fromNow()))
     })
 
     const cleanSharesJob = schedule.scheduleJob(clean_shares_check_interval, async function () {
         await Sync.cleanExpiredShares()
+        log('Next cleanExpiredShares ' + colors.green(cleanSharesJob.nextInvocation()._date.fromNow()))
     })
+
+    log('Next scrappeAllWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
+    log('Next registerWorldsJob ' + colors.green(registerWorldsJob.nextInvocation()._date.fromNow()))
+    log('Next cleanExpiredShares ' + colors.green(cleanSharesJob.nextInvocation()._date.fromNow()))
+    console.log('')
 }
 
 Sync.registerWorlds = async function () {
@@ -471,7 +480,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 const queryData = async function (data, marketId, worldNumber) {
     const worldId = marketId + worldNumber
 
-    log('Writing data ' + worldId + ' to database')
+    log('Writing ' + worldId + ' data to database')
 
     try {
         for (let [tribe_id, tribe] of data.tribes) {
