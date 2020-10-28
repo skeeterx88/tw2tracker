@@ -377,7 +377,7 @@ Sync.scrappeAllWorlds = async function (flag) {
             logLevel--
             return ERROR_SYNC_ALL
         } else {
-            log(color.orange('Some worlds failed to sync:'))
+            log(colors.magenta('Some worlds failed to sync:'))
             logLevel++
 
             for (let fail of failedToSync) {
