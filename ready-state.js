@@ -8,7 +8,7 @@ module.exports = function () {
                 clearTimeout(injectorTimeout)
 
                 if (document.querySelector('.modal-establish-village')) {
-                    console.log('Scrapper: Ready to fetch villages')
+                    console.log('Scrapper: Ready')
 
                     return resolve()
                 }
@@ -17,7 +17,7 @@ module.exports = function () {
                 const mapScope = transferredSharedDataService.getSharedData('MapController')
 
                 if (mapScope && mapScope.isInitialized) {
-                    console.log('Scrapper: Ready to fetch villages')
+                    console.log('Scrapper: Ready')
 
                     resolve()
                 } else {
@@ -41,7 +41,7 @@ module.exports = function () {
                     clearTimeout(timeout)
                     clearTimeout(injectorTimeout)
 
-                    console.log('Scrapper: Ready to fetch villages')
+                    console.log('Scrapper: Ready')
 
                     resolve()
                 })

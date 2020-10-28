@@ -76,7 +76,7 @@ const time = async function (handler) {
     const start = Date.now()
     await handler()
     const end = Date.now()
-    return end - start
+    return (Math.round(((end - start) / 1000) * 10) / 10) + 's'
 }
 
 module.exports = {
