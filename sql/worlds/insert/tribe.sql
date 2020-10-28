@@ -9,6 +9,7 @@ INSERT INTO ${worldId:name}.tribes (
     victory_points,
     rank,
     members,
+    level,
     bash_points_off,
     bash_points_def,
     bash_points_total
@@ -23,6 +24,7 @@ INSERT INTO ${worldId:name}.tribes (
     ${victory_points},
     ${rank},
     ${members},
+    ${level},
     ${bash_points_off},
     ${bash_points_def},
     ${bash_points_total}
@@ -37,6 +39,7 @@ SET name = excluded.name,
     victory_points = excluded.victory_points,
     rank = excluded.rank,
     members = excluded.members,
+    level = excluded.level,
     bash_points_off = excluded.bash_points_off,
     bash_points_def = excluded.bash_points_def,
     bash_points_total = excluded.bash_points_total;

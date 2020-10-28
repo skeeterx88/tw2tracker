@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS ${schema:name}.tribes (
     rank INT,
     creating_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     members INT,
+    level INT,
 
     best_rank INT,
     best_points INT,

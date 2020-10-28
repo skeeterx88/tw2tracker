@@ -4,6 +4,7 @@
 module.exports = async function () {
     const socketService = injector.get('socketService')
     const routeProvider = injector.get('routeProvider')
+    const tribeSkillService = injector.get('tribeSkillService')
     const RANKING_QUERY_COUNT = 25
     const CHUNK_SIZE = 50
     const COORDS_REFERENCE = {
@@ -215,7 +216,8 @@ module.exports = async function () {
                         points_per_villages: tribe.points_per_villages,
                         rank: tribe.rank,
                         victory_points: tribe.victory_points,
-                        villages: tribe.villages
+                        villages: tribe.villages,
+                        level: tribeSkillService.getTribeLevel(tribe.power)
                     })
                 }
 

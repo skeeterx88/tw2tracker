@@ -324,6 +324,7 @@ Sync.auth = async function (marketId, { account_name, account_password }, auth_a
 }
 
 Sync.scrappeAllWorlds = async function (flag) {
+    log('')
     log('Sync.scrappeAllWorlds()')
     logLevel++
 
