@@ -135,9 +135,8 @@ Sync.registerWorlds = async function () {
 
     if (process.env.NODE_ENV === 'development') {
         markets = [
-            { id: 'de', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' },
-            { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' },
-            { id: 'en', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
+            { id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' },
+            { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
         ]
     } else {
         markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
@@ -341,9 +340,8 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     if (process.env.NODE_ENV === 'development') {
         worlds = [
-            { market: 'de', num: 48 },
-            { market: 'br', num: 48 },
-            { market: 'en', num: 56 }
+            { market: 'zz', num: 8 },
+            { market: 'br', num: 52 }
         ]
     } else {
         worlds = await db.any(sql.worlds.allOpen)
