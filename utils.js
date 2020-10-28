@@ -1,6 +1,7 @@
 const db = require('./db')
 const sql = require('./sql')
 const https = require('https')
+const colors = require('colors/safe')
 
 const noop = function () {}
 

@@ -12,6 +12,12 @@ const authenticatedMarkets = {}
 const zlib = require('zlib')
 const path = require('path')
 const hasOwn = Object.prototype.hasOwnProperty
+const colors = require('colors/safe')
+let logLevel = 0
+
+const log = function () {
+    console.log('    '.repeat(logLevel), ...arguments)
+}
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
@@ -40,7 +46,7 @@ const puppeteerPage = async function () {
 
     page.on('console', function (msg) {
         if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
-            console.log(msg._text)
+            log(msg._text)
         }
     })
 
@@ -50,13 +56,13 @@ const puppeteerPage = async function () {
 const Sync = {}
 
 Sync.init = async function () {
-    console.log('Sync.init()')
+    log('Sync.init()')
 
     // const worldData = JSON.parse(await fs.promises.readFile('./dev-data/br48/worldData.json'))
     // await inserWorldData(worldData, 'br', 48)
 
     process.on('SIGTERM', async function () {
-        console.log('Stopping tw2tracker')
+        log('Stopping tw2tracker')
         process.exit()
     })
 
@@ -77,24 +83,12 @@ Sync.init = async function () {
     try {
         await Sync.daemon()
     } catch (error) {
-        console.log(error)
-    }
-}
-
-Sync.createInitialStructure = async function () {
-    const mainSchamaExists = await utils.schemaExists('main')
-
-    if (!mainSchamaExists) {
-        await fs.promises.mkdir(path.join('.', 'data'), { recursive: true })
-        await db.query(sql.mainSchema)
-        await Sync.markets()
-        await Sync.registerWorlds()
-        await Sync.scrappeAllWorlds()
+        log(colors.red(error))
     }
 }
 
 Sync.daemon = async function () {
-    console.log('Sync.daemon()')
+    log('Sync.daemon()')
 
     const {
         scrappe_all_interval,
@@ -116,8 +110,11 @@ Sync.daemon = async function () {
     })
 }
 
-Sync.fetchAllWorlds = async function () {
-    console.log('Sync.fetchAllWorlds()')
+Sync.registerWorlds = async function () {
+    log('Sync.registerWorlds()')
+    logLevel++
+
+    await db.query(sql.state.update.registerWorlds)
 
     let markets
 
@@ -131,9 +128,6 @@ Sync.fetchAllWorlds = async function () {
         markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
     }
 
-    const allWorlds = {}
-    const availableWorlds = {}
-
     for (let i = 0; i < markets.length; i++) {
         const market = markets[i]
         let account
@@ -141,12 +135,16 @@ Sync.fetchAllWorlds = async function () {
         try {
             account = await Sync.auth(market.id, market)
         } catch (error) {
-            console.log(error.message)
+            log(colors.red(error.message))
             continue
         }
 
         const allowedLoginCharacters = account.characters.filter(world => world.allow_login)
         const nonFullWorlds = account.worlds.filter(world => !world.full)
+
+        for (let world of nonFullWorlds) {
+            await Sync.registerCharacter(market.id, utils.extractNumbers(world.world_id))
+        }
 
         const formatedAllowedLoginCharacters = allowedLoginCharacters.map(function (world) {
             return {
@@ -162,59 +160,43 @@ Sync.fetchAllWorlds = async function () {
             }
         })
 
-        allWorlds[market.id] = [
+        const allWorlds = [
             ...formatedAllowedLoginCharacters,
             ...formatedNonFullWorlds
         ]
 
         if (nonFullWorlds.length) {
-            availableWorlds[market.id] = formatedNonFullWorlds
+            for (let {worldNumber} of Object.entries(formatedNonFullWorlds)) {
+                await Sync.registerCharacter(market.id, worldNumber)
+            }
         }
 
-        console.log('Sync.fetchAllWorlds: market:' + market.id + ' worlds:', allWorlds[market.id].map(world => world.worldNumber).join(','))
-    }
+        for (let world of allWorlds) {
+            const {worldNumber, worldName} = world
 
-    return [allWorlds, availableWorlds]
-}
+            const worldSchemaExists = await utils.schemaExists(market.id + worldNumber)
+            const worldEntryExists = await utils.worldEntryExists(market.id, worldNumber)
 
-Sync.registerWorlds = async function () {
-    console.log('Sync.registerWorlds()')
-
-    await db.query(sql.state.update.registerWorlds)
-
-    const [allWorlds, availableWorlds] = await Sync.fetchAllWorlds()
-
-    for (let [marketId, marketWorlds] of Object.entries(availableWorlds)) {
-        for (let i = 0; i < marketWorlds.length; i++) {
-            const { worldNumber } = marketWorlds[i]
-            await Sync.registerCharacter(marketId, worldNumber)
-        }
-    }
-
-    for (let [marketId, marketWorlds] of Object.entries(allWorlds)) {
-        for (let i = 0; i < marketWorlds.length; i++) {
-            const {worldNumber, worldName} = marketWorlds[i]
-
-            const worldSchemaExists = await utils.schemaExists(marketId + worldNumber)
-            const worldEntryExists = await utils.worldEntryExists(marketId, worldNumber)
+            if (!worldSchemaExists || !worldEntryExists) {
+                log('Creating world entry for', market.id + worldNumber)
+            }
 
             if (!worldSchemaExists) {
-                console.log('Sync.registerWorlds: Creating schema for', marketId + worldNumber)
-                await db.query(sql.worlds.createSchema, {schema: marketId + worldNumber})
+                await db.query(sql.worlds.createSchema, {schema: market.id + worldNumber})
             }
 
             if (!worldEntryExists) {
-                console.log('Sync.registerWorlds: Creating world entry for', marketId + worldNumber)
-                await db.query(sql.worlds.addEntry, [marketId, worldNumber, worldName, true])
+                await db.query(sql.worlds.addEntry, [market.id, worldNumber, worldName, true])
             }
         }
     }
 
-    console.log('Sync.registerWorlds: Finished')
+    logLevel--
 }
 
 Sync.registerCharacter = async function (marketId, worldNumber) {
-    console.log('Sync.registerCharacter() market:' + marketId + ', world:' + worldNumber)
+    log('Sync.registerCharacter() ' + marketId + worldNumber)
+    logLevel++
 
     const page = await puppeteerPage()
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
@@ -235,17 +217,16 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
     await page.waitFor(2000)
 
-    console.log('Sync.registerWorld:', 'character for', marketId + worldNumber, 'created')
+    log('Character created')
+    logLevel--
 }
 
-Sync.auth = async function (marketId, { account_name, account_password }, retries = 0) {
-    if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
-        const account = authenticatedMarkets[marketId]
-        console.log('Sync.auth() market:' + marketId + ', already authenticated with account', account.name)
-        return account
-    }
+Sync.auth = async function (marketId, { account_name, account_password }, auth_attempt = 1) {
+    log('Sync.auth() market:' + marketId)
 
-    console.log('Sync.auth() market:' + marketId + ', account:' + account_name)
+    if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
+        return authenticatedMarkets[marketId]
+    }
 
     const page = await puppeteerPage()
 
@@ -311,16 +292,15 @@ Sync.auth = async function (marketId, { account_name, account_password }, retrie
     } catch (error) {
         await page.close()
 
-        if (retries < 2) {
-            retries++
+        if (auth_attempt < 3) {
+            auth_attempt++
 
-            console.log('Error when trying to authenticate (' + error.message + ')')
-            console.log('Retrying... (' + (retries) + ')')
+            log(colors.red('Error trying to auth (' + error.message + ')'))
 
             return await Sync.auth(marketId, {
                 account_name,
                 account_password
-            }, retries)
+            }, auth_attempt)
         } else {
             throw new Error(error.message)
         }
@@ -328,7 +308,8 @@ Sync.auth = async function (marketId, { account_name, account_password }, retrie
 }
 
 Sync.scrappeAllWorlds = async function (flag) {
-    console.log('Sync.scrappeAllWorlds()')
+    log('Sync.scrappeAllWorlds()')
+    logLevel++
 
     let worlds
 
@@ -350,7 +331,7 @@ Sync.scrappeAllWorlds = async function (flag) {
         try {
             await Sync.scrappeWorld(world.market, world.num, flag)
         } catch (error) {
-            console.log(error.message)
+            log(colors.red(error.message))
 
             failedToSync.push({
                 marketId: world.market,
@@ -364,20 +345,25 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
-            console.log('Sync.scrappeAllWorlds: All worlds failed to sync.')
+            log(colors.red('All worlds failed to sync.'))
 
+            logLevel--
             return ERROR_SYNC_ALL
         } else {
-            console.log('Sync.scrappeAllWorlds: Some worlds failed to sync:')
+            log(color.orange('Sync.scrappeAllWorlds: Some worlds failed to sync:'))
+            logLevel++
 
             for (let fail of failedToSync) {
-                console.log(fail.marketId + fail.worldNumber + ':', fail.message)
+                log(fail.marketId + fail.worldNumber + ':', fail.message)
             }
 
+            logLevel--
+            logLevel--
             return ERROR_SYNC_SOME
         }
     } else {
-        console.log('Sync.scrappeAllWorlds: Finished')
+        log(colors.green('Finished'))
+        logLevel--
 
         return SUCCESS_SYNC_ALL
     }
@@ -392,7 +378,8 @@ const downloadStruct = async function (url, marketId, worldNumber) {
 }
 
 Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
-    console.log('Sync.scrappeWorld()', marketId + worldNumber)
+    log('Sync.scrappeWorld()', marketId + worldNumber)
+    logLevel++
 
     const worldId = marketId + worldNumber
     const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
@@ -402,11 +389,11 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
     try {
         worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
     } catch (e) {
-        throw new Error('Sync.scrappeWorld: World ' + worldId + ' not found.')
+        throw new Error('World ' + worldId + ' not found.')
     }
 
     if (!worldInfo.open) {
-        throw new Error('Sync.scrappeWorld: World ' + worldId + ' is closed')
+        throw new Error('World ' + worldId + ' is closed')
     }
 
     if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
@@ -414,7 +401,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         const settings = await getSettings()
 
         if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-            throw new Error('Sync.scrappeWorld: ' + worldId + ' already sincronized')
+            throw new Error(worldId + ' already sincronized')
         }
     }
 
@@ -439,8 +426,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
 
         try {
             await fs.promises.access(path.join('.', 'data', worldId, 'struct'))
-        } catch (_) {
-            console.log('Sync.scrappeWorld: Downloading map structure')
+        } catch (e) {
+            log('Downloading map structure')
             const structPath = await page.evaluate(getStructPath)
             await downloadStruct(`https://${urlId}.tribalwars2.com/${structPath}`, marketId, worldNumber)
         }
@@ -458,18 +445,20 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag) {
         await queryData(data, marketId, worldNumber)
         await db.query(sql.worlds.updateSyncStatus, [SUCCESS, marketId, worldNumber])
 
-        console.log('Sync.scrappeWorld:', marketId + worldNumber, 'scrapped')
+        log(colors.green('Finished'))
+        logLevel--
     } catch (error) {
         await db.query(sql.worlds.updateSyncStatus, [FAIL, marketId, worldNumber])
-        console.log('Sync.scrappeWorld: Failed to synchronize ' + marketId + worldNumber)
-        console.log(error.message)
+        log('Failed to synchronize ' + marketId + worldNumber)
+        log(colors.red(error.message))
+        logLevel--
     }
 }
 
 const queryData = async function (data, marketId, worldNumber) {
     const worldId = marketId + worldNumber
 
-    console.log('Sync.scrappeWorld: Saving ' + worldId + ' data')
+    log('Saving ' + worldId + ' data')
 
     for (let [tribe_id, tribe] of data.tribes) {
         await db.query(sql.worlds.insert.tribe, {worldId, tribe_id, ...tribe})
@@ -565,7 +554,7 @@ const queryData = async function (data, marketId, worldNumber) {
 }
 
 Sync.markets = async function () {
-    console.log('Sync.markets()')
+    log('Sync.markets()')
 
     await db.query(sql.state.update.lastFetchMarkets)
 
@@ -588,7 +577,7 @@ Sync.markets = async function () {
 }
 
 Sync.genWorldBlocks = async function (marketId, worldNumber) {
-    console.log('Sync.genWorldBlocks()', marketId + worldNumber)
+    log('Sync.genWorldBlocks()', marketId + worldNumber)
 
     const worldId = marketId + worldNumber
     const players = await db.any(sql.worlds.getData, { worldId, table: 'players' })
@@ -676,8 +665,6 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 
     const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
     await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
-
-    console.log('Sync.genWorldBlocks:', worldId, 'finished')
 
     return true
 }

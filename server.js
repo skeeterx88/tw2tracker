@@ -111,7 +111,7 @@ app.use(function (err, req, res, next) {
 app.set('port', port)
 
 module.exports = function () {
-    console.log('Server: Initializing...')
+    // console.log('Server: Initializing...')
 
     const server = http.createServer(app)
 
