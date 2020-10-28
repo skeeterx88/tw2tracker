@@ -10,8 +10,11 @@ CREATE TABLE main.settings (
     static_share_expire_time INT NOT NULL
 );
 
+-- '30 */1 * * *' == At minute 30 past every hour
+-- '10 */12 * * *' == At minute 10 past every 12th hour
+-- '0 */12 * * *' == At minute 0 past every 12th hour
 -- 129600 = 60 days
-INSERT INTO main.settings VALUES ('Tw2-Tracker', '123', '0 * * * *', '0 */12 * * *', '0 */12 * * *', 129600);
+INSERT INTO main.settings VALUES ('Tw2-Tracker', '123', '30 */1 * * *', '10 */12 * * *', '0 */12 * * *', 129600);
 
 CREATE TABLE main.state (
     last_scrappe_all_time TIMESTAMP DEFAULT NULL,
