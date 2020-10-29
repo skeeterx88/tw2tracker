@@ -2,8 +2,6 @@
     const db = require('./db')
     const sql = require('./sql')
     const utils = require('./utils')
-    const fs = require('fs')
-    const path = require('path')
 
     if (!await utils.schemaExists('main')) {
         await db.query(sql.mainSchema)
