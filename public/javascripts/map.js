@@ -117,7 +117,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     const settingTriggers = {}
 
     settingTriggers.neutralColor = (flag) => {
-        if (flag === INITIAL_SETUP) {
+        if (flag === TW2Map.INITIAL_SETUP) {
             return
         }
 
@@ -126,7 +126,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     settingTriggers.barbarianColor = (flag) => {
-        if (flag === INITIAL_SETUP) {
+        if (flag === TW2Map.INITIAL_SETUP) {
             return
         }
 
@@ -139,7 +139,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     }
 
     settingTriggers.demarcationsColor = (flag) => {
-        if (flag === INITIAL_SETUP) {
+        if (flag === TW2Map.INITIAL_SETUP) {
             return
         }
 
@@ -157,7 +157,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         this.moveTo(currentCenterX, currentCenterY)
 
-        if (flag === INITIAL_SETUP) {
+        if (flag === TW2Map.INITIAL_SETUP) {
             resetZoomContinents()
         }
 
@@ -1100,7 +1100,7 @@ const TW2DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadInfo = new Promise(async (resolve) => {
-        const url = mapShare && mapShare.type === mapShareTypes.STATIC
+        const url = mapShare && mapShare.type === TW2Map.mapShareTypes.STATIC
             ? `/maps/api/${marketId}/${worldNumber}/info/${mapShare.share_id}`
             : `/maps/api/${marketId}/${worldNumber}/info`
 
@@ -1141,7 +1141,7 @@ const TW2DataLoader = function (marketId, worldNumber) {
         }
 
         continentPromises[continent] = new Promise(async (resolve) => {
-            const url = mapShare && mapShare.type === mapShareTypes.STATIC
+            const url = mapShare && mapShare.type === TW2Map.mapShareTypes.STATIC
                 ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShare.share_id}`
                 : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`
 
