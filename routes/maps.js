@@ -3,6 +3,7 @@ const path = require('path')
 const express = require('express')
 const router = express.Router()
 const utils = require('../utils')
+const {asyncRouter} = utils
 const getSettings = require('../settings')
 const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
 const EMPTY_CONTINENT = 'empty_continent'
@@ -15,7 +16,7 @@ const mapShareTypes = {
     DYNAMIC: 'dynamic'
 }
 
-router.get('/', async function (req, res) {
+router.get('/', asyncRouter(async function (req, res) {
     const [
         settings,
         worlds,
@@ -31,9 +32,9 @@ router.get('/', async function (req, res) {
         worlds: worlds,
         markets: markets
     })
-})
+}))
 
-router.get('/:marketId/:worldNumber', async function (req, res, next) {
+router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -46,12 +47,7 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
 
     if (!worldExists) {
         res.status(404)
-        res.render('error', {
-            title: 'Tw2-Tracker Error',
-            error_title: 'This world does not exist'
-        })
-
-        return false
+        throw new Error('This world does not exist')
     }
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
@@ -67,9 +63,9 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
             development: process.env.NODE_ENV === 'development'
         }
     })
-})
+}))
 
-router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res) {
+router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async function (req, res) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -85,12 +81,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
 
     if (!worldExists) {
         res.status(404)
-        res.render('error', {
-            title: 'Tw2-Tracker Error',
-            error_title: 'This world does not exist'
-        })
-
-        return false
+        throw new Error('This world does not exist')
     }
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
@@ -100,11 +91,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
         mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
     } catch (error) {
         res.status(404)
-        res.render('error', {
-            title: 'Tw2-Tracker Error',
-            error_title: 'This map share does not exist'
-        })
-        return false
+        throw new Error('This map share does not exist')
     }
 
     mapShare.creation_date = new Date(mapShare.creation_date).getTime()
@@ -123,9 +110,9 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res
             development: process.env.NODE_ENV === 'development'
         }
     })
-})
+}))
 
-router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req, res) {
+router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const mapShareId = req.params.mapShareId
@@ -135,8 +122,7 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req,
 
     if (!worldExists) {
         res.status(404)
-        res.send('Invalid API call')
-        return false
+        throw new Error('World does not exist')
     }
 
     let dataPath
@@ -152,9 +138,8 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req,
     try {
         await fs.promises.access(dataPath)
     } catch (error) {
-        res.status(404)
-        res.send('API call error')
-        return false
+        res.status(500)
+        throw new Error('Share data not found')
     }
 
     const ifNoneMatchValue = req.headers['if-none-match']
@@ -173,21 +158,21 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req,
     res.setHeader('Vary', 'ETag, Content-Encoding')
     res.setHeader('ETag', etag)
     res.end(data)
-})
+}))
 
-router.get('/api/get-worlds', async function (req, res) {
+router.get('/api/get-worlds', asyncRouter(async function (req, res) {
     const allWorlds = await db.any(sql.worlds.allOpen)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allWorlds))
-})
+}))
 
-router.get('/api/get-markets', async function (req, res) {
+router.get('/api/get-markets', asyncRouter(async function (req, res) {
     const allMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allMarkets))
-})
+}))
 
-router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', async function (req, res) {
+router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', asyncRouter(async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
@@ -198,14 +183,12 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
 
     if (!worldExists) {
         res.status(404)
-        res.send('Invalid API call')
-        return false
+        throw new Error('World does not exist')
     }
 
     if (continentId < 0 || continentId > 99 || isNaN(continentId)) {
         res.status(400)
-        res.send('Invalid API call')
-        return false
+        throw new Error('Invalid continent')
     }
 
     let dataPath
@@ -251,9 +234,9 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
 
     res.setHeader('ETag', etag)
     res.end(data)
-})
+}))
 
-router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
+router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
@@ -262,8 +245,7 @@ router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
 
     if (!worldExists) {
         res.status(404)
-        res.send('Invalid API call')
-        return false
+        throw new Error('World does not exist')
     }
 
     const structPath = path.join('.', 'data', worldId, 'struct')
@@ -271,9 +253,8 @@ router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
     try {
         await fs.promises.access(structPath)
     } catch (error) {
-        res.status(404)
-        res.send('API call error')
-        return false
+        res.status(500)
+        throw new Error('Struct data not found')
     }
 
     const ifNoneMatchValue = req.headers['if-none-match']
@@ -309,17 +290,23 @@ router.post('/api/create-share', async function (req, res) {
     try {
         const worldExists = await utils.schemaExists(marketId, worldNumber)
 
-        if (!worldExists) {
-            throw new Error('World does not exist')
-        }
+    if (!worldExists) {
+        res.status(404)
+        res.end('World does not exist')
+        return
+    }
 
-        if (!highlights || !Array.isArray(highlights)) {
-            throw new Error('Invalid highlights data')
-        }
+    if (!highlights || !Array.isArray(highlights)) {
+        res.status(400)
+        res.end('Invalid highlights data')
+        return
+    }
 
-        if (!highlights.length) {
-            throw new Error('No highlights specified')
-        }
+    if (!highlights.length) {
+        res.status(400)
+        res.end('No highlights specified')
+        return
+    }
 
         const highlightsString = JSON.stringify(highlights)
         const shareId = utils.makeid(20)
@@ -364,6 +351,7 @@ router.post('/api/create-share', async function (req, res) {
 router.post('/api/get-share/', async function (req, res) {
     const response = {}
 
+router.post('/api/get-share/', asyncRouter(async function (req, res) {
     let {
         mapShareId,
         marketId,

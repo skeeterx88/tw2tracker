@@ -97,15 +97,13 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message
-    res.locals.error = req.app.get('env') === 'development' ? err : {}
+    const status = err.status || 404
+    res.locals.error = req.app.get('env') === 'development' ? err : err.message
+    res.locals.status = status
+    res.locals.title = 'Tw2-Tracker Error'
 
-    // render the error page
-    res.status(err.status || 500)
-    res.render('error', {
-        title: 'Tw2-Tracker Error'
-    })
+    res.status(status)
+    res.render('error')
 })
 
 app.set('port', port)

@@ -105,6 +105,12 @@ const sha1sum = function (value) {
     return hash.digest('hex')
 }
 
+const asyncRouter = function (handler) {
+    return function (req, res, next) {
+        Promise.resolve(handler(req, res, next)).catch(next)
+    }
+}
+
 module.exports = {
     noop,
     schemaExists,
@@ -115,5 +121,6 @@ module.exports = {
     getHTML,
     getBuffer,
     perf,
-    sha1sum
+    sha1sum,
+    asyncRouter
 }

@@ -3,9 +3,10 @@ const router = express.Router()
 const db = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
+const {asyncRouter} = utils
 const getSettings = require('../settings')
 
-router.get('/:marketId/:worldNumber', async function (req, res, next) {
+router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -18,12 +19,7 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
 
     if (!worldExists) {
         res.status(404)
-        res.render('error', {
-            title: 'Tw2-Tracker Error',
-            error_title: 'This world does not exist'
-        })
-
-        return false
+        throw new Error('This world does not exist')
     }
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
@@ -53,9 +49,9 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
             tribes
         }
     })
-})
+}))
 
-router.get('/:marketId/:worldNumber/tribes/:tribeId', async function (req, res, next) {
+router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -69,12 +65,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', async function (req, res, 
 
     if (!worldExists) {
         res.status(404)
-        res.render('error', {
-            title: 'Tw2-Tracker Error',
-            error_title: 'This world does not exist'
-        })
-
-        return false
+        throw new Error('This world does not exist')
     }
 
     let tribe
@@ -86,12 +77,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', async function (req, res, 
         })
     } catch (error) {
         res.status(404)
-        res.render('error', {
-            title: 'Tw2-Tracker Error',
-            error_title: 'This tribe does not exist'
-        })
-
-        return false
+        throw new Error('This tribe does not exist')
     }
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
@@ -106,6 +92,6 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', async function (req, res, 
         siteName: settings.site_name,
         development: process.env.NODE_ENV === 'development'
     })
-})
+}))
 
 module.exports = router
