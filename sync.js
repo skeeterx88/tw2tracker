@@ -17,6 +17,11 @@ let fullSyncInProgress = false
 let authenticatedMarkets = {}
 
 const log = function () {
+    if (logLevel < 0) {
+        logLevel = 0
+        console.log(colors.red('Invalid logLevel value!'))
+    }
+
     console.log(
         colors.gray(' ·'.repeat(logLevel)),
         ...arguments
@@ -508,6 +513,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < 3) {
             logLevel--
             await Sync.scrappeWorld(marketId, worldNumber, flag, ++attempt)
+            return
         } else {
             await db.query(sql.worlds.updateSyncStatus, [FAIL, marketId, worldNumber])
         }
