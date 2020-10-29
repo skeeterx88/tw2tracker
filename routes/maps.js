@@ -43,7 +43,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
 
-    const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)
@@ -77,7 +77,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
 
     let mapShare
 
-    const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)
@@ -118,7 +118,7 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async fu
     const mapShareId = req.params.mapShareId
     const worldId = marketId + worldNumber
 
-    const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)
@@ -179,7 +179,7 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
     const continentId = req.params.continentId
     const mapShareId = req.params.mapShareId
 
-    const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)
@@ -241,7 +241,7 @@ router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
     
-    const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)
@@ -288,7 +288,7 @@ router.post('/api/create-share', async function (req, res) {
     } = req.body
 
     try {
-        const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)

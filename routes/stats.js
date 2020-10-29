@@ -15,7 +15,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
 
-    const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)
@@ -61,7 +61,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const tribeId = parseInt(req.params.tribeId, 10)
 
-    const worldExists = await utils.schemaExists(marketId, worldNumber)
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
         res.status(404)
