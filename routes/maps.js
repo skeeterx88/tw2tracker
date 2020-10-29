@@ -274,10 +274,9 @@ router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req
     res.setHeader('Vary', 'ETag, Content-Encoding')
     res.setHeader('ETag', etag)
     res.end(struct)
-})
+}))
 
-router.post('/api/create-share', async function (req, res) {
-    const response = {}
+router.post('/api/create-share', asyncRouter(async function (req, res) {
     const {
         marketId,
         worldNumber,
@@ -287,7 +286,6 @@ router.post('/api/create-share', async function (req, res) {
         center
     } = req.body
 
-    try {
     const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
@@ -308,48 +306,37 @@ router.post('/api/create-share', async function (req, res) {
         return
     }
 
-        const highlightsString = JSON.stringify(highlights)
-        const shareId = utils.makeid(20)
+    const highlightsString = JSON.stringify(highlights)
+    const shareId = utils.makeid(20)
 
-        const settingsString = JSON.stringify(settings)
-        const { creation_date } = await db.one(sql.maps.createShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y])
+    const settingsString = JSON.stringify(settings)
+    const {creation_date} = await db.one(sql.maps.createShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y])
 
-        if (shareType === mapShareTypes.STATIC) {
-            const dateId = utils.getHourlyDir(creation_date)
-            const worldId = marketId + worldNumber
-            const copyDestination = path.join('.', 'data', 'static-maps', worldId, dateId)
+    if (shareType === mapShareTypes.STATIC) {
+        const dateId = utils.getHourlyDir(creation_date)
+        const worldId = marketId + worldNumber
+        const copyDestination = path.join('.', 'data', 'static-maps', worldId, dateId)
 
-            try {
-                await fs.promises.access(copyDestination)
-            } catch (e) {
-                const worldDataLocation = path.join('.', 'data', worldId)
-                const worldData = await fs.promises.readdir(worldDataLocation)
-                const toCopy = worldData.filter((file) => file !== 'struct')
+        try {
+            await fs.promises.access(copyDestination)
+        } catch (e) {
+            const worldDataLocation = path.join('.', 'data', worldId)
+            const worldData = await fs.promises.readdir(worldDataLocation)
+            const toCopy = worldData.filter((file) => file !== 'struct')
 
-                await fs.promises.mkdir(copyDestination, { recursive: true })
+            await fs.promises.mkdir(copyDestination, { recursive: true })
 
-                for (let file of toCopy) {
-                    await fs.promises.copyFile(
-                        path.join(worldDataLocation, file),
-                        path.join(copyDestination, file)
-                    )
-                }
+            for (let file of toCopy) {
+                await fs.promises.copyFile(
+                    path.join(worldDataLocation, file),
+                    path.join(copyDestination, file)
+                )
             }
         }
-
-        response.success = true
-        response.url = `/maps/${marketId}/${worldNumber}/share/${shareId}`
-    } catch (error) {
-        response.success = false
-        response.message = error.message
     }
 
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(response))
-})
-
-router.post('/api/get-share/', async function (req, res) {
-    const response = {}
+    res.end(`/maps/${marketId}/${worldNumber}/share/${shareId}`)
+}))
 
 router.post('/api/get-share/', asyncRouter(async function (req, res) {
     let {
@@ -361,29 +348,24 @@ router.post('/api/get-share/', asyncRouter(async function (req, res) {
 
     let mapShare
 
-    res.setHeader('Content-Type', 'application/json')
+    const worldExists = await utils.schemaExists(marketId + worldNumber)
 
-    try {
-        await db.one(sql.worlds.one, [marketId, worldNumber])
-    } catch (error) {
-        response.success = false
-        response.message = 'World does not exist'
-        return res.end(JSON.stringify(response))
+    if (!worldExists) {
+        res.status(404)
+        res.end('World does not exist')
+        return
     }
 
     try {
         const shareSql = highlightsOnly ? sql.maps.getShareHighlights : sql.maps.getShareInfo
-        mapShare = await db.one(shareSql, [mapShareId, marketId, worldNumber])
+        const mapShare = await db.one(shareSql, [mapShareId, marketId, worldNumber])
+
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify(mapShare))
     } catch (error) {
-        response.success = false
-        response.message = 'Map share does not exist'
-        return res.end(JSON.stringify(response))
+        res.status(404)
+        res.end('Map share does not exist')
     }
-
-    response.success = true
-    response.data = mapShare
-
-    res.end(JSON.stringify(response))
-})
+}))
 
 module.exports = router

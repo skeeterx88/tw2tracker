@@ -466,26 +466,30 @@
         let creatingShare = false
 
         if (mapShare) {
-            mapShare.loadHighlights = new Promise(async (resolve) => {
-                const load = await ajaxPost('/maps/api/get-share/', {
+            const response = await fetch('/maps/api/get-share', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
                     mapShareId: mapShare.share_id,
                     marketId,
                     worldNumber,
                     highlightsOnly: true
                 })
-
-                if (!load.success) {
-                    notif({
-                        title: 'Failed to load shared map highlights',
-                        content: load.message,
-                        timeout: 0
-                    })
-
-                    return
-                }
-
-                resolve(JSON.parse(load.data.highlights))
             })
+
+            if (response.status === 200) {
+                const content = await response.json()
+                mapShare.highlights = JSON.parse(content.highlights)
+            } else {
+                const message = await response.text()
+                notif({
+                    title: 'Failed to load shared map highlights',
+                    content: message,
+                    timeout: 0
+                })
+            }
 
             map.moveTo(mapShare.center_x, mapShare.center_y)
 
@@ -495,13 +499,11 @@
                 }
             }
 
-            mapShare.loadHighlights.then(async (highlights) => {
-                await loader.loadInfo
+            await loader.loadInfo
 
-                for (let [highlightType, id, color] of highlights) {
-                    map.addHighlight(highlightType, id, color)
-                }
-            })
+            for (let [highlightType, id, color] of mapShare.highlights) {
+                map.addHighlight(highlightType, id, color)
+            }
         }
 
         const $mapShare = document.querySelector('#map-share')
@@ -525,7 +527,7 @@
 
                 notif({
                     title: 'Dynamic map',
-                    link: location.origin + result.url,
+                    link: location.origin + result,
                     timeout: 0
                 })
             } catch (error) {
@@ -554,7 +556,7 @@
 
                 notif({
                     title: 'Static map',
-                    link: location.origin + result.url,
+                    link: location.origin + result,
                     timeout: 0
                 })
             } catch (error) {

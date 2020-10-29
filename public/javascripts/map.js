@@ -956,30 +956,38 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             throw new Error('No highlights to create a share')
         }
 
-        const result = await ajaxPost('/maps/api/create-share', {
-            marketId,
-            worldNumber,
-            highlights: highlightsExport,
-            shareType,
-            center: {
-                x: centerCoordX,
-                y: centerCoordY
+        const response = await fetch('/maps/api/create-share', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             },
-            settings: {
-                zoomLevel: settings.zoomLevel,
-                neutralColor: settings.neutralColor,
-                barbarianColor: settings.barbarianColor,
-                backgroundColor: settings.backgroundColor,
-                highlightPlayerColor: settings.highlightPlayerColor,
-                demarcationsColor: settings.demarcationsColor
-            }
+            body: JSON.stringify({
+                marketId,
+                worldNumber,
+                highlights: highlightsExport,
+                shareType,
+                center: {
+                    x: centerCoordX,
+                    y: centerCoordY
+                },
+                settings: {
+                    zoomLevel: settings.zoomLevel,
+                    neutralColor: settings.neutralColor,
+                    barbarianColor: settings.barbarianColor,
+                    backgroundColor: settings.backgroundColor,
+                    highlightPlayerColor: settings.highlightPlayerColor,
+                    demarcationsColor: settings.demarcationsColor
+                }
+            })
         })
 
-        if (!result.success) {
-            throw new Error(result.message)
-        }
+        const content = await response.text()
 
-        return result
+        if (response.status === 400) {
+            throw new Error(content)
+        } else {
+            return content
+        }
     }
 
     this.on = (event, handler) => {
