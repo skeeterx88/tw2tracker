@@ -2,6 +2,7 @@ const db = require('./db')
 const sql = require('./sql')
 const https = require('https')
 const colors = require('colors/safe')
+const crypto = require('crypto')
 
 const noop = function () {}
 
@@ -98,6 +99,12 @@ perf.MILLISECONDS = 'milliseconds'
 perf.SECONDS = 'seconds'
 perf.MINUTES = 'minutes'
 
+const sha1sum = function (value) {
+    const hash = crypto.createHash('sha1')
+    hash.update(value)
+    return hash.digest('hex')
+}
+
 module.exports = {
     noop,
     schemaExists,
@@ -107,5 +114,6 @@ module.exports = {
     getHourlyDir,
     getHTML,
     getBuffer,
-    perf
+    perf,
+    sha1sum
 }

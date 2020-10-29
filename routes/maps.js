@@ -4,7 +4,8 @@ const express = require('express')
 const router = express.Router()
 const utils = require('../utils')
 const getSettings = require('../settings')
-const EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
+const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
+const EMPTY_CONTINENT = 'empty_continent'
 
 const db = require('../db')
 const sql = require('../sql')
@@ -69,6 +70,10 @@ router.get('/:marketId/:worldNumber', async function (req, res, next) {
 })
 
 router.get('/:marketId/:worldNumber/share/:mapShareId', async function (req, res) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
     const settings = await getSettings()
     const mapShareId = req.params.mapShareId
     const marketId = req.params.marketId
@@ -144,15 +149,30 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', async function (req,
         dataPath = path.join('.', 'data', worldId, 'info')
     }
 
-    fs.promises.readFile(dataPath)
-        .then(function (data) {
-            res.setHeader('Content-Encoding', 'zlib')
-            res.end(data)
-        })
-        .catch(function () {
-            res.status(404)
-            res.send('Invalid API call')
-        })
+    try {
+        await fs.promises.access(dataPath)
+    } catch (error) {
+        res.status(404)
+        res.send('API call error')
+        return false
+    }
+
+    const ifNoneMatchValue = req.headers['if-none-match']
+    const dataStats = await fs.promises.lstat(dataPath)
+    const etag = utils.sha1sum(dataStats.mtime.toISOString())
+
+    if (ifNoneMatchValue && ifNoneMatchValue === etag) {
+        res.status(304)
+        return res.end()
+    }
+
+    const data = await fs.promises.readFile(dataPath)
+
+    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader('Cache-Control', 'no-cache, max-age=31536000')
+    res.setHeader('Vary', 'ETag, Content-Encoding')
+    res.setHeader('ETag', etag)
+    res.end(data)
 })
 
 router.get('/api/get-worlds', async function (req, res) {
@@ -198,15 +218,39 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
         dataPath = path.join('.', 'data', worldId, continentId)
     }
 
-    res.setHeader('Content-Encoding', 'zlib')
+    let data
+    let etag
 
-    fs.promises.readFile(dataPath)
-        .then(function (data) {
-            res.end(data)
-        })
-        .catch(function () {
-            res.end(EMPTY_CONTINENT)
-        })
+    const ifNoneMatchValue = req.headers['if-none-match']
+
+    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader('Cache-Control', 'no-cache, max-age=31536000')
+    res.setHeader('Vary', 'ETag, Content-Encoding')
+
+    try {
+        await fs.promises.access(dataPath)
+        const dataStats = await fs.promises.lstat(dataPath)
+        etag = utils.sha1sum(dataStats.mtime.toISOString())
+
+        if (ifNoneMatchValue && ifNoneMatchValue === etag) {
+            res.status(304)
+            return res.end()
+        }
+
+        data = await fs.promises.readFile(dataPath)
+    } catch (error) {
+        etag = EMPTY_CONTINENT
+
+        if (ifNoneMatchValue && ifNoneMatchValue === etag) {
+            res.status(304)
+            return res.end()
+        }
+
+        data = GZIP_EMPTY_CONTINENT
+    }
+
+    res.setHeader('ETag', etag)
+    res.end(data)
 })
 
 router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
@@ -222,15 +266,33 @@ router.get('/api/:marketId/:worldNumber/struct', async function (req, res) {
         return false
     }
 
-    fs.promises.readFile(path.join('.', 'data', worldId, 'struct'))
-        .then(function (data) {
-            res.setHeader('Content-Encoding', 'zlib')
-            res.end(data)
-        })
-        .catch(function () {
-            res.status(400)
-            res.send('API call error')
-        })
+    const structPath = path.join('.', 'data', worldId, 'struct')
+
+    try {
+        await fs.promises.access(structPath)
+    } catch (error) {
+        res.status(404)
+        res.send('API call error')
+        return false
+    }
+
+    const ifNoneMatchValue = req.headers['if-none-match']
+    const structStats = await fs.promises.lstat(structPath)
+    const etag = utils.sha1sum(structStats.mtime.toISOString())
+
+    if (ifNoneMatchValue && ifNoneMatchValue === etag) {
+        res.status(304)
+        return res.end()
+    }
+
+    const struct = await fs.promises.readFile(structPath)
+
+    // res.setHeader('Content-Encoding', 'gzib')
+    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader('Cache-Control', 'no-cache, max-age=31536000')
+    res.setHeader('Vary', 'ETag, Content-Encoding')
+    res.setHeader('ETag', etag)
+    res.end(struct)
 })
 
 router.post('/api/create-share', async function (req, res) {
