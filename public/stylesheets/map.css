@@ -137,8 +137,8 @@ button.red:focus {
     color: #6d4f32;
     width: 86px;
     height: 18px;
-    padding-top: 1px;
-    padding-bottom: 1px;
+    padding-top: 2px;
+    padding-bottom: 0px;
     font-weight: bold;
     position: relative;
     text-align: center;
@@ -163,6 +163,7 @@ button.red:focus {
     cursor: pointer;
     width: 42px;
     display: inline-block;
+    vertical-align: top;
 }
 
 
@@ -523,10 +524,6 @@ header {
 #current-world {
     margin-left: 4px;
     width: 60px;
-}
-
-#current-world .flag {
-    margin-top: 1px;
 }
 
 #all-worlds {
