@@ -153,9 +153,9 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async fu
 
     const data = await fs.promises.readFile(dataPath)
 
-    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader('Content-Encoding', 'gzip')
     res.setHeader('Cache-Control', 'no-cache, max-age=31536000')
-    res.setHeader('Vary', 'ETag, Content-Encoding')
+    res.setHeader('Vary', 'ETag')
     res.setHeader('ETag', etag)
     res.end(data)
 }))
@@ -206,9 +206,9 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
 
     const ifNoneMatchValue = req.headers['if-none-match']
 
-    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader('Content-Encoding', 'gzip')
     res.setHeader('Cache-Control', 'no-cache, max-age=31536000')
-    res.setHeader('Vary', 'ETag, Content-Encoding')
+    res.setHeader('Vary', 'ETag')
 
     try {
         await fs.promises.access(dataPath)
@@ -268,10 +268,9 @@ router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req
 
     const struct = await fs.promises.readFile(structPath)
 
-    // res.setHeader('Content-Encoding', 'gzib')
-    res.setHeader('Content-Type', 'application/octet-stream')
+    res.setHeader('Content-Encoding', 'gzip')
     res.setHeader('Cache-Control', 'no-cache, max-age=31536000')
-    res.setHeader('Vary', 'ETag, Content-Encoding')
+    res.setHeader('Vary', 'ETag')
     res.setHeader('ETag', etag)
     res.end(struct)
 }))

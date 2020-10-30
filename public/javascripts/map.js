@@ -1113,8 +1113,7 @@ const TW2DataLoader = function (marketId, worldNumber) {
             : `/maps/api/${marketId}/${worldNumber}/info`
 
         const load = await fetch(url)
-        const gzipped = await load.arrayBuffer()
-        const info = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
+        const info = await load.json()
 
         this.players = info.players
         this.tribes = info.tribes
@@ -1154,9 +1153,8 @@ const TW2DataLoader = function (marketId, worldNumber) {
                 : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`
 
             const load = await fetch(url)
-            const gzipped = await load.arrayBuffer()
-            const villages = JSON.parse(pako.inflate(gzipped, { to: 'string' }))
-            
+            const villages = await load.json()
+
             this.continents[continent] = villages
 
             mergeVillages(villages)
@@ -1168,9 +1166,8 @@ const TW2DataLoader = function (marketId, worldNumber) {
 
     this.loadStruct = new Promise(async (resolve) => {
         const load = await fetch(`/maps/api/${marketId}/${worldNumber}/struct`)
-        const gzipped = await load.arrayBuffer()
-        const array = pako.inflate(gzipped)
-        const buffer = array.buffer.slice(array.byteOffset, array.byteLength + array.byteOffset)
+        const blob = await load.blob()
+        const buffer = await blob.arrayBuffer()
 
         this.struct = new DataView(buffer)
 
