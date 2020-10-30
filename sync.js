@@ -456,8 +456,6 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
             }
         }
 
-        await db.query(sql.worlds.updateSync, [marketId, worldNumber])
-
         page = await puppeteerPage()
 
         const perf = utils.perf()
@@ -504,6 +502,8 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
         await db.query(sql.worlds.updateSyncStatus, [SUCCESS, marketId, worldNumber])
         
         const time = perf.end()
+
+        await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
         log('Finished in ' + time)
     } catch (error) {
