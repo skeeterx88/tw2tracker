@@ -1,3 +1,3 @@
 SELECT *
-FROM ${schema:name}.tribes
+FROM ${worldId:name}.tribes
 WHERE id = ${tribeId}

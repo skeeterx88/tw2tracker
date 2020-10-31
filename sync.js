@@ -11,6 +11,7 @@ const zlib = require('zlib')
 const path = require('path')
 const hasOwn = Object.prototype.hasOwnProperty
 const colors = require('colors/safe')
+const development = process.env.NODE_ENV === 'development'
 let logLevel = 0
 let fullSyncInProgress = false
 let authenticatedMarkets = {}
@@ -145,7 +146,7 @@ Sync.registerWorlds = async function () {
 
     let markets
 
-    if (process.env.NODE_ENV === 'development') {
+    if (development) {
         markets = [
             { id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' },
             { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
@@ -351,7 +352,7 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     const perf = utils.perf(utils.perf.MINUTES)
 
-    if (process.env.NODE_ENV === 'development') {
+    if (development) {
         worlds = [
             { market: 'zz', num: 8 },
             { market: 'br', num: 52 }

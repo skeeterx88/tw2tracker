@@ -11,6 +11,7 @@ const db = require('./db')
 const sql = require('./sql')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const getSettings = require('./settings')
+const development = process.env.NODE_ENV === 'development'
 
 const indexRouter = require('./routes/index')
 const adminRouter = require('./routes/admin')
@@ -77,7 +78,7 @@ passport.deserializeUser(function(username, callback) {
 app.use(passport.initialize())
 app.use(passport.session())
 
-if (process.env.NODE_ENV === 'development') {
+if (development) {
     app.use(function (req, res, next) {
         setTimeout(next, 1000)
     })

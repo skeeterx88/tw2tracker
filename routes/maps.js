@@ -5,6 +5,7 @@ const router = express.Router()
 const utils = require('../utils')
 const {asyncRouter} = utils
 const getSettings = require('../settings')
+const development = process.env.NODE_ENV === 'development'
 const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
 const EMPTY_CONTINENT = 'empty_continent'
 
@@ -60,7 +61,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
             worldNumber,
             worldName: worldInfo.name,
             lastSync,
-            development: process.env.NODE_ENV === 'development'
+            development
         }
     })
 }))
@@ -107,7 +108,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
             worldName: worldInfo.name,
             lastSync,
             mapShare,
-            development: process.env.NODE_ENV === 'development'
+            development
         }
     })
 }))

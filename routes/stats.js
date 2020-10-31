@@ -5,6 +5,7 @@ const sql = require('../sql')
 const utils = require('../utils')
 const {asyncRouter} = utils
 const getSettings = require('../settings')
+const development = process.env.NODE_ENV === 'development'
 
 router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -15,7 +16,8 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
 
-    const worldExists = await utils.schemaExists(marketId + worldNumber)
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
         res.status(404)
@@ -23,7 +25,6 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     }
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const worldId = marketId + worldNumber
 
     const players = await db.any(sql.stats.worldTopPlayers, {worldId})
     const tribes = await db.any(sql.stats.worldTopTribes, {worldId})
@@ -36,7 +37,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         players,
         tribes,
         siteName: settings.site_name,
-        development: process.env.NODE_ENV === 'development',
+        development,
         exportValues: {
             marketId,
             worldNumber,
@@ -52,12 +53,14 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
         return next()
     }
 
+
     const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const tribeId = parseInt(req.params.tribeId, 10)
 
-    const worldExists = await utils.schemaExists(marketId + worldNumber)
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
         res.status(404)
@@ -67,17 +70,13 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     let tribe
 
     try {
-        tribe = await db.one(sql.worlds.tribe, {
-            schema: marketId + worldNumber,
-            tribeId
-        })
+        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
     } catch (error) {
         res.status(404)
         throw new Error('This tribe does not exist')
     }
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const worldId = marketId + worldNumber
 
     res.render('stats-tribe', {
         title: `Tribe ${tribe.name} - ${marketId}${worldNumber} - ${settings.site_name}`,
@@ -92,7 +91,53 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
             mapHighlights: [tribe]
         },
         siteName: settings.site_name,
-        development: process.env.NODE_ENV === 'development'
+        development
+    })
+}))
+
+router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const playerId = parseInt(req.params.playerId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        res.status(404)
+        throw new Error('This world does not exist')
+    }
+
+    let player
+
+    try {
+        player = await db.one(sql.worlds.player, {worldId, playerId})
+    } catch (error) {
+        res.status(404)
+        throw new Error('This player does not exist')
+    }
+
+    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+
+    res.render('stats-player', {
+        title: `Tribe ${player.name} - ${marketId}${worldNumber} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        worldName: worldInfo.name,
+        player,
+        exportValues: {
+            marketId,
+            worldNumber,
+            player,
+            mapHighlights: [player]
+        },
+        siteName: settings.site_name,
+        development
     })
 }))
 

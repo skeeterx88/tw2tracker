@@ -2,6 +2,7 @@
     const server = require('./server')
     const Sync = require('./sync')
     const utils = require('./utils')
+    const development = process.env.NODE_ENV === 'development'
 
     if (!await utils.schemaExists('main')) {
         const db = require('./db')
@@ -9,7 +10,7 @@
         await db.query(sql.mainSchema)
     }
 
-    if (process.env.NODE_ENV === 'development') {
+    if (development) {
         server()
         Sync.init()
     } else {

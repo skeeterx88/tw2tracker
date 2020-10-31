@@ -21,8 +21,12 @@
 
         await loader.loadInfo
 
+        const highlightType = STATS_PAGE === 'player'
+            ? TW2Map.highlightTypes.PLAYERS
+            : TW2Map.highlightTypes.TRIBES
+
         for (let i = 0; i < mapHighlights.length; i++) {
-            map.addHighlight(TW2Map.highlightTypes.TRIBES, mapHighlights[i].name, colors[i])
+            map.addHighlight(highlightType, mapHighlights[i].name, colors[i])
         }
     }
 
