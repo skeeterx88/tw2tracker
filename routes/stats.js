@@ -25,13 +25,8 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
     const worldId = marketId + worldNumber
 
-    const players = await db.any('SELECT * FROM ${schema:name}.players ORDER BY points DESC LIMIT 10', {
-        schema: worldId
-    })
-
-    const tribes = await db.any('SELECT * FROM ${schema:name}.tribes ORDER BY points DESC LIMIT 10', {
-        schema: worldId
-    })
+    const players = await db.any(sql.stats.worldTopPlayers, {worldId})
+    const tribes = await db.any(sql.stats.worldTopTribes, {worldId})
 
     res.render('stats', {
         title: `Stats ${marketId}${worldNumber} - ${settings.site_name}`,
