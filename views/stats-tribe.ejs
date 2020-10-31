@@ -20,12 +20,17 @@
     <body>
         <header></header>
         <main class="content-border">
-            <h1><a href="/"><%= siteName %></a>: <%= worldName %> (<%= marketId %><%= worldNumber %>): Tribe</h1>
+            <h1>
+                <a href="/"><%= siteName %></a>:
+                Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a>:
+                World <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= worldName %></a>:
+                Tribe <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
+            </h1>
 
             <div class="content">
                 <div class="left">
                     <section id="tribe">
-                        <h2><%= tribe.name %></h2>
+                        <h2>Tribe profile</h2>
 
                         <table>
                             <colgroup>

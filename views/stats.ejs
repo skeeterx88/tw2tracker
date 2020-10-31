@@ -22,7 +22,10 @@
     <body>
         <header></header>
         <main class="content-border">
-            <h1><a href="/"><%= siteName %></a>: <%= worldName %> (<%= marketId %><%= worldNumber %>)</h1>
+            <h1>
+                <a href="/"><%= siteName %></a>:
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= worldName %></a>
+            </h1>
 
             <div class="content">
                 <div class="left">
