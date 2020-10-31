@@ -46,7 +46,8 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
             marketId,
             worldNumber,
             players,
-            tribes
+            tribes,
+            mapHighlights: tribes.slice(0, 3)
         }
     })
 }))
@@ -89,6 +90,12 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
         worldNumber,
         worldName: worldInfo.name,
         tribe,
+        exportValues: {
+            marketId,
+            worldNumber,
+            tribe,
+            mapHighlights: [tribe]
+        },
         siteName: settings.site_name,
         development: process.env.NODE_ENV === 'development'
     })
