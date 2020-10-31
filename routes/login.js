@@ -10,7 +10,7 @@ router.get('/', async function (req, res, next) {
     const settings = await getSettings()
 
     res.render('login', {
-        title: 'Admin login - ' + settings.site_name
+        title: `Admin login - ${settings.site_name}`
     })
 })
 

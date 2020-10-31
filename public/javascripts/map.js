@@ -678,7 +678,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 if (hasOwn.call(loader.playersByName, lowerId)) {
                     return loader.playersByName[lowerId]
                 } else {
-                    throw new Error('Highlights: Player ' + id + ' not found')
+                    throw new Error(`Highlights: Player ${id} not found`)
                 }
 
                 break
@@ -689,7 +689,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 } else if (hasOwn.call(loader.tribesByName, lowerId)) {
                     return loader.tribesByName[lowerId]
                 } else {
-                    throw new Error('Highlights: Tribe ' + id + ' not found')
+                    throw new Error(`Highlights: Tribe ${id} not found`)
                 }
 
                 break
@@ -879,7 +879,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         switch (highlightType) {
             case TW2Map.highlightTypes.TRIBES: {
                 const [name, tag] = loader.tribes[realId]
-                displayName = tag + ' (' + name + ')'
+                displayName = `${tag} (${name})`
                 break
             }
             case TW2Map.highlightTypes.PLAYERS: {
@@ -1012,7 +1012,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
     this.changeSetting = (id, value, flag) => {
         if (!hasOwn.call(settings, id)) {
-            throw new Error('Setting "' + id + '" does not exist')
+            throw new Error(`Setting '${id}' does not exist`)
         }
 
         settings[id] = value
@@ -1221,7 +1221,7 @@ const TW2Tooltip = function (selector) {
             y += mouseDistance
         }
 
-        $tooltip.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)'
+        $tooltip.style.transform = `translate3d(${x}px, ${y}px, 0px)`
     }
 
     const setEvents = () => {
@@ -1252,11 +1252,11 @@ const TW2Tooltip = function (selector) {
         $villagePoints.innerHTML = villagePoints.toLocaleString('pt-BR')
         $playerName.innerHTML = playerName || '-'
         $playerPoints.innerHTML = playerPoints ? playerPoints.toLocaleString('pt-BR') : 0
-        $playerVillages.innerHTML = playerVillages ? '(' + playerVillages.toLocaleString('pt-BR') + ' <span class="village mini-icon"></span>)' : ''
+        $playerVillages.innerHTML = playerVillages ? `(${playerVillages.toLocaleString('pt-BR')} <span class="village mini-icon"></span>)` : ''
         $tribeName.innerHTML = tribeName || '-'
         $tribeTag.innerHTML = tribeTag || '-'
         $tribePoints.innerHTML = tribePoints ? tribePoints.toLocaleString('pt-BR') : 0
-        $tribeVillages.innerHTML = tribeVillages ? '(' + tribeVillages.toLocaleString('pt-BR') + ' <span class="village mini-icon"></span>)' : ''
+        $tribeVillages.innerHTML = tribeVillages ? `(${tribeVillages.toLocaleString('pt-BR')} <span class="village mini-icon"></span>)` : ''
         $provinceName.innerHTML = provinceName
     }
 

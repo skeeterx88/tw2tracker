@@ -34,7 +34,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     })
 
     res.render('stats', {
-        title: 'Stats ' + marketId + worldNumber + ' - ' + settings.site_name,
+        title: `Stats ${marketId}${worldNumber} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: worldInfo.name,
@@ -84,7 +84,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     const worldId = marketId + worldNumber
 
     res.render('stats-tribe', {
-        title: 'Tribe ' + tribe.name + ' - ' + marketId + worldNumber + ' - ' + settings.site_name,
+        title: `Tribe ${tribe.name} - ${marketId}${worldNumber} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: worldInfo.name,

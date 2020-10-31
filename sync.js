@@ -221,7 +221,7 @@ Sync.registerWorlds = async function () {
 }
 
 Sync.registerCharacter = async function (marketId, worldNumber) {
-    log('Sync.registerCharacter() ' + marketId + worldNumber)
+    log(`Sync.registerCharacter() ${marketId}${worldNumber}`)
     logLevel++
 
     const page = await puppeteerPage()
@@ -248,7 +248,7 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
 }
 
 Sync.auth = async function (marketId, { account_name, account_password }, auth_attempt = 1) {
-    log('Sync.auth() market:' + marketId)
+    log(`Sync.auth() market:${marketId}`)
 
     if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
         return authenticatedMarkets[marketId]
@@ -308,7 +308,7 @@ Sync.auth = async function (marketId, { account_name, account_password }, auth_a
         try {
             await page.waitForSelector('.player-worlds', { timeout: 3000 })
         } catch (error) {
-            throw new Error('Authentication to market:' + marketId + ' failed "unknown reason"')
+            throw new Error(`Authentication to market:${marketId} failed "unknown reason"`)
         }
 
         await page.close()
@@ -321,7 +321,7 @@ Sync.auth = async function (marketId, { account_name, account_password }, auth_a
         if (auth_attempt < 3) {
             auth_attempt++
 
-            log(colors.red('Error trying to auth (' + error.message + ')'))
+            log(colors.red(`Error trying to auth (${error.message})`))
 
             return await Sync.auth(marketId, {
                 account_name,
@@ -387,7 +387,7 @@ Sync.scrappeAllWorlds = async function (flag) {
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
             log(colors.red('All worlds failed to sync.'))
-            log('Finished in ' + time)
+            log(`Finished in ${time}`)
 
             logLevel--
             return ERROR_SYNC_ALL
@@ -396,18 +396,18 @@ Sync.scrappeAllWorlds = async function (flag) {
             logLevel++
 
             for (let fail of failedToSync) {
-                log(fail.marketId + fail.worldNumber + ':', fail.message)
+                log(`${fail.marketId} ${fail.worldNumber}: ${fail.message}`)
             }
 
             logLevel--
 
-            log('Finished in ' + time)
+            log(`Finished in ${time}`)
             logLevel--
 
             return ERROR_SYNC_SOME
         }
     } else {
-        log('Finished in ' + time)
+        log(`Finished in ${time}`)
         logLevel--
 
         return SUCCESS_SYNC_ALL
@@ -424,7 +424,7 @@ const downloadStruct = async function (url, marketId, worldNumber) {
 
 Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
     log('')
-    log('Sync.scrappeWorld()', colors.green(marketId + worldNumber), colors.magenta(attempt > 1 ? '(attempt ' + attempt + ')' : ''))
+    log(`Sync.scrappeWorld() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
     logLevel++
 
     const worldId = marketId + worldNumber
@@ -439,11 +439,11 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
         try {
             worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
         } catch (e) {
-            throw new Error('World ' + worldId + ' not found.')
+            throw new Error(`World ${worldId} not found.`)
         }
 
         if (!worldInfo.open) {
-            throw new Error('World ' + worldId + ' is closed')
+            throw new Error(`World ${worldId} is closed`)
         }
 
         if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
@@ -451,7 +451,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
             const settings = await getSettings()
 
             if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
-                throw new Error(worldId + ' already sincronized')
+                throw new Error(`${worldId} already sincronized`)
             }
         }
 
@@ -511,9 +511,9 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
-        log('Finished in ' + time)
+        log(`Finished in ${time}`)
     } catch (error) {
-        log(colors.red('Failed to synchronize ' + worldId + ': ' + error.message))
+        log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
         await page.close()
 
         if (attempt < 3) {
@@ -627,7 +627,7 @@ const queryData = async function (data, marketId, worldNumber) {
 
     const time = perf.end()
 
-    log('........................... ' + time)
+    log(`........................... ${time}`)
 }
 
 Sync.markets = async function () {
@@ -746,13 +746,13 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
         await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
     } catch (error) {
         logLevel++
-        log(colors.red('Failed to write to filesystem: ' + error.message))
+        log(colors.red(`Failed to write to filesystem: ${error.message}`))
         logLevel--
     }
 
     const time = perf.end()
 
-    log('Writed data to filesystem in ' + time)
+    log(`Writed data to filesystem in ${time}`)
 
     return false
 }

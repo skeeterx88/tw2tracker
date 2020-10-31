@@ -15,7 +15,7 @@ router.get('/', ensureLoggedIn, async function (req, res) {
     const settings = await getSettings()
 
     res.render('admin', {
-        title: 'Admin Panel - ' + settings.site_name,
+        title: `Admin Panel - ${settings.site_name}`,
         worlds: worlds,
         markets: markets,
         settings: settings
@@ -56,7 +56,7 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     } else {
         try {
             await Sync.scrappeWorld(marketId, worldNumber)
-            response.message = marketId + worldNumber + ' synchronized successfully'
+            response.message = `${marketId}${worldNumber} synchronized successfully`
             response.success = true
         } catch (error) {
             response.message = error.message
@@ -85,7 +85,7 @@ router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async funct
     } else {
         try {
             await Sync.scrappeWorld(marketId, worldNumber, IGNORE_LAST_SYNC)
-            response.message = marketId + worldNumber + ' synchronized successfully'
+            response.message = `${marketId}${worldNumber} synchronized successfully`
             response.success = true
         } catch (error) {
             response.message = error.message

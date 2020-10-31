@@ -28,7 +28,7 @@ router.get('/', asyncRouter(async function (req, res) {
     ])
 
     res.render('maps', {
-        title: 'All Available Maps - ' + settings.site_name,
+        title: `All Available Maps - ${settings.site_name}`,
         worlds: worlds,
         markets: markets
     })
@@ -54,7 +54,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
 
     res.render('map', {
-        title: 'Map ' + marketId + worldNumber + ' - ' + settings.site_name,
+        title: `Map ${marketId}${worldNumber} - ${settings.site_name}`,
         exportValues: {
             marketId,
             worldNumber,
@@ -100,7 +100,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
     db.query(sql.maps.updateShareAccess, [mapShareId])
 
     res.render('map', {
-        title: 'Map ' + marketId + worldNumber + ' - ' + settings.site_name,
+        title: `Map ${marketId}${worldNumber} - ${settings.site_name}`,
         exportValues: {
             marketId,
             worldNumber,

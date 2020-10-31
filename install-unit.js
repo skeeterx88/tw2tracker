@@ -42,7 +42,7 @@
             await reloadDaemon()
             await enableDaemon()
 
-            process.stdout.write('Unit installed in ' + unitDest + '\n')
+            process.stdout.write(`Unit installed in ${unitDest}\n`)
             process.exit(0)
         } catch (error) {
             if (error) {
@@ -104,7 +104,7 @@
         return new Promise(async function (resolve, reject) {
             try {
                 if (isUser) {
-                    await fs.access(xdgBasedir.config + '/systemd/user/tw2tracker.service')
+                    await fs.access(`${xdgBasedir.config}/systemd/user/tw2tracker.service`)
                 } else {
                     await fs.access('/etc/systemd/system/tw2tracker.service')
                 }

@@ -84,7 +84,7 @@
 
                         for (let [name, tag] of Object.values(loader.tribes)) {
                             matches.push({
-                                search: tag + ' (' + name + ')',
+                                search: `${tag} (${name})`,
                                 id: tag,
                                 highlightType: TW2Map.highlightTypes.TRIBES
                             })
@@ -157,7 +157,7 @@
             const $villages = document.createElement('div')
             const $icon = document.createElement('span')
 
-            $item.classList.add('highlight-' + normalizeString(id))
+            $item.classList.add(`highlight-${normalizeString(id)}`)
             $item.classList.add('item')
             $item.classList.add(highlightType)
             $item.dataset.highlightType = highlightType
@@ -171,7 +171,7 @@
             $name.classList.add('name')
             $name.innerHTML = displayName
             
-            $icon.classList.add('icon-' + highlightType)
+            $icon.classList.add(`icon-${highlightType}`)
 
             $color.classList.add('color')
             $color.classList.add('open-color-picker')
@@ -198,7 +198,7 @@
             }
 
             $villages.classList.add('villages')
-            $villages.innerHTML = villages + ' villages'
+            $villages.innerHTML = `${villages} villages`
 
             $item.appendChild($icon)
             $item.appendChild($name)
@@ -208,7 +208,7 @@
         })
 
         map.on('update highlight', (highlightType, id, displayName, color) => {
-            const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
+            const $item = $highlightItems.querySelector(`.highlight-${normalizeString(id)}`)
 
             if (!$item) {
                 return false
@@ -221,7 +221,7 @@
         })
 
         map.on('remove highlight', (highlightType, id) => {
-            const $item = $highlightItems.querySelector('.highlight-' + normalizeString(id))
+            const $item = $highlightItems.querySelector(`.highlight-${normalizeString(id)}`)
 
             if ($item) {
                 $item.remove()
@@ -286,7 +286,7 @@
 
             $colorPicker.style.visibility = 'visible'
             $colorPicker.style.opacity = 1
-            $colorPicker.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)'
+            $colorPicker.style.transform =  `translate3d(${x}px, ${y}px, 0px)`
 
             const index = TW2Map.colorPalette.flat().indexOf(selectedColor)
 
@@ -423,8 +423,8 @@
 
             if (visible = !visible) {
                 const { x, y } = getElemPosition($changeSettings)
-                $settings.style.left = x + 'px'
-                $settings.style.top = y + 'px'
+                $settings.style.left = `${x}px`
+                $settings.style.top = `${y}px`
 
                 addEventListener('mousedown', closeHandler)
             }
@@ -453,7 +453,7 @@
         }
 
         map.on('change setting', (id, value) => {
-            const $color = $settings.querySelector('div[data-setting-id="' + id + '"] .color')
+            const $color = $settings.querySelector(`div[data-setting-id="${id}"] .color`)
 
             if ($color) {
                 $color.dataset.color = value
@@ -679,9 +679,9 @@
 
                 $button.classList.add('market')
                 $button.classList.add('text-container')
-                $text.innerText = ' ' + market
+                $text.innerText = ` ${market}`
                 $flag.classList.add('flag')
-                $flag.classList.add('flag-' + market)
+                $flag.classList.add(`flag-${market}`)
 
                 $button.appendChild($flag)
                 $button.appendChild($text)
@@ -715,7 +715,7 @@
                 const $archor = document.createElement('a')
                 const $button = document.createElement('button')
 
-                $archor.href = location.origin + '/maps/' + market + '/' + num + '/'
+                $archor.href = location.origin + `/maps/${market}/${num}/`
 
                 $button.classList.add('world')
 
@@ -723,7 +723,7 @@
                     $button.classList.add('selected')
                 }
 
-                $button.innerText = market + num + ' ' + name
+                $button.innerText = `${market}${num} ${name}`
 
                 $archor.appendChild($button)
                 $world.appendChild($archor)
@@ -756,8 +756,8 @@
 
             if (visible = !visible) {
                 const { x, y } = getElemPosition($currentWorld)
-                $allWorlds.style.left = x + 'px'
-                $allWorlds.style.top = y + 'px'
+                $allWorlds.style.left = `${x}px`
+                $allWorlds.style.top = `${y}px`
 
                 addEventListener('mousedown', closeHandler)
             }

@@ -36,7 +36,7 @@ const getHourlyDir = function (now) {
     const rawNow = (now || new Date()).toISOString()
     const [date, rawTime] = rawNow.split('T')
     const [hour] = rawTime.split(':')
-    return date + '-' + hour
+    return `${date}-${hour}`
 }
 
 const getHTML = function (url) {

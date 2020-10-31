@@ -8,7 +8,7 @@ router.get('/', async function (req, res, next) {
     const settings = await getSettings()
 
     res.render('index', {
-        title: 'Home - ' + settings.site_name
+        title: `Home - ${settings.site_name}`
     })
 })
 
