@@ -35,69 +35,69 @@
                             <tbody>
                                 <tr>
                                     <td>Rank:</td>
-                                    <td></td>
+                                    <td><%= tribe.rank.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
                                     <td>Name:</td>
                                     <td><%= tribe.name %> (<%= tribe.tag %>)</td>
                                 </tr>
                                 <tr>
-                                    <td>Created:</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Members:</td>
-                                    <td></td>
+                                    <td>Villages:</td>
+                                    <td><%= tribe.villages.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
                                     <td>Points:</td>
                                     <td><%= tribe.points.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
-                                    <td>Villages:</td>
-                                    <td><%= tribe.villages.toLocaleString('pt-BR') %></td>
+                                    <td>Members:</td>
+                                    <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/members"><%= tribe.members.toLocaleString('pt-BR') %></a></td>
                                 </tr>
                                 <tr>
-                                    <td>Average points per village:</td>
-                                    <td></td>
+                                    <td>Bash Attack:</td>
+                                    <td><%= tribe.bash_points_off.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
-                                    <td>Tribe Changes:</td>
-                                    <td></td>
+                                    <td>Bash Defense:</td>
+                                    <td><%= tribe.bash_points_def.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
-                                    <td>Conquers:</td>
+                                    <td>Average Points/Member:</td>
+                                    <td><%= tribe.points_per_member.toLocaleString('pt-BR') %></td>
+                                </tr>
+                                <tr>
+                                    <td>Average Points/Village:</td>
+                                    <td><%= tribe.points_per_villages.toLocaleString('pt-BR') %></td>
+                                </tr>
+                                <tr>
+                                    <td>Member Changes:</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>Village Conquers:</td>
                                     <td>x (+y-z)</td>
                                 </tr>
                                 <tr>
                                     <td>Best Rank:</td>
-                                    <td></td>
+                                    <td><%= tribe.best_rank.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
                                     <td>Most Points:</td>
-                                    <td></td>
+                                    <td><%= tribe.best_points.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
                                     <td>Most Villages:</td>
-                                    <td></td>
+                                    <td><%= tribe.best_villages.toLocaleString('pt-BR') %></td>
                                 </tr>
                                 <tr>
-                                    <td>OD Rank:</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>OD Attack Rank:</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>OD Defense Rank</td>
-                                    <td></td>
+                                    <td>Creation Date:</td>
+                                    <td><%= tribe.creating_date.toLocaleString('pt-BR') %></td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <div class="actions">
-                            no-actions
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/history">View tribe history</a>
                         </div>
                     </section>
                 </div>
