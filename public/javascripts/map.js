@@ -1108,7 +1108,7 @@ const TW2DataLoader = function (marketId, worldNumber) {
     }
 
     this.loadInfo = new Promise(async (resolve) => {
-        const url = mapShare && mapShare.type === TW2Map.mapShareTypes.STATIC
+        const url = typeof mapShare !== 'undefined' && mapShare.type === TW2Map.mapShareTypes.STATIC
             ? `/maps/api/${marketId}/${worldNumber}/info/${mapShare.share_id}`
             : `/maps/api/${marketId}/${worldNumber}/info`
 
@@ -1148,7 +1148,7 @@ const TW2DataLoader = function (marketId, worldNumber) {
         }
 
         continentPromises[continent] = new Promise(async (resolve) => {
-            const url = mapShare && mapShare.type === TW2Map.mapShareTypes.STATIC
+            const url = typeof mapShare !== 'undefined' && mapShare.type === TW2Map.mapShareTypes.STATIC
                 ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShare.share_id}`
                 : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`
 
