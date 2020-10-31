@@ -1,5 +1,5 @@
 (async () => {
-    const colors = ["#0075ff", "#ffee00", "#ff008a"]
+    const colors = ["#ffee00", "#0000ff", "#ff0000"]
 
     const setupMapPreview = async () => {
         const $colors = document.querySelectorAll('#tribes .color')
