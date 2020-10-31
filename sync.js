@@ -3,7 +3,6 @@ const sql = require('./sql')
 const utils = require('./utils')
 const Scrapper = require('./scrapper.js')
 const readyState = require('./ready-state.js')
-const getStructPath = require('./get-struct-path.js')
 const getSettings = require('./settings')
 const fs = require('fs')
 const https = require('https')
@@ -478,7 +477,14 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
             await fs.promises.access(path.join('.', 'data', worldId, 'struct'))
         } catch (e) {
             log('Downloading map structure')
-            const structPath = await page.evaluate(getStructPath)
+
+            const structPath = await page.evaluate(function () {
+                console.log('Scrapper: Loading structure binary')
+                const cdn = require('cdn')
+                const conf = require('conf/conf')
+                return cdn.getPath(conf.getMapPath())
+            })
+
             await downloadStruct(`https://${urlId}.tribalwars2.com/${structPath}`, marketId, worldNumber)
         }
 
