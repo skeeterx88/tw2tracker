@@ -109,6 +109,68 @@ const asyncRouter = function (handler) {
     }
 }
 
+const log = function () {
+    const args = Array.from(arguments)
+    const empty = ' ·'
+    const message = []
+
+    switch (args.length) {
+        case 0: {
+            message.push(empty.repeat(log.level))
+            break
+        }
+        case 1: {
+            message.push(empty.repeat(log.level))
+            message.push(args[0])
+            break
+        }
+        default: {
+            const last = args[args.length - 1]
+            const left = args.slice(0, args.length - 1)
+
+            if (typeof last === 'string') {
+                switch (last) {
+                    case log.INCREASE: {
+                        message.push(empty.repeat(log.level))
+                        message.push(...left)
+                        log.increase()
+                        break
+                    }
+                    case log.DECREASE: {
+                        message.push(empty.repeat(log.level))
+                        message.push(...left)
+                        log.decrease()
+                        break
+                    }
+                    case log.ZERO: {
+                        message.push(...left)
+                        break
+                    }
+                    default: {
+                        message.push(empty.repeat(log.level))
+                        message.push(...args)
+                    }
+                }
+            }
+        }
+    }
+
+    console.log(...message)
+}
+
+log.level = 0
+log.INCREASE = 'log_increase'
+log.DECREASE = 'log_decrease'
+log.ZERO = 'log_zero'
+
+log.increase = function () {
+    log.level++
+}
+
+log.decrease = function () {
+    log.level = Math.max(0, log.level - 1)
+}
+
 module.exports = {
     noop,
     schemaExists,
@@ -120,5 +182,6 @@ module.exports = {
     getBuffer,
     perf,
     sha1sum,
-    asyncRouter
+    asyncRouter,
+    log
 }
