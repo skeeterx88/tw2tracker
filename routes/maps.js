@@ -66,7 +66,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     })
 }))
 
-router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async function (req, res) {
+router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -345,8 +345,6 @@ router.post('/api/get-share/', asyncRouter(async function (req, res) {
         worldNumber,
         highlightsOnly
     } = req.body
-
-    let mapShare
 
     const worldExists = await utils.schemaExists(marketId + worldNumber)
 
