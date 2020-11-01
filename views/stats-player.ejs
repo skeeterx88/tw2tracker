@@ -47,6 +47,16 @@
                                     <td><%= player.name %></td>
                                 </tr>
                                 <tr>
+                                    <td>Tribe:</td>
+                                    <td>
+                                        <% if (tribe) { %>
+                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %> (<%= tribe.tag %>)</a>
+                                        <% } else { %>
+                                            No tribe
+                                        <% } %>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>Villages:</td>
                                     <td><%= player.villages.toLocaleString('pt-BR') %></td>
                                 </tr>

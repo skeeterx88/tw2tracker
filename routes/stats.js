@@ -124,12 +124,19 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
 
+    let tribe = false
+
+    if (player.tribe_id) {
+        tribe = await db.one(sql.worlds.tribeName, {worldId, tribeId: player.tribe_id})
+    }
+
     res.render('stats-player', {
         title: `Tribe ${player.name} - ${marketId}${worldNumber} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: worldInfo.name,
         player,
+        tribe,
         exportValues: {
             marketId,
             worldNumber,
