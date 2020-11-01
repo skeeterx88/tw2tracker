@@ -67,49 +67,6 @@ module.exports = async function () {
         })
     }
 
-    const runTest = function () {
-        const assert = function (conditionHandler) {
-            if (conditionHandler() !== true) {
-                throw new Error('Assertion failed')
-            }
-        }
-
-        assert(function () {
-            const result = filterBlocks({
-                left: { x: 200 },
-                right: { x: 700 },
-                top: { y: 200 },
-                bottom: { y: 700 }
-            })
-
-            const expect = [
-                [200, 200],[300, 200],[200, 300],[300, 300],
-                [600, 200],[700, 200],[600, 300],[700, 300],
-                [200, 600],[300, 600],[200, 700],[300, 700],
-                [600, 600],[700, 600],[600, 700],[700, 700],
-            ]
-
-            return JSON.stringify(result) === JSON.stringify(expect)
-        })
-
-        assert(function () {
-            const result = filterBlocks({
-                left: { x: 300, y: 0 },
-                right: { x: 700, y: 0 },
-                top: { x: 0, y: 300 },
-                bottom: { x: 0, y: 700 }
-            })
-
-            const expect = [
-                [300, 300],[600, 300],[700, 300],[300, 600],
-                [300, 700],[600, 600],[700, 600],[600, 700],
-                [700, 700]
-            ]
-
-            return JSON.stringify(result) === JSON.stringify(expect)
-        })
-    }
-
     const getBoundaries = async function () {
         const boundaries = {
             left: 500,
