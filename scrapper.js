@@ -121,6 +121,8 @@ module.exports = async function () {
             loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
         ])
 
+        await sleep(150)
+
         return loadVillages.reduce((sum, value) => sum + value)
     }
 
@@ -200,6 +202,8 @@ module.exports = async function () {
                 loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 3)),
             ])
+
+            await sleep(150)
         }
     }
 
@@ -250,6 +254,8 @@ module.exports = async function () {
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 3)),
             ])
+
+            await sleep(150)
         }
     }
 
