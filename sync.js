@@ -5,6 +5,7 @@ const {log} = utils
 const Scrapper = require('./scrapper.js')
 const readyState = require('./ready-state.js')
 const getSettings = require('./settings')
+const Events = require('./events.js')
 const fs = require('fs')
 const schedule = require('node-schedule')
 const zlib = require('zlib')
