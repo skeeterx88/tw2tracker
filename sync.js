@@ -66,6 +66,8 @@ Sync.init = async function () {
     // const worldData = JSON.parse(await fs.promises.readFile('./dev-data/br48/worldData.json'))
     // await inserWorldData(worldData, 'br', 48)
 
+    // await Sync.scrappeWorld('zz', 8)
+
     process.on('SIGTERM', async function () {
         log('Stopping tw2tracker')
         process.exit()
@@ -133,8 +135,8 @@ Sync.registerWorlds = async function () {
 
     if (development) {
         markets = [
-            { id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' },
-            { id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A' }
+            {id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'},
+            {id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'}
         ]
     } else {
         markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
@@ -231,7 +233,7 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
     log('Character created', log.DECREASE)
 }
 
-Sync.auth = async function (marketId, { account_name, account_password }, auth_attempt = 1) {
+Sync.auth = async function (marketId, {account_name, account_password}, auth_attempt = 1) {
     log(`Sync.auth() market:${marketId}`)
 
     if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
@@ -243,7 +245,7 @@ Sync.auth = async function (marketId, { account_name, account_password }, auth_a
     try {
         const urlId = marketId === 'zz' ? 'beta' : marketId
 
-        await page.goto(`https://${urlId}.tribalwars2.com/page`, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+        await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
         await page.waitFor(1000)
 
         const account = await page.evaluate(function (account_name, account_password) {
@@ -287,10 +289,10 @@ Sync.auth = async function (marketId, { account_name, account_password }, auth_a
             session: false
         })
 
-        await page.goto(`https://${urlId}.tribalwars2.com/page`, { waitUntil: ['domcontentloaded', 'networkidle0'] })
+        await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
 
         try {
-            await page.waitForSelector('.player-worlds', { timeout: 3000 })
+            await page.waitForSelector('.player-worlds', {timeout: 3000})
         } catch (error) {
             throw new Error(`Authentication to market:${marketId} failed "unknown reason"`)
         }
@@ -336,8 +338,8 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     if (development) {
         worlds = [
-            { market: 'zz', num: 8 },
-            { market: 'br', num: 52 }
+            {market: 'zz', num: 8},
+            {market: 'br', num: 52}
         ]
     } else {
         worlds = await db.any(sql.worlds.allOpen)
@@ -396,7 +398,7 @@ const downloadStruct = async function (url, marketId, worldNumber) {
     const buffer = await utils.getBuffer(url)
     const gzipped = zlib.gzipSync(buffer)
     
-    await fs.promises.mkdir(path.join('.', 'data', marketId + worldNumber), { recursive: true })
+    await fs.promises.mkdir(path.join('.', 'data', marketId + worldNumber), {recursive: true})
     await fs.promises.writeFile(path.join('.', 'data', marketId + worldNumber, 'struct'), gzipped)
 }
 
@@ -437,7 +439,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
         const perf = utils.perf()
 
         const account = await Sync.auth(marketId, accountCredentials)
-        const worldCharacter = account.characters.find(({ world_id }) => world_id === worldId)
+        const worldCharacter = account.characters.find(({world_id}) => world_id === worldId)
 
         if (!worldCharacter) {
             await Sync.registerCharacter(marketId, worldNumber)
@@ -636,10 +638,10 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
     const perf = utils.perf()
 
     try {
-        const players = await db.any(sql.worlds.getData, { worldId, table: 'players' })
-        const villages = await db.any(sql.worlds.getData, { worldId, table: 'villages' })
-        const tribes = await db.any(sql.worlds.getData, { worldId, table: 'tribes' })
-        const provinces = await db.any(sql.worlds.getData, { worldId, table: 'provinces' })
+        const players = await db.any(sql.worlds.getData, {worldId, table: 'players'})
+        const villages = await db.any(sql.worlds.getData, {worldId, table: 'villages'})
+        const tribes = await db.any(sql.worlds.getData, {worldId, table: 'tribes'})
+        const provinces = await db.any(sql.worlds.getData, {worldId, table: 'provinces'})
 
         const parsedPlayers = {}
         const parsedTribes = {}
@@ -648,7 +650,7 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 
         const dataPath = path.join('.', 'data', worldId)
 
-        await fs.promises.mkdir(dataPath, { recursive: true })
+        await fs.promises.mkdir(dataPath, {recursive: true})
 
         for (let {id, name, tribe_id, points, villages} of players) {
             parsedPlayers[id] = [name, tribe_id || 0, points, villages]
@@ -694,7 +696,7 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
             parsedTribes[id] = [name, tag, points, villages]
         }
 
-        for (let { name } of provinces) {
+        for (let {name} of provinces) {
             parsedProvinces.push(name)
         }
 
@@ -721,11 +723,11 @@ Sync.genWorldBlocks = async function (marketId, worldNumber) {
 Sync.cleanExpiredShares = async function () {
     const now = Date.now()
     const shares = await db.any(sql.maps.getShareLastAccess)
-    let { static_share_expire_time } = await db.one(sql.settings.intervals)
+    let {static_share_expire_time} = await db.one(sql.settings.intervals)
 
     static_share_expire_time = static_share_expire_time * 60 * 1000
 
-    for (let { share_id, last_access } of shares) {
+    for (let {share_id, last_access} of shares) {
         if (now - last_access.getTime() < static_share_expire_time) {
             await db.query(sql.maps.deleteStaticShare, [share_id])
         }
