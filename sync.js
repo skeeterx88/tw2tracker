@@ -13,17 +13,39 @@ const path = require('path')
 const hasOwn = Object.prototype.hasOwnProperty
 const colors = require('colors/safe')
 const development = process.env.NODE_ENV === 'development'
-let logLevel = 0
-let fullSyncInProgress = false
 let authenticatedMarkets = {}
 
-const IGNORE_LAST_SYNC = 'ignore_last_sync'
+const {
+    SYNC_SUCCESS,
+    SYNC_FAIL,
+    SYNC_SUCCESS_ALL,
+    SYNC_ERROR_ALL,
+    SYNC_ERROR_SOME,
+    SCRAPPE_WORLD_START,
+    SCRAPPE_WORLD_END,
+    SCRAPPE_ALL_WORLD_START,
+    SCRAPPE_ALL_WORLD_END,
+    IGNORE_LAST_SYNC
+} = require('./constants.js')
 
-const SUCCESS = 'success'
-const FAIL = 'fail' 
-const SUCCESS_SYNC_ALL = 0
-const ERROR_SYNC_ALL = 1
-const ERROR_SYNC_SOME = 2
+let scrappeWorldInProgress = false
+let scrappeAllWorldsInProgress = false
+
+Events.on(SCRAPPE_WORLD_START, function () {
+    scrappeWorldInProgress = true
+})
+
+Events.on(SCRAPPE_WORLD_END, function () {
+    scrappeWorldInProgress = false
+})
+
+Events.on(SCRAPPE_WORLD_START, function () {
+    scrappeAllWorldsInProgress = true
+})
+
+Events.on(SCRAPPE_WORLD_END, function () {
+    scrappeAllWorldsInProgress = false
+})
 
 let browser = null
 
@@ -68,10 +90,20 @@ Sync.init = async function () {
     // await inserWorldData(worldData, 'br', 48)
 
     // await Sync.scrappeWorld('zz', 8)
-
     process.on('SIGTERM', async function () {
-        log('Stopping tw2tracker')
-        process.exit()
+        log(colors.red('Stopping tw2-tracker! Waiting pendent tasks...'))
+
+        if (scrappeWorldInProgress) {
+            await Events.on(SCRAPPE_WORLD_END)
+        }
+
+        if (browser) {
+            await browser.close()
+        }
+
+        await db.$pool.end()
+
+        process.exit(0)
     })
 
     const state = await db.one(sql.state.all)
@@ -324,18 +356,17 @@ Sync.scrappeAllWorlds = async function (flag) {
     log()
     log('Sync.scrappeAllWorlds()', log.INCREASE)
 
-    if (fullSyncInProgress) {
-        log(colors.red('A sync is already in progress'))
-        logLevel--
+    if (scrappeAllWorldsInProgress) {
+        log(colors.red('\nA Scrappe All Worlds is already in progress\n'), log.ZERO)
         return false
     }
 
-    fullSyncInProgress = true
+    Events.trigger(SCRAPPE_ALL_WORLD_START)
+
+    const failedToSync = []
+    const perf = utils.perf(utils.perf.MINUTES)
 
     let worlds
-    const failedToSync = []
-
-    const perf = utils.perf(utils.perf.MINUTES)
 
     if (development) {
         worlds = [
@@ -347,7 +378,6 @@ Sync.scrappeAllWorlds = async function (flag) {
     }
 
     await db.query(sql.state.update.lastScrappeAll)
-
     await puppeteerBrowser()
 
     for (let world of worlds) {
@@ -368,14 +398,14 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     await puppeteerClose()
 
-    fullSyncInProgress = false
+    Events.trigger(SCRAPPE_ALL_WORLD_END)
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
             log(colors.red('All worlds failed to sync.'))
             log(`Finished in ${time}`, log.DECREASE)
 
-            return ERROR_SYNC_ALL
+            return SYNC_ERROR_ALL
         } else {
             log(colors.magenta('Some worlds failed to sync:'), log.INCREASE)
 
@@ -386,12 +416,12 @@ Sync.scrappeAllWorlds = async function (flag) {
             log.decrease()
             log(`Finished in ${time}`, log.DECREASE)
 
-            return ERROR_SYNC_SOME
+            return SYNC_ERROR_SOME
         }
     } else {
         log(`Finished in ${time}`, log.DECREASE)
 
-        return SUCCESS_SYNC_ALL
+        return SYNC_SUCCESS_ALL
     }
 }
 
@@ -404,8 +434,11 @@ const downloadStruct = async function (url, marketId, worldNumber) {
 }
 
 Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
+    Events.trigger(SCRAPPE_WORLD_START)
+
     log()
     log(`Sync.scrappeWorld() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''), log.INCREASE)
+
 
     const worldId = marketId + worldNumber
 
@@ -485,7 +518,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await queryData(data, marketId, worldNumber)
         await Sync.genWorldBlocks(marketId, worldNumber)
-        await db.query(sql.worlds.updateSyncStatus, [SUCCESS, marketId, worldNumber])
+        await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])
         
         const time = perf.end()
 
@@ -501,11 +534,12 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
             await Sync.scrappeWorld(marketId, worldNumber, flag, ++attempt)
             return
         } else {
-            await db.query(sql.worlds.updateSyncStatus, [FAIL, marketId, worldNumber])
+            await db.query(sql.worlds.updateSyncStatus, [SYNC_FAIL, marketId, worldNumber])
         }
     }
 
     log.decrease()
+    Events.trigger(SCRAPPE_WORLD_END)
 }
 
 const queryData = async function (data, marketId, worldNumber) {
