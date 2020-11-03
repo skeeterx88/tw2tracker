@@ -47,7 +47,11 @@ const formatSince = (date) => {
     if (minutes <= 1) {
         format = 'just now'
     } else if (hours <= 1) {
-        format = Math.floor(minutes) + ' minutes ago'
+        if (minutes < 2) {
+            format = '1 minute ago'
+        } else {
+            format = Math.floor(minutes) + ' minutes ago'
+        }
     } else if (days <= 1) {
         if (hours < 2) {
             format = '1 hour ago'
