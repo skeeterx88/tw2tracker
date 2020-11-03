@@ -198,7 +198,7 @@
             }
 
             $villages.classList.add('villages')
-            $villages.innerHTML = `${villages} villages`
+            $villages.innerHTML = villages > 1 ? `${villages} villages` : `${villages} village`
 
             $item.appendChild($icon)
             $item.appendChild($name)
