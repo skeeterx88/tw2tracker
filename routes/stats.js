@@ -34,10 +34,9 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         marketId,
         worldNumber,
         siteName: settings.site_name,
-        worldName: worldInfo.name,
         players,
         tribes,
-        open: worldInfo.open,
+        world: worldInfo,
         development,
         exportValues: {
             marketId,

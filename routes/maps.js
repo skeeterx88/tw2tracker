@@ -56,6 +56,8 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
 
     res.render('map', {
         title: `Map ${marketId}${worldNumber} - ${settings.site_name}`,
+        marketId,
+        world: worldInfo,
         exportValues: {
             marketId,
             worldNumber,

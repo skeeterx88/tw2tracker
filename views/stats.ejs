@@ -25,10 +25,7 @@
             <h1>
                 <a href="/"><%= siteName %></a> /
                 Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a> /
-                World <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= worldName %></a>
-                <% if (!open) { %>
-                    (Closed)
-                <% } %>
+                World <a href="/stats/<%= marketId %>/<%= world.num %>/"><%= world.name %></a><%= world.open ? '' : ' (Closed)' %>
             </h1>
 
             <div class="content">
@@ -57,7 +54,7 @@
                                     <tr>
                                         <td><%= rank %></td>
                                         <td>
-                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
+                                            <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
                                             <% if (rank < 4) { %>
                                                 <div class="color"></div>
                                             <% } %>
@@ -72,7 +69,7 @@
                         </table>
 
                         <div class="actions">
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/">View complete tribes ranking</a>
+                            <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/">View complete tribes ranking</a>
                         </div>
                     </section>
 
@@ -99,7 +96,7 @@
                                 <% for (let player of players) { %>
                                     <tr>
                                         <td><%= rank %></td>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>"><%= player.name %></a></td>
+                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
                                         <td><%= player.points.toLocaleString('pt-BR') %></td>
                                         <td><%= player.villages.toLocaleString('pt-BR') %></td>
                                     </tr>
@@ -110,7 +107,7 @@
                         </table>
 
                         <div class="actions">
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/">View complete players ranking</a>
+                            <a href="/stats/<%= marketId %>/<%= world.num %>/players/">View complete players ranking</a>
                         </div>
                     </section>
 
@@ -141,7 +138,7 @@
                         <div id="map" class="content-border"></div>
 
                         <div class="actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
                         </div>
                     </section>
                 </div>

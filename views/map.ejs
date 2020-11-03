@@ -22,10 +22,12 @@
         <div id="map-wrapper">
             <div id="side-panel">
                 <header>
-                    <h1 id="world-name"><%= exportValues.worldName %></h1>
+                    <a href="/stats/<%= marketId %>/<%= world.number %>">
+                        <h1 id="world-name"><%= world.name %></h1>
+                    </a>
                     <button id="current-world">
-                        <span class="flag flag-<%= exportValues.marketId %>"></span>
-                        <%= exportValues.marketId %><%= exportValues.worldNumber %>
+                        <span class="flag flag-<%= marketId %>"></span>
+                        <%= marketId %><%= world.num %>
                     </button>
                     <button id="change-settings">Settings</button>
                 </header>
