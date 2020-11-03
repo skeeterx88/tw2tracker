@@ -6,12 +6,12 @@ const crypto = require('crypto')
 const noop = function () {}
 
 const schemaExists = async function (schemaName) {
-    const schema = await db.one(sql.helpers.schemaExists, [schemaName])
+    const schema = await db.one(sql.helpers.schemaExists, {schema: schemaName})
     return schema.exists
 }
 
-const worldEntryExists = async function (marketId, worldNumber) {
-    const worldEntry = await db.one(sql.worlds.exists, [marketId, worldNumber])
+const worldEntryExists = async function (worldId) {
+    const worldEntry = await db.one(sql.worlds.exists, {worldId})
     return worldEntry.exists
 }
 

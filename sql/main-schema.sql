@@ -35,6 +35,7 @@ CREATE TYPE map_sync_status AS ENUM ('success', 'fail');
 CREATE TABLE main.worlds (
     market VARCHAR (10) REFERENCES main.markets(id),
     num SMALLINT,
+    world_id VARCHAR (5),
     name VARCHAR (255) NOT NULL,
     last_sync TIMESTAMP,
     last_sync_status map_sync_status,

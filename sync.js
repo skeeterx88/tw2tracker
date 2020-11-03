@@ -1,7 +1,7 @@
 const db = require('./db')
 const sql = require('./sql')
 const utils = require('./utils')
-const {log} = utils
+const {log, schemaExists, worldEntryExists} = utils
 const Scrapper = require('./scrapper.js')
 const readyState = require('./ready-state.js')
 const getSettings = require('./settings')
@@ -14,6 +14,11 @@ const hasOwn = Object.prototype.hasOwnProperty
 const colors = require('colors/safe')
 const development = process.env.NODE_ENV === 'development'
 let authenticatedMarkets = {}
+
+const devAccounts = [
+    {id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'},
+    {id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'}
+]
 
 const {
     SYNC_SUCCESS,
@@ -164,77 +169,52 @@ Sync.registerWorlds = async function () {
     log('Sync.registerWorlds()', log.INCREASE)
 
     await db.query(sql.state.update.registerWorlds)
+    const markets = development ? devAccounts : await db.any(sql.markets.withAccount)
 
-    let markets
+    for (let market of markets) {
+        const marketId = market.id
+        const account = await Sync.auth(marketId, market)
 
-    if (development) {
-        markets = [
-            {id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'},
-            {id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'}
-        ]
-    } else {
-        markets = (await db.any(sql.markets.all)).filter(market => market.account_name && market.account_password)
-    }
-
-    for (let i = 0; i < markets.length; i++) {
-        const market = markets[i]
-        let account
-
-        try {
-            account = await Sync.auth(market.id, market)
-        } catch (error) {
-            log(colors.red(error.message))
+        if (!account) {
             continue
         }
 
-        const allowedLoginCharacters = account.characters.filter(world => world.allow_login)
-        const nonFullWorlds = account.worlds.filter(world => !world.full)
+        const characters = account.characters
+        .filter((world) => world.allow_login && world.character_id === account.player_id)
+        .map(world => ({
+            worldNumber: utils.extractNumbers(world.world_id),
+            worldName: world.world_name,
+            registered: true
+        }))
 
-        for (let world of nonFullWorlds) {
-            await Sync.registerCharacter(market.id, utils.extractNumbers(world.world_id))
-        }
+        const worlds = account.worlds
+        .filter(world => !world.full)
+        .map(world => ({
+            worldNumber: utils.extractNumbers(world.id),
+            worldName: world.name,
+            registered: false
+        }))
 
-        const formatedAllowedLoginCharacters = allowedLoginCharacters.map(function (world) {
-            return {
-                worldNumber: utils.extractNumbers(world.world_id),
-                worldName: world.world_name
-            }
-        })
-
-        const formatedNonFullWorlds = nonFullWorlds.map(function (world) {
-            return {
-                worldNumber: utils.extractNumbers(world.id),
-                worldName: world.name
-            }
-        })
-
-        const allWorlds = [
-            ...formatedAllowedLoginCharacters,
-            ...formatedNonFullWorlds
-        ]
-
-        if (nonFullWorlds.length) {
-            for (let {worldNumber} of Object.entries(formatedNonFullWorlds)) {
-                await Sync.registerCharacter(market.id, worldNumber)
-            }
-        }
+        const allWorlds = [...worlds, ...characters]
 
         for (let world of allWorlds) {
-            const {worldNumber, worldName} = world
+            const {worldNumber, worldName, registered, entryExists} = world
+            const worldId = marketId + worldNumber
 
-            const worldSchemaExists = await utils.schemaExists(market.id + worldNumber)
-            const worldEntryExists = await utils.worldEntryExists(market.id, worldNumber)
-
-            if (!worldSchemaExists || !worldEntryExists) {
-                log('Creating world entry for', market.id + worldNumber)
+            if (!registered) {
+                await Sync.registerCharacter(marketId, worldNumber)
             }
 
-            if (!worldSchemaExists) {
-                await db.query(sql.worlds.createSchema, {schema: market.id + worldNumber})
-            }
+            if (!await worldEntryExists(worldId)) {
+                log(`Creating world entry for ${worldId}`)
 
-            if (!worldEntryExists) {
-                await db.query(sql.worlds.addEntry, [market.id, worldNumber, worldName, true])
+                await db.query(sql.worlds.addEntry, {
+                    worldId,
+                    marketId,
+                    worldNumber,
+                    worldName,
+                    open: true
+                })
             }
         }
     }
