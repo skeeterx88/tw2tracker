@@ -27,7 +27,7 @@ router.get('/scrapper/all/:flag?', ensureLoggedIn, async function (req, res) {
     const flag = req.params.flag === 'force' ? IGNORE_LAST_SYNC : false
 
     try {
-        await Sync.scrappeAllWorlds(flag)
+        await Sync.allWorlds(flag)
         response.message = 'worlds synchronized successfully'
         response.success = true
     } catch (error) {
@@ -55,7 +55,7 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
         response.message = `world ${worldNumber} is invalid`
     } else {
         try {
-            await Sync.scrappeWorld(marketId, worldNumber)
+            await Sync.world(marketId, worldNumber)
             response.message = `${marketId}${worldNumber} synchronized successfully`
             response.success = true
         } catch (error) {
@@ -84,7 +84,7 @@ router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async funct
         response.message = `world ${worldNumber} is invalid`
     } else {
         try {
-            await Sync.scrappeWorld(marketId, worldNumber, IGNORE_LAST_SYNC)
+            await Sync.world(marketId, worldNumber, IGNORE_LAST_SYNC)
             response.message = `${marketId}${worldNumber} synchronized successfully`
             response.success = true
         } catch (error) {

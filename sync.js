@@ -28,23 +28,23 @@ const {
     IGNORE_LAST_SYNC
 } = require('./constants.js')
 
-let scrappeWorldInProgress = false
-let scrappeAllWorldsInProgress = false
+let syncInProgress = false
+let syncAllInProgress = false
 
 Events.on(SCRAPPE_WORLD_START, function () {
-    scrappeWorldInProgress = true
+    syncInProgress = true
 })
 
 Events.on(SCRAPPE_WORLD_END, function () {
-    scrappeWorldInProgress = false
+    syncInProgress = false
 })
 
 Events.on(SCRAPPE_WORLD_START, function () {
-    scrappeAllWorldsInProgress = true
+    syncAllInProgress = true
 })
 
 Events.on(SCRAPPE_WORLD_END, function () {
-    scrappeAllWorldsInProgress = false
+    syncAllInProgress = false
 })
 
 let browser = null
@@ -89,11 +89,10 @@ Sync.init = async function () {
     // const worldData = JSON.parse(await fs.promises.readFile('./dev-data/br48/worldData.json'))
     // await inserWorldData(worldData, 'br', 48)
 
-    // await Sync.scrappeWorld('zz', 8)
     process.on('SIGTERM', async function () {
         log(colors.red('Stopping tw2-tracker! Waiting pendent tasks...'))
 
-        if (scrappeWorldInProgress) {
+        if (syncInProgress) {
             await Events.on(SCRAPPE_WORLD_END)
         }
 
@@ -117,11 +116,13 @@ Sync.init = async function () {
     }
 
     if (!state.last_scrappe_all_time) {
-        await Sync.scrappeAllWorlds()
+        await Sync.allWorlds()
     }
 
     try {
         await Sync.daemon()
+        // await Sync.world('zz', 8)
+        // await Sync.registerWorlds()
     } catch (error) {
         log(colors.red(error.message))
     }
@@ -138,8 +139,8 @@ Sync.daemon = async function () {
     } = await db.one(sql.settings.intervals)
 
     const scrapeWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
-        await Sync.scrappeAllWorlds()
-        log('Next scrappeAllWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
+        await Sync.allWorlds()
+        log('Next allWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
     })
 
     const registerWorldsJob = schedule.scheduleJob(register_worlds_interval, async function () {
@@ -153,7 +154,7 @@ Sync.daemon = async function () {
         log('Next cleanExpiredShares ' + colors.green(cleanSharesJob.nextInvocation()._date.fromNow()))
     })
 
-    log('Next scrappeAllWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
+    log('Next allWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
     log('Next registerWorldsJob ' + colors.green(registerWorldsJob.nextInvocation()._date.fromNow()))
     log('Next cleanExpiredShares ' + colors.green(cleanSharesJob.nextInvocation()._date.fromNow()), log.DECREASE)
 }
@@ -352,11 +353,11 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
     }
 }
 
-Sync.scrappeAllWorlds = async function (flag) {
+Sync.allWorlds = async function (flag) {
     log()
-    log('Sync.scrappeAllWorlds()', log.INCREASE)
+    log('Sync.allWorlds()', log.INCREASE)
 
-    if (scrappeAllWorldsInProgress) {
+    if (syncAllInProgress) {
         log(colors.red('\nA Scrappe All Worlds is already in progress\n'), log.ZERO)
         return false
     }
@@ -382,7 +383,7 @@ Sync.scrappeAllWorlds = async function (flag) {
 
     for (let world of worlds) {
         try {
-            await Sync.scrappeWorld(world.market, world.num, flag)
+            await Sync.world(world.market, world.num, flag)
         } catch (error) {
             log(colors.red(error.message))
 
@@ -433,11 +434,11 @@ const downloadStruct = async function (url, marketId, worldNumber) {
     await fs.promises.writeFile(path.join('.', 'data', marketId + worldNumber, 'struct'), gzipped)
 }
 
-Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
+Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     Events.trigger(SCRAPPE_WORLD_START)
 
     log()
-    log(`Sync.scrappeWorld() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''), log.INCREASE)
+    log(`Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''), log.INCREASE)
 
 
     const worldId = marketId + worldNumber
@@ -492,7 +493,6 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
             log('Downloading map structure')
 
             const structPath = await page.evaluate(function () {
-                console.log('Scrapper: Loading structure binary')
                 const cdn = require('cdn')
                 const conf = require('conf/conf')
                 return cdn.getPath(conf.getMapPath())
@@ -531,7 +531,7 @@ Sync.scrappeWorld = async function (marketId, worldNumber, flag, attempt = 1) {
 
         if (attempt < 3) {
             log.decrease()
-            await Sync.scrappeWorld(marketId, worldNumber, flag, ++attempt)
+            await Sync.world(marketId, worldNumber, flag, ++attempt)
             return
         } else {
             await db.query(sql.worlds.updateSyncStatus, [SYNC_FAIL, marketId, worldNumber])
