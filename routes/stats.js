@@ -33,10 +33,11 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         title: `Stats ${marketId}${worldNumber} - ${settings.site_name}`,
         marketId,
         worldNumber,
+        siteName: settings.site_name,
         worldName: worldInfo.name,
         players,
         tribes,
-        siteName: settings.site_name,
+        open: worldInfo.open,
         development,
         exportValues: {
             marketId,

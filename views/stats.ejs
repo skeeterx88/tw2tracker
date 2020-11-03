@@ -26,6 +26,9 @@
                 <a href="/"><%= siteName %></a> /
                 Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a> /
                 World <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= worldName %></a>
+                <% if (!open) { %>
+                    (Closed)
+                <% } %>
             </h1>
 
             <div class="content">
