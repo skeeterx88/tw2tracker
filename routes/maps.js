@@ -163,7 +163,7 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async fu
     res.end(data)
 }))
 
-router.get('/api/get-worlds', asyncRouter(async function (req, res) {
+router.get('/api/get-open-worlds', asyncRouter(async function (req, res) {
     const allWorlds = await db.any(sql.worlds.allOpen)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allWorlds))

@@ -25,7 +25,7 @@ a {
 }
 
 header a {
-    color: #ffeccc  ;
+    color: #ffeccc;
     
 }
 
@@ -540,7 +540,7 @@ header {
     position: absolute;
     width: 200px;
     background: url(/images/noise.png) #6f4327;
-    color: #e0bfbf;
+    color: #ffeccc;
     padding: 3px;
     text-shadow: 1px 1px 0px #00000090;
     z-index: 7;
@@ -559,8 +559,14 @@ header {
     text-decoration: none;
 }
 
+#all-worlds h2 {
+    width: 100%;
+    text-align: center;
+    margin: 5px;
+}
+
 #all-market-worlds {
-    width: 70%;
+    width: 67%;
     float: left;
 }
 
@@ -569,7 +575,7 @@ header {
     white-space: nowrap;
     display: block;
     overflow: hidden;
-    max-width: 134px;
+    max-width: 131px;
     margin: 5px 1px;
     padding: 0 5px;
 }
@@ -583,6 +589,7 @@ header {
 #all-markets {
     width: 30%;
     float: left;
+    margin-right: 5px;
 }
 
 #all-markets li {

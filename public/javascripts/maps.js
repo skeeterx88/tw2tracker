@@ -640,21 +640,11 @@
             }
 
             loadWorldsPromise = new Promise(async (resolve) => {
-                const loadWorlds = fetch('/maps/api/get-worlds')
-                const loadMarkets = fetch('/maps/api/get-markets')
-
-                const [responseWorlds, responseMarkets] = await Promise.all([
-                    loadWorlds,
-                    loadMarkets
-                ])
-
-                const [worlds, markets] = await Promise.all([
-                    responseWorlds.json(),
-                    responseMarkets.json()
-                ])
+                const responseWorlds = await fetch('/maps/api/get-open-worlds')
+                const worlds = await responseWorlds.json()
 
                 allWorlds = worlds
-                allMarkets = markets
+                allMarkets = new Set(worlds.map((world) => world.market))
 
                 buildWorldList()
                 changeWorldList(marketId)
