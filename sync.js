@@ -496,6 +496,25 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             await downloadStruct(`https://${urlId}.tribalwars2.com/${structPath}`, marketId, worldNumber)
         }
 
+        if (!worldInfo.config) {
+            try {
+                log('Fetching world config')
+
+                const worldConfig = await page.evaluate(function () {
+                    const modelDataService = injector.get('modelDataService')
+                    const worldConfig = modelDataService.getWorldConfig()
+                    return worldConfig.data
+                })
+
+                await db.none(sql.worlds.insert.config, {
+                    worldId,
+                    worldConfig
+                })
+            } catch (error) {
+                log(colors.red('Error trying to fetch world config! Skipping...'))
+            }
+        }
+
         const evaluationExpire = setTimeout(async function () {
             await page.close()
             throw new Error('Scrappe evaluation timeout')

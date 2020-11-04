@@ -40,6 +40,7 @@ CREATE TABLE main.worlds (
     last_sync TIMESTAMP,
     last_sync_status map_sync_status,
     open BOOLEAN NOT NULL DEFAULT TRUE,
+    config JSONB,
     player_count INT DEFAULT 0,
     village_count INT DEFAULT 0,
     tribe_count INT DEFAULT 0
