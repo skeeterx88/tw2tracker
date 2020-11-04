@@ -511,7 +511,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
                     worldConfig
                 })
             } catch (error) {
-                log(colors.red('Error trying to fetch world config! Skipping...'))
+                log(colors.red(`Error trying to fetch world config: ${error.message}`))
             }
         }
 
