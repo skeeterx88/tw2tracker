@@ -5,6 +5,7 @@ module.exports = async function () {
     const socketService = injector.get('socketService')
     const routeProvider = injector.get('routeProvider')
     const tribeSkillService = injector.get('tribeSkillService')
+    const LOAD_VILLAGE_SECTION_TIMEOUT = 'load_village_section_timeout'
     const RANKING_QUERY_COUNT = 25
     const CHUNK_SIZE = 50
     const COORDS_REFERENCE = {
@@ -100,30 +101,40 @@ module.exports = async function () {
     }
 
     const loadVillageSection = function (x, y) {
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
+            const timeoutId = setTimeout(function () {
+                reject(LOAD_VILLAGE_SECTION_TIMEOUT)
+            }, 15000)
+
             socketService.emit(routeProvider.MAP_GETVILLAGES, {
                 x: x,
                 y: y,
                 width: CHUNK_SIZE,
                 height: CHUNK_SIZE
             }, function (section) {
+                clearTimeout(timeoutId)
                 processVillages(section.villages)
                 resolve(section.villages.length)
             })
         })
     }
 
-    const loadContinent = async function (x, y) {
-        const loadVillages = await Promise.all([
-            loadVillageSection(x, y),
-            loadVillageSection(x + CHUNK_SIZE, y),
-            loadVillageSection(x, y + CHUNK_SIZE),
-            loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
-        ])
+    const loadContinent = function (x, y) {
+        return new Promise(async function (resolve, reject) {
+            const timeout = setTimeout(function () {
+                reject(new Error('Failed to fetch villages section'))
+            }, 10000)
 
-        await sleep(150)
+            const loadVillages = await Promise.all([
+                loadVillageSection(x, y),
+                loadVillageSection(x + CHUNK_SIZE, y),
+                loadVillageSection(x, y + CHUNK_SIZE),
+                loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
+            ])
 
-        return loadVillages.reduce((sum, value) => sum + value)
+            clearTimeout(timeout)
+            resolve(loadVillages.reduce((sum, value) => sum + value))
+        })
     }
 
     const processVillages = function (rawVillages) {
