@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%= title %></title>
+        <meta name="viewport" content="width=1000 initial-scale=1"/>
+        <meta name="description" content="Detailed statistics for Tribal Wars 2">
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel='stylesheet' href='/stylesheets/stats.css' />
+        <link rel="icon" type="image/png" href="/images/favicon.png"/>
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber,
+                tribe
+            } = <%- JSON.stringify(exportValues) %>
+
+            const STATS_PAGE = 'tribe-members'
+        </script>
+    </head>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <h1>
+                <a href="/"><%= siteName %></a> /
+                Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a> /
+                World <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= worldName %></a> /
+                Tribe <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %></a> /
+                Members
+            </h1>
+
+            <div class="content">
+                <div class="left">
+                    <section id="tribe">
+                        <h2>Tribe profile</h2>
+
+                        <table>
+                            <colgroup>
+                                <col width="5%">
+                                <col width="*">
+                                <col width="10%">
+                                <col width="10%">
+                            </colgroup>
+
+                            <thead>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Points</th>
+                                <th>Villages</th>
+                            </thead>
+
+                            <tbody>
+                                <% if (!members.length) { %>
+                                    <tr>
+                                        <td colspan="*">This triba does not have any members</td>
+                                    </tr>
+                                <% } %>
+
+                                <% for (let member of members) { %>
+                                    <tr>
+                                        <td><%= member.rank %></td>
+                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
+                                        <td><%= member.points %></td>
+                                        <td><%= member.villages %></td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+
+                <div class="right">
+                </div>
+            </div>
+        </main>
+
+        <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
+    </body>
+</html>

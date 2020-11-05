@@ -95,6 +95,53 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     })
 }))
 
+router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const tribeId = parseInt(req.params.tribeId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        res.status(404)
+        throw new Error('This world does not exist')
+    }
+
+    let tribe
+
+    try {
+        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
+    } catch (error) {
+        res.status(404)
+        throw new Error('This tribe does not exist')
+    }
+
+    const members = await db.any(sql.worlds.tribeMembers, {worldId, tribeId})
+    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+
+    res.render('stats-tribe-members', {
+        title: `Tribe ${tribe.name} - ${marketId}${worldNumber} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        worldName: worldInfo.name,
+        tribe,
+        members,
+        exportValues: {
+            marketId,
+            worldNumber,
+            tribe
+        },
+        siteName: settings.site_name,
+        development
+    })
+}))
+
 router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()

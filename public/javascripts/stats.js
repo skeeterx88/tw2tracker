@@ -30,5 +30,12 @@
         }
     }
 
-    setupMapPreview()
+    switch (STATS_PAGE) {
+        case 'home':
+        case 'tribe':
+        case 'player': {
+            setupMapPreview()
+            break;
+        }
+    }
 })();
