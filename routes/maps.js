@@ -43,10 +43,16 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
+    const worldId = marketId + worldNumber
 
-    const worldExists = await utils.schemaExists(marketId + worldNumber)
+    try {
+        await fs.promises.access(path.join('.', 'data', worldId, 'info'))
+    } catch (error) {
+        res.status(404)
+        throw new Error('This world does not exist')
+    }
 
-    if (!worldExists) {
+    if (!await utils.schemaExists(worldId)) {
         res.status(404)
         throw new Error('This world does not exist')
     }
