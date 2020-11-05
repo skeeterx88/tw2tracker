@@ -126,6 +126,7 @@ Sync.init = async function () {
 
     try {
         await Sync.daemon()
+        // await Sync.allWorlds()
         // await Sync.world('zz', 8)
         // await Sync.registerWorlds()
     } catch (error) {
@@ -365,8 +366,6 @@ Sync.allWorlds = async function (flag) {
         try {
             await Sync.world(world.market, world.num, flag)
         } catch (error) {
-            log(colors.red(error.message))
-
             failedToSync.push({
                 marketId: world.market,
                 worldNumber: world.num,
@@ -383,24 +382,40 @@ Sync.allWorlds = async function (flag) {
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
-            log(colors.red('All worlds failed to sync.'))
-            log(`Finished in ${time}`, log.DECREASE)
-
-            return SYNC_ERROR_ALL
-        } else {
-            log(colors.magenta('Some worlds failed to sync:'), log.INCREASE)
+            log()
+            log('All worlds failed to sync:')
+            log.increase()
 
             for (let fail of failedToSync) {
-                log(`${fail.marketId} ${fail.worldNumber}: ${fail.message}`)
+                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
             }
 
             log.decrease()
-            log(`Finished in ${time}`, log.DECREASE)
+            log()
+            log(`Finished in ${time}`)
+            log.decrease()
+
+            return SYNC_ERROR_ALL
+        } else {
+            log()
+            log('Some worlds failed to sync:')
+            log.increase()
+
+            for (let fail of failedToSync) {
+                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
+            }
+
+            log.decrease()
+            log()
+            log(`Finished in ${time}`)
+            log.decrease()
 
             return SYNC_ERROR_SOME
         }
     } else {
-        log(`Finished in ${time}`, log.DECREASE)
+        log()
+        log(`Finished in ${time}`)
+        log.decrease()
 
         return SYNC_SUCCESS_ALL
     }
@@ -418,8 +433,8 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     Events.trigger(SCRAPPE_WORLD_START)
 
     log()
-    log(`Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''), log.INCREASE)
-
+    log(`Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    log.increase()
 
     const worldId = marketId + worldNumber
 
@@ -488,7 +503,6 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         const data = await page.evaluate(Scrapper)
         clearTimeout(evaluationExpire)
-        await page.close()
 
         log(
             colors.green(data.villages.length), 'villages',
@@ -505,21 +519,28 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
         log(`Finished in ${time}`)
-    } catch (error) {
-        log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
+        log.decrease()
+
         await page.close()
 
+        Events.trigger(SCRAPPE_WORLD_END)
+    } catch (error) {
+        log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
+        log.decrease()
+
+        if (page) {
+            await page.close()
+        }
+
         if (attempt < 3) {
-            log.decrease()
-            await Sync.world(marketId, worldNumber, flag, ++attempt)
-            return
+            return await Sync.world(marketId, worldNumber, flag, ++attempt)
         } else {
             await db.query(sql.worlds.updateSyncStatus, [SYNC_FAIL, marketId, worldNumber])
+            Events.trigger(SCRAPPE_WORLD_END)
+
+            throw new Error(error.message)
         }
     }
-
-    log.decrease()
-    Events.trigger(SCRAPPE_WORLD_END)
 }
 
 const queryData = async function (data, marketId, worldNumber) {
