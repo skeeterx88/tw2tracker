@@ -9,11 +9,11 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         allowZoom: true,
         hexagonVillages: true,
         zoomLevel: 2,
-        quickHighlight: true,
+        inlineHighlight: true,
         neutralColor: '#823c0a',
         barbarianColor: '#4c6f15',
         backgroundColor: '#436213',
-        highlightPlayerColor: '#ffffff',
+        quickHighlightColor: '#ffffff',
         activeVillageBorderColor: '#ffffff',
         activeVillageBorderOpacity: '80',
         demarcationsColor: '#000000'
@@ -27,6 +27,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     let activeVillage = false
     let renderEnabled = false
     let zoomSettings
+    let quickHighlightVillages = false
 
     const $zoomElements = {}
     const $viewport = document.createElement('canvas')
@@ -294,7 +295,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         })
 
         $overlay.addEventListener('mousemove', (event) => {
-            if (!settings.quickHighlight || draggable) {
+            if (draggable) {
                 return
             }
 
@@ -322,9 +323,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             renderEnabled = false
             $overlay.style.cursor = 'default'
 
-            if (settings.quickHighlight) {
-                unsetActiveVillage()
-            }
+            unsetActiveVillage()
         })
 
         if (settings.allowZoom) {
@@ -548,14 +547,16 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         ];
     }
 
-    const renderVillages = (villages, context = $cacheContext, zoomSettings = zoomLevels[settings.zoomLevel]) => {
+    const renderVillages = (villages, forceColor = false, context = $cacheContext, zoomSettings = zoomLevels[settings.zoomLevel]) => {
         for (let x in villages) {
             for (let y in villages[x]) {
                 let [id, name, points, character_id] = villages[x][y]
 
                 let tribeId = loader.players && character_id ? loader.players[character_id][1] : false
 
-                if (!character_id) {
+                if (forceColor) {
+                    context.fillStyle = forceColor
+                } else if (!character_id) {
                     context.fillStyle = settings.barbarianColor
                 } else if (character_id in highlights.players) {
                     context.fillStyle = highlights.players[character_id].color
@@ -623,13 +624,17 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
+        if (!settings.inlineHighlight) {
+            return
+        }
+
         const characterId = activeVillage.character_id
 
         if (!characterId) {
             return
         }
 
-        $overlayContext.fillStyle = settings.highlightPlayerColor
+        $overlayContext.fillStyle = settings.quickHighlightColor
 
         for (let [x, y] of loader.playerVillages[characterId]) {
             let off = y % 2 ? zoomSettings.villageOffset : 0
@@ -661,13 +666,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         requestAnimationFrame(continuousRender)
     }
 
-    const formatVillagesToDraw = (villagesId, scope) => {
-        if (villagesId) {
-            for (let [x, y] of villagesId) {
-                scope[x] = scope[x] || {}
-                scope[x][y] = loader.villages[x][y]
-            }
+    const formatVillagesToDraw = (villagesId = [], scope = {x: {}}) => {
+        for (let [x, y] of villagesId) {
+            scope[x] = scope[x] || {}
+            scope[x][y] = loader.villages[x][y]
         }
+
+        return scope
     }
 
     const highlightGetRealId = (highlightType, id) => {
@@ -905,7 +910,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         const sortedZooms = Object.keys($zoomElements).sort((a, b) => a == settings.zoomLevel ? -1 : 0)
 
         for (let zoomLevel of sortedZooms) {
-            renderVillages(redrawVillages, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
+            renderVillages(redrawVillages, false, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
         }
 
         renderViewport()
@@ -933,12 +938,55 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         const sortedZooms = Object.keys($zoomElements).sort((a, b) => a == settings.zoomLevel ? -1 : 0)
 
         for (let zoomLevel of sortedZooms) {
-            renderVillages(redrawVillages, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
+            renderVillages(redrawVillages, false, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
         }
 
         this.trigger('remove highlight', [highlightType, id])
 
         renderViewport()
+    }
+
+    this.quickHighlight = (type, id) => {
+        if (quickHighlightVillages) {
+            return false
+        }
+
+        if (typeof id !== 'number') {
+            throw new Error('QuickHighlight: Invalid id')
+        }
+
+        let villages
+
+        switch (type) {
+            case TW2Map.highlightTypes.PLAYERS: {
+                if (!hasOwn.call(loader.players, id)) {
+                    return false
+                }
+
+                villages = loader.playerVillages[id]
+            }
+            case TW2Map.highlightTypes.TRIBES: {
+                if (!hasOwn.call(loader.tribes, id)) {
+                    return false
+                }
+
+                villages = loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat()
+            }
+        }
+
+        quickHighlightVillages = formatVillagesToDraw(villages)
+        renderVillages(quickHighlightVillages, settings.quickHighlightColor)
+        renderViewport()
+    }
+
+    this.quickHighlightOff = () => {
+        if (!quickHighlightVillages) {
+            return
+        }
+
+        renderVillages(quickHighlightVillages)
+        renderViewport()
+        quickHighlightVillages = false
     }
 
     this.shareMap = async (shareType) => {
@@ -975,7 +1023,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                     neutralColor: settings.neutralColor,
                     barbarianColor: settings.barbarianColor,
                     backgroundColor: settings.backgroundColor,
-                    highlightPlayerColor: settings.highlightPlayerColor,
+                    quickHighlightColor: settings.quickHighlightColor,
                     demarcationsColor: settings.demarcationsColor
                 }
             })
