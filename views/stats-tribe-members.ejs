@@ -57,10 +57,10 @@
 
                                 <% for (let member of members) { %>
                                     <tr>
-                                        <td><%= member.rank %></td>
+                                        <td><%= member.rank.toLocaleString('pt-BR') %></td>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
-                                        <td><%= member.points %></td>
-                                        <td><%= member.villages %></td>
+                                        <td><%= member.points.toLocaleString('pt-BR') %></td>
+                                        <td><%= member.villages.toLocaleString('pt-BR') %></td>
                                     </tr>
                                 <% } %>
                             </tbody>
