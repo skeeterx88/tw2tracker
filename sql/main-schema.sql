@@ -39,7 +39,10 @@ CREATE TABLE main.worlds (
     name VARCHAR (255) NOT NULL,
     last_sync TIMESTAMP,
     last_sync_status map_sync_status,
-    open BOOLEAN NOT NULL DEFAULT TRUE
+    open BOOLEAN NOT NULL DEFAULT TRUE,
+    player_count INT DEFAULT 0,
+    village_count INT DEFAULT 0,
+    tribe_count INT DEFAULT 0
 );
 
 CREATE TYPE map_share_type AS ENUM ('static', 'dynamic');

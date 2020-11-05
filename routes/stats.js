@@ -24,8 +24,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         throw new Error('This world does not exist')
     }
 
-    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
     const players = await db.any(sql.stats.worldTopPlayers, {worldId})
     const tribes = await db.any(sql.stats.worldTopTribes, {worldId})
 
@@ -36,7 +35,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         siteName: settings.site_name,
         players,
         tribes,
-        world: worldInfo,
+        world,
         development,
         exportValues: {
             marketId,

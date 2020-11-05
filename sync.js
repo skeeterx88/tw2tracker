@@ -619,6 +619,13 @@ const queryData = async function (data, marketId, worldNumber) {
         await db.query(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
     }
 
+    await db.query(sql.worlds.update.stats, {
+        worldId,
+        villages: data.villages.length,
+        players: data.players.length,
+        tribes: data.tribes.length
+    })
+
     const time = perf.end()
 
     log(`........................... ${time}`)
