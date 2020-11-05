@@ -1,12 +1,15 @@
 (async () => {
+    let map
+
     const colors = ["#ffee00", "#0000ff", "#ff0000"]
 
     const setupMapPreview = async () => {
         const loader = new TW2DataLoader(marketId, worldNumber)
-        const map = new TW2Map('#map', loader, null, {
+
+        map = new TW2Map('#map', loader, null, {
             allowZoom: false,
             zoomLevel: 1,
-            quickHighlight: false
+            inlineHighlight: false
         })
 
         map.init()
@@ -30,11 +33,43 @@
         }
     }
 
+    const setupQuickHighlight = async () => {
+        const $tribes = document.querySelectorAll('#tribes tbody tr')
+        const $players = document.querySelectorAll('#players tbody tr')
+
+        for (let $tribe of $tribes) {
+            $tribe.addEventListener('mouseenter', () => {
+                map.quickHighlight(TW2Map.highlightTypes.TRIBES, parseInt($tribe.dataset.tribeId, 10))
+            })
+
+            $tribe.addEventListener('mouseleave', () => {
+                map.quickHighlightOff()
+            })
+        }
+
+        for (let $player of $players) {
+            $player.addEventListener('mouseenter', () => {
+                map.quickHighlight(TW2Map.highlightTypes.PLAYERS, parseInt($player.dataset.playerId, 10))
+            })
+
+            $player.addEventListener('mouseleave', () => {
+                map.quickHighlightOff()
+            })
+        }
+    }
+
     switch (STATS_PAGE) {
         case 'home':
         case 'tribe':
         case 'player': {
             setupMapPreview()
+            break;
+        }
+    }
+
+    switch (STATS_PAGE) {
+        case 'home': {
+            setupQuickHighlight()
             break;
         }
     }

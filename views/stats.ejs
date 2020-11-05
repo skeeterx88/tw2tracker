@@ -51,7 +51,7 @@
                             <tbody>
                                 <% let rank = 1 %>
                                 <% for (let tribe of tribes) { %>
-                                    <tr>
+                                    <tr data-tribe-id="<%= tribe.id %>">
                                         <td><%= rank %></td>
                                         <td>
                                             <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
@@ -94,7 +94,7 @@
                             <tbody>
                                 <% rank = 1 %>
                                 <% for (let player of players) { %>
-                                    <tr>
+                                    <tr data-player-id="<%= player.id %>">
                                         <td><%= rank %></td>
                                         <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
                                         <td><%= player.points.toLocaleString('pt-BR') %></td>

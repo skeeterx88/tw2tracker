@@ -61,3 +61,8 @@ section {
                 1px 1px 2px #000;
     display: inline-block;
 }
+
+#tribes tr:hover td,
+#players tr:hover td {
+    background: #e0b47657;
+}
