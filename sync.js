@@ -149,23 +149,23 @@ Sync.daemon = async function () {
 
     const scrapeWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
         await Sync.allWorlds()
-        log('Next allWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
+        log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const registerWorldsJob = schedule.scheduleJob(register_worlds_interval, async function () {
         await Sync.markets()
         await Sync.registerWorlds()
-        log('Next registerWorldsJob ' + colors.green(registerWorldsJob.nextInvocation()._date.fromNow()))
+        log('Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const cleanSharesJob = schedule.scheduleJob(clean_shares_check_interval, async function () {
         await Sync.cleanExpiredShares()
-        log('Next cleanExpiredShares ' + colors.green(cleanSharesJob.nextInvocation()._date.fromNow()))
+        log('Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
     })
 
-    log('Next allWorlds ' + colors.green(scrapeWorldsJob.nextInvocation()._date.fromNow()))
-    log('Next registerWorldsJob ' + colors.green(registerWorldsJob.nextInvocation()._date.fromNow()))
-    log('Next cleanExpiredShares ' + colors.green(cleanSharesJob.nextInvocation()._date.fromNow()), log.DECREASE)
+    log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+    log('Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
+    log('Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()), log.DECREASE)
 }
 
 Sync.registerWorlds = async function () {
