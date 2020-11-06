@@ -171,6 +171,19 @@ log.decrease = function () {
     log.level = Math.max(0, log.level - 1)
 }
 
+const timeout = function (handler, time, errorMessage) {
+    return new Promise(async function (resolve, reject) {
+        const id = setTimeout(function () {
+            reject(new Error(errorMessage))
+        }, time)
+
+        handler().then(function (result) {
+            clearTimeout(id)
+            resolve(result)
+        }).catch(reject)
+    })
+}
+
 module.exports = {
     noop,
     schemaExists,
@@ -183,5 +196,6 @@ module.exports = {
     perf,
     sha1sum,
     asyncRouter,
-    log
+    log,
+    timeout
 }

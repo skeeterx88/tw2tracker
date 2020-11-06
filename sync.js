@@ -510,13 +510,9 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             }
         }
 
-        const evaluationExpire = setTimeout(async function () {
-            await page.close()
-            throw new Error('Scrappe evaluation timeout')
-        }, 120000)
-
-        const data = await page.evaluate(Scrapper)
-        clearTimeout(evaluationExpire)
+        const data = await utils.timeout(async function () {
+            return await page.evaluate(Scrapper)
+        }, 120000, 'Scrappe evaluation timeout')
 
         await commitDataFilesystem(worldId)
         await commitDataDatabase(data, worldId)
