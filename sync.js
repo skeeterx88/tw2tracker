@@ -550,6 +550,51 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     }
 }
 
+Sync.markets = async function () {
+    log('Sync.markets()')
+
+    await db.query(sql.state.update.lastFetchMarkets)
+
+    const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
+    const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
+    const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
+    
+    const marketList = $markets.map(function ($market) {
+        const market = $market.attributes.href.split('//')[1].split('.')[0]
+        return market === 'beta' ? 'zz' : market
+    })
+
+    const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId))
+
+    for (let missingMarket of missingMarkets) {
+        await db.query(sql.markets.add, missingMarket)
+    }
+
+    return missingMarkets
+}
+
+Sync.cleanExpiredShares = async function () {
+    const now = Date.now()
+    const shares = await db.any(sql.maps.getShareLastAccess)
+    let {static_share_expire_time} = await db.one(sql.settings.intervals)
+
+    static_share_expire_time = static_share_expire_time * 60 * 1000
+
+    for (let {share_id, last_access} of shares) {
+        if (now - last_access.getTime() < static_share_expire_time) {
+            await db.query(sql.maps.deleteStaticShare, [share_id])
+        }
+    }
+}
+
+const downloadMapStruct = async function (url, worldId) {
+    const buffer = await utils.getBuffer(url)
+    const gzipped = zlib.gzipSync(buffer)
+    
+    await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true})
+    await fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped)
+}
+
 const commitDataDatabase = async function (data, worldId) {
     const perf = utils.perf()
 
@@ -618,29 +663,6 @@ const commitDataDatabase = async function (data, worldId) {
     const time = perf.end()
 
     log(`Writed data to database in ${time}`)
-}
-
-Sync.markets = async function () {
-    log('Sync.markets()')
-
-    await db.query(sql.state.update.lastFetchMarkets)
-
-    const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
-    const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
-    const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
-    
-    const marketList = $markets.map(function ($market) {
-        const market = $market.attributes.href.split('//')[1].split('.')[0]
-        return market === 'beta' ? 'zz' : market
-    })
-
-    const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId))
-
-    for (let missingMarket of missingMarkets) {
-        await db.query(sql.markets.add, missingMarket)
-    }
-
-    return missingMarkets
 }
 
 const commitDataFilesystem = async function (worldId) {
@@ -727,20 +749,6 @@ const commitDataFilesystem = async function (worldId) {
     log(`Writed data to filesystem in ${time}`)
 
     return false
-}
-
-Sync.cleanExpiredShares = async function () {
-    const now = Date.now()
-    const shares = await db.any(sql.maps.getShareLastAccess)
-    let {static_share_expire_time} = await db.one(sql.settings.intervals)
-
-    static_share_expire_time = static_share_expire_time * 60 * 1000
-
-    for (let {share_id, last_access} of shares) {
-        if (now - last_access.getTime() < static_share_expire_time) {
-            await db.query(sql.maps.deleteStaticShare, [share_id])
-        }
-    }
 }
 
 module.exports = Sync
