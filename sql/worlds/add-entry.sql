@@ -6,7 +6,7 @@ INSERT INTO main.worlds (
     ${worldId},
     ${worldName},
     ${open}
-)
+);
 
 CREATE SCHEMA IF NOT EXISTS ${worldId:name};
 

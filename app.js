@@ -1,6 +1,4 @@
 (async function () {
-    const server = require('./server')
-    const Sync = require('./sync')
     const utils = require('./utils')
     const development = process.env.NODE_ENV === 'development'
 
@@ -9,6 +7,9 @@
         const sql = require('./sql')
         await db.query(sql.mainSchema)
     }
+
+    const server = require('./server')
+    const Sync = require('./sync')
 
     if (development) {
         server()
