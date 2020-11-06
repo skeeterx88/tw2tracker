@@ -433,13 +433,13 @@ const downloadStruct = async function (url, marketId, worldNumber) {
 }
 
 Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
+    const worldId = marketId + worldNumber
+
     Events.trigger(SCRAPPE_WORLD_START)
 
     log()
     log(`Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
     log.increase()
-
-    const worldId = marketId + worldNumber
 
     let page
 
@@ -532,13 +532,12 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             colors.green(data.tribes.length), 'tribes'
         )
 
-        await queryData(data, marketId, worldNumber)
-        await Sync.genWorldBlocks(marketId, worldNumber)
-        await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])
-        
-        const time = perf.end()
-
+        await commitDataFilesystem(worldId)
+        await commitDataDatabase(data, worldId)
+        await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
         await db.query(sql.worlds.updateSync, [marketId, worldNumber])
+
+        const time = perf.end()
 
         log(`Finished in ${time}`)
         log.decrease()
@@ -565,102 +564,63 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     }
 }
 
-const queryData = async function (data, marketId, worldNumber) {
-    const worldId = marketId + worldNumber
-
-    log('Writing data to database...')
-
+const commitDataDatabase = async function (data, worldId) {
     const perf = utils.perf()
 
-    for (let [tribe_id, tribe] of data.tribes) {
-        await db.query(sql.worlds.insert.tribe, {worldId, tribe_id, ...tribe})
+    await db.tx(async function () {
+        const tribesBestValues = new Map(await db.map(sql.worlds.tribesBestValues, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]]))
+        const playersBestValues = new Map(await db.map(sql.worlds.playersBestValues, {worldId}, (player) => [player.id, [player.best_rank, player.best_points, player.best_villages]]))
 
-        const {
-            best_rank,
-            best_points,
-            best_villages
-        } = await db.any(sql.worlds.tribeBestValues, {
-            worldId,
-            tribe_id
-        })
+        for (let [tribe_id, tribe] of data.tribes) {
+            this.none(sql.worlds.insert.tribe, {worldId, tribe_id, ...tribe})
 
-        if (!best_rank || tribe.rank > best_rank) {
-            await db.query(sql.worlds.update.tribeBestRank, {
-                worldId,
-                rank: tribe.rank,
-                tribe_id
-            })
+            const [best_rank, best_points, best_villages] = tribesBestValues.get(tribe_id) || []
+
+            if (!best_rank || tribe.rank > best_rank) {
+                this.none(sql.worlds.update.tribeBestRank, {worldId, rank: tribe.rank, tribe_id})
+            }
+            
+            if (!best_points || tribe.points > best_points) {
+                this.none(sql.worlds.update.tribeBestPoints, {worldId, points: tribe.points, tribe_id})
+            }
+
+            if (!best_villages || tribe.villages > best_villages) {
+                this.none(sql.worlds.update.tribeBestVillages, {worldId, villages: tribe.villages, tribe_id})
+            }
         }
 
-        if (!best_points || tribe.points > best_points) {
-            await db.query(sql.worlds.update.tribeBestPoints, {
-                worldId,
-                points: tribe.points,
-                tribe_id
-            })
+        for (let [character_id, player] of data.players) {
+            this.none(sql.worlds.insert.player, {worldId, character_id, ...player})
+
+            const [best_rank, best_points, best_villages] = playersBestValues.get(character_id) || []
+
+            if (!best_rank || player.rank > best_rank) {
+                this.none(sql.worlds.update.playerBestRank, {worldId, rank: player.rank, character_id})
+            }
+            
+            if (!best_points || player.points > best_points) {
+                this.none(sql.worlds.update.playerBestPoints, {worldId, points: player.points, character_id})
+            }
+
+            if (!best_villages || player.villages > best_villages) {
+                this.none(sql.worlds.update.playerBestVillages, {worldId, villages: player.villages, character_id})
+            }
         }
 
-        if (!best_villages || tribe.villages > best_villages) {
-            await db.query(sql.worlds.update.tribeBestVillages, {
-                worldId,
-                villages: tribe.villages,
-                tribe_id
-            })
-        }
-    }
-
-    for (let [character_id, player] of data.players) {
-        await db.query(sql.worlds.insert.player, {worldId, character_id, ...player})
-
-        const {
-            best_rank,
-            best_points,
-            best_villages
-        } = await db.any(sql.worlds.playerBestValues, {
-            worldId,
-            character_id
-        })
-
-        if (!best_rank || player.rank > best_rank) {
-            await db.query(sql.worlds.update.playerBestRank, {
-                worldId,
-                rank: player.rank,
-                character_id
-            })
+        for (let [province_name, province_id] of data.provinces) {
+            this.none(sql.worlds.insert.province, {worldId, province_id, province_name})
         }
 
-        if (!best_points || player.points > best_points) {
-            await db.query(sql.worlds.update.playerBestPoints, {
-                worldId,
-                points: player.points,
-                character_id
-            })
+        for (let [village_id, village] of data.villages) {
+            this.none(sql.worlds.insert.village, {worldId, village_id, ...village})
         }
 
-        if (!best_villages || player.villages > best_villages) {
-            await db.query(sql.worlds.update.playerBestVillages, {
-                worldId,
-                villages: player.villages,
-                character_id
-            })
+        for (let [character_id, villages_id] of data.villagesByPlayer) {
+            this.none(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
         }
-    }
 
-    for (let [province_name, province_id] of data.provinces) {
-        await db.query(sql.worlds.insert.province, {
-            worldId,
-            province_id,
-            province_name
-        })
-    }
-
-    for (let [village_id, village] of data.villages) {
-        await db.query(sql.worlds.insert.village, {worldId, village_id, ...village})
-    }
-
-    for (let [character_id, villages_id] of data.villagesByPlayer) {
-        await db.query(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
-    }
+        return
+    })
 
     await db.query(sql.worlds.update.stats, {
         worldId,
@@ -671,7 +631,7 @@ const queryData = async function (data, marketId, worldNumber) {
 
     const time = perf.end()
 
-    log(`........................... ${time}`)
+    log(`Writed data to database in ${time}`)
 }
 
 Sync.markets = async function () {
@@ -697,9 +657,7 @@ Sync.markets = async function () {
     return missingMarkets
 }
 
-Sync.genWorldBlocks = async function (marketId, worldNumber) {
-    const worldId = marketId + worldNumber
-
+const commitDataFilesystem = async function (worldId) {
     const perf = utils.perf()
 
     try {
