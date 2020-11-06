@@ -518,12 +518,6 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         const data = await page.evaluate(Scrapper)
         clearTimeout(evaluationExpire)
 
-        log(
-            colors.green(data.villages.length), 'villages',
-            colors.green(data.players.length), 'players',
-            colors.green(data.tribes.length), 'tribes'
-        )
-
         await commitDataFilesystem(worldId)
         await commitDataDatabase(data, worldId)
         await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
