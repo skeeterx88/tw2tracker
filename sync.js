@@ -650,6 +650,13 @@ const commitDataDatabase = async function (data, worldId) {
             this.none(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
         }
 
+        this.none(sql.worlds.update.stats, {
+            worldId,
+            villages: data.villages.length,
+            players: data.players.length,
+            tribes: data.tribes.length
+        })
+
         return
     })
 
