@@ -424,14 +424,6 @@ Sync.allWorlds = async function (flag) {
     }
 }
 
-const downloadStruct = async function (url, marketId, worldNumber) {
-    const buffer = await utils.getBuffer(url)
-    const gzipped = zlib.gzipSync(buffer)
-    
-    await fs.promises.mkdir(path.join('.', 'data', marketId + worldNumber), {recursive: true})
-    await fs.promises.writeFile(path.join('.', 'data', marketId + worldNumber, 'struct'), gzipped)
-}
-
 Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
@@ -496,7 +488,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
                 return cdn.getPath(conf.getMapPath())
             })
 
-            await downloadStruct(`https://${urlId}.tribalwars2.com/${structPath}`, marketId, worldNumber)
+            await downloadMapStruct(`https://${urlId}.tribalwars2.com/${structPath}`, worldId)
         }
 
         if (!worldInfo.config) {
