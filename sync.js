@@ -514,8 +514,8 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             return await page.evaluate(Scrapper)
         }, 120000, 'Scrappe evaluation timeout')
 
-        await commitDataFilesystem(worldId)
         await commitDataDatabase(data, worldId)
+        await commitDataFilesystem(worldId)
         await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
         await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
