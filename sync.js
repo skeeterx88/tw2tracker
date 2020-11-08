@@ -129,9 +129,11 @@ Sync.init = async function () {
             await Sync.daemon()
         }
 
-        await Sync.allWorlds()
-        // await Sync.world('zz', 8)
-        // await Sync.registerWorlds()
+        if (development) {
+            // await Sync.allWorlds()
+            // await Sync.world('zz', 8)
+            // await Sync.registerWorlds()
+        }
     } catch (error) {
         log(colors.red(error.message))
     }
