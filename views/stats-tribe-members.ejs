@@ -11,7 +11,8 @@
             const {
                 marketId,
                 worldNumber,
-                tribe
+                tribe,
+                mapHighlights
             } = <%- JSON.stringify(exportValues) %>
 
             const STATS_PAGE = 'tribe-members'
@@ -23,14 +24,16 @@
             <h1>
                 <a href="/"><%= siteName %></a> /
                 Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a> /
-                World <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= worldName %></a> /
+                World <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= world.name %></a> /
                 Tribe <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %></a> /
                 Members
             </h1>
 
             <div class="content">
                 <div class="left">
-                    <section id="tribe">
+                    <section id="players">
+                        <h2>Tribe Members</h2>
+
                         <table>
                             <colgroup>
                                 <col width="5%">
@@ -54,7 +57,7 @@
                                 <% } %>
 
                                 <% for (let member of members) { %>
-                                    <tr>
+                                    <tr data-player-id="<%= member.id %>">
                                         <td><%= member.rank.toLocaleString('pt-BR') %></td>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
                                         <td><%= member.points.toLocaleString('pt-BR') %></td>
@@ -67,10 +70,20 @@
                 </div>
 
                 <div class="right">
+                    <section class="world-map">
+                        <h2>World map</h2>
+
+                        <div id="map" class="content-border"></div>
+
+                        <div class="actions">
+                            <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
+                        </div>
+                    </section>
                 </div>
             </div>
         </main>
 
+        <script type="text/javascript" src="/javascripts/map.js"></script>
         <script type="text/javascript" src="/javascripts/utils.js"></script>
         <script type="text/javascript" src="/javascripts/stats.js"></script>
     </body>
