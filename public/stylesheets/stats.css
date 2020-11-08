@@ -19,9 +19,11 @@ tr:nth-child(even) {
     background: #bd9b6c4f;
 }
 
-td {
+td, th {
     text-align: center;
     height: 20px;
+    padding: 1px 3px 1px 3px;
+    vertical-align: bottom;
 }
 
 .content {
