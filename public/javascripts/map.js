@@ -964,6 +964,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 }
 
                 villages = loader.playerVillages[id]
+                break
             }
             case TW2Map.highlightTypes.TRIBES: {
                 if (!hasOwn.call(loader.tribes, id)) {
@@ -971,6 +972,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 }
 
                 villages = loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat()
+                break
             }
         }
 
