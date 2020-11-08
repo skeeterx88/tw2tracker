@@ -2,9 +2,6 @@
 extends: eslint:recommended
 parserOptions:
   ecmaVersion: 2018
-ignorePatterns:
-- src/header.js
-- src/footer.js
 env:
   node: true
   es6: true

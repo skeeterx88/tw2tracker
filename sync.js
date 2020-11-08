@@ -1,7 +1,7 @@
 const db = require('./db')
 const sql = require('./sql')
 const utils = require('./utils')
-const {log, schemaExists, worldEntryExists} = utils
+const {log, worldEntryExists} = utils
 const Scrapper = require('./scrapper.js')
 const readyState = require('./ready-state.js')
 const getSettings = require('./settings')
@@ -184,25 +184,25 @@ Sync.registerWorlds = async function () {
         }
 
         const characters = account.characters
-        .filter((world) => world.allow_login && world.character_id === account.player_id)
-        .map(world => ({
-            worldNumber: utils.extractNumbers(world.world_id),
-            worldName: world.world_name,
-            registered: true
-        }))
+            .filter((world) => world.allow_login && world.character_id === account.player_id)
+            .map(world => ({
+                worldNumber: utils.extractNumbers(world.world_id),
+                worldName: world.world_name,
+                registered: true
+            }))
 
         const worlds = account.worlds
-        .filter(world => !world.full)
-        .map(world => ({
-            worldNumber: utils.extractNumbers(world.id),
-            worldName: world.name,
-            registered: false
-        }))
+            .filter(world => !world.full)
+            .map(world => ({
+                worldNumber: utils.extractNumbers(world.id),
+                worldName: world.name,
+                registered: false
+            }))
 
         const allWorlds = [...worlds, ...characters]
 
         for (let world of allWorlds) {
-            const {worldNumber, worldName, registered, entryExists} = world
+            const {worldNumber, worldName, registered} = world
             const worldId = marketId + worldNumber
 
             if (!registered) {
