@@ -13,7 +13,7 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         neutralColor: '#823c0a',
         barbarianColor: '#4c6f15',
         backgroundColor: '#436213',
-        quickHighlightColor: '#ffffff',
+        quickHighlightColor: '#000000',
         activeVillageBorderColor: '#ffffff',
         activeVillageBorderOpacity: '80',
         demarcationsColor: '#000000'
