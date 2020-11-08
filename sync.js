@@ -129,7 +129,7 @@ Sync.init = async function () {
             await Sync.daemon()
         }
 
-        // await Sync.allWorlds()
+        await Sync.allWorlds()
         // await Sync.world('zz', 8)
         // await Sync.registerWorlds()
     } catch (error) {
@@ -480,7 +480,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         try {
             await fs.promises.access(path.join('.', 'data', worldId, 'struct'))
         } catch (e) {
-            log('Downloading map structure')
+            log('Scrapper: Fetching map structure')
 
             const structPath = await page.evaluate(function () {
                 const cdn = require('cdn')
@@ -493,7 +493,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         if (!worldInfo.config) {
             try {
-                log('Fetching world config')
+                log('Scrapper: Fetching world config')
 
                 const worldConfig = await page.evaluate(function () {
                     const modelDataService = injector.get('modelDataService')

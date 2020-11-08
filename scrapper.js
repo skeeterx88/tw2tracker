@@ -326,8 +326,6 @@ module.exports = async function () {
     processVillagesByPlayer()
     processPlayersByTribe()
 
-    console.log('Scrapper: Finished')
-
     return {
         villages: Array.from(villages),
         players: Array.from(players),
