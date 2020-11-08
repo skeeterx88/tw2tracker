@@ -974,6 +974,12 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
+        villages = villages.filter(playerVillages => typeof playerVillages !== 'undefined')
+
+        if (!villages.length) {
+            return false
+        }
+
         quickHighlightVillages = formatVillagesToDraw(villages)
         renderVillages(quickHighlightVillages, settings.quickHighlightColor)
         renderViewport()
