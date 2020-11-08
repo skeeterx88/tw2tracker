@@ -775,11 +775,9 @@
     //     })
     // }
 
-    const mapSettings = {}
-
     const loader = new TW2DataLoader(marketId, worldNumber)
     const tooltip = new TW2Tooltip('#tooltip')
-    const map = new TW2Map('#map', loader, tooltip, mapSettings)
+    const map = new TW2Map('#map', loader, tooltip, {})
 
     setupQuickJump()
     setupCustomHighlights()

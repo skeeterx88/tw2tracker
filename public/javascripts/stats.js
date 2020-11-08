@@ -9,7 +9,8 @@
         map = new TW2Map('#map', loader, null, {
             allowZoom: false,
             zoomLevel: 1,
-            inlineHighlight: false
+            inlineHighlight: false,
+            quickHighlightColor: '#000000'
         })
 
         map.init()
