@@ -37,13 +37,15 @@
                             <colgroup>
                                 <col width="50px">
                                 <col width="*">
-                                <col width="120px">
-                                <col width="80px">
+                                <col width="50px">
+                                <col width="50px">
+                                <col width="50px">
                             </colgroup>
                             <thead>
                                 <tr>
                                     <th>Rank</th>
                                     <th>Tribe</th>
+                                    <th>Members</th>
                                     <th>Points</th>
                                     <th>Villages</th>
                                 </tr>
@@ -59,6 +61,7 @@
                                                 <div class="color"></div>
                                             <% } %>
                                         </td>
+                                        <td><%= tribe.members.toLocaleString('pt-BR') %></td>
                                         <td><%= tribe.points.toLocaleString('pt-BR') %></td>
                                         <td><%= tribe.villages.toLocaleString('pt-BR') %></td>
                                     </tr>
@@ -80,8 +83,8 @@
                             <colgroup>
                                 <col width="50px">
                                 <col width="*">
-                                <col width="120px">
-                                <col width="80px">
+                                <col width="50px">
+                                <col width="50px">
                             </colgroup>
                             <thead>
                                 <tr>
