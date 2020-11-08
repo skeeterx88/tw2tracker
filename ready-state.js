@@ -1,60 +1,41 @@
 module.exports = function () {
-    const readyState = function () {
-        return new Promise(function (resolve, reject) {
-            let injectorTimeout
-            let timeout
+    return new Promise(function (resolve, reject) {
+        let injectorTimeout
 
-            timeout = setTimeout(function () {
-                clearTimeout(injectorTimeout)
+        const timeout = setTimeout(function () {
+            clearTimeout(injectorTimeout)
 
-                if (document.querySelector('.modal-establish-village')) {
-                    console.log('Scrapper: Ready')
-
-                    return resolve()
-                }
-
-                const transferredSharedDataService = injector.get('transferredSharedDataService')
-                const mapScope = transferredSharedDataService.getSharedData('MapController')
-
-                if (mapScope && mapScope.isInitialized) {
-                    console.log('Scrapper: Ready')
-
-                    resolve()
-                } else {
-                    reject()
-                }
-            }, 10000)
-
-            const waitForInjector = function (callback) {
-                if (typeof injector === 'undefined') {
-                    setTimeout(waitForInjector, 100)
-                } else {
-                    callback()
-                }
+            if (document.querySelector('.modal-establish-village')) {
+                return resolve()
             }
 
-            waitForInjector(function () {
-                const $rootScope = injector.get('$rootScope')
-                const eventTypeProvider = injector.get('eventTypeProvider')
+            const transferredSharedDataService = injector.get('transferredSharedDataService')
+            const mapScope = transferredSharedDataService.getSharedData('MapController')
 
-                $rootScope.$on(eventTypeProvider.CHARACTER_INFO, function () {
-                    clearTimeout(timeout)
-                    clearTimeout(injectorTimeout)
+            if (mapScope && mapScope.isInitialized) {
+                resolve()
+            } else {
+                reject('Could not get ready state (timeout)')
+            }
+        }, 10000)
 
-                    console.log('Scrapper: Ready')
+        const waitForInjector = function (callback) {
+            if (typeof injector === 'undefined') {
+                injectorTimeout = setTimeout(waitForInjector, 100)
+            } else {
+                callback()
+            }
+        }
 
-                    resolve()
-                })
+        waitForInjector(function () {
+            const $rootScope = injector.get('$rootScope')
+            const eventTypeProvider = injector.get('eventTypeProvider')
+
+            $rootScope.$on(eventTypeProvider.CHARACTER_INFO, function () {
+                clearTimeout(timeout)
+                clearTimeout(injectorTimeout)
+                resolve()
             })
         })
-    }
-
-    return new Promise(async function (resolve, reject) {
-        try {
-            await readyState()
-            resolve()
-        } catch (error) {
-            reject()
-        }
     })
 }
