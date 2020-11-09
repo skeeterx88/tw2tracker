@@ -6,6 +6,7 @@ const utils = require('../utils')
 const {asyncRouter} = utils
 const getSettings = require('../settings')
 const development = process.env.NODE_ENV === 'development'
+const SEARCH_CATEGORIES = ['players', 'tribes', 'villages']
 
 router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -189,6 +190,65 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
             worldNumber,
             player,
             mapHighlights: [player]
+        },
+        siteName: settings.site_name,
+        development
+    })
+}))
+
+router.get('/:marketId/:worldNumber/search/:category/:query', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const category = req.params.category
+
+    if (!SEARCH_CATEGORIES.includes(category)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        res.status(404)
+        throw new Error('This world does not exist')
+    }
+
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const rawQuery = req.params.query
+
+    if (rawQuery.length < 3) {
+        res.status(500)
+        throw new Error('Minimum search characters is 3')
+    }
+
+    if (rawQuery.length > 20) {
+        res.status(500)
+        throw new Error('Maximum search characters is 20')
+    }
+
+    const query = '%' + rawQuery + '%'
+    const results = await db.any(sql.stats.search[category], {worldId, query})
+
+    console.log(results)
+
+    return res.render('world-search', {
+        title: `Search "${rawQuery}" - ${marketId}${worldNumber} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        query: rawQuery,
+        category,
+        results,
+        resultsCount: results.length,
+        exportValues: {
+            marketId,
+            worldNumber
         },
         siteName: settings.site_name,
         development

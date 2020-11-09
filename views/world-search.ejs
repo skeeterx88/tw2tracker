@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%= title %></title>
+        <meta name="viewport" content="width=1000 initial-scale=1"/>
+        <meta name="description" content="Detailed statistics for Tribal Wars 2">
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link rel='stylesheet' href='/stylesheets/stats.css' />
+        <link rel="icon" type="image/png" href="/images/favicon.png"/>
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber
+            } = <%- JSON.stringify(exportValues) %>
+
+            const STATS_PAGE = 'search'
+        </script>
+    </head>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <h1>
+                <a href="/"><%= siteName %></a> /
+                Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a> /
+                World <a href="/stats/<%= marketId %>/<%= world.num %>/"><%= world.name %></a><%= world.open ? '' : ' (Closed)' %> /
+                Search
+            </h1>
+
+            <div class="content">
+                <div class="left">
+                    <section id="search">
+                        <h2>Search results for "<%= query %>"</h2>
+
+                        <% if (!resultsCount) { %>
+                            <h3>No results</h3>
+                        <% } else { %>
+                            <%- include('world-search-' + category + '.ejs') %>
+                        <% } %>
+                    </section>
+                </div>
+
+                <div class="right">
+                </div>
+            </div>
+        </main>
+
+        <script type="text/javascript" src="/javascripts/utils.js"></script>
+    </body>
+</html>
