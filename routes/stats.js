@@ -196,7 +196,25 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
     })
 }))
 
-router.get('/:marketId/:worldNumber/search/:category/:query', asyncRouter(async function (req, res, next) {
+router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const category = (req.body.category || '').toLowerCase()
+
+    if (!SEARCH_CATEGORIES.includes(category)) {
+        res.status(404)
+        throw new Error('This search category does not exist')
+    }
+
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+
+    return res.redirect(307, `/stats/${marketId}/${worldNumber}/search/${category}`);
+}))
+
+router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -220,7 +238,12 @@ router.get('/:marketId/:worldNumber/search/:category/:query', asyncRouter(async 
     }
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const rawQuery = req.params.query
+    const rawQuery = req.body.query
+
+    if (!rawQuery) {
+        res.status(500)
+        throw new Error('No search specified')
+    }
 
     if (rawQuery.length < 3) {
         res.status(500)
@@ -234,8 +257,6 @@ router.get('/:marketId/:worldNumber/search/:category/:query', asyncRouter(async 
 
     const query = '%' + rawQuery + '%'
     const results = await db.any(sql.stats.search[category], {worldId, query})
-
-    console.log(results)
 
     return res.render('world-search', {
         title: `Search "${rawQuery}" - ${marketId}${worldNumber} - ${settings.site_name}`,
