@@ -1,4 +1,4 @@
-const db = require('./db')
+const {db} = require('./db')
 const sql = require('./sql')
 const utils = require('./utils')
 const {log, worldEntryExists} = utils

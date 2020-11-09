@@ -7,7 +7,7 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
-const db = require('./db')
+const {db} = require('./db')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const getSettings = require('./settings')
 const development = process.env.NODE_ENV === 'development'

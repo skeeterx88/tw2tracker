@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 
-const db = require('../db')
+const {db} = require('../db')
 const sql = require('../sql')
 const Sync = require('../sync')
 const getSettings = require('../settings')

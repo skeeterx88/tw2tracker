@@ -3,7 +3,7 @@
     const development = process.env.NODE_ENV === 'development'
 
     if (!await utils.schemaExists('main')) {
-        const db = require('./db')
+        const {db} = require('./db')
         const sql = require('./sql')
         await db.query(sql.mainSchema)
     }
