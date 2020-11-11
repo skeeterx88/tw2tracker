@@ -184,6 +184,8 @@ const timeout = function (handler, time, errorMessage) {
     })
 }
 
+const hasOwn = Object.prototype.hasOwnProperty
+
 module.exports = {
     noop,
     schemaExists,
@@ -197,5 +199,6 @@ module.exports = {
     sha1sum,
     asyncRouter,
     log,
-    timeout
+    timeout,
+    hasOwn
 }

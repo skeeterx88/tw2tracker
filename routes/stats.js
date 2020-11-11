@@ -3,7 +3,7 @@ const router = express.Router()
 const {db,pgp} = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
-const {asyncRouter} = utils
+const {asyncRouter, hasOwn} = utils
 const getSettings = require('../settings')
 const development = process.env.NODE_ENV === 'development'
 const SEARCH_CATEGORIES = {
