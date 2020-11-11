@@ -1,3 +1,7 @@
+html {
+    background: url(/images/background-scene.webp) top no-repeat, url(/images/noise-2.png), #88785F;
+}
+
 table {
     background: #ab80455e;
     width: 100%;
@@ -24,13 +28,49 @@ table {
     margin-top: 5px;
 }
 
-#search form input[type=text] {
-    border: 1px solid #5e351b;
-    border-radius: 2px;
-    padding: 4px 5px;
-    width: 70%;
-    font-size: 13px;
-    background: #f0e2bd;
+#search form input[type="text"] {
+    width: 75%;
+    height: 22px;
+    border-radius: 1px;
+    border: 1px solid #8d5b39;
+    padding: 1px 5px;
+    background: url(/images/noise.png) #a07246;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset 1px 1px 3px #00000095;
+}
+
+#search form input[type="text"]:focus {
+    border: 1px solid #b17a55;
+}
+
+#search form input[type="text"]::placeholder {
+    color: #333;
+    text-shadow: none;
+}
+
+#search form input[type="submit"] {
+    height: 26px;
+    padding: 0px 5px;
+    outline: none;
+    cursor: pointer;
+    color: #e0bfbf;
+    text-shadow: 1px 1px 0px #000;
+    border-radius: 1px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #794929;
+    background: url(/images/noise.png), linear-gradient(#8d5b39, #583f2d);
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset -1px -1px 2px #000;
+}
+
+#search form input[type="submit"]:hover,
+#search form input[type="submit"]:focus {
+    background: url(/images/noise.png), linear-gradient(#af7046, #583f2d);
 }
 
 section .actions {

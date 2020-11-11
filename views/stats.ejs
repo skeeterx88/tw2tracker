@@ -33,16 +33,18 @@
                     <section id="search">
                         <h2>Search</h2>
 
-                        <div class="content-border wrapper">
-                            <form method="POST" action="/stats/<%= marketId %>/<%= world.num %>/search/">
-                                <input type="text" name="query" placeholder="Search...">
-                                
-                                <div class="submit-buttons">
-                                    <input type="submit" name="category" value="Players">
-                                    <input type="submit" name="category" value="Tribes">
-                                    <input type="submit" name="category" value="Villages">
-                                </div>
-                            </form>
+                        <div class="content-border">
+                            <ul class="content-menu">
+                               <li class="selected">Players</li>
+                               <li>Tribes</li>
+                               <li>Villages</li>
+                            </ul>
+                            <div class="wrapper">
+                                <form method="POST" action="/stats/<%= marketId %>/<%= world.num %>/search/">
+                                    <input type="text" class="input" name="query">
+                                    <input type="submit" class="red" value="Search">
+                                </form>
+                            </div>
                         </div>
                     </section>
 

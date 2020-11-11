@@ -1,6 +1,24 @@
 html {
+    width: 100%;
+    height: 100%;
     font: 14px 'Lucida Grande', Helvetica, Arial, sans-serif;
     background: url(/images/background-scene.webp) top no-repeat, url(/images/noise-2.png), #88785F;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+input,
+button {
+    outline: none;
+    font: 14px Arial, Helvetica, sans-serif;
+}
+
+html {
     margin: 0px;
     color: #50311d;
 }
@@ -58,6 +76,49 @@ menu {
     border-radius: 2px;
     box-shadow: 0px 0px 0px 1px #5e351b, 0px 0px 0px 2px #865130, inset -2px -2px 2px #00000050, 2px 2px 4px #00000050;
     border: 1px solid #3d3b51;
+}
+
+.content-menu {
+    margin: 0px;
+    padding: 0px;
+    background: #ab80455e;
+    text-align: center;
+    border-bottom: 2px solid #5e351b;
+    border-radius: 3px;
+    box-shadow: 0px 1px 3px #5e351b;
+}
+
+.content-menu li {
+    padding: 2px 10px;
+    margin: 4px 2px;
+    outline: none;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    color: #e0bfbf;
+    text-shadow: 1px 1px 0px #000;
+    border-radius: 1px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #794929;
+    background: url(/images/noise.png), linear-gradient(#8d5b39, #583f2d);
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #00000050,
+                inset -1px -1px 2px #000;
+}
+
+.content-menu li:hover {
+    background: url(/images/noise.png), linear-gradient(#af7046, #583f2d);
+}
+
+.content-menu li.selected {
+    border-color: #923f32;
+    background-image: linear-gradient(#bd4646, #7d1616);
+}
+
+.content-menu li.selected:hover {
+    background-image: linear-gradient(#c75f5f, #7d1616);
 }
 
 menu li {
