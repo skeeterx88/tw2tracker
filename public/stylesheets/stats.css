@@ -96,16 +96,18 @@ td, th {
     display: flex;
 }
 
-.content > div {
-    width: 50%;
-}
-
 .content > div.left {
+    width: 50%;
     margin-right: 6px;
 }
 
 .content > div.right {
+    width: 50%;
     margin-left: 6px;
+}
+
+.content > div.single {
+    width: 100%;
 }
 
 section {
