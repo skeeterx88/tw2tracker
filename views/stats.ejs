@@ -34,15 +34,16 @@
                         <h2>Search</h2>
 
                         <div class="content-border">
-                            <ul class="content-menu">
-                               <li class="selected">Players</li>
-                               <li>Tribes</li>
-                               <li>Villages</li>
+                            <ul class="content-menu" id="search-categories">
+                               <li data-search-category="players">Players</li>
+                               <li data-search-category="tribes">Tribes</li>
+                               <li data-search-category="villages">Villages</li>
                             </ul>
                             <div class="wrapper">
                                 <form method="POST" action="/stats/<%= marketId %>/<%= world.num %>/search/">
-                                    <input type="text" class="input" name="query">
+                                    <input type="text" id="search-input" class="input" name="query" autocomplete="off">
                                     <input type="submit" class="red" value="Search">
+                                    <input type="hidden" id="search-category" name="category" value="">
                                 </form>
                             </div>
                         </div>

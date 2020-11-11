@@ -62,17 +62,56 @@
         }
     }
 
-    switch (STATS_PAGE) {
-        case 'tribe-members':
-        case 'home': {
-            setupMapPreview()
-            setupQuickHighlight()
-            break;
+    const setupSearch = async () => {
+        const SEARCH_CATEGORIES = {
+            players: 'players',
+            tribes: 'tribes',
+            villages: 'villages'
         }
-        case 'tribe':
-        case 'player': {
-            setupMapPreview()
-            break;
+
+        const $searchCategories = document.querySelectorAll('#search-categories li')
+        const $searchInput = document.querySelector('#search-input')
+
+        const selectCategory = (category) => {
+            if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
+                return false
+            }
+
+            const $form = document.querySelector('#search form')
+            const $selected = document.querySelector('#search-categories li.selected')
+            const $hiddenInput = document.querySelector('#search-category')
+
+            if ($selected) {
+                $selected.classList.remove('selected')
+            }
+
+            const $toSelect = document.querySelector(`#search-categories li[data-search-category=${category}]`)
+            $toSelect.classList.add('selected')
+            $hiddenInput.value = category
+
+            $searchInput.focus()
         }
+
+        for ($searchCategory of $searchCategories) {
+            $searchCategory.addEventListener('click', function () {
+                selectCategory(this.dataset.searchCategory)
+                return false
+            })
+        }
+
+        selectCategory(SEARCH_CATEGORIES.players)
+    }
+
+    if (STATS_PAGE === 'home') {
+        setupMapPreview()
+        setupQuickHighlight()
+        setupSearch()
+    } else if (STATS_PAGE === 'tribe-members') {
+        setupMapPreview()
+        setupQuickHighlight()
+    } else if (STATS_PAGE === 'tribe') {
+        setupMapPreview()
+    } else if (STATS_PAGE === 'player') {
+        setupMapPreview()
     }
 })();

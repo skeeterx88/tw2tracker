@@ -23,16 +23,15 @@
                 <a href="/"><%= siteName %></a> /
                 Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a> /
                 World <a href="/stats/<%= marketId %>/<%= world.num %>/"><%= world.name %></a><%= world.open ? '' : ' (Closed)' %> /
-                Search
+                Search "<%= query %>"
             </h1>
 
             <div class="content">
                 <div class="left">
                     <section id="search">
-                        <h2>Search results for "<%= query %>"</h2>
-
                         <% if (!resultsCount) { %>
                             <h3>No results</h3>
+                            <a href="/stats/<%= marketId %>/<%= world.num %>/">Go back</a>
                         <% } else { %>
                             <%- include('world-search-' + category + '.ejs') %>
                         <% } %>

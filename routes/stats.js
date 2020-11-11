@@ -6,7 +6,11 @@ const utils = require('../utils')
 const {asyncRouter} = utils
 const getSettings = require('../settings')
 const development = process.env.NODE_ENV === 'development'
-const SEARCH_CATEGORIES = ['players', 'tribes', 'villages']
+const SEARCH_CATEGORIES = {
+    players: 'players',
+    tribes: 'tribes',
+    villages: 'villages'
+}
 
 router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -203,7 +207,7 @@ router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, 
 
     const category = (req.body.category || '').toLowerCase()
 
-    if (!SEARCH_CATEGORIES.includes(category)) {
+    if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
         res.status(404)
         throw new Error('This search category does not exist')
     }
@@ -221,7 +225,7 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
 
     const category = req.params.category
 
-    if (!SEARCH_CATEGORIES.includes(category)) {
+    if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
         return next()
     }
 
