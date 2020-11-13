@@ -71,15 +71,15 @@
 
         const $searchCategories = document.querySelectorAll('#search-categories li')
         const $searchInput = document.querySelector('#search-input')
+        const $form = document.querySelector('#search form')
+        const $hiddenInput = document.querySelector('#search-category')
 
         const selectCategory = (category) => {
             if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
                 return false
             }
 
-            const $form = document.querySelector('#search form')
             const $selected = document.querySelector('#search-categories li.selected')
-            const $hiddenInput = document.querySelector('#search-category')
 
             if ($selected) {
                 $selected.classList.remove('selected')
@@ -100,6 +100,14 @@
         }
 
         selectCategory(SEARCH_CATEGORIES.players)
+
+        $form.addEventListener('submit', function (event) {
+            const length = $searchInput.value.length
+
+            if (!length || length > 20) {
+                event.preventDefault()
+            }
+        })
     }
 
     if (STATS_PAGE === 'home') {
