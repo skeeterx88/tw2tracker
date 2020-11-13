@@ -104,11 +104,13 @@
                                 <col width="*">
                                 <col width="50px">
                                 <col width="50px">
+                                <col width="50px">
                             </colgroup>
                             <thead>
                                 <tr>
                                     <th>Rank</th>
                                     <th>Player</th>
+                                    <th>Tribe</th>
                                     <th>Points</th>
                                     <th>Villages</th>
                                 </tr>
@@ -119,6 +121,13 @@
                                     <tr data-player-id="<%= player.id %>">
                                         <td><%= rank %></td>
                                         <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
+                                        
+                                        <% if (player.tribe_id) { -%>
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
+                                        <% } else { -%>
+                                            <td>-</td>
+                                        <% } -%>
+                                        
                                         <td><%= player.points.toLocaleString('pt-BR') %></td>
                                         <td><%= player.villages.toLocaleString('pt-BR') %></td>
                                     </tr>
