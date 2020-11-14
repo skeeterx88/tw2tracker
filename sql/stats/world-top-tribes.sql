@@ -3,6 +3,7 @@ SELECT
     name,
     tag,
     points,
+    victory_points,
     members,
     rank,
     villages

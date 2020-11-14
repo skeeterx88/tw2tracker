@@ -2,6 +2,7 @@ SELECT
     players.id,
     players.name,
     players.points,
+    players.victory_points,
     players.villages,
     players.rank,
     players.tribe_id,

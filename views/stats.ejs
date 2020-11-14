@@ -58,6 +58,9 @@
                                 <col width="*">
                                 <col width="50px">
                                 <col width="50px">
+                                <% if (world.config.victory_points) { -%>
+                                    <col width="40px">
+                                <% } -%>
                                 <col width="50px">
                             </colgroup>
                             <thead>
@@ -66,6 +69,9 @@
                                     <th>Tribe</th>
                                     <th>Members</th>
                                     <th>Points</th>
+                                    <% if (world.config.victory_points) { -%>
+                                        <th title="Victory Points">VP</th>
+                                    <% } -%>
                                     <th>Villages</th>
                                 </tr>
                             </thead>
@@ -81,6 +87,11 @@
                                         </td>
                                         <td><%= tribe.members.toLocaleString('pt-BR') %></td>
                                         <td><%= tribe.points.toLocaleString('pt-BR') %></td>
+
+                                        <% if (world.config.victory_points) { -%>
+                                            <td><%= tribe.victory_points.toLocaleString('pt-BR') %></td>
+                                        <% } -%>
+
                                         <td><%= tribe.villages.toLocaleString('pt-BR') %></td>
                                     </tr>
                                 <% } %>
@@ -101,6 +112,9 @@
                                 <col width="*">
                                 <col width="50px">
                                 <col width="50px">
+                                <% if (world.config.victory_points) { -%>
+                                    <col width="40px">
+                                <% } -%>
                                 <col width="50px">
                             </colgroup>
                             <thead>
@@ -109,6 +123,9 @@
                                     <th>Player</th>
                                     <th>Tribe</th>
                                     <th>Points</th>
+                                    <% if (world.config.victory_points) { -%>
+                                        <th title="Victory Points">VP</th>
+                                    <% } -%>
                                     <th>Villages</th>
                                 </tr>
                             </thead>
@@ -123,8 +140,13 @@
                                         <% } else { -%>
                                             <td>-</td>
                                         <% } -%>
-                                        
+
                                         <td><%= player.points.toLocaleString('pt-BR') %></td>
+
+                                        <% if (world.config.victory_points) { -%>
+                                            <td><%= player.victory_points.toLocaleString('pt-BR') %></td>
+                                        <% } -%>
+
                                         <td><%= player.villages.toLocaleString('pt-BR') %></td>
                                     </tr>
                                 <% } %>
