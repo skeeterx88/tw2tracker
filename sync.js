@@ -499,8 +499,30 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
                 const worldConfig = await page.evaluate(function () {
                     const modelDataService = injector.get('modelDataService')
-                    const worldConfig = modelDataService.getWorldConfig()
-                    return worldConfig.data
+                    const configs = modelDataService.getWorldConfig().data
+
+                    return {
+                        speed: configs.speed,
+                        victory_points: configs.victory_points,
+                        barbarian_point_limit: configs.barbarian_point_limit,
+                        barbarian_spawn_rate: configs.barbarian_spawn_rate,
+                        barbarize_inactive_percent: configs.barbarize_inactive_percent,
+                        bathhouse: configs.bathhouse,
+                        chapel_bonus: configs.chapel_bonus,
+                        church: configs.church,
+                        farm_rule: configs.farm_rule,
+                        instant_recruit: configs.instant_recruit,
+                        language_selection: configs.language_selection,
+                        loyalty_after_conquer: configs.loyalty_after_conquer,
+                        mass_buildings: configs.mass_buildings,
+                        mass_recruiting: configs.mass_recruiting,
+                        noob_protection_days: configs.noob_protection_days,
+                        relocate_units: configs.relocate_units,
+                        resource_deposits: configs.resource_deposits,
+                        second_village: configs.second_village,
+                        tribe_member_limit: configs.tribe_member_limit,
+                        tribe_skills: configs.tribe_skills
+                    }
                 })
 
                 await db.none(sql.worlds.insert.config, {
