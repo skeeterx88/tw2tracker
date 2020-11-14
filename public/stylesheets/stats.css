@@ -96,12 +96,12 @@ td, th {
 }
 
 .content > div.left {
-    width: 50%;
+    width: 60%;
     margin-right: 6px;
 }
 
 .content > div.right {
-    width: 50%;
+    width: 40%;
     margin-left: 6px;
 }
 
