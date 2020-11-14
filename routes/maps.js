@@ -93,8 +93,8 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
         throw new Error('This world does not exist')
     }
 
-    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
 
     try {
         mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
@@ -110,10 +110,12 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
 
     res.render('map', {
         title: `Map ${marketId}${worldNumber} - ${settings.site_name}`,
+        marketId,
+        world,
         exportValues: {
             marketId,
             worldNumber,
-            worldName: worldInfo.name,
+            worldName: world.name,
             lastSync,
             mapShare,
             development
