@@ -249,9 +249,9 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
         throw new Error('No search specified')
     }
 
-    if (!rawQuery.length) {
+    if (rawQuery.length < 3) {
         res.status(500)
-        throw new Error('Minimum search characters is 1')
+        throw new Error('Minimum search characters is 3')
     }
 
     if (rawQuery.length > 20) {
