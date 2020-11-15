@@ -658,7 +658,6 @@
                 const $marketContainer = document.createElement('li')
                 const $button = document.createElement('div')
                 const $flag = document.createElement('span')
-                const $text = document.createElement('span')
 
                 $button.dataset.market = market
                 $button.appendChild($flag)
@@ -669,12 +668,11 @@
 
                 $button.classList.add('market')
                 $button.classList.add('text-container')
-                $text.innerText = ` ${market}`
+                $flag.innerText = market
                 $flag.classList.add('flag')
                 $flag.classList.add(`flag-${market}`)
 
                 $button.appendChild($flag)
-                $button.appendChild($text)
 
                 $button.addEventListener('mouseenter', function () {
                     $selectedmarket = $allWorlds.querySelector('.market.selected')

@@ -597,7 +597,7 @@ header {
 }
 
 #all-markets div.market {
-    padding: 1px 0px;
+    height: 14px;
     text-align: center;
     margin: 3px 2px;
 }

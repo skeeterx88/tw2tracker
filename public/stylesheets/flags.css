@@ -1,10 +1,11 @@
 
 .flag {
     height: 12px;
-    width: 18px;
     background: url(/images/flags.png) no-repeat top left;
     display: inline-block;
-    vertical-align: top;
+    padding-left: 20px;
+    line-height: 12px;
+    text-align: left;
 }
 
 .flag-de {
