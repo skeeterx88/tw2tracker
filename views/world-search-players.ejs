@@ -18,7 +18,7 @@
     <tbody>
         <% for (let player of results) { %>
             <tr>
-                <td><%= player.player_rank.toLocaleString('pt-BR') %></td>
+                <td><%= formatNumbers(player.player_rank) %></td>
                 <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.player_id %>/"><%= player.player_name %></a></td>
 
                 <% if (player.tribe_id) { %>
@@ -27,8 +27,8 @@
                     <td>-</td>
                 <% } %>
 
-                <td><%= player.player_points.toLocaleString('pt-BR') %></td>
-                <td><%= player.player_villages.toLocaleString('pt-BR') %></td>
+                <td><%= formatNumbers(player.player_points) %></td>
+                <td><%= formatNumbers(player.player_villages) %></td>
             </tr>
         <% } %>
     </tbody>

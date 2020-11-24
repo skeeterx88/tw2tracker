@@ -48,7 +48,8 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
             players,
             tribes,
             mapHighlights: tribes.slice(0, 3)
-        }
+        },
+        ...utils.ejsHelpers
     })
 }))
 
@@ -95,7 +96,8 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
             mapHighlights: [tribe]
         },
         siteName: settings.site_name,
-        development
+        development,
+        ...utils.ejsHelpers
     })
 }))
 
@@ -143,7 +145,8 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
             mapHighlights: [tribe]
         },
         siteName: settings.site_name,
-        development
+        development,
+        ...utils.ejsHelpers
     })
 }))
 
@@ -196,7 +199,8 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
             mapHighlights: [player]
         },
         siteName: settings.site_name,
-        development
+        development,
+        ...utils.ejsHelpers
     })
 }))
 
@@ -276,7 +280,8 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
             worldNumber
         },
         siteName: settings.site_name,
-        development
+        development,
+        ...utils.ejsHelpers
     })
 }))
 

@@ -17,7 +17,7 @@
         <% for (let village of results) { %>
             <tr>
                 <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.village_id %>/"><%= village.village_name %> (<%= village.village_x %>|<%= village.village_y %>)</a></td>
-                <td><%= village.village_points.toLocaleString('pt-BR') %></td>
+                <td><%= formatNumbers(village.village_points) %></td>
 
                 <% if (village.player_id) { %>
                     <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>

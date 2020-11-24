@@ -4,6 +4,7 @@ const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 
 const {db} = require('../db')
 const sql = require('../sql')
+const utils = require('../utils')
 const Sync = require('../sync')
 const getSettings = require('../settings')
 
@@ -18,7 +19,8 @@ router.get('/', ensureLoggedIn, async function (req, res) {
         title: `Admin Panel - ${settings.site_name}`,
         worlds: worlds,
         markets: markets,
-        settings: settings
+        settings: settings,
+        ...utils.ejsHelpers
     })
 })
 

@@ -186,6 +186,14 @@ const timeout = function (handler, time, errorMessage) {
 
 const hasOwn = Object.prototype.hasOwnProperty
 
+const ejsHelpers = {
+    formatNumbers: function (value) {
+        return typeof value === 'number'
+            ? value.toLocaleString('pt-BR')
+            : value
+    }
+}
+
 module.exports = {
     noop,
     schemaExists,
@@ -200,5 +208,6 @@ module.exports = {
     asyncRouter,
     log,
     timeout,
-    hasOwn
+    hasOwn,
+    ejsHelpers
 }

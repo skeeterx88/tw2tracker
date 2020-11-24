@@ -58,10 +58,10 @@
 
                                 <% for (let member of members) { %>
                                     <tr data-player-id="<%= member.id %>">
-                                        <td><%= member.rank.toLocaleString('pt-BR') %></td>
+                                        <td><%= formatNumbers(member.rank) %></td>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
-                                        <td><%= member.points.toLocaleString('pt-BR') %></td>
-                                        <td><%= member.villages.toLocaleString('pt-BR') %></td>
+                                        <td><%= formatNumbers(member.points) %></td>
+                                        <td><%= formatNumbers(member.villages) %></td>
                                     </tr>
                                 <% } %>
                             </tbody>

@@ -89,7 +89,7 @@
             <span class="flag flag-<%= world.market %>"></span>
             <span><%= world.market %><%= world.num %> (<%= world.name %></span>)
             <div class="short-info">
-                <span class="last-sync">Last sync: <strong><%= world_last_sync.toLocaleString('pt-BR') %></strong></span>
+                <span class="last-sync">Last sync: <strong><%= formatNumbers(world_last_sync) %></strong></span>
             </div>
             <ul class="actions">
                 <li><a href="/admin/scrapper/<%= world.market %>/<%= world.num %>">Sync now</a></li>

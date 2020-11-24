@@ -40,7 +40,7 @@
                             <tbody>
                                 <tr>
                                     <td>Rank:</td>
-                                    <td><%= tribe.rank.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.rank) %></td>
                                 </tr>
                                 <tr>
                                     <td>Name:</td>
@@ -52,31 +52,31 @@
                                 </tr>
                                 <tr>
                                     <td>Villages:</td>
-                                    <td><%= tribe.villages.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.villages) %></td>
                                 </tr>
                                 <tr>
                                     <td>Points:</td>
-                                    <td><%= tribe.points.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.points) %></td>
                                 </tr>
                                 <tr>
                                     <td>Members:</td>
-                                    <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/members"><%= tribe.members.toLocaleString('pt-BR') %></a></td>
+                                    <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/members"><%= formatNumbers(tribe.members) %></a></td>
                                 </tr>
                                 <tr>
                                     <td>Bash Attack:</td>
-                                    <td><%= tribe.bash_points_off.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.bash_points_off) %></td>
                                 </tr>
                                 <tr>
                                     <td>Bash Defense:</td>
-                                    <td><%= tribe.bash_points_def.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.bash_points_def) %></td>
                                 </tr>
                                 <tr>
                                     <td>Average Points/Member:</td>
-                                    <td><%= tribe.points_per_member.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.points_per_member) %></td>
                                 </tr>
                                 <tr>
                                     <td>Average Points/Village:</td>
-                                    <td><%= tribe.points_per_villages.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.points_per_villages) %></td>
                                 </tr>
                                 <tr>
                                     <td>Member Changes:</td>
@@ -88,19 +88,19 @@
                                 </tr>
                                 <tr>
                                     <td>Best Rank:</td>
-                                    <td><%= tribe.best_rank.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.best_rank) %></td>
                                 </tr>
                                 <tr>
                                     <td>Most Points:</td>
-                                    <td><%= tribe.best_points.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.best_points) %></td>
                                 </tr>
                                 <tr>
                                     <td>Most Villages:</td>
-                                    <td><%= tribe.best_villages.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.best_villages) %></td>
                                 </tr>
                                 <tr>
                                     <td>Creation Date:</td>
-                                    <td><%= tribe.creating_date.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(tribe.creating_date) %></td>
                                 </tr>
                             </tbody>
                         </table>

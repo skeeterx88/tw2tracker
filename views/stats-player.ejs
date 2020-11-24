@@ -40,7 +40,7 @@
                             <tbody>
                                 <tr>
                                     <td>Rank:</td>
-                                    <td><%= player.rank.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.rank) %></td>
                                 </tr>
                                 <tr>
                                     <td>Name:</td>
@@ -58,23 +58,23 @@
                                 </tr>
                                 <tr>
                                     <td>Villages:</td>
-                                    <td><%= player.villages.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.villages) %></td>
                                 </tr>
                                 <tr>
                                     <td>Points:</td>
-                                    <td><%= player.points.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.points) %></td>
                                 </tr>
                                 <tr>
                                     <td>Bash Attack:</td>
-                                    <td><%= player.bash_points_off.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.bash_points_off) %></td>
                                 </tr>
                                 <tr>
                                     <td>Bash Defense:</td>
-                                    <td><%= player.bash_points_def.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.bash_points_def) %></td>
                                 </tr>
                                 <tr>
                                     <td>Average Points/Village:</td>
-                                    <td><%= player.points_per_villages.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.points_per_villages) %></td>
                                 </tr>
                                 <tr>
                                     <td>Village Conquers:</td>
@@ -82,15 +82,15 @@
                                 </tr>
                                 <tr>
                                     <td>Best Rank:</td>
-                                    <td><%= player.best_rank.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.best_rank) %></td>
                                 </tr>
                                 <tr>
                                     <td>Most Points:</td>
-                                    <td><%= player.best_points.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.best_points) %></td>
                                 </tr>
                                 <tr>
                                     <td>Most Villages:</td>
-                                    <td><%= player.best_villages.toLocaleString('pt-BR') %></td>
+                                    <td><%= formatNumbers(player.best_villages) %></td>
                                 </tr>
                             </tbody>
                         </table>
