@@ -11,6 +11,10 @@ const SEARCH_CATEGORIES = {
     tribes: 'tribes',
     villages: 'villages'
 }
+const RANKING_CATEGORIES = {
+    players: 'players',
+    tribes: 'tribes'
+}
 
 router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -284,5 +288,76 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
         ...utils.ejsHelpers
     })
 }))
+
+const routerRanking = async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const category = req.params.category
+
+    if (!hasOwn.call(RANKING_CATEGORIES, category)) {
+        res.status(404)
+        throw new Error('This ranking category does not exist')
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        res.status(404)
+        throw new Error('This world does not exist')
+    }
+
+    const page = req.params.page && !isNaN(req.params.page)
+        ? Math.max(1, parseInt(req.params.page, 10))
+        : 1
+    const offset = settings.ranking_items_per_page * (page - 1)
+
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const amount = settings.ranking_items_per_page
+
+    let players
+    let tribes
+
+    switch (category) {
+        case RANKING_CATEGORIES.players: {
+            players = await db.any(sql.stats.rankingPlayers, {worldId, offset, amount})
+            break
+        }
+        case RANKING_CATEGORIES.tribes: {
+            tribes = await db.any(sql.stats.rankingTribes, {worldId, offset, amount})
+            break
+        }
+    }
+
+    const categoryUpper = category[0].toUpperCase() + category.slice(1)
+
+    res.render('ranking', {
+        title: `${categoryUpper} Ranking - ${marketId}${worldNumber} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        worldName: world.name,
+        world,
+        tribes,
+        players,
+        category,
+        categoryUpper,
+        exportValues: {
+            marketId,
+            worldNumber
+        },
+        siteName: settings.site_name,
+        development,
+        ...utils.ejsHelpers
+    })
+}
+
+router.get('/:marketId/:worldNumber/ranking/:category?/', asyncRouter(routerRanking))
+router.get('/:marketId/:worldNumber/ranking/:category?/page/:page', asyncRouter(routerRanking))
 
 module.exports = router

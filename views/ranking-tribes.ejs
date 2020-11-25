@@ -1,0 +1,45 @@
+<table>
+    <colgroup>
+        <col width="50px">
+        <col width="*">
+        <col width="50px">
+        <col width="50px">
+        <% if (world.config.victory_points) { -%>
+            <col width="40px">
+        <% } -%>
+        <col width="50px">
+    </colgroup>
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Tribe</th>
+            <th>Members</th>
+            <th>Points</th>
+            <% if (world.config.victory_points) { -%>
+                <th title="Victory Points">VP</th>
+            <% } -%>
+            <th>Villages</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for (let tribe of tribes) { %>
+            <tr data-tribe-id="<%= tribe.id %>">
+                <td><%= tribe.rank %></td>
+                <td>
+                    <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
+                    <% if (tribe.rank < 4) { %>
+                        <div class="color"></div>
+                    <% } %>
+                </td>
+                <td><%= formatNumbers(tribe.members) %></td>
+                <td><%= formatNumbers(tribe.points) %></td>
+
+                <% if (world.config.victory_points) { -%>
+                    <td><%= formatNumbers(tribe.victory_points) %></td>
+                <% } -%>
+
+                <td><%= formatNumbers(tribe.villages) %></td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
