@@ -136,3 +136,20 @@ section {
 #players tr:hover td {
     background: #e0b47657;
 }
+
+.pagination {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0;
+    padding: 0px;
+}
+
+.pagination .page {
+    display: inline;
+    margin: 0px 3px;
+    padding: 1px 5px;
+}
+
+.pagination .current {
+    border: 1px solid black;
+}

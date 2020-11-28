@@ -301,6 +301,8 @@ const routerRanking = async function (req, res, next) {
         throw new Error('This ranking category does not exist')
     }
 
+    const categoryUpper = category[0].toUpperCase() + category.slice(1)
+
     const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
@@ -319,23 +321,36 @@ const routerRanking = async function (req, res, next) {
     const offset = settings.ranking_items_per_page * (page - 1)
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const amount = settings.ranking_items_per_page
+    const limit = settings.ranking_items_per_page
 
     let players
     let tribes
+    let total
 
     switch (category) {
         case RANKING_CATEGORIES.players: {
-            players = await db.any(sql.stats.rankingPlayers, {worldId, offset, amount})
+            players = await db.any(sql.stats.rankingPlayers, {worldId, offset, limit})
+            total = (await db.one(sql.stats.playerCount, {worldId})).count
             break
         }
         case RANKING_CATEGORIES.tribes: {
-            tribes = await db.any(sql.stats.rankingTribes, {worldId, offset, amount})
+            tribes = await db.any(sql.stats.rankingTribes, {worldId, offset, limit})
+            total = (await db.one(sql.stats.tribeCount, {worldId})).count
             break
         }
     }
 
-    const categoryUpper = category[0].toUpperCase() + category.slice(1)
+    const pagination = {}
+
+    pagination.current = page
+    pagination.last = Math.max(1, parseInt(Math.ceil(total / limit), 10))
+    pagination.start = Math.max(1, pagination.current - 3)
+    pagination.end = Math.min(pagination.last, pagination.current + 3)
+    pagination.showAllPages = pagination.last <= 7
+    pagination.showGotoLast = pagination.end < pagination.last
+    pagination.showGotoFirst = pagination.start > 1
+    pagination.showGotoNext = pagination.current < pagination.last
+    pagination.showGotoPrev = pagination.current > 1 && pagination.last > 1
 
     res.render('ranking', {
         title: `${categoryUpper} Ranking - ${marketId}${worldNumber} - ${settings.site_name}`,
@@ -347,6 +362,7 @@ const routerRanking = async function (req, res, next) {
         players,
         category,
         categoryUpper,
+        pagination,
         exportValues: {
             marketId,
             worldNumber

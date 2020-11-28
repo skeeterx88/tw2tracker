@@ -8,4 +8,4 @@ SELECT
     rank,
     villages
 FROM ${worldId:name}.tribes
-ORDER BY rank ASC LIMIT ${amount} OFFSET ${offset}
+ORDER BY rank ASC LIMIT ${limit} OFFSET ${offset}

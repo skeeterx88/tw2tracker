@@ -12,4 +12,4 @@ FROM ${worldId:name}.players
 LEFT OUTER JOIN ${worldId:name}.tribes
 ON (${worldId:name}.players.tribe_id = tribes.id)
 ORDER BY players.rank ASC
-LIMIT ${amount} OFFSET ${offset}
+LIMIT ${limit} OFFSET ${offset}
