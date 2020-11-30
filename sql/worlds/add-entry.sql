@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.tribes (
     villages INT,
     victory_points INT,
     rank INT,
-    creating_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    first_seen TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     members INT,
     level INT,
 
