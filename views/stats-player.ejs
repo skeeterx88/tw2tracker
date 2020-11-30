@@ -32,68 +32,70 @@
                     <section id="player">
                         <h2>Player profile</h2>
 
-                        <table>
-                            <colgroup>
-                                <col width="50%">
-                                <col width="50%">
-                            </colgroup>
-                            <tbody>
-                                <tr>
-                                    <td>Rank:</td>
-                                    <td><%= formatNumbers(player.rank) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Name:</td>
-                                    <td><%= player.name %></td>
-                                </tr>
-                                <tr>
-                                    <td>Tribe:</td>
-                                    <td>
-                                        <% if (tribe) { %>
-                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %> (<%= tribe.tag %>)</a>
-                                        <% } else { %>
-                                            No tribe
-                                        <% } %>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Villages:</td>
-                                    <td><%= formatNumbers(player.villages) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Points:</td>
-                                    <td><%= formatNumbers(player.points) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Bash Attack:</td>
-                                    <td><%= formatNumbers(player.bash_points_off) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Bash Defense:</td>
-                                    <td><%= formatNumbers(player.bash_points_def) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Average Points/Village:</td>
-                                    <td><%= formatNumbers(player.points_per_villages) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Village Conquers:</td>
-                                    <td>x (+y-z)</td>
-                                </tr>
-                                <tr>
-                                    <td>Best Rank:</td>
-                                    <td><%= formatNumbers(player.best_rank) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Most Points:</td>
-                                    <td><%= formatNumbers(player.best_points) %></td>
-                                </tr>
-                                <tr>
-                                    <td>Most Villages:</td>
-                                    <td><%= formatNumbers(player.best_villages) %></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="content-border">
+                            <table>
+                                <colgroup>
+                                    <col width="50%">
+                                    <col width="50%">
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <td>Rank:</td>
+                                        <td><%= formatNumbers(player.rank) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Name:</td>
+                                        <td><%= player.name %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tribe:</td>
+                                        <td>
+                                            <% if (tribe) { %>
+                                                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %> (<%= tribe.tag %>)</a>
+                                            <% } else { %>
+                                                No tribe
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Villages:</td>
+                                        <td><%= formatNumbers(player.villages) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Points:</td>
+                                        <td><%= formatNumbers(player.points) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bash Attack:</td>
+                                        <td><%= formatNumbers(player.bash_points_off) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bash Defense:</td>
+                                        <td><%= formatNumbers(player.bash_points_def) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Points/Village:</td>
+                                        <td><%= formatNumbers(player.points_per_villages) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Village Conquers:</td>
+                                        <td>x (+y-z)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Best Rank:</td>
+                                        <td><%= formatNumbers(player.best_rank) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Most Points:</td>
+                                        <td><%= formatNumbers(player.best_points) %></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Most Villages:</td>
+                                        <td><%= formatNumbers(player.best_villages) %></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div class="actions">
                             <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/history">View player history</a>

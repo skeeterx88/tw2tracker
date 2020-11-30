@@ -52,51 +52,53 @@
                     <section id="tribes">
                         <h2>Tribes</h2>
 
-                        <table>
-                            <colgroup>
-                                <col width="50px">
-                                <col width="*">
-                                <col width="50px">
-                                <col width="50px">
-                                <% if (world.config.victory_points) { -%>
-                                    <col width="40px">
-                                <% } -%>
-                                <col width="50px">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Tribe</th>
-                                    <th>Members</th>
-                                    <th>Points</th>
+                        <div class="content-border">
+                            <table>
+                                <colgroup>
+                                    <col width="50px">
+                                    <col width="*">
+                                    <col width="50px">
+                                    <col width="50px">
                                     <% if (world.config.victory_points) { -%>
-                                        <th title="Victory Points">VP</th>
+                                        <col width="40px">
                                     <% } -%>
-                                    <th>Villages</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (let tribe of tribes) { %>
-                                    <tr data-tribe-id="<%= tribe.id %>">
-                                        <td><%= tribe.rank %></td>
-                                        <td>
-                                            <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
-                                            <% if (tribe.rank < 4) { %>
-                                                <div class="color"></div>
-                                            <% } %>
-                                        </td>
-                                        <td><%= formatNumbers(tribe.members) %></td>
-                                        <td><%= formatNumbers(tribe.points) %></td>
-
+                                    <col width="50px">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Tribe</th>
+                                        <th>Members</th>
+                                        <th>Points</th>
                                         <% if (world.config.victory_points) { -%>
-                                            <td><%= formatNumbers(tribe.victory_points) %></td>
+                                            <th title="Victory Points">VP</th>
                                         <% } -%>
-
-                                        <td><%= formatNumbers(tribe.villages) %></td>
+                                        <th>Villages</th>
                                     </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <% for (let tribe of tribes) { %>
+                                        <tr data-tribe-id="<%= tribe.id %>">
+                                            <td><%= tribe.rank %></td>
+                                            <td>
+                                                <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
+                                                <% if (tribe.rank < 4) { %>
+                                                    <div class="color"></div>
+                                                <% } %>
+                                            </td>
+                                            <td><%= formatNumbers(tribe.members) %></td>
+                                            <td><%= formatNumbers(tribe.points) %></td>
+
+                                            <% if (world.config.victory_points) { -%>
+                                                <td><%= formatNumbers(tribe.victory_points) %></td>
+                                            <% } -%>
+
+                                            <td><%= formatNumbers(tribe.villages) %></td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div class="actions">
                             <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/tribes/">View complete tribes ranking</a>
@@ -106,52 +108,54 @@
                     <section id="players">
                         <h2>Players</h2>
 
-                        <table>
-                            <colgroup>
-                                <col width="50px">
-                                <col width="*">
-                                <col width="50px">
-                                <col width="50px">
-                                <% if (world.config.victory_points) { -%>
-                                    <col width="40px">
-                                <% } -%>
-                                <col width="50px">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Player</th>
-                                    <th>Tribe</th>
-                                    <th>Points</th>
+                        <div class="content-border">
+                            <table>
+                                <colgroup>
+                                    <col width="50px">
+                                    <col width="*">
+                                    <col width="50px">
+                                    <col width="50px">
                                     <% if (world.config.victory_points) { -%>
-                                        <th title="Victory Points">VP</th>
+                                        <col width="40px">
                                     <% } -%>
-                                    <th>Villages</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (let player of players) { %>
-                                    <tr data-player-id="<%= player.id %>">
-                                        <td><%= player.rank %></td>
-                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
-                                        
-                                        <% if (player.tribe_id) { -%>
-                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
-                                        <% } else { -%>
-                                            <td>-</td>
-                                        <% } -%>
-
-                                        <td><%= formatNumbers(player.points) %></td>
-
+                                    <col width="50px">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Player</th>
+                                        <th>Tribe</th>
+                                        <th>Points</th>
                                         <% if (world.config.victory_points) { -%>
-                                            <td><%= formatNumbers(player.victory_points) %></td>
+                                            <th title="Victory Points">VP</th>
                                         <% } -%>
-
-                                        <td><%= formatNumbers(player.villages) %></td>
+                                        <th>Villages</th>
                                     </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <% for (let player of players) { %>
+                                        <tr data-player-id="<%= player.id %>">
+                                            <td><%= player.rank %></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
+                                            
+                                            <% if (player.tribe_id) { -%>
+                                                <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
+                                            <% } else { -%>
+                                                <td>-</td>
+                                            <% } -%>
+
+                                            <td><%= formatNumbers(player.points) %></td>
+
+                                            <% if (world.config.victory_points) { -%>
+                                                <td><%= formatNumbers(player.victory_points) %></td>
+                                            <% } -%>
+
+                                            <td><%= formatNumbers(player.villages) %></td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
 
                         <div class="actions">
                             <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/players/">View complete players ranking</a>
@@ -161,20 +165,22 @@
                     <section>
                         <h2>Statistics</h2>
 
-                        <table>
-                            <tr>
-                                <td><%= formatNumbers(world.player_count) %> players</td>
-                                <td><a href="#">View player statistics</a></td>
-                            </tr>
-                            <tr>
-                                <td><%= formatNumbers(world.village_count) %> Villages</td>
-                                <td><a href="#">View village statistics</a></td>
-                            </tr>
-                            <tr>
-                                <td><%= formatNumbers(world.tribe_count) %> Tribes</td>
-                                <td><a href="#">View tribe statistics</a></td>
-                            </tr>
-                        </table>
+                        <div class="content-border">
+                            <table>
+                                <tr>
+                                    <td><%= formatNumbers(world.player_count) %> players</td>
+                                    <td><a href="#">View player statistics</a></td>
+                                </tr>
+                                <tr>
+                                    <td><%= formatNumbers(world.village_count) %> Villages</td>
+                                    <td><a href="#">View village statistics</a></td>
+                                </tr>
+                                <tr>
+                                    <td><%= formatNumbers(world.tribe_count) %> Tribes</td>
+                                    <td><a href="#">View tribe statistics</a></td>
+                                </tr>
+                            </table>
+                        </div>
                     </section>
                 </div>
 

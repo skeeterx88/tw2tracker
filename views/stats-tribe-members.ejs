@@ -34,38 +34,40 @@
                     <section id="players">
                         <h2>Tribe Members</h2>
 
-                        <table>
-                            <colgroup>
-                                <col width="5%">
-                                <col width="*">
-                                <col width="10%">
-                                <col width="10%">
-                            </colgroup>
+                        <div class="content-border">
+                            <table>
+                                <colgroup>
+                                    <col width="5%">
+                                    <col width="*">
+                                    <col width="10%">
+                                    <col width="10%">
+                                </colgroup>
 
-                            <thead>
-                                <th>Rank</th>
-                                <th>Name</th>
-                                <th>Points</th>
-                                <th>Villages</th>
-                            </thead>
+                                <thead>
+                                    <th>Rank</th>
+                                    <th>Name</th>
+                                    <th>Points</th>
+                                    <th>Villages</th>
+                                </thead>
 
-                            <tbody>
-                                <% if (!members.length) { %>
-                                    <tr>
-                                        <td colspan="*">This triba does not have any members</td>
-                                    </tr>
-                                <% } %>
+                                <tbody>
+                                    <% if (!members.length) { %>
+                                        <tr>
+                                            <td colspan="*">This triba does not have any members</td>
+                                        </tr>
+                                    <% } %>
 
-                                <% for (let member of members) { %>
-                                    <tr data-player-id="<%= member.id %>">
-                                        <td><%= formatNumbers(member.rank) %></td>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
-                                        <td><%= formatNumbers(member.points) %></td>
-                                        <td><%= formatNumbers(member.villages) %></td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
+                                    <% for (let member of members) { %>
+                                        <tr data-player-id="<%= member.id %>">
+                                            <td><%= formatNumbers(member.rank) %></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
+                                            <td><%= formatNumbers(member.points) %></td>
+                                            <td><%= formatNumbers(member.villages) %></td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                 </div>
 
