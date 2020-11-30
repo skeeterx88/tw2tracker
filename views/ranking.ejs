@@ -29,32 +29,7 @@
             <div class="content">
                 <div class="single">
                     <%- include('ranking-' + category + '.ejs') %>
-
-                    <ul class="pagination">
-                        <% if (pagination.showGotoFirst) { -%>
-                            <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/">&lt;&lt;&lt; First</a></li>
-                        <% } -%>
-
-                        <% if (pagination.showGotoPrev) { -%>
-                            <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= (pagination.current - 1) %>">&lt; Previous</a></li>
-                        <% } -%>
-
-                        <% for (let i = pagination.start; i <= pagination.end; i++) { -%>
-                            <% if (i === pagination.current) { -%>
-                                <li class="page current"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= i %>"><%= i %></a></li>
-                            <% } else { -%>
-                                <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= i %>"><%= i %></a></li>
-                            <% } -%>
-                        <% } -%>
-
-                        <% if (pagination.showGotoNext) { -%>
-                            <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= (pagination.current + 1) %>">Next &gt;</a></li>
-                        <% } -%>
-
-                        <% if (pagination.showGotoLast) { -%>
-                            <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= pagination.last %>">Last &gt;&gt;&gt;</a></li>
-                        <% } -%>
-                    </ul>
+                    <%- include('pagination.ejs') %>
                 </div>
             </div>
         </main>

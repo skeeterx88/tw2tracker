@@ -330,27 +330,17 @@ const routerRanking = async function (req, res, next) {
     switch (category) {
         case RANKING_CATEGORIES.players: {
             players = await db.any(sql.stats.rankingPlayers, {worldId, offset, limit})
-            total = (await db.one(sql.stats.playerCount, {worldId})).count
+            total = parseInt((await db.one(sql.stats.playerCount, {worldId})).count, 10)
             break
         }
         case RANKING_CATEGORIES.tribes: {
             tribes = await db.any(sql.stats.rankingTribes, {worldId, offset, limit})
-            total = (await db.one(sql.stats.tribeCount, {worldId})).count
+            total = parseInt((await db.one(sql.stats.tribeCount, {worldId})).count, 10)
             break
         }
     }
 
-    const pagination = {}
-
-    pagination.current = page
-    pagination.last = Math.max(1, parseInt(Math.ceil(total / limit), 10))
-    pagination.start = Math.max(1, pagination.current - 3)
-    pagination.end = Math.min(pagination.last, pagination.current + 3)
-    pagination.showAllPages = pagination.last <= 7
-    pagination.showGotoLast = pagination.end < pagination.last
-    pagination.showGotoFirst = pagination.start > 1
-    pagination.showGotoNext = pagination.current < pagination.last
-    pagination.showGotoPrev = pagination.current > 1 && pagination.last > 1
+    console.log(utils.createPagination(page, total, limit))
 
     res.render('ranking', {
         title: `${categoryUpper} Ranking - ${marketId}${worldNumber} - ${settings.site_name}`,
@@ -362,7 +352,7 @@ const routerRanking = async function (req, res, next) {
         players,
         category,
         categoryUpper,
-        pagination,
+        pagination: utils.createPagination(page, total, limit),
         exportValues: {
             marketId,
             worldNumber
