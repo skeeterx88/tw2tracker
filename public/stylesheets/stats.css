@@ -138,18 +138,19 @@ section {
 }
 
 .pagination {
+    background: #ab80455e;
     width: 100%;
     text-align: center;
-    margin: 10px 0;
-    padding: 0px;
+    margin: 10px 0px;
+    padding: 3px 0px;
 }
 
 .pagination .page {
-    display: inline;
     margin: 0px 3px;
-    padding: 1px 5px;
+    padding: 3px 5px;
 }
 
 .pagination .current {
-    border: 1px solid black;
+    background: #a276384f;
+    border-radius: 3px;
 }

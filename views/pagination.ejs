@@ -1,25 +1,51 @@
-<ul class="pagination">
+<table class="pagination content-border">
+    <colgroup>
+        <col width="100px">
+        <col width="100px">
+        <col width="*">
+        <col width="100px">
+        <col width="100px">
+    </colgroup>
+
     <% if (pagination.showGotoFirst) { -%>
-        <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/">&lt;&lt;&lt; First</a></li>
+        <td>
+            <a class="page" href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/">&lt;&lt;&lt; First</a>
+        </td>
+    <% } else { -%>
+        <td></td>
     <% } -%>
 
     <% if (pagination.showGotoPrev) { -%>
-        <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= (pagination.current - 1) %>">&lt; Previous</a></li>
+        <td>
+            <a class="page" href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= (pagination.current - 1) %>">&lt; Previous</a>
+        </td>
+    <% } else { -%>
+        <td></td>
     <% } -%>
 
-    <% for (let i = pagination.start; i <= pagination.end; i++) { -%>
-        <% if (i === pagination.current) { -%>
-            <li class="page current"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= i %>"><%= i %></a></li>
-        <% } else { -%>
-            <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= i %>"><%= i %></a></li>
+    <td>
+        <% for (let i = pagination.start; i <= pagination.end; i++) { -%>
+            <% if (i === pagination.current) { -%>
+                <span class="page current"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= i %>"><%= i %></a></span>
+            <% } else { -%>
+                <a class="page" href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= i %>"><%= i %></a>
+            <% } -%>
         <% } -%>
-    <% } -%>
+    </td>
 
     <% if (pagination.showGotoNext) { -%>
-        <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= (pagination.current + 1) %>">Next &gt;</a></li>
+        <td>
+            <a class="page" href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= (pagination.current + 1) %>">Next &gt;</a>
+        </td>
+    <% } else { -%>
+        <td></td>
     <% } -%>
 
     <% if (pagination.showGotoLast) { -%>
-        <li class="page"><a href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= pagination.last %>">Last &gt;&gt;&gt;</a></li>
+        <td>
+            <a class="page" href="/stats/<%= marketId %>/<%= world.num %>/ranking/<%= category %>/page/<%= pagination.last %>">Last &gt;&gt;&gt;</a>
+        </td>
+    <% } else { -%>
+        <td></td>
     <% } -%>
-</ul>
+</table>
