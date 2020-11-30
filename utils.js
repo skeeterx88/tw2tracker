@@ -191,6 +191,25 @@ const ejsHelpers = {
         return typeof value === 'number'
             ? value.toLocaleString('pt-BR')
             : value
+    },
+    formatDate: function (dateObject) {
+        if (dateObject instanceof Date) {
+            const date = [
+                dateObject.getFullYear(),
+                dateObject.getMonth() + 1,
+                dateObject.getDate()
+            ]
+
+            const time = [
+                dateObject.getHours(),
+                dateObject.getMinutes(),
+                dateObject.getSeconds()
+            ]
+
+            return date.join('/') + ' ' + time.join(':')
+        } else {
+            throw new Error('formatDate: dateObject is not of type Date')
+        }
     }
 }
 
