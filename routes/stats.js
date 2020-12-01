@@ -330,12 +330,14 @@ const routerRanking = async function (req, res, next) {
     switch (category) {
         case RANKING_CATEGORIES.players: {
             players = await db.any(sql.stats.rankingPlayers, {worldId, offset, limit})
-            total = parseInt((await db.one(sql.stats.playerCount, {worldId})).count, 10)
+            total = await db.one(sql.stats.playerCount, {worldId})
+            total = parseInt(total.count, 10)
             break
         }
         case RANKING_CATEGORIES.tribes: {
             tribes = await db.any(sql.stats.rankingTribes, {worldId, offset, limit})
-            total = parseInt((await db.one(sql.stats.tribeCount, {worldId})).count, 10)
+            total = await db.one(sql.stats.tribeCount, {worldId})
+            total = parseInt(total.count, 10)
             break
         }
     }
