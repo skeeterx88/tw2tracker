@@ -23,7 +23,7 @@
                 <a href="/"><%= siteName %></a> /
                 Server <a href="/stats/<%= marketId %>/"><%= marketId.toUpperCase() %></a> /
                 World <a href="/stats/<%= marketId %>/<%= world.num %>/"><%= world.name %></a><%= world.open ? '' : ' (Closed)' %> /
-                <%= categoryUpper %>
+                <%= capitalize(category) %>
             </h1>
 
             <div class="content">

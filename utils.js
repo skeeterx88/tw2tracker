@@ -186,6 +186,12 @@ const timeout = function (handler, time, errorMessage) {
 
 const hasOwn = Object.prototype.hasOwnProperty
 
+const capitalize = function (value) {
+    return typeof value === 'string'
+        ? value.charAt(0).toUpperCase() + value.slice(1)
+        : value
+}
+
 const ejsHelpers = {
     formatNumbers: function (value) {
         return typeof value === 'number'
@@ -210,7 +216,8 @@ const ejsHelpers = {
         } else {
             throw new Error('formatDate: dateObject is not of type Date')
         }
-    }
+    },
+    capitalize
 }
 
 const createPagination = function (current, total, limit) {
@@ -259,5 +266,6 @@ module.exports = {
     timeout,
     hasOwn,
     ejsHelpers,
-    createPagination
+    createPagination,
+    capitalize
 }

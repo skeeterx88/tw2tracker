@@ -301,8 +301,6 @@ const routerRanking = async function (req, res, next) {
         throw new Error('This ranking category does not exist')
     }
 
-    const categoryUpper = category[0].toUpperCase() + category.slice(1)
-
     const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
@@ -343,7 +341,7 @@ const routerRanking = async function (req, res, next) {
     }
 
     res.render('ranking', {
-        title: `${categoryUpper} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `${utils.capitalize(category)} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: world.name,
@@ -351,7 +349,6 @@ const routerRanking = async function (req, res, next) {
         tribes,
         players,
         category,
-        categoryUpper,
         pagination: utils.createPagination(page, total, limit),
         exportValues: {
             marketId,
