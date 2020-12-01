@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
+const createError = require('http-errors')
 const router = express.Router()
 const utils = require('../utils')
 const {asyncRouter} = utils
@@ -48,13 +49,11 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     try {
         await fs.promises.access(path.join('.', 'data', worldId, 'info'))
     } catch (error) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     if (!await utils.schemaExists(worldId)) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
@@ -89,8 +88,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
     const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
@@ -99,8 +97,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
     try {
         mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
     } catch (error) {
-        res.status(404)
-        throw new Error('This map share does not exist')
+        throw createError(404, 'This map share does not exist')
     }
 
     mapShare.creation_date = new Date(mapShare.creation_date).getTime()
@@ -132,8 +129,7 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async fu
     const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('World does not exist')
+        throw createError(404, 'World does not exist')
     }
 
     let dataPath
@@ -149,8 +145,7 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async fu
     try {
         await fs.promises.access(dataPath)
     } catch (error) {
-        res.status(500)
-        throw new Error('Share data not found')
+        throw createError(500, 'Share data not found')
     }
 
     const ifNoneMatchValue = req.headers['if-none-match']
@@ -193,13 +188,11 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
     const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('World does not exist')
+        throw createError(404, 'World does not exist')
     }
 
     if (continentId < 0 || continentId > 99 || isNaN(continentId)) {
-        res.status(400)
-        throw new Error('Invalid continent')
+        throw createError(400, 'Invalid continent')
     }
 
     let dataPath
@@ -255,8 +248,7 @@ router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req
     const worldExists = await utils.schemaExists(marketId + worldNumber)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('World does not exist')
+        throw createError(404, 'World does not exist')
     }
 
     const structPath = path.join('.', 'data', worldId, 'struct')
@@ -264,8 +256,7 @@ router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req
     try {
         await fs.promises.access(structPath)
     } catch (error) {
-        res.status(500)
-        throw new Error('Struct data not found')
+        throw createError(500, 'Struct data not found')
     }
 
     const ifNoneMatchValue = req.headers['if-none-match']

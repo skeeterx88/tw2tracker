@@ -1,4 +1,5 @@
 const express = require('express')
+const createError = require('http-errors')
 const router = express.Router()
 const {db,pgp} = require('../db')
 const sql = require('../sql')
@@ -29,8 +30,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
@@ -72,8 +72,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     let tribe
@@ -81,17 +80,16 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     try {
         tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
     } catch (error) {
-        res.status(404)
-        throw new Error('This tribe does not exist')
+        throw createError(404, 'This tribe does not exist')
     }
 
-    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     res.render('stats-tribe', {
         title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        worldName: worldInfo.name,
+        worldName: world.name,
         tribe,
         exportValues: {
             marketId,
@@ -119,8 +117,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
     const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     let tribe
@@ -128,8 +125,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
     try {
         tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
     } catch (error) {
-        res.status(404)
-        throw new Error('This tribe does not exist')
+        throw createError(404, 'This tribe does not exist')
     }
 
     const members = await db.any(sql.worlds.tribeMembers, {worldId, tribeId})
@@ -168,8 +164,7 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
     const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     let player
@@ -177,11 +172,10 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
     try {
         player = await db.one(sql.worlds.player, {worldId, playerId})
     } catch (error) {
-        res.status(404)
-        throw new Error('This player does not exist')
+        throw createError(404, 'This player does not exist')
     }
 
-    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     let tribe = false
 
@@ -193,7 +187,7 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        worldName: worldInfo.name,
+        worldName: world.name,
         player,
         tribe,
         exportValues: {
@@ -216,8 +210,7 @@ router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, 
     const category = (req.body.category || '').toLowerCase()
 
     if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
-        res.status(404)
-        throw new Error('This search category does not exist')
+        throw createError(404, 'This search category does not exist')
     }
 
     const marketId = req.params.marketId
@@ -245,26 +238,22 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
     const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
     const rawQuery = req.body.query
 
     if (!rawQuery) {
-        res.status(500)
-        throw new Error('No search specified')
+        throw createError(500, 'No search specified')
     }
 
     if (rawQuery.length < 3) {
-        res.status(500)
-        throw new Error('Minimum search characters is 3')
+        throw createError(500, 'Minimum search characters is 3')
     }
 
     if (rawQuery.length > 20) {
-        res.status(500)
-        throw new Error('Maximum search characters is 20')
+        throw createError(500, 'Maximum search characters is 20')
     }
 
     const query = '%' + rawQuery + '%'
@@ -297,8 +286,7 @@ const routerRanking = async function (req, res, next) {
     const category = req.params.category
 
     if (!hasOwn.call(RANKING_CATEGORIES, category)) {
-        res.status(404)
-        throw new Error('This ranking category does not exist')
+        throw createError(404, 'This ranking category does not exist')
     }
 
     const settings = await getSettings()
@@ -309,8 +297,7 @@ const routerRanking = async function (req, res, next) {
     const worldExists = await utils.schemaExists(worldId)
 
     if (!worldExists) {
-        res.status(404)
-        throw new Error('This world does not exist')
+        throw createError(404, 'This world does not exist')
     }
 
     const page = req.params.page && !isNaN(req.params.page)
