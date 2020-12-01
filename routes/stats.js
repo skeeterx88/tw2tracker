@@ -340,8 +340,6 @@ const routerRanking = async function (req, res, next) {
         }
     }
 
-    console.log(utils.createPagination(page, total, limit))
-
     res.render('ranking', {
         title: `${categoryUpper} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
