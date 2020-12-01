@@ -38,7 +38,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const tribes = await db.any(sql.stats.worldTopTribes, {worldId})
 
     res.render('stats', {
-        title: `Stats ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         siteName: settings.site_name,
@@ -88,7 +88,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     res.render('stats-tribe', {
-        title: `Tribe ${tribe.tag} - ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: worldInfo.name,
@@ -136,7 +136,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     res.render('stats-tribe-members', {
-        title: `Tribe ${tribe.tag} - ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         world,
@@ -190,7 +190,7 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
     }
 
     res.render('stats-player', {
-        title: `Player ${player.name} - ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: worldInfo.name,
@@ -271,7 +271,7 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
     const results = await db.any(sql.stats.search[category], {worldId, query})
 
     return res.render('world-search', {
-        title: `Search "${rawQuery}" - ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         world,
@@ -343,7 +343,7 @@ const routerRanking = async function (req, res, next) {
     console.log(utils.createPagination(page, total, limit))
 
     res.render('ranking', {
-        title: `${categoryUpper} Ranking - ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `${categoryUpper} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: world.name,
