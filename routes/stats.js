@@ -336,7 +336,7 @@ const routerRanking = async function (req, res, next) {
         tribes,
         players,
         category,
-        pagination: utils.createPagination(page, total, limit),
+        pagination: utils.createPagination(page, total, limit, req.path),
         exportValues: {
             marketId,
             worldNumber
