@@ -202,6 +202,55 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
     })
 }))
 
+router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const playerId = parseInt(req.params.playerId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    let player
+    let villages
+
+    try {
+        player = await db.one(sql.worlds.player, {worldId, playerId})
+        villages = await db.any(sql.worlds.playerVillages, {worldId, playerId})
+    } catch (error) {
+        throw createError(404, 'This player does not exist')
+    }
+
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+
+    res.render('stats-player-villages', {
+        title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        worldName: world.name,
+        world,
+        player,
+        villages,
+        exportValues: {
+            marketId,
+            worldNumber,
+            player,
+            mapHighlights: [player]
+        },
+        siteName: settings.site_name,
+        development,
+        ...utils.ejsHelpers
+    })
+}))
+
 router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
