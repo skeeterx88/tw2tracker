@@ -207,6 +207,7 @@ router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, 
         return next()
     }
 
+    const rawQuery = encodeURIComponent(req.body.query)
     const category = (req.body.category || '').toLowerCase()
 
     if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
@@ -216,10 +217,23 @@ router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, 
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
 
-    return res.redirect(307, `/stats/${marketId}/${worldNumber}/search/${category}`);
+    return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
 }))
 
-router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async function (req, res, next) {
+router.get('/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    return res.redirect(302, `/stats/${marketId}/${worldNumber}`);
+}))
+
+const routerSearch = async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -241,8 +255,12 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
         throw createError(404, 'This world does not exist')
     }
 
+    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
+    const limit = settings.ranking_items_per_page
+    const offset = limit * (page - 1)
+
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const rawQuery = req.body.query
+    const rawQuery = decodeURIComponent(req.params.query)
 
     if (!rawQuery) {
         throw createError(500, 'No search specified')
@@ -257,7 +275,9 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
     }
 
     const query = '%' + rawQuery + '%'
-    const results = await db.any(sql.stats.search[category], {worldId, query})
+    const allResults = await db.any(sql.stats.search[category], {worldId, query})
+    const results = allResults.slice(offset, offset + limit)
+    const total = allResults.length
 
     return res.render('world-search', {
         title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -268,6 +288,7 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
         category,
         results,
         resultsCount: results.length,
+        pagination: utils.createPagination(page, total, limit, req.path),
         exportValues: {
             marketId,
             worldNumber
@@ -276,7 +297,10 @@ router.post('/:marketId/:worldNumber/search/:category/', asyncRouter(async funct
         development,
         ...utils.ejsHelpers
     })
-}))
+}
+
+router.get('/:marketId/:worldNumber/search/:category/:query', asyncRouter(routerSearch))
+router.get('/:marketId/:worldNumber/search/:category/:query/page/:page', asyncRouter(routerSearch))
 
 const routerRanking = async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
