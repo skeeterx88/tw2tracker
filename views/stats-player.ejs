@@ -33,22 +33,22 @@
                         <h2>Player profile</h2>
 
                         <div class="content-border">
-                            <table>
+                            <table class="vertical">
                                 <colgroup>
                                     <col width="50%">
                                     <col width="50%">
                                 </colgroup>
                                 <tbody>
                                     <tr>
-                                        <td>Rank:</td>
+                                        <th>Rank:</th>
                                         <td><%= formatNumbers(player.rank) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Name:</td>
+                                        <th>Name:</th>
                                         <td><%= player.name %></td>
                                     </tr>
                                     <tr>
-                                        <td>Tribe:</td>
+                                        <th>Tribe:</th>
                                         <td>
                                             <% if (tribe) { %>
                                                 <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %> (<%= tribe.tag %>)</a>
@@ -58,40 +58,40 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Villages:</td>
+                                        <th>Villages:</th>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/villages"><%= formatNumbers(player.villages) %></a></td>
                                     </tr>
                                     <tr>
-                                        <td>Points:</td>
+                                        <th>Points:</th>
                                         <td><%= formatNumbers(player.points) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Bash Attack:</td>
+                                        <th>Bash Attack:</th>
                                         <td><%= formatNumbers(player.bash_points_off) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Bash Defense:</td>
+                                        <th>Bash Defense:</th>
                                         <td><%= formatNumbers(player.bash_points_def) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Average Points/Village:</td>
+                                        <th>Average Points/Village:</th>
                                         <td><%= formatNumbers(player.points_per_villages) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Village Conquers:</td>
+                                        <th>Village Conquers:</th>
                                         <td>x (+y-z)</td>
                                     </tr>
                                     <tr>
-                                        <td>Best Rank:</td>
                                         <td><%= formatNumbers(player.best_rank) %></td>
+                                        <th>Best Rank:</th>
                                     </tr>
                                     <tr>
-                                        <td>Most Points:</td>
                                         <td><%= formatNumbers(player.best_points) %></td>
+                                        <th>Most Points:</th>
                                     </tr>
                                     <tr>
-                                        <td>Most Villages:</td>
                                         <td><%= formatNumbers(player.best_villages) %></td>
+                                        <th>Most Villages:</th>
                                     </tr>
                                 </tbody>
                             </table>

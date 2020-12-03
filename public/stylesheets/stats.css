@@ -74,6 +74,23 @@ section .actions {
     margin: 12px 0px;
 }
 
+table small {
+    padding: 2px 0px;
+}
+
+table.vertical th,
+table.vertical td {
+    text-align: left;
+}
+
+.right {
+    float: right;
+}
+
+table.vertical th {
+    background: #ab804521;
+}
+
 th {
     background: #ab80455e;
 }
