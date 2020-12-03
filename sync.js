@@ -645,15 +645,15 @@ const commitDataDatabase = async function (data, worldId) {
 
             const [best_rank, best_points, best_villages] = playersBestValues.get(character_id) || []
 
-            if (!best_rank || player.rank > best_rank) {
+            if (!best_rank || player.rank >= best_rank) {
                 this.none(sql.worlds.update.playerBestRank, {worldId, rank: player.rank, character_id})
             }
-            
-            if (!best_points || player.points > best_points) {
+
+            if (!best_points || player.points >= best_points) {
                 this.none(sql.worlds.update.playerBestPoints, {worldId, points: player.points, character_id})
             }
 
-            if (!best_villages || player.villages > best_villages) {
+            if (!best_villages || player.villages >= best_villages) {
                 this.none(sql.worlds.update.playerBestVillages, {worldId, villages: player.villages, character_id})
             }
         }
