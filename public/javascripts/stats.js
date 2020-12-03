@@ -25,7 +25,7 @@
 
         await loader.loadInfo
 
-        const highlightType = STATS_PAGE === 'player'
+        const highlightType = STATS_PAGE === 'player' || STATS_PAGE === 'player-villages'
             ? TW2Map.highlightTypes.PLAYERS
             : TW2Map.highlightTypes.TRIBES
 
