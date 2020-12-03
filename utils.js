@@ -202,14 +202,14 @@ const ejsHelpers = {
         if (dateObject instanceof Date) {
             const date = [
                 dateObject.getFullYear(),
-                dateObject.getMonth() + 1,
-                dateObject.getDate()
+                (dateObject.getMonth() + 1).toString().padStart(2, 0),
+                dateObject.getDate().toString().padStart(2, 0)
             ]
 
             const time = [
-                dateObject.getHours(),
-                dateObject.getMinutes(),
-                dateObject.getSeconds()
+                dateObject.getHours().toString().padStart(2, 0),
+                dateObject.getMinutes().toString().padStart(2, 0),
+                dateObject.getSeconds().toString().padStart(2, 0)
             ]
 
             return date.join('/') + ' ' + time.join(':')
