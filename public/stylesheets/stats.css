@@ -150,3 +150,8 @@ table.quick-highlight tbody tr:hover td {
     background: #a276384f;
     border-radius: 3px;
 }
+
+.world-map {
+    position: sticky;
+    top: 0;
+}
