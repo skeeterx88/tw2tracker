@@ -75,3 +75,22 @@ const formatSince = (date) => {
 
     return format
 }
+
+const averageCoords = (coords) => {
+    let averageX = 0
+    let averageY = 0
+
+    coords = coords.filter(function (coord) {
+        return coord
+    })
+
+    for (let [x, y] of coords) {
+        averageX += parseInt(x, 10)
+        averageY += parseInt(y, 10)
+    }
+
+    averageX = Math.floor(averageX / coords.length)
+    averageY = Math.floor(averageY / coords.length)
+
+    return [averageX, averageY]
+}
