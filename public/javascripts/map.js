@@ -974,6 +974,15 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 villages = loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat()
                 break
             }
+            case TW2Map.highlightTypes.VILLAGES: {
+                if (!hasOwn.call(loader.villagesById, id)) {
+                    return false
+                }
+
+                const village = loader.villagesById[id]
+                villages = [[village.x, village.y]]
+                break
+            }
         }
 
         villages = villages.filter(playerVillages => typeof playerVillages !== 'undefined')
@@ -1117,7 +1126,8 @@ TW2Map.mapShareTypes = {
 
 TW2Map.highlightTypes = {
     PLAYERS: 'players',
-    TRIBES: 'tribes'
+    TRIBES: 'tribes',
+    VILLAGES: 'villages'
 }
 
 TW2Map.INITIAL_SETUP = 'initial_setup'
@@ -1135,6 +1145,7 @@ const TW2DataLoader = function (marketId, worldNumber) {
     this.tribePlayers = {}
     this.continents = {}
     this.provinces = []
+    this.villagesById = {}
     this.villages = {}
     this.villages.x = {}
     this.struct = false
@@ -1151,6 +1162,16 @@ const TW2DataLoader = function (marketId, worldNumber) {
 
                 let village = this.villages[x][y]
                 let character_id = village[3]
+
+                this.villagesById[village[0]] = {
+                    x,
+                    y,
+                    id: village[0],
+                    name: village[1],
+                    points: village[2],
+                    character_id: village[3],
+                    province_id: village[4],
+                }
 
                 if (character_id) {
                     if (character_id in this.playerVillages) {
