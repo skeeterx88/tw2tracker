@@ -34,17 +34,20 @@
                         <colgroup>
                             <col width="*">
                             <col width="100px">
+                            <col width="100px">
                         </colgroup>
                         <thead>
                             <tr>
                                 <th>Name</th>
+                                <th>Coords</th>
                                 <th>Points</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% for (let village of villages) { %>
                                 <tr>
-                                    <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %> (<%= village.x + '|' + village.y %>)</a></td>
+                                    <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
+                                    <td><%= village.x + '|' + village.y %></td>
                                     <td><%= formatNumbers(village.points) %></td>
                                 </tr>
                             <% } %>
