@@ -35,30 +35,16 @@
     }
 
     const setupQuickHighlight = async () => {
-        const $players = document.querySelectorAll('#players tbody tr')
+        const $highlightRows = document.querySelectorAll('.quick-highlight tbody tr')
 
-        for (let $player of $players) {
-            $player.addEventListener('mouseenter', () => {
-                map.quickHighlight(TW2Map.highlightTypes.PLAYERS, parseInt($player.dataset.playerId, 10))
+        for (let $row of $highlightRows) {
+            $row.addEventListener('mouseenter', () => {
+                map.quickHighlight($row.dataset.highlightType, parseInt($row.dataset.id, 10))
             })
 
-            $player.addEventListener('mouseleave', () => {
+            $row.addEventListener('mouseleave', () => {
                 map.quickHighlightOff()
             })
-        }
-
-        if (STATS_PAGE === 'home') {
-            const $tribes = document.querySelectorAll('#tribes tbody tr')
-            
-            for (let $tribe of $tribes) {
-                $tribe.addEventListener('mouseenter', () => {
-                    map.quickHighlight(TW2Map.highlightTypes.TRIBES, parseInt($tribe.dataset.tribeId, 10))
-                })
-
-                $tribe.addEventListener('mouseleave', () => {
-                    map.quickHighlightOff()
-                })
-            }
         }
     }
 
@@ -121,5 +107,8 @@
         setupMapPreview()
     } else if (STATS_PAGE === 'player') {
         setupMapPreview()
+    } else if (STATS_PAGE === 'player-villages') {
+        setupMapPreview()
+        setupQuickHighlight()
     }
 })();

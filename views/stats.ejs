@@ -53,7 +53,7 @@
                         <h2>Tribes</h2>
 
                         <div class="content-border">
-                            <table>
+                            <table class="quick-highlight">
                                 <colgroup>
                                     <col width="50px">
                                     <col width="*">
@@ -78,7 +78,7 @@
                                 </thead>
                                 <tbody>
                                     <% for (let tribe of tribes) { %>
-                                        <tr data-tribe-id="<%= tribe.id %>">
+                                        <tr data-id="<%= tribe.id %>" data-highlight-type="tribes">
                                             <td><%= tribe.rank %></td>
                                             <td>
                                                 <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
@@ -109,7 +109,7 @@
                         <h2>Players</h2>
 
                         <div class="content-border">
-                            <table>
+                            <table class="quick-highlight">
                                 <colgroup>
                                     <col width="50px">
                                     <col width="*">
@@ -134,7 +134,7 @@
                                 </thead>
                                 <tbody>
                                     <% for (let player of players) { %>
-                                        <tr data-player-id="<%= player.id %>">
+                                        <tr data-id="<%= player.id %>" data-highlight-type="players">
                                             <td><%= player.rank %></td>
                                             <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
                                             
