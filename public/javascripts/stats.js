@@ -117,8 +117,6 @@
             })
         }
 
-        selectCategory(SEARCH_CATEGORIES.players)
-
         $form.addEventListener('submit', function (event) {
             const length = $searchInput.value.length
 
