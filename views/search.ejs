@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('includes/head-stats.ejs') %>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <%- include('includes/navigation.ejs') %>
+
+            <div class="content">
+                <div class="single">
+                    <section id="search" class="content-border">
+                        <% if (!resultsCount) { %>
+                            <h3>No results</h3>
+                            <a href="/stats/<%= marketId %>/<%= world.num %>/">Go back</a>
+                        <% } else { %>
+                            <%- include('search/' + category + '.ejs') %>
+                            <%- include('includes/pagination.ejs') %>
+                        <% } %>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
+        <script type="text/javascript" src="/javascripts/utils.js"></script>
+    </body>
+</html>
