@@ -985,6 +985,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         }
 
+        if (!villages) {
+            return false
+        }
+
         villages = villages.filter(playerVillages => typeof playerVillages !== 'undefined')
 
         if (!villages.length) {
