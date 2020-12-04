@@ -150,6 +150,10 @@
         setupMapPreview()
         setupQuickHighlight()
         setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
+    } else if (STATS_PAGE === 'tribe-villages') {
+        setupMapPreview()
+        setupQuickHighlight()
+        setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
     } else if (STATS_PAGE === 'tribe') {
         setupMapPreview()
         setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)

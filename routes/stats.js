@@ -150,6 +150,64 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
     })
 }))
 
+const tribeVillagesRouter = async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const tribeId = parseInt(req.params.tribeId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
+    const limit = settings.ranking_items_per_page
+    const offset = limit * (page - 1)
+
+    let tribe
+
+    try {
+        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
+    } catch (error) {
+        throw createError(404, 'This tribe does not exist')
+    }
+
+    const allVillages = await db.any(sql.worlds.tribeVillages, {worldId, tribeId})
+    const villages = allVillages.slice(offset, offset + limit)
+    const total = allVillages.length
+
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+
+    res.render('stats-tribe-villages', {
+        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        tribe,
+        villages,
+        pagination: utils.createPagination(page, total, limit, req.path),
+        exportValues: {
+            marketId,
+            worldNumber,
+            tribe,
+            mapHighlights: [tribe]
+        },
+        siteName: settings.site_name,
+        development,
+        ...utils.ejsHelpers
+    })
+}
+
+router.get('/:marketId/:worldNumber/tribes/:tribeId/villages', asyncRouter(tribeVillagesRouter))
+router.get('/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', asyncRouter(tribeVillagesRouter))
+
 router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
