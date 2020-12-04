@@ -35,7 +35,7 @@
                         <h2>Tribe Members</h2>
 
                         <div class="content-border">
-                            <table>
+                            <table class="quick-highlight">
                                 <colgroup>
                                     <col width="5%">
                                     <col width="*">
@@ -58,7 +58,7 @@
                                     <% } %>
 
                                     <% for (let member of members) { %>
-                                        <tr data-player-id="<%= member.id %>">
+                                        <tr data-id="<%= member.id %>" data-highlight-type="players">
                                             <td><%= formatNumbers(member.rank) %></td>
                                             <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
                                             <td><%= formatNumbers(member.points) %></td>
