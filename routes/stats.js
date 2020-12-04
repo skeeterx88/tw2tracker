@@ -56,7 +56,8 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
             worldNumber,
             players,
             tribes,
-            mapHighlights: tribes.slice(0, 3)
+            mapHighlights: tribes.slice(0, 3),
+            mapHighlightsType: 'tribes'
         },
         ...utils.ejsHelpers
     })
@@ -106,7 +107,8 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
             marketId,
             worldNumber,
             tribe,
-            mapHighlights: [tribe]
+            mapHighlights: [tribe],
+            mapHighlightsType: 'tribes'
         },
         siteName: settings.site_name,
         development,
@@ -160,7 +162,8 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
             marketId,
             worldNumber,
             tribe,
-            mapHighlights: [tribe]
+            mapHighlights: [tribe],
+            mapHighlightsType: 'tribes'
         },
         siteName: settings.site_name,
         development,
@@ -222,7 +225,8 @@ const tribeVillagesRouter = async function (req, res, next) {
             marketId,
             worldNumber,
             tribe,
-            mapHighlights: [tribe]
+            mapHighlights: [tribe],
+            mapHighlightsType: 'tribes'
         },
         siteName: settings.site_name,
         development,
@@ -283,7 +287,8 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
             marketId,
             worldNumber,
             player,
-            mapHighlights: [player]
+            mapHighlights: [player],
+            mapHighlightsType: 'players'
         },
         siteName: settings.site_name,
         development,
@@ -339,7 +344,8 @@ router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(asy
             marketId,
             worldNumber,
             player,
-            mapHighlights: [player]
+            mapHighlights: [player],
+            mapHighlightsType: 'players'
         },
         siteName: settings.site_name,
         development,

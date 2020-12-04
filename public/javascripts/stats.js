@@ -30,7 +30,23 @@
         return [averageX, averageY]
     }
 
+    const setupTopRankingColors = () => {
+        const $topColors = document.querySelectorAll('.top-colors')
+
+        if (!$topColors.length) {
+            return false
+        }
+
+        for (let i = 0; i < mapHighlights.length; i++) {
+            $topColors[i].style.backgroundColor = colors[i]
+        }
+    }
+
     const setupMapPreview = async () => {
+        if (!document.querySelector('#map')) {
+            return false
+        }
+
         loader = new TW2DataLoader(marketId, worldNumber)
         map = new TW2Map('#map', loader, null, {
             allowZoom: false,
@@ -41,29 +57,21 @@
 
         map.init()
 
-        if (STATS_PAGE === 'home') {
-            const $colors = document.querySelectorAll('#tribes .color')
-
-            for (let i = 0; i < mapHighlights.length; i++) {
-                $colors[i].style.backgroundColor = colors[i]
-            }
-        }
-
         await loader.loadInfo
 
-        const highlightType = STATS_PAGE === 'player' || STATS_PAGE === 'player-villages'
-            ? TW2Map.highlightTypes.PLAYERS
-            : TW2Map.highlightTypes.TRIBES
-
         for (let i = 0; i < mapHighlights.length; i++) {
-            map.addHighlight(highlightType, mapHighlights[i].name, colors[i])
+            map.addHighlight(mapHighlightsType, mapHighlights[i].name, colors[i])
         }
     }
 
     const setupQuickHighlight = async () => {
-        await loader.loadInfo
-
         const $highlightRows = document.querySelectorAll('.quick-highlight tbody tr')
+
+        if (!$highlightRows.length) {
+            return false
+        }
+
+        await loader.loadInfo
 
         for (let $row of $highlightRows) {
             $row.addEventListener('mouseenter', () => {
@@ -142,27 +150,13 @@
         map.moveTo(...averagePositionFor(type, id))
     }
 
-    if (STATS_PAGE === 'home') {
-        setupMapPreview()
-        setupQuickHighlight()
-        setupSearch()
-    } else if (STATS_PAGE === 'tribe-members') {
-        setupMapPreview()
-        setupQuickHighlight()
-        setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
-    } else if (STATS_PAGE === 'tribe-villages') {
-        setupMapPreview()
-        setupQuickHighlight()
-        setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
-    } else if (STATS_PAGE === 'tribe') {
-        setupMapPreview()
-        setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
-    } else if (STATS_PAGE === 'player') {
-        setupMapPreview()
+    setupMapPreview()
+    setupTopRankingColors()
+    setupQuickHighlight()
+
+    if (typeof player !== 'undefined') {
         setupMapCenter(TW2Map.highlightTypes.PLAYERS, player.id)
-    } else if (STATS_PAGE === 'player-villages') {
-        setupMapPreview()
-        setupQuickHighlight()
-        setupMapCenter(TW2Map.highlightTypes.PLAYERS, player.id)
+    } else if (typeof tribe !== 'undefined') {
+        setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
     }
 })();
