@@ -89,6 +89,10 @@
     }
 
     const setupSearch = async () => {
+        if (!document.querySelector('#search')) {
+            return false
+        }
+
         const SEARCH_CATEGORIES = {
             players: 'players',
             tribes: 'tribes',
@@ -153,6 +157,7 @@
     setupMapPreview()
     setupTopRankingColors()
     setupQuickHighlight()
+    setupSearch()
 
     if (typeof player !== 'undefined') {
         setupMapCenter(TW2Map.highlightTypes.PLAYERS, player.id)
