@@ -490,8 +490,10 @@ const routerRanking = async function (req, res, next) {
         }
     }
 
+    const capitalizedCategory = utils.capitalize(category)
+
     res.render('ranking', {
-        title: `${utils.capitalize(category)} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `${capitalizedCategory} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         worldName: world.name,
@@ -500,6 +502,12 @@ const routerRanking = async function (req, res, next) {
         players,
         category,
         pagination: utils.createPagination(page, total, limit, req.path),
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `${capitalizedCategory}`
+        ],
         exportValues: {
             marketId,
             worldNumber
