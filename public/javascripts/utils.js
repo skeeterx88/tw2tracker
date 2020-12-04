@@ -77,6 +77,10 @@ const formatSince = (date) => {
 }
 
 const averageCoords = (coords) => {
+    if (!coords) {
+        return [500, 500]
+    }
+
     let averageX = 0
     let averageY = 0
 
