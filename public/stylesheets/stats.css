@@ -159,8 +159,7 @@ table.quick-highlight tbody tr:hover td {
 }
 
 .pagination .page {
-    margin: 0px 3px;
-    padding: 3px 5px;
+    padding: 3px 4px;
 }
 
 .pagination .current {
