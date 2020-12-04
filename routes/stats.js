@@ -46,6 +46,11 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         tribes,
         world,
         development,
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`
+        ],
         exportValues: {
             marketId,
             worldNumber,
@@ -91,6 +96,12 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
         worldNumber,
         worldName: world.name,
         tribe,
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`
+        ],
         exportValues: {
             marketId,
             worldNumber,
@@ -138,6 +149,13 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
         world,
         tribe,
         members,
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `Members`
+        ],
         exportValues: {
             marketId,
             worldNumber,
@@ -193,6 +211,13 @@ const tribeVillagesRouter = async function (req, res, next) {
         tribe,
         villages,
         pagination: utils.createPagination(page, total, limit, req.path),
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `Villages`
+        ],
         exportValues: {
             marketId,
             worldNumber,
@@ -248,6 +273,12 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
         worldName: world.name,
         player,
         tribe,
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`
+        ],
         exportValues: {
             marketId,
             worldNumber,
@@ -297,6 +328,13 @@ router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(asy
         world,
         player,
         villages,
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
+            'Villages'
+        ],
         exportValues: {
             marketId,
             worldNumber,
@@ -396,6 +434,12 @@ const routerSearch = async function (req, res, next) {
         results,
         resultsCount: results.length,
         pagination: utils.createPagination(page, total, limit, req.path),
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Search "${rawQuery}"`
+        ],
         exportValues: {
             marketId,
             worldNumber
