@@ -415,7 +415,7 @@ const routerSearch = async function (req, res, next) {
     const results = allResults.slice(offset, offset + limit)
     const total = allResults.length
 
-    return res.render('world-search', {
+    return res.render('search', {
         title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
