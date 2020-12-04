@@ -160,7 +160,7 @@
     } else if (STATS_PAGE === 'player') {
         setupMapPreview()
         setupMapCenter(TW2Map.highlightTypes.PLAYERS, player.id)
-    } else if (STATS_PAGE === 'player-villages', tribe.id) {
+    } else if (STATS_PAGE === 'player-villages') {
         setupMapPreview()
         setupQuickHighlight()
         setupMapCenter(TW2Map.highlightTypes.PLAYERS, player.id)
