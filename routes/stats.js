@@ -140,7 +140,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     res.render('stats-tribe-members', {
-        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         world,
@@ -200,7 +200,7 @@ const tribeVillagesRouter = async function (req, res, next) {
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     res.render('stats-tribe-villages', {
-        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         world,
@@ -314,7 +314,7 @@ router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(asy
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     res.render('stats-player-villages', {
-        title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         world,
