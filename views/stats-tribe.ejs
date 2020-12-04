@@ -12,74 +12,74 @@
                         <h2>Tribe profile</h2>
 
                         <div class="content-border">
-                            <table>
+                            <table class="vertical">
                                 <colgroup>
                                     <col width="50%">
                                     <col width="50%">
                                 </colgroup>
                                 <tbody>
                                     <tr>
-                                        <td>Rank:</td>
+                                        <th>Rank:</th>
                                         <td><%= formatNumbers(tribe.rank) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Name:</td>
+                                        <th>Name:</th>
                                         <td><%= tribe.name %></td>
                                     </tr>
                                     <tr>
-                                        <td>Tag:</td>
+                                        <th>Tag:</th>
                                         <td><%= tribe.tag %></td>
                                     </tr>
                                     <tr>
-                                        <td>Villages:</td>
+                                        <th>Villages:</th>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/villages"><%= formatNumbers(tribe.villages) %></a></td>
                                     </tr>
                                     <tr>
-                                        <td>Points:</td>
+                                        <th>Points:</th>
                                         <td><%= formatNumbers(tribe.points) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Members:</td>
+                                        <th>Members:</th>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/members"><%= formatNumbers(tribe.members) %></a></td>
                                     </tr>
                                     <tr>
-                                        <td>Bash Attack:</td>
+                                        <th>Bash Attack:</th>
                                         <td><%= formatNumbers(tribe.bash_points_off) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Bash Defense:</td>
+                                        <th>Bash Defense:</th>
                                         <td><%= formatNumbers(tribe.bash_points_def) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Average Points/Member:</td>
+                                        <th>Average Points/Member:</th>
                                         <td><%= formatNumbers(tribe.points_per_member) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Average Points/Village:</td>
+                                        <th>Average Points/Village:</th>
                                         <td><%= formatNumbers(tribe.points_per_villages) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Member Changes:</td>
+                                        <th>Member Changes:</th>
                                         <td>-</td>
                                     </tr>
                                     <tr>
-                                        <td>Village Conquers:</td>
+                                        <th>Village Conquers:</th>
                                         <td>x (+y-z)</td>
                                     </tr>
                                     <tr>
-                                        <td>Best Rank:</td>
+                                        <th>Best Rank:</th>
                                         <td><%= formatNumbers(tribe.best_rank) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Most Points:</td>
+                                        <th>Most Points:</th>
                                         <td><%= formatNumbers(tribe.best_points) %></td>
                                     </tr>
                                     <tr>
-                                        <td>Most Villages:</td>
+                                        <th>Most Villages:</th>
                                         <td><%= formatNumbers(tribe.best_villages) %></td>
                                     </tr>
                                     <tr>
-                                        <td>First seen:</td>
+                                        <th>First seen:</th>
                                         <td><%= formatDate(tribe.first_seen) %></td>
                                     </tr>
                                 </tbody>
