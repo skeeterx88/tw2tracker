@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title><%= title %></title>
-        <meta name="viewport" content="width=1000 initial-scale=1"/>
-        <meta name="description" content="Detailed statistics for Tribal Wars 2">
-        <link rel='stylesheet' href='/stylesheets/style.css' />
-        <link rel='stylesheet' href='/stylesheets/stats.css' />
-        <link rel="icon" type="image/png" href="/images/favicon.png"/>
-        <script type="text/javascript">
-            const {
-                marketId,
-                worldNumber,
-                mapHighlights,
-                player
-            } = <%- JSON.stringify(exportValues) %>
-
-            const STATS_PAGE = 'player-villages'
-        </script>
-    </head>
+    <%- include('includes/head-stats.ejs') %>
     <body>
         <header></header>
         <main class="content-border">

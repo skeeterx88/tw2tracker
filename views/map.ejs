@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title><%= title %></title>
-        <meta name="viewport" content="width=800 initial-scale=1"/>
-        <meta name="description" content="Interactive world map for Tribal Wars 2">
-        <link rel="icon" type="image/png" href="/images/favicon.png"/>
-        <link rel='stylesheet' href='/stylesheets/flags.css' />
-        <link rel='stylesheet' href='/stylesheets/map.css' />
-        <script type="text/javascript">
-            const {
-                marketId,
-                worldNumber,
-                development,
-                worldName,
-                lastSync,
-                mapShare
-            } = <%- JSON.stringify(exportValues) %>
-        </script>
-    </head>
+    <%- include('includes/head-map.ejs') %>
     <body>
         <div id="map-wrapper">
             <div id="side-panel">
@@ -200,6 +183,16 @@
             <div class="color-option" data-setting-id="demarcationsColor"><label>Demarcations color</label></div>
         </div>
 
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber,
+                development,
+                worldName,
+                lastSync,
+                mapShare
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
         <script type="text/javascript" src="/javascripts/utils.js"></script>
         <script type="text/javascript" src="/javascripts/autoComplete.js"></script>
         <script type="text/javascript" src="/javascripts/map.js"></script>
