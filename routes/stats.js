@@ -41,11 +41,9 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         title: `${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        siteName: settings.site_name,
         players,
         tribes,
         world,
-        development,
         navigation: [
             `<a href="/">${settings.site_name}</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -67,7 +65,6 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
-
 
     const settings = await getSettings()
     const marketId = req.params.marketId
@@ -95,7 +92,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
         title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        worldName: world.name,
+        world,
         tribe,
         navigation: [
             `<a href="/">${settings.site_name}</a>`,
@@ -110,8 +107,6 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
             mapHighlights: [tribe],
             mapHighlightsType: 'tribes'
         },
-        siteName: settings.site_name,
-        development,
         ...utils.ejsHelpers
     })
 }))
@@ -165,8 +160,6 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
             mapHighlights: [tribe],
             mapHighlightsType: 'tribes'
         },
-        siteName: settings.site_name,
-        development,
         ...utils.ejsHelpers
     })
 }))
@@ -228,8 +221,6 @@ const tribeVillagesRouter = async function (req, res, next) {
             mapHighlights: [tribe],
             mapHighlightsType: 'tribes'
         },
-        siteName: settings.site_name,
-        development,
         ...utils.ejsHelpers
     })
 }
@@ -274,7 +265,6 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        worldName: world.name,
         player,
         tribe,
         navigation: [
@@ -290,8 +280,6 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
             mapHighlights: [player],
             mapHighlightsType: 'players'
         },
-        siteName: settings.site_name,
-        development,
         ...utils.ejsHelpers
     })
 }))
@@ -329,7 +317,6 @@ router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(asy
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        worldName: world.name,
         world,
         player,
         villages,
@@ -347,8 +334,6 @@ router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(asy
             mapHighlights: [player],
             mapHighlightsType: 'players'
         },
-        siteName: settings.site_name,
-        development,
         ...utils.ejsHelpers
     })
 }))
@@ -435,7 +420,6 @@ const routerSearch = async function (req, res, next) {
         marketId,
         worldNumber,
         world,
-        query: rawQuery,
         category,
         results,
         resultsCount: results.length,
@@ -450,8 +434,6 @@ const routerSearch = async function (req, res, next) {
             marketId,
             worldNumber
         },
-        siteName: settings.site_name,
-        development,
         ...utils.ejsHelpers
     })
 }
@@ -522,8 +504,6 @@ const routerRanking = async function (req, res, next) {
             marketId,
             worldNumber
         },
-        siteName: settings.site_name,
-        development,
         ...utils.ejsHelpers
     })
 }
