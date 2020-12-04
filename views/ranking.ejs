@@ -7,9 +7,25 @@
             <%- include('includes/navigation.ejs') %>
 
             <div class="content">
-                <div class="single content-border">
-                    <%- include('rankings/' + category + '.ejs') %>
-                    <%- include('includes/pagination.ejs') %>
+                <div class="left">
+                    <h2>Ranking</h2>
+
+                    <div class="content-border">
+                        <%- include('rankings/' + category + '.ejs') %>
+                        <%- include('includes/pagination.ejs') %>
+                    </div>
+                </div>
+
+                <div class="right">
+                    <section class="world-map">
+                        <h2>World map</h2>
+
+                        <div id="map" class="content-border"></div>
+
+                        <div class="actions">
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>">View complete world map</a>
+                        </div>
+                    </section>
                 </div>
             </div>
         </main>
@@ -21,5 +37,7 @@
             } = <%- JSON.stringify(exportValues) %>
         </script>
         <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/map.js"></script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
     </body>
 </html>

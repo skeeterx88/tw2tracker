@@ -59,8 +59,10 @@
 
         await loader.loadInfo
 
-        for (let i = 0; i < mapHighlights.length; i++) {
-            map.addHighlight(mapHighlightsType, mapHighlights[i].name, colors[i])
+        if (typeof mapHighlights !== 'undefined') {
+            for (let i = 0; i < mapHighlights.length; i++) {
+                map.addHighlight(mapHighlightsType, mapHighlights[i].name, colors[i])
+            }
         }
     }
 
