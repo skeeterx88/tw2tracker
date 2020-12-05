@@ -1,3 +1,13 @@
+@media screen and (min-width: 480px) {
+    .content > div.left {
+        width: 80%;
+    }
+
+    .content > div.right {
+        width: 80%;
+    }
+}
+
 html {
     background: url(/images/background-scene.webp) top no-repeat, url(/images/noise-2.png), #88785F;
 }
@@ -76,6 +86,7 @@ section .actions {
 
 table small {
     padding: 2px 0px;
+    font-size: 11px;
 }
 
 table.vertical th,
@@ -107,6 +118,7 @@ td, th {
 
 .content {
     display: flex;
+    flex-direction: row;
 }
 
 .content > div.left {
@@ -170,4 +182,25 @@ table.quick-highlight tbody tr:hover td {
 .world-map {
     position: sticky;
     top: 0;
+}
+
+
+@media (max-width: 800px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .content > div.left {
+        width: 100%;
+        margin-right: 6px;
+    }
+
+    .content > div.right {
+        width: 100%;
+        margin-left: 6px;
+    }
+
+    .content > div.single {
+        width: 100%;
+    }
 }
