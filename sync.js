@@ -179,49 +179,54 @@ Sync.registerWorlds = async function () {
 
     for (let market of markets) {
         const marketId = market.id
-        const account = await Sync.auth(marketId, market)
 
-        if (!account) {
-            continue
-        }
+        try {
+            const account = await Sync.auth(marketId, market)
 
-        const characters = account.characters
-            .filter((world) => world.allow_login && world.character_id === account.player_id)
-            .map(world => ({
-                worldNumber: utils.extractNumbers(world.world_id),
-                worldName: world.world_name,
-                registered: true
-            }))
-
-        const worlds = account.worlds
-            .filter(world => !world.full)
-            .map(world => ({
-                worldNumber: utils.extractNumbers(world.id),
-                worldName: world.name,
-                registered: false
-            }))
-
-        const allWorlds = [...worlds, ...characters]
-
-        for (let world of allWorlds) {
-            const {worldNumber, worldName, registered} = world
-            const worldId = marketId + worldNumber
-
-            if (!registered) {
-                await Sync.registerCharacter(marketId, worldNumber)
+            if (!account) {
+                continue
             }
 
-            if (!await worldEntryExists(worldId)) {
-                log(`Creating world entry for ${worldId}`)
+            const characters = account.characters
+                .filter((world) => world.allow_login && world.character_id === account.player_id)
+                .map(world => ({
+                    worldNumber: utils.extractNumbers(world.world_id),
+                    worldName: world.world_name,
+                    registered: true
+                }))
 
-                await db.query(sql.worlds.addEntry, {
-                    worldId,
-                    marketId,
-                    worldNumber,
-                    worldName,
-                    open: true
-                })
+            const worlds = account.worlds
+                .filter(world => !world.full)
+                .map(world => ({
+                    worldNumber: utils.extractNumbers(world.id),
+                    worldName: world.name,
+                    registered: false
+                }))
+
+            const allWorlds = [...worlds, ...characters]
+
+            for (let world of allWorlds) {
+                const {worldNumber, worldName, registered} = world
+                const worldId = marketId + worldNumber
+
+                if (!registered) {
+                    await Sync.registerCharacter(marketId, worldNumber)
+                }
+
+                if (!await worldEntryExists(worldId)) {
+                    log(`Creating world entry for ${worldId}`)
+
+                    await db.query(sql.worlds.addEntry, {
+                        worldId,
+                        marketId,
+                        worldNumber,
+                        worldName,
+                        open: true
+                    })
+                }
             }
+        } catch (error) {
+            log(colors.red(`Failed to register worlds on market ${marketId}: ${error.message}`))
         }
     }
 
