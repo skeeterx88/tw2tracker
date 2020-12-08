@@ -268,62 +268,67 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
     const page = await puppeteerPage()
 
     try {
-        const urlId = marketId === 'zz' ? 'beta' : marketId
+        const account = await utils.timeout(async function () {
+            const urlId = marketId === 'zz' ? 'beta' : marketId
 
-        await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
-        await page.waitFor(1000)
+            await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
+            await page.waitFor(1000)
 
-        const account = await page.evaluate(function (account_name, account_password) {
-            return new Promise(function (resolve) {
-                const socketService = injector.get('socketService')
-                const routeProvider = injector.get('routeProvider')
+            const account = await page.evaluate(function (account_name, account_password) {
+                return new Promise(function (resolve) {
+                    const socketService = injector.get('socketService')
+                    const routeProvider = injector.get('routeProvider')
 
-                const loginTimeout = setTimeout(function () {
-                    resolve(false)
-                }, 5000)
+                    const loginTimeout = setTimeout(function () {
+                        resolve(false)
+                    }, 5000)
 
-                socketService.emit(routeProvider.LOGIN, {
-                    name: account_name,
-                    pass: account_password,
-                    ref_param: ''
-                }, function (data) {
-                    clearTimeout(loginTimeout)
-                    resolve(data)
+                    socketService.emit(routeProvider.LOGIN, {
+                        name: account_name,
+                        pass: account_password,
+                        ref_param: ''
+                    }, function (data) {
+                        clearTimeout(loginTimeout)
+                        resolve(data)
+                    })
                 })
+            }, account_name, account_password)
+
+            if (!account) {
+                const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent)
+                throw new Error(error)
+            }
+
+            await page.setCookie({
+                name: 'globalAuthCookie',
+                value: JSON.stringify({
+                    token: account.token,
+                    playerName: account.name,
+                    autologin: true
+                }),
+                domain: `.${urlId}.tribalwars2.com`,
+                path: '/',
+                expires: 2147482647,
+                size: 149,
+                httpOnly: false,
+                secure: false,
+                session: false
             })
-        }, account_name, account_password)
 
-        if (!account) {
-            const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent)
-            throw new Error(error)
-        }
+            await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
 
-        await page.setCookie({
-            name: 'globalAuthCookie',
-            value: JSON.stringify({
-                token: account.token,
-                playerName: account.name,
-                autologin: true
-            }),
-            domain: `.${urlId}.tribalwars2.com`,
-            path: '/',
-            expires: 2147482647,
-            size: 149,
-            httpOnly: false,
-            secure: false,
-            session: false
-        })
+            try {
+                await page.waitForSelector('.player-worlds', {timeout: 3000})
+            } catch (error) {
+                throw new Error(`Authentication to market:${marketId} failed "unknown reason"`)
+            }
 
-        await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
+            authenticatedMarkets[marketId] = account
 
-        try {
-            await page.waitForSelector('.player-worlds', {timeout: 3000})
-        } catch (error) {
-            throw new Error(`Authentication to market:${marketId} failed "unknown reason"`)
-        }
+            return account
+        }, 60000, 'Auth took more than 1 minute')
 
         await page.close()
-        authenticatedMarkets[marketId] = account
 
         return account
     } catch (error) {
