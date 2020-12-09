@@ -91,9 +91,6 @@ const Sync = {}
 Sync.init = async function () {
     log('Sync.init()')
 
-    // const worldData = JSON.parse(await fs.promises.readFile('./dev-data/br48/worldData.json'))
-    // await inserWorldData(worldData, 'br', 48)
-
     process.on('SIGTERM', async function () {
         log(colors.red('Stopping tw2-tracker! Waiting pendent tasks...'))
 
@@ -130,8 +127,18 @@ Sync.init = async function () {
         }
 
         if (development) {
+            // // SKIP WORLD SYNC AND COMMIT "FAKE" DATA TO DB/FS.
+            // const worldNumber = 52
+            // const marketId = 'br'
+            // const worldId = marketId + worldNumber
+            // const data = JSON.parse(await fs.promises.readFile(path.join('.', 'data', `${worldId}.freeze.json`)))
+            // await commitDataDatabase(data, worldId)
+            // await commitDataFilesystem(worldId)
+            // await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
+            // await db.query(sql.worlds.updateSync, [marketId, worldNumber])
+
             // await Sync.allWorlds()
-            // await Sync.world('zz', 8)
+            // await Sync.world('br', 52)
             // await Sync.registerWorlds()
         }
     } catch (error) {
@@ -548,6 +555,9 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             return await page.evaluate(Scrapper)
         }, 120000, 'Scrappe evaluation timeout')
 
+        // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
+        // await fs.promises.writeFile(path.join('.', 'data', `${worldId}.freeze.json`), JSON.stringify(data))
+        // process.exit()
 
         await commitDataDatabase(data, worldId)
         await commitDataFilesystem(worldId)
