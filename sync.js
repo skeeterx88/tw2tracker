@@ -683,6 +683,8 @@ const commitDataDatabase = async function (data, worldId) {
             this.none(sql.worlds.insert.province, {worldId, province_id, province_name})
         }
 
+        const currentPlayers = new Map(data.players)
+        const currentTribes = new Map(data.tribes)
         const currentVillages = new Map(data.villages)
         const currentVillagesId = Array.from(currentVillages.keys())
         const oldVillages = new Map(await this.map(sql.worlds.villages, {worldId}, village => [village.id, village]))
@@ -699,10 +701,43 @@ const commitDataDatabase = async function (data, worldId) {
                 : {village_id, ...village}
 
             if (village.character_id !== oldVillage.character_id && village.character_id) {
-                const newOwner = village.character_id
-                const oldOwner = newVillagesId.includes(village_id) ? null : oldVillage.character_id
+                const newOwnerId = village.character_id
+                const newOwner = currentPlayers.get(newOwnerId)
+                const oldOwner = newVillagesId.includes(village_id) ? null : currentPlayers.get(oldVillage.character_id)
+                const oldOwnerId = oldOwner ? oldVillage.character_id : null
 
-                this.none(sql.worlds.insert.conquest, {worldId, village_id, newOwner, oldOwner})
+                const tribeData = {
+                    new_owner_tribe_id: null,
+                    new_owner_tribe_tag: null,
+                    old_owner_tribe_id: null,
+                    old_owner_tribe_tag: null
+                }
+
+                if (newOwner.tribe_id) {
+                    tribeData.new_owner_tribe_id = newOwner.tribe_id
+                    tribeData.new_owner_tribe_tag = currentTribes.get(newOwner.tribe_id).tag
+                }
+
+                if (oldOwner && oldOwner.tribe_id) {
+                    tribeData.old_owner_tribe_id = oldOwner.tribe_id
+                    tribeData.old_owner_tribe_tag = currentTribes.get(oldOwner.tribe_id).tag
+                }
+
+                // console.log('commit conquest', {
+                //     worldId,
+                //     village_id,
+                //     newOwner: newOwnerId,
+                //     oldOwner: oldOwnerId,
+                //     ...tribeData
+                // })
+
+                await this.none(sql.worlds.insert.conquest, {
+                    worldId,
+                    village_id,
+                    newOwner: newOwnerId,
+                    oldOwner: oldOwnerId,
+                    ...tribeData
+                })
             }
         }
 

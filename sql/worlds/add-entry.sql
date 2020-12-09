@@ -93,5 +93,9 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.conquests (
     old_owner INT REFERENCES ${worldId:name}.players(id) NULL,
     new_owner INT REFERENCES ${worldId:name}.players(id) NOT NULL,
     date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
-    village_id INT REFERENCES ${worldId:name}.villages(id) NOT NULL
+    village_id INT REFERENCES ${worldId:name}.villages(id) NOT NULL,
+    old_owner_tribe_id INT REFERENCES ${worldId:name}.tribes(id) NULL,
+    old_owner_tribe_tag VARCHAR (3) NULL,
+    new_owner_tribe_id INT REFERENCES ${worldId:name}.tribes(id) NULL,
+    new_owner_tribe_tag VARCHAR (3) NULL
 );
