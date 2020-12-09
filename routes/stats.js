@@ -284,7 +284,7 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
     })
 }))
 
-router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(async function (req, res, next) {
+router.get('/:marketId/:worldNumber/players/:character_id/villages', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -292,7 +292,7 @@ router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(asy
     const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
-    const playerId = parseInt(req.params.playerId, 10)
+    const character_id = parseInt(req.params.character_id, 10)
 
     const worldId = marketId + worldNumber
     const worldExists = await utils.schemaExists(worldId)
@@ -305,8 +305,8 @@ router.get('/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(asy
     let villages
 
     try {
-        player = await db.one(sql.worlds.player, {worldId, playerId})
-        villages = await db.any(sql.worlds.playerVillages, {worldId, playerId})
+        player = await db.one(sql.worlds.player, {worldId, character_id})
+        villages = await db.any(sql.worlds.playerVillages, {worldId, character_id})
     } catch (error) {
         throw createError(404, 'This player does not exist')
     }
