@@ -87,3 +87,11 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.villages_by_player (
     character_id INT REFERENCES ${worldId:name}.players(id) PRIMARY KEY,
     villages_id INT[]
 );
+
+CREATE TABLE IF NOT EXISTS ${worldId:name}.conquests (
+    id SERIAL PRIMARY KEY,
+    old_owner INT REFERENCES ${worldId:name}.players(id) NULL,
+    new_owner INT REFERENCES ${worldId:name}.players(id) NOT NULL,
+    date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    village_id INT REFERENCES ${worldId:name}.villages(id) NOT NULL
+);

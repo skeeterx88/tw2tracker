@@ -548,6 +548,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             return await page.evaluate(Scrapper)
         }, 120000, 'Scrappe evaluation timeout')
 
+
         await commitDataDatabase(data, worldId)
         await commitDataFilesystem(worldId)
         await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
@@ -620,7 +621,7 @@ Sync.cleanExpiredShares = async function () {
 const downloadMapStruct = async function (url, worldId) {
     const buffer = await utils.getBuffer(url)
     const gzipped = zlib.gzipSync(buffer)
-    
+
     await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true})
     await fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped)
 }
@@ -672,8 +673,27 @@ const commitDataDatabase = async function (data, worldId) {
             this.none(sql.worlds.insert.province, {worldId, province_id, province_name})
         }
 
+        const currentVillages = new Map(data.villages)
+        const currentVillagesId = Array.from(currentVillages.keys())
+        const oldVillages = new Map(await this.map(sql.worlds.villages, {worldId}, village => [village.id, village]))
+        const oldVillagesId = Array.from(oldVillages.keys())
+        const newVillagesId = currentVillagesId.filter(villageId => !oldVillagesId.includes(villageId))
+
         for (let [village_id, village] of data.villages) {
             this.none(sql.worlds.insert.village, {worldId, village_id, ...village})
+        }
+
+        for (let [village_id, village] of currentVillages.entries()) {
+            const oldVillage = oldVillages.has(village_id)
+                ? oldVillages.get(village_id)
+                : {village_id, ...village}
+
+            if (village.character_id !== oldVillage.character_id && village.character_id) {
+                const newOwner = village.character_id
+                const oldOwner = newVillagesId.includes(village_id) ? null : oldVillage.character_id
+
+                this.none(sql.worlds.insert.conquest, {worldId, village_id, newOwner, oldOwner})
+            }
         }
 
         for (let [character_id, villages_id] of data.villagesByPlayer) {
