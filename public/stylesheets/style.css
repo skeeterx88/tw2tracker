@@ -55,10 +55,11 @@ h2 {
 
 header {
     width: 80vw;
-    height: 30vh;
-    background: url(/images/banner-no-logo.png) no-repeat center;
-    background-size: 40vw;
+    height: 25vh;
+    background: url(/images/banner.svg) no-repeat center;
+    background-size: 50vw;
     margin-bottom: 10px;
+    filter: drop-shadow(10px 10px 12px #00000090);
 }
 
 menu {
@@ -154,9 +155,10 @@ div.modal {
     }
 
     header {
-        width: 95vw;
-        height: 20vh;
-        background-size: 95vw;
+        width: 90vw;
+        height: 25vh;
+        background-size: 60vw;
+        filter: drop-shadow(10px 10px 9px #00000090);
     }
 
     .content {
