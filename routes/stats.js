@@ -75,6 +75,45 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     })
 }))
 
+router.get('/:marketId/:worldNumber/conquests', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const conquests = await db.any(sql.stats.worldConquests, {worldId})
+
+    res.render('stats-conquests', {
+        title: `${marketId.toUpperCase()}/${world.name} - Conquests - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        conquests,
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            'Conquests'
+        ],
+        exportValues: {
+            marketId,
+            worldNumber
+        },
+        ...utils.ejsHelpers
+    })
+}))
+
 router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
