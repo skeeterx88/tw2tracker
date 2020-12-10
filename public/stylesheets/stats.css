@@ -74,9 +74,9 @@ section .actions {
     margin: 12px 0px;
 }
 
-table small {
+small {
     padding: 2px 0px;
-    font-size: 1rem;
+    font-size: 0.8em;
 }
 
 table.vertical th,
@@ -142,7 +142,7 @@ td, th {
 }
 
 .content > div.single {
-    width: 80%;
+    width: 100%;
 }
 
 section {
@@ -216,19 +216,102 @@ span.conquest-self {
     background: #e1d400 radial-gradient(circle at 70% 60%, #ffef00, #e1d400);
 }
 
+div.world-title {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#worlds {
+    margin: 0 auto;
+    width: 90%;
+}
+
+#worlds .world {
+    color: #311a11;
+    width: 220px;
+    font-size: 0.8em;
+    border-color: #b18e76;
+    border-radius: 1px;
+    background: url(/images/noise.png) #f9eed166;
+    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e, 2px 2px 2px #000;
+    padding: 5px 0px;
+    cursor: pointer;
+    border-style: outset;
+    border-width: 2px;
+    float: left;
+    margin: 5px;
+}
+
+#worlds .world:hover {
+    border-color: #dc9750;
+}
+
+#worlds .world a {
+    color: inherit;
+    font-weight: normal;
+}
+
+#worlds .world-title {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #693a00;
+    text-align: center;
+    cursor: pointer;
+    line-height: 18px;
+}
+
+#worlds .info {
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: -4px;
+}
+
+#worlds fieldset {
+    border: none;
+    padding: 0px;
+    margin-left: 15px;
+}
+
+#worlds fieldset legend {
+    margin-left: -10px;
+    font-weight: bold;
+    color: #100a07;
+}
+
+#worlds fieldset {
+    border: none;
+    padding: 0px;
+    margin-left: 15px;
+}
+
 @media (max-width: 800px) {
+    html {
+        font-size: 12px;
+    }
+
+    body {
+        width: 95vw;
+    }
+
+    header {
+        height: 8em;
+        background-size: 25em;
+        margin-bottom: 10px;
+        filter: drop-shadow(10px 10px 12px #00000090);
+    }
+
     .content {
         flex-direction: column;
     }
 
     .content > div.left {
         width: 100%;
-        margin-right: 6px;
+        margin-right: 0px;
     }
 
     .content > div.right {
         width: 100%;
-        margin-left: 6px;
+        margin-left: 0px;
     }
 
     .content > div.single {

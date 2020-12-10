@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('includes/head-stats.ejs') %>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <%- include('includes/navigation.ejs') %>
+
+            <div class="content">
+                <div class="single">
+                    <section id="worlds">
+                        <% if (openWorlds.length) { -%>
+                            <h2>Open Worlds</h2>
+
+                            <div>
+                                <% for (let world of openWorlds) { -%>
+                                    <div class="world">
+                                        <a href="/stats/<%= marketId %>/<%= world.num %>">
+                                            <div class="world-title">
+                                                <span class="flag flag-<%= marketId %>"><%= world.name %></span>
+                                            </div>
+                                            <div class="info">
+                                                <div class="stats">
+                                                    <fieldset>
+                                                        <legend>Statistics:</legend>
+                                                        <span>
+                                                            <%= formatNumbers(world.player_count) %> players,
+                                                            <%= formatNumbers(world.tribe_count) %> tribes,
+                                                            <%= formatNumbers(world.village_count) %> villages
+                                                        </span>
+                                                    </fieldset>
+                                                </div>
+                                                <div class="settings">
+                                                    <fieldset>
+                                                        <legend>Settings:</legend>
+                                                        <span>
+                                                            victory points system: <% __append(world.config.victory_points ? 'yes' : 'no') %>,
+                                                            speed: <%= formatNumbers(world.config.speed) %>
+                                                        </span>
+                                                    </fieldset>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                <% } -%>
+                            </div>
+                        <% } -%>
+
+                        <% if (closedWorlds.length) { -%>
+                            <h2>Closed Worlds</h2>
+
+                            <div class="content-border">
+                                <% for (let world of closedWorlds) { -%>
+                                    <div class="world">
+                                        <div class="world-button-container">
+                                            <a href="/stats/<%= marketId %>/<%= world.num %>">
+                                                <button class="world-button">
+                                                    <span class="flag flag-<%= marketId %>"><%= world.name %></span>
+                                                </button>
+                                            </a>
+                                        </div>
+                                        <div class="info">
+                                            <div class="stats">
+                                                <fieldset>
+                                                    <legend>Statistics:</legend>
+                                                    <small>
+                                                        <%= formatNumbers(world.player_count) %> players,
+                                                        <%= formatNumbers(world.tribe_count) %> tribes,
+                                                        <%= formatNumbers(world.village_count) %> villages.
+                                                    </small>
+                                                </fieldset>
+                                            </div>
+                                            <div class="settings">
+                                                <fieldset>
+                                                    <legend>Settings:</legend>
+                                                    <small>
+                                                        speed: <%= formatNumbers(world.config.speed) %>,
+                                                        victory points system: <% __append(world.config.victory_points ? 'yes' : 'no') %>
+                                                    </small>
+                                                </fieldset>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } -%>
+                            </div>
+                        <% } -%>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <script type="text/javascript">
+            const {
+                marketId
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
+        <script type="text/javascript" src="/javascripts/map.js"></script>
+        <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
+    </body>
+</html>

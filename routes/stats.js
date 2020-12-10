@@ -22,6 +22,38 @@ const conquestTypes = {
     SELF: 'self'
 }
 
+router.get('/:marketId', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const marketWorlds = await db.any(sql.stats.marketWorlds, {marketId})
+
+    if (!marketWorlds.length) {
+        throw createError(404, 'This server does not exist or does not have any available world')
+    }
+
+    const openWorlds = marketWorlds.filter(world => world.open)
+    const closedWorlds = marketWorlds.filter(world => !world.open)
+
+    res.render('stats-server', {
+        title: `${marketId.toUpperCase()} - ${settings.site_name}`,
+        marketId,
+        openWorlds,
+        closedWorlds,
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`
+        ],
+        exportValues: {
+            marketId
+        },
+        ...utils.ejsHelpers
+    })
+}))
+
 router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
