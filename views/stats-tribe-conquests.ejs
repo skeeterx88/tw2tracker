@@ -19,7 +19,7 @@
                                     <col width="5%">
                                     <col width="*">
                                     <col width="*">
-                                    <col width="17%">
+                                    <col width="14%">
                                 </colgroup>
 
                                 <thead>
@@ -28,7 +28,7 @@
                                     <th>Points</th>
                                     <th>Old owner</th>
                                     <th>New owner</th>
-                                    <th>Date/Time</th>
+                                    <th>Date/Hour</th>
                                 </thead>
 
                                 <tbody>
@@ -72,7 +72,7 @@
                                                         <% } -%>
                                                     <% } -%>
                                                 </td>
-                                                <td><%= formatDate(conquest.date) %></td>
+                                                <td><%= formatDate(conquest.date, 'hours-only') %></td>
                                             </tr>
                                         <% } %>
                                     <% } -%>
