@@ -708,19 +708,19 @@ const commitDataDatabase = async function (data, worldId) {
 
                 const tribeData = {
                     new_owner_tribe_id: null,
-                    new_owner_tribe_tag: null,
+                    new_owner_tribe_tag_then: null,
                     old_owner_tribe_id: null,
-                    old_owner_tribe_tag: null
+                    old_owner_tribe_tag_then: null
                 }
 
                 if (newOwner.tribe_id) {
                     tribeData.new_owner_tribe_id = newOwner.tribe_id
-                    tribeData.new_owner_tribe_tag = currentTribes.get(newOwner.tribe_id).tag
+                    tribeData.new_owner_tribe_tag_then = currentTribes.get(newOwner.tribe_id).tag
                 }
 
                 if (oldOwner && oldOwner.tribe_id) {
                     tribeData.old_owner_tribe_id = oldOwner.tribe_id
-                    tribeData.old_owner_tribe_tag = currentTribes.get(oldOwner.tribe_id).tag
+                    tribeData.old_owner_tribe_tag_then = currentTribes.get(oldOwner.tribe_id).tag
                 }
 
                 // console.log('commit conquest', {
@@ -736,6 +736,7 @@ const commitDataDatabase = async function (data, worldId) {
                     village_id,
                     newOwner: newOwnerId,
                     oldOwner: oldOwnerId,
+                    village_points_then: village.points,
                     ...tribeData
                 })
             }
