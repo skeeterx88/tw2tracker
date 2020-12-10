@@ -194,6 +194,27 @@ table.quick-highlight tbody tr:hover td {
     top: 0;
 }
 
+span.conquest-gain,
+span.conquest-loss,
+span.conquest-self {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 7px;
+    box-shadow: 1px 1px 0px #00000050;
+}
+
+span.conquest-gain {
+    background: #21bf32 radial-gradient(circle at 70% 60%, #21bf32, #00de18);
+}
+
+span.conquest-loss {
+    background: #e20000 radial-gradient(circle at 70% 60%, #e20000, #f45a5a);
+}
+
+span.conquest-self {
+    background: #e1d400 radial-gradient(circle at 70% 60%, #ffef00, #e1d400);
+}
 
 @media (max-width: 800px) {
     .content {

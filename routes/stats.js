@@ -16,6 +16,11 @@ const RANKING_CATEGORIES = {
     players: 'players',
     tribes: 'tribes'
 }
+const conquestTypes = {
+    GAIN: 'gain',
+    LOSS: 'loss',
+    SELF: 'self'
+}
 
 router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -33,9 +38,17 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         throw createError(404, 'This world does not exist')
     }
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const players = await db.any(sql.stats.worldTopPlayers, {worldId})
-    const tribes = await db.any(sql.stats.worldTopTribes, {worldId})
+    const [
+        world,
+        players,
+        tribes,
+        lastConquests
+    ] = await Promise.all([
+        await db.one(sql.worlds.one, [marketId, worldNumber]),
+        await db.any(sql.stats.worldTopPlayers, {worldId}),
+        await db.any(sql.stats.worldTopTribes, {worldId}),
+        await db.any(sql.stats.worldLastConquests, {worldId})
+    ])
 
     res.render('stats', {
         title: `${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -44,6 +57,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         players,
         tribes,
         world,
+        lastConquests,
         navigation: [
             `<a href="/">${settings.site_name}</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -86,6 +100,10 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
         throw createError(404, 'This tribe does not exist')
     }
 
+    let conquestCount = await db.one(sql.stats.tribes.conquestCount, {worldId, tribeId})
+    conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
+    conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
+
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     res.render('stats-tribe', {
@@ -94,11 +112,107 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
         worldNumber,
         world,
         tribe,
+        conquestCount,
+        conquestTypes,
         navigation: [
             `<a href="/">${settings.site_name}</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`
+        ],
+        exportValues: {
+            marketId,
+            worldNumber,
+            tribe,
+            mapHighlights: [tribe],
+            mapHighlightsType: 'tribes'
+        },
+        ...utils.ejsHelpers
+    })
+}))
+
+router.get('/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const tribeId = parseInt(req.params.tribeId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    let tribe
+
+    try {
+        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
+    } catch (error) {
+        throw createError(404, 'This tribe does not exist')
+    }
+
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+
+    let conquests
+    let navigationTitle = ['Conquests']
+
+    switch (req.params.type) {
+        case undefined: {
+            conquests = await db.any(sql.stats.tribes.conquests, {worldId, tribeId})
+            break
+        }
+        case conquestTypes.GAIN: {
+            console.log(sql.stats.tribes.conquestsGain)
+            conquests = await db.any(sql.stats.tribes.conquestsGain, {worldId, tribeId})
+            navigationTitle.push('Gains')
+            break
+        }
+        case conquestTypes.LOSS: {
+            conquests = await db.any(sql.stats.tribes.conquestsLoss, {worldId, tribeId})
+            navigationTitle.push('Losses')
+            break
+        }
+        default: {
+            throw createError(404, 'This conquests sub page does not exist')
+        }
+    }
+
+    conquests = conquests.map(function (conquest) {
+        if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
+            conquest.type = conquestTypes.SELF
+        } else if (conquest.new_owner_tribe_id === tribeId) {
+            conquest.type = conquestTypes.GAIN
+        } else if (conquest.old_owner_tribe_id === tribeId) {
+            conquest.type = conquestTypes.LOSS
+        }
+
+
+        return conquest
+    })
+
+    navigationTitle = navigationTitle.join(' ')
+
+    res.render('stats-tribe-conquests', {
+        title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        tribe,
+        conquests,
+        conquestTypes,
+        navigationTitle,
+        // pagination: utils.createPagination(page, total, limit, req.path),
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            navigationTitle
         ],
         exportValues: {
             marketId,
@@ -253,6 +367,10 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
         throw createError(404, 'This player does not exist')
     }
 
+    let conquestCount = await db.one(sql.stats.players.conquestCount, {worldId, playerId})
+    conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
+    conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
+
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     let tribe = false
@@ -267,6 +385,8 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
         worldNumber,
         player,
         tribe,
+        conquestCount,
+        conquestTypes,
         navigation: [
             `<a href="/">${settings.site_name}</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -326,6 +446,98 @@ router.get('/:marketId/:worldNumber/players/:character_id/villages', asyncRouter
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
             'Villages'
+        ],
+        exportValues: {
+            marketId,
+            worldNumber,
+            player,
+            mapHighlights: [player],
+            mapHighlightsType: 'players'
+        },
+        ...utils.ejsHelpers
+    })
+}))
+
+router.get('/:marketId/:worldNumber/players/:playerId/conquests/:type?', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const playerId = parseInt(req.params.playerId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    let player
+
+    try {
+        player = await db.one(sql.worlds.player, {worldId, playerId})
+    } catch (error) {
+        throw createError(404, 'This player does not exist')
+    }
+
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+
+    let conquests
+    let navigationTitle = ['Conquests']
+
+    switch (req.params.type) {
+        case undefined: {
+            conquests = await db.any(sql.stats.players.conquests, {worldId, playerId})
+            break
+        }
+        case conquestTypes.GAIN: {
+            console.log(sql.stats.players.conquestsGain)
+            conquests = await db.any(sql.stats.players.conquestsGain, {worldId, playerId})
+            navigationTitle.push('Gains')
+            break
+        }
+        case conquestTypes.LOSS: {
+            conquests = await db.any(sql.stats.players.conquestsLoss, {worldId, playerId})
+            navigationTitle.push('Losses')
+            break
+        }
+        default: {
+            throw createError(404, 'This conquests sub page does not exist')
+        }
+    }
+
+    conquests = conquests.map(function (conquest) {
+        if (conquest.new_owner === conquest.old_owner) {
+            conquest.type = conquestTypes.SELF
+        } else if (conquest.new_owner === playerId) {
+            conquest.type = conquestTypes.GAIN
+        } else if (conquest.old_owner === playerId) {
+            conquest.type = conquestTypes.LOSS
+        }
+
+        return conquest
+    })
+
+    navigationTitle = navigationTitle.join(' ')
+
+    res.render('stats-player-conquests', {
+        title: `Player ${player.name} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        conquests,
+        conquestTypes,
+        navigationTitle,
+        // pagination: utils.createPagination(page, total, limit, req.path),
+        navigation: [
+            `<a href="/">${settings.site_name}</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
+            navigationTitle
         ],
         exportValues: {
             marketId,

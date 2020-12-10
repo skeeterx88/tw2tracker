@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('includes/head-stats.ejs') %>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <%- include('includes/navigation.ejs') %>
+
+            <div class="content">
+                <div class="left-really-big">
+                    <section id="players">
+                        <h2><%= navigationTitle %></h2>
+
+                        <div class="content-border">
+                            <table class="quick-highlight">
+                                <colgroup>
+                                    <col width="1%">
+                                    <col width="*">
+                                    <col width="5%">
+                                    <col width="*">
+                                    <col width="*">
+                                    <col width="17%">
+                                </colgroup>
+
+                                <thead>
+                                    <th></th>
+                                    <th>Village</th>
+                                    <th>Points</th>
+                                    <th>Old owner</th>
+                                    <th>New owner</th>
+                                    <th>Date/Time</th>
+                                </thead>
+
+                                <tbody>
+                                    <% if (!conquests.length) { -%>
+                                        <tr>
+                                            <td colspan="6">No results</td>
+                                        </tr>
+                                    <% } else { -%>
+                                        <% for (let conquest of conquests) { %>
+                                            <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
+                                                <td><span class="conquest-<%= conquest.type %>"></span></td>
+                                                <td>
+                                                    <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
+                                                </td>
+                                                <td><%= formatNumbers(conquest.village_points_then) %></td>
+
+                                                <% if (conquest.old_owner) { -%>
+                                                    <td>
+                                                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
+
+                                                        <% if (conquest.old_owner_tribe_id) { -%>
+                                                            <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
+                                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
+                                                            <% } else { -%>
+                                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
+                                                            <% } -%>
+                                                        <% } -%>
+                                                    </td>
+                                                <% } else { -%>
+                                                    <td>Abandoned</td>
+                                                <% } -%>
+
+                                                <td>
+                                                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
+
+                                                    <% if (conquest.new_owner_tribe_id) { -%>
+                                                        <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
+                                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>]
+                                                        <% } else { -%>
+                                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>]
+                                                        <% } -%>
+                                                    <% } -%>
+                                                </td>
+                                                <td><%= formatDate(conquest.date) %></td>
+                                            </tr>
+                                        <% } %>
+                                    <% } -%>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="right-really-small">
+                    <section class="world-map">
+                        <h2>World map</h2>
+
+                        <div id="map" class="content-border"></div>
+
+                        <div class="actions">
+                            <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber,
+                player,
+                mapHighlights,
+                mapHighlightsType
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
+        <script type="text/javascript" src="/javascripts/map.js"></script>
+        <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
+    </body>
+</html>
