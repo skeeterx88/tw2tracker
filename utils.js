@@ -198,7 +198,7 @@ const ejsHelpers = {
             ? value.toLocaleString('pt-BR')
             : value
     },
-    formatDate: function (dateObject) {
+    formatDate: function (dateObject, flag = false) {
         if (dateObject instanceof Date) {
             const date = [
                 dateObject.getFullYear(),
@@ -206,11 +206,15 @@ const ejsHelpers = {
                 dateObject.getDate().toString().padStart(2, 0)
             ]
 
-            const time = [
-                dateObject.getHours().toString().padStart(2, 0),
-                dateObject.getMinutes().toString().padStart(2, 0),
-                dateObject.getSeconds().toString().padStart(2, 0)
-            ]
+            const time = []
+
+            if (flag === 'hours-only') {
+                time.push(dateObject.getHours().toString().padStart(2, 0) + 'h')
+            } else {
+                time.push(dateObject.getHours().toString().padStart(2, 0))
+                time.push(dateObject.getMinutes().toString().padStart(2, 0))
+                time.push(dateObject.getSeconds().toString().padStart(2, 0))
+            }
 
             return date.join('/') + ' ' + time.join(':')
         } else {
