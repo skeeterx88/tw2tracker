@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('includes/head-stats.ejs') %>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <%- include('includes/navigation.ejs') %>
+
+            <div class="content">
+                <div class="left">
+                    <section id="village">
+                        <h2>Village profile</h2>
+
+                        <div class="content-border">
+                            <table class="vertical">
+                                <colgroup>
+                                    <col width="50%">
+                                    <col width="50%">
+                                </colgroup>
+                                <tbody>
+                                    <tr>
+                                        <th>Name:</th>
+                                        <td><%= village.name %></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Location:</th>
+                                        <td><%= village.x %>|<%= village.y %></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Points:</th>
+                                        <td><%= formatNumbers(village.points) %></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Owner:</th>
+                                        <% if (village.character_id) { -%>
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= village.character_id %>"><%= village.player_name %></a></td>
+                                        <% } else { -%>
+                                            <td>Abandoned</td>
+                                        <% } -%>
+                                    </tr>
+                                    <tr>
+                                        <th>Owner's tribe:</th>
+                                        <% if (village.character_id && village.tribe_id) { -%>
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= village.tribe_id %>"><%= village.tribe_tag %></a></td>
+                                        <% } else { -%>
+                                            <td>-</td>
+                                        <% } -%>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>Conquest History</h3>
+                        <div class="content-border">
+                            <table>
+                                <colgroup>
+                                    <col width="20%">
+                                    <col width="10%">
+                                    <col width="*">
+                                    <col width="*">
+                                </colgroup>
+
+                                <thead>
+                                    <th>Date/Hour</th>
+                                    <th>Points</th>
+                                    <th>Old owner</th>
+                                    <th>New owner</th>
+                                </thead>
+
+                                <tbody>
+                                    <% if (!conquests.length) { -%>
+                                        <tr>
+                                            <td colspan="4">No results</td>
+                                        </tr>
+                                    <% } else { -%>
+                                        <% for (let conquest of conquests) { %>
+                                            <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
+                                                <td><%= formatDate(conquest.date, 'hours-only') %></td>
+                                                <td><%= formatNumbers(conquest.village_points_then) %></td>
+
+                                                <% if (conquest.old_owner) { -%>
+                                                    <td>
+                                                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
+
+                                                        <% if (conquest.old_owner_tribe_id) { -%>
+                                                            <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
+                                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
+                                                            <% } else { -%>
+                                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
+                                                            <% } -%>
+                                                        <% } -%>
+                                                    </td>
+                                                <% } else { -%>
+                                                    <td>Abandoned</td>
+                                                <% } -%>
+
+                                                <td>
+                                                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
+
+                                                    <% if (conquest.new_owner_tribe_id) { -%>
+                                                        <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
+                                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>]
+                                                        <% } else { -%>
+                                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>]
+                                                        <% } -%>
+                                                    <% } -%>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% } -%>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="right">
+                    <section class="world-map">
+                        <h2>World map</h2>
+
+                        <div id="map" class="content-border"></div>
+
+                        <div class="actions">
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>">View complete world map</a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber,
+                mapHighlights,
+                mapHighlightsType,
+                village
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
+        <script type="text/javascript" src="/javascripts/map.js"></script>
+        <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
+    </body>
+</html>
