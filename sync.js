@@ -142,7 +142,7 @@ Sync.init = async function () {
             // await Sync.registerWorlds()
         }
     } catch (error) {
-        log(colors.red(error.message))
+        log(colors.red(error))
     }
 }
 
