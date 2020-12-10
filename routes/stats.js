@@ -451,7 +451,7 @@ router.get('/:marketId/:worldNumber/players/:character_id/villages', asyncRouter
     const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
-    const character_id = parseInt(req.params.character_id, 10)
+    const playerId = parseInt(req.params.character_id, 10)
 
     const worldId = marketId + worldNumber
     const worldExists = await utils.schemaExists(worldId)
@@ -464,8 +464,8 @@ router.get('/:marketId/:worldNumber/players/:character_id/villages', asyncRouter
     let villages
 
     try {
-        player = await db.one(sql.worlds.player, {worldId, character_id})
-        villages = await db.any(sql.worlds.playerVillages, {worldId, character_id})
+        player = await db.one(sql.worlds.player, {worldId, playerId})
+        villages = await db.any(sql.worlds.playerVillages, {worldId, playerId})
     } catch (error) {
         throw createError(404, 'This player does not exist')
     }
