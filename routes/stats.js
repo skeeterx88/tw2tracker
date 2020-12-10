@@ -44,10 +44,10 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         tribes,
         lastConquests
     ] = await Promise.all([
-        await db.one(sql.worlds.one, [marketId, worldNumber]),
-        await db.any(sql.stats.worldTopPlayers, {worldId}),
-        await db.any(sql.stats.worldTopTribes, {worldId}),
-        await db.any(sql.stats.worldLastConquests, {worldId})
+        db.one(sql.worlds.one, [marketId, worldNumber]),
+        db.any(sql.stats.worldTopPlayers, {worldId}),
+        db.any(sql.stats.worldTopTribes, {worldId}),
+        db.any(sql.stats.worldLastConquests, {worldId})
     ])
 
     res.render('stats', {
