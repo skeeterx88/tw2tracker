@@ -287,6 +287,12 @@ div.world-title {
     margin-left: 15px;
 }
 
+#worlds .stats ul,
+#worlds .settings ul {
+    margin: 0px;
+    padding: 0px;
+}
+
 #worlds .flag {
     height: 14px;
     line-height: 6px;

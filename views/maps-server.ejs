@@ -26,11 +26,11 @@
                                                         <div class="stats">
                                                             <fieldset>
                                                                 <legend>Statistics:</legend>
-                                                                <span>
-                                                                    <%= formatNumbers(world.player_count) %> players,
-                                                                    <%= formatNumbers(world.tribe_count) %> tribes,
-                                                                    <%= formatNumbers(world.village_count) %> villages
-                                                                </span>
+                                                                <ul>
+                                                                    <li><%= formatNumbers(world.player_count) %> players</li>
+                                                                    <li><%= formatNumbers(world.tribe_count) %> tribes</li>
+                                                                    <li><%= formatNumbers(world.village_count) %> villages</li>
+                                                                </ul>
                                                             </fieldset>
                                                         </div>
 
@@ -38,10 +38,10 @@
                                                             <div class="settings">
                                                                 <fieldset>
                                                                     <legend>Settings:</legend>
-                                                                    <span>
-                                                                        victory points system: <% __append(world.config.victory_points ? 'yes' : 'no') %>,
-                                                                        speed: <%= formatNumbers(world.config.speed) %>
-                                                                    </span>
+                                                                    <ul>
+                                                                        <li>World Type: <% __append(world.config.victory_points ? 'Victory Points' : 'Domination') %></li>
+                                                                        <li>Troop relocation: <% __append(world.config.relocate_units ? 'Enabled' : 'Disabled') %></li>
+                                                                    </ul>
                                                                 </fieldset>
                                                             </div>
                                                         <% } -%>
