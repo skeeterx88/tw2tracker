@@ -221,7 +221,8 @@ div.world-title {
     margin-bottom: 10px;
 }
 
-#worlds .world {
+#worlds .world,
+#markets .market {
     color: #311a11;
     width: 230px;
     font-size: 0.8em;
@@ -237,16 +238,19 @@ div.world-title {
     margin: 5px;
 }
 
-#worlds .world:hover {
+#worlds .world:hover,
+#markets .market:hover {
     border-color: #dc9750;
 }
 
-#worlds .world a {
+#worlds .world a,
+#markets .market a {
     color: inherit;
     font-weight: normal;
 }
 
-#worlds .world-title {
+#worlds .world-title,
+#markets .market-title {
     font-size: 1.3em;
     font-weight: bold;
     color: #693a00;
@@ -255,25 +259,29 @@ div.world-title {
     line-height: 18px;
 }
 
-#worlds .info {
+#worlds .info,
+#markets .info {
     display: inline-block;
     vertical-align: middle;
     margin-top: -4px;
 }
 
-#worlds fieldset {
+#worlds fieldset,
+#markets fieldset {
     border: none;
     padding: 0px;
     margin-left: 15px;
 }
 
-#worlds fieldset legend {
+#worlds fieldset legend,
+#markets fieldset legend {
     margin-left: -10px;
     font-weight: bold;
     color: #100a07;
 }
 
-#worlds fieldset {
+#worlds fieldset,
+#markets fieldset {
     border: none;
     padding: 0px;
     margin-left: 15px;

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('includes/head-stats.ejs') %>
+    <body>
+        <header></header>
+        <main class="content-border">
+            <h1>Servers</h1>
+
+            <div class="content">
+                <div class="single">
+                    <section id="markets">
+                        <% for (let market of markets) { -%>
+                            <div class="market">
+                                <a href="/stats/<%= market.id %>">
+                                    <div class="market-title">
+                                        <span class="flag flag-<%= market.id %>"><%= market.id.toUpperCase() %></span>
+                                    </div>
+                                    <div class="info">
+                                        <div class="stats">
+                                            <fieldset>
+                                                <legend>Statistics:</legend>
+                                                <span>
+                                                    <%= formatNumbers(market.player_count) %> players,
+                                                    <%= formatNumbers(market.tribe_count) %> tribes,
+                                                    <%= formatNumbers(market.village_count) %> villages
+                                                </span>
+                                            </fieldset>
+                                        </div>
+                                        <div class="worlds">
+                                            <fieldset>
+                                                <legend>Worlds:</legend>
+                                                <span>
+                                                    open: <%= formatNumbers(market.open_world_count) %>,
+                                                    closed: <%= formatNumbers(market.closed_world_count) %>
+                                                </span>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        <% } -%>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
