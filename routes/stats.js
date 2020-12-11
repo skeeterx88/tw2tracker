@@ -120,7 +120,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         navigation: [
             `<a href="/">${settings.site_name}</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>${!world.open ? ' (Closed)' : ''}`
         ],
         exportValues: {
             marketId,
