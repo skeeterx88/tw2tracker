@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('includes/head-stats.ejs') %>
+    <body>
+        <header></header>
+        <%- include('includes/menu.ejs') %>
+
+        <main class="content-border">
+            <%- include('includes/navigation.ejs') %>
+
+            <div class="content">
+                <div class="single">
+                    <section id="worlds">
+                        <% for (let [label, data] of worlds) { -%>
+                            <% if (data.length) { -%>
+                                <div>
+                                    <h2><%= label %></h2>
+                                    <div>
+                                        <% for (let world of data) { -%>
+                                            <div class="world">
+                                                <a href="/maps/<%= marketId %>/<%= world.num %>">
+                                                    <div class="world-title">
+                                                        <span class="flag flag-<%= marketId %>"><%= world.name %><sup><%= world.num %></sup></span>
+                                                    </div>
+                                                    <div class="info">
+                                                        <div class="stats">
+                                                            <fieldset>
+                                                                <legend>Statistics:</legend>
+                                                                <span>
+                                                                    <%= formatNumbers(world.player_count) %> players,
+                                                                    <%= formatNumbers(world.tribe_count) %> tribes,
+                                                                    <%= formatNumbers(world.village_count) %> villages
+                                                                </span>
+                                                            </fieldset>
+                                                        </div>
+                                                        <div class="settings">
+                                                            <fieldset>
+                                                                <legend>Settings:</legend>
+                                                                <span>
+                                                                    victory points system: <% __append(world.config.victory_points ? 'yes' : 'no') %>,
+                                                                    speed: <%= formatNumbers(world.config.speed) %>
+                                                                </span>
+                                                            </fieldset>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        <% } -%>
+                                    </div>
+                                </div>
+                            <% } -%>
+                        <% } -%>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
