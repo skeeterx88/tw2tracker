@@ -1,9 +1,7 @@
 <menu>
     <a href="/"><li>Home</li></a>
     
-    <% if (typeof worldNumber !== 'undefined') { -%>
-        <a href="/maps/<%= marketId %>/<%= worldNumber %>"><li>Maps</li></a>
-    <% } else if (typeof marketId !== 'undefined') { -%>
+    <% if (typeof marketId !== 'undefined') { -%>
         <a href="/maps/<%= marketId %>"><li>Maps</li></a>
     <% } else { -%>
         <a href="/maps"><li>Maps</li></a>
