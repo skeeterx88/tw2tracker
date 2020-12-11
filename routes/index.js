@@ -25,7 +25,8 @@ router.get('/', asyncRouter(async function (req, res, next) {
         title: settings.site_name,
         markets,
         navigation: [
-            `<a href="/stats/">${settings.site_name}</a>`
+            `<a href="/stats">Stats</a>`,
+            'Server List'
         ],
         ...utils.ejsHelpers
     })

@@ -41,7 +41,8 @@ router.get('/', asyncRouter(async function (req, res, next) {
         title: settings.site_name,
         markets,
         navigation: [
-            `<a href="/stats/">${settings.site_name}</a>`
+            `<a href="/stats">Stats</a>`,
+            'Server List'
         ],
         ...utils.ejsHelpers
     })
@@ -71,8 +72,9 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
         marketId,
         worlds,
         navigation: [
-            `<a href="/stats/">${settings.site_name}</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`
+            `<a href="/stats">Stats</a>`,
+            `Server <a href="/stats/${marketId}">${marketId.toUpperCase()}</a>`,
+            `World List`
         ],
         exportValues: {
             marketId
@@ -118,7 +120,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         world,
         lastConquests,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>${!world.open ? ' (Closed)' : ''}`
         ],
@@ -160,7 +162,7 @@ router.get('/:marketId/:worldNumber/conquests', asyncRouter(async function (req,
         world,
         conquests,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             'Conquests'
@@ -213,7 +215,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
         conquestCount,
         conquestTypes,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`
@@ -306,7 +308,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?', asyncRout
         navigationTitle,
         // pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
@@ -359,7 +361,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async 
         tribe,
         members,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
@@ -420,7 +422,7 @@ const tribeVillagesRouter = async function (req, res, next) {
         villages,
         pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
@@ -486,7 +488,7 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
         conquestCount,
         conquestTypes,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`
@@ -539,7 +541,7 @@ router.get('/:marketId/:worldNumber/players/:character_id/villages', asyncRouter
         player,
         villages,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
@@ -631,7 +633,7 @@ router.get('/:marketId/:worldNumber/players/:playerId/conquests/:type?', asyncRo
         navigationTitle,
         // pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
@@ -684,7 +686,7 @@ router.get('/:marketId/:worldNumber/villages/:village_id', asyncRouter(async fun
         village,
         conquests,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Village <a href="/stats/${marketId}/${world.num}/villages/${village.id}">${village.name}</a>`
@@ -787,7 +789,7 @@ const routerSearch = async function (req, res, next) {
         resultsCount: results.length,
         pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Search "${rawQuery}"`
@@ -865,7 +867,7 @@ const routerRanking = async function (req, res, next) {
         category,
         pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Ranking / ${capitalizedCategory}`

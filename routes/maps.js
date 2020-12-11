@@ -37,7 +37,8 @@ router.get('/', asyncRouter(async function (req, res, next) {
         title: settings.site_name,
         markets,
         navigation: [
-            `<a href="/maps/">Maps</a>`
+            `<a href="/maps">Maps</a>`,
+            `Server List`
         ],
         ...utils.ejsHelpers
     })
@@ -67,8 +68,9 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
         marketId,
         worlds,
         navigation: [
-            `<a href="/maps/">${settings.site_name}</a>`,
-            `Server <a href="/maps/${marketId}/">${marketId.toUpperCase()}</a>`
+            `<a href="/maps">Maps</a>`,
+            `Server <a href="/maps/${marketId}/">${marketId.toUpperCase()}</a>`,
+            'World List'
         ],
         exportValues: {
             marketId
