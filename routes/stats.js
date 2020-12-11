@@ -22,7 +22,7 @@ const conquestTypes = {
     SELF: 'self'
 }
 
-router.get('/', asyncRouter(async function (req, res, next) {
+const homeRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
     const worlds = await db.any(sql.worlds.all)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
@@ -46,9 +46,12 @@ router.get('/', asyncRouter(async function (req, res, next) {
         ],
         ...utils.ejsHelpers
     })
-}))
+})
 
-router.get('/:marketId', asyncRouter(async function (req, res, next) {
+router.get('/', homeRouter)
+router.get('/stats', homeRouter)
+
+router.get('/stats/:marketId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2) {
         return next()
     }
@@ -83,7 +86,7 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
     })
 }))
 
-router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -136,7 +139,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     })
 }))
 
-router.get('/:marketId/:worldNumber/conquests', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/conquests', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -175,7 +178,7 @@ router.get('/:marketId/:worldNumber/conquests', asyncRouter(async function (req,
     })
 }))
 
-router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -231,7 +234,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function
     })
 }))
 
-router.get('/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -325,7 +328,7 @@ router.get('/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?', asyncRout
     })
 }))
 
-router.get('/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -439,10 +442,10 @@ const tribeVillagesRouter = async function (req, res, next) {
     })
 }
 
-router.get('/:marketId/:worldNumber/tribes/:tribeId/villages', asyncRouter(tribeVillagesRouter))
-router.get('/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', asyncRouter(tribeVillagesRouter))
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages', asyncRouter(tribeVillagesRouter))
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', asyncRouter(tribeVillagesRouter))
 
-router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -504,7 +507,7 @@ router.get('/:marketId/:worldNumber/players/:playerId', asyncRouter(async functi
     })
 }))
 
-router.get('/:marketId/:worldNumber/players/:character_id/villages', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/players/:character_id/villages', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -558,7 +561,7 @@ router.get('/:marketId/:worldNumber/players/:character_id/villages', asyncRouter
     })
 }))
 
-router.get('/:marketId/:worldNumber/players/:playerId/conquests/:type?', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -650,7 +653,7 @@ router.get('/:marketId/:worldNumber/players/:playerId/conquests/:type?', asyncRo
     })
 }))
 
-router.get('/:marketId/:worldNumber/villages/:village_id', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/villages/:village_id', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -702,7 +705,7 @@ router.get('/:marketId/:worldNumber/villages/:village_id', asyncRouter(async fun
     })
 }))
 
-router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
+router.post('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -720,7 +723,7 @@ router.post('/:marketId/:worldNumber/search/', asyncRouter(async function (req, 
     return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
 }))
 
-router.get('/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
@@ -802,8 +805,8 @@ const routerSearch = async function (req, res, next) {
     })
 }
 
-router.get('/:marketId/:worldNumber/search/:category/:query', asyncRouter(routerSearch))
-router.get('/:marketId/:worldNumber/search/:category/:query/page/:page', asyncRouter(routerSearch))
+router.get('/stats/:marketId/:worldNumber/search/:category/:query', asyncRouter(routerSearch))
+router.get('/stats/:marketId/:worldNumber/search/:category/:query/page/:page', asyncRouter(routerSearch))
 
 const routerRanking = async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -880,7 +883,7 @@ const routerRanking = async function (req, res, next) {
     })
 }
 
-router.get('/:marketId/:worldNumber/ranking/:category?/', asyncRouter(routerRanking))
-router.get('/:marketId/:worldNumber/ranking/:category?/page/:page', asyncRouter(routerRanking))
+router.get('/stats/:marketId/:worldNumber/ranking/:category?/', asyncRouter(routerRanking))
+router.get('/stats/:marketId/:worldNumber/ranking/:category?/page/:page', asyncRouter(routerRanking))
 
 module.exports = router

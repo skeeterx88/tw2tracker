@@ -12,12 +12,11 @@ const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const getSettings = require('./settings')
 const development = process.env.NODE_ENV === 'development'
 
-const indexRouter = require('./routes/index')
+const statsRouter = require('./routes/stats')
 const adminRouter = require('./routes/admin')
 const loginRouter = require('./routes/login')
 const logoutRouter = require('./routes/logout')
 const mapsRouter = require('./routes/maps')
-const statsRouter = require('./routes/stats')
 
 const app = express()
 
@@ -83,12 +82,11 @@ app.use(passport.session())
 //     })
 // }
 
-app.use('/', indexRouter)
+app.use('/', statsRouter)
 app.use('/admin', adminRouter)
 app.use('/login', loginRouter)
 app.use('/logout', logoutRouter)
 app.use('/maps', mapsRouter)
-app.use('/stats', statsRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
