@@ -224,7 +224,7 @@ div.world-title {
 #worlds .world,
 #markets .market {
     color: #311a11;
-    width: 230px;
+    width: 235px;
     font-size: 0.8em;
     border-color: #b18e76;
     border-radius: 1px;
@@ -257,6 +257,7 @@ div.world-title {
     text-align: center;
     cursor: pointer;
     line-height: 18px;
+    margin-bottom: 5px;
 }
 
 #worlds .info,
@@ -287,8 +288,18 @@ div.world-title {
     margin-left: 15px;
 }
 
+#markets .stats,
+#markets .worlds,
+#worlds .stats,
+#worlds .settings {
+    float: left;
+}
+
 #worlds .stats ul,
-#worlds .settings ul {
+#worlds .settings ul,
+
+#markets .stats ul,
+#markets .worlds ul {
     margin: 0px;
     padding: 0px;
 }

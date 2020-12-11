@@ -21,20 +21,20 @@
                                         <div class="stats">
                                             <fieldset>
                                                 <legend>Statistics:</legend>
-                                                <span>
-                                                    <%= formatNumbers(market.player_count) %> players,
-                                                    <%= formatNumbers(market.tribe_count) %> tribes,
-                                                    <%= formatNumbers(market.village_count) %> villages
-                                                </span>
+                                                <ul>
+                                                    <li><%= formatNumbers(market.player_count) %> players</li>
+                                                    <li><%= formatNumbers(market.tribe_count) %> tribes</li>
+                                                    <li><%= formatNumbers(market.village_count) %> villages</li>
+                                                </ul>
                                             </fieldset>
                                         </div>
                                         <div class="worlds">
                                             <fieldset>
                                                 <legend>Worlds:</legend>
-                                                <span>
-                                                    open: <%= formatNumbers(market.open_world_count) %>,
-                                                    closed: <%= formatNumbers(market.closed_world_count) %>
-                                                </span>
+                                                <ul>
+                                                    <li>Open: <%= formatNumbers(market.open_world_count) %></li>
+                                                    <li>Closed: <%= formatNumbers(market.closed_world_count) %></li>
+                                                </ul>
                                             </fieldset>
                                         </div>
                                     </div>
