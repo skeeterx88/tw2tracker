@@ -34,7 +34,7 @@ router.get('/', asyncRouter(async function (req, res, next) {
     })
 
     res.render('maps-home', {
-        title: settings.site_name,
+        title: `Maps - Server List - ${settings.site_name}`,
         markets,
         navigation: [
             `<a href="/maps">Maps</a>`,
@@ -64,7 +64,7 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
     ]
 
     res.render('maps-server', {
-        title: `${marketId.toUpperCase()} - ${settings.site_name}`,
+        title: `Maps ${marketId.toUpperCase()} - World List - ${settings.site_name}`,
         marketId,
         worlds,
         navigation: [
@@ -99,17 +99,17 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         throw createError(404, 'This world does not exist')
     }
 
-    const worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const lastSync = worldInfo.last_sync ? new Date(worldInfo.last_sync).getTime() : false
+    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
 
     res.render('map', {
-        title: `Map ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `Map ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
-        world: worldInfo,
+        world,
         exportValues: {
             marketId,
             worldNumber,
-            worldName: worldInfo.name,
+            worldName: world.name,
             lastSync,
             development
         }
@@ -149,7 +149,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
     db.query(sql.maps.updateShareAccess, [mapShareId])
 
     res.render('map', {
-        title: `Map ${marketId}${worldNumber} - ${settings.site_name}`,
+        title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${settings.site_name}`,
         marketId,
         world,
         exportValues: {
