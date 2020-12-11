@@ -96,7 +96,7 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
     const status = err.status || 500
-    res.locals.error = req.app.get('env') === 'development' ? err : err.message
+    res.locals.error = req.app.get('env') === 'development' ? err.stack : err.message
     res.locals.status = status
     res.locals.title = 'Tw2-Tracker Error'
 
