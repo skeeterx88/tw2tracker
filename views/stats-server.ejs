@@ -33,15 +33,18 @@
                                                                 </span>
                                                             </fieldset>
                                                         </div>
-                                                        <div class="settings">
-                                                            <fieldset>
-                                                                <legend>Settings:</legend>
-                                                                <span>
-                                                                    victory points system: <% __append(world.config.victory_points ? 'yes' : 'no') %>,
-                                                                    speed: <%= formatNumbers(world.config.speed) %>
-                                                                </span>
-                                                            </fieldset>
-                                                        </div>
+
+                                                        <% if (world.config) { -%>
+                                                            <div class="settings">
+                                                                <fieldset>
+                                                                    <legend>Settings:</legend>
+                                                                    <span>
+                                                                        victory points system: <% __append(world.config.victory_points ? 'yes' : 'no') %>,
+                                                                        speed: <%= formatNumbers(world.config.speed) %>
+                                                                    </span>
+                                                                </fieldset>
+                                                            </div>
+                                                        <% } -%>
                                                     </div>
                                                 </a>
                                             </div>

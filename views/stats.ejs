@@ -39,7 +39,7 @@
                                     <col width="*">
                                     <col width="50px">
                                     <col width="50px">
-                                    <% if (world.config.victory_points) { -%>
+                                    <% if (world.config && world.config.victory_points) { -%>
                                         <col width="40px">
                                     <% } -%>
                                     <col width="50px">
@@ -50,7 +50,7 @@
                                         <th>Tribe</th>
                                         <th>Members</th>
                                         <th>Points</th>
-                                        <% if (world.config.victory_points) { -%>
+                                        <% if (world.config && world.config.victory_points) { -%>
                                             <th title="Victory Points">VP</th>
                                         <% } -%>
                                         <th>Villages</th>
@@ -69,7 +69,7 @@
                                             <td><%= formatNumbers(tribe.members) %></td>
                                             <td><%= formatNumbers(tribe.points) %></td>
 
-                                            <% if (world.config.victory_points) { -%>
+                                            <% if (world.config && world.config.victory_points) { -%>
                                                 <td><%= formatNumbers(tribe.victory_points) %></td>
                                             <% } -%>
 
@@ -95,7 +95,7 @@
                                     <col width="*">
                                     <col width="50px">
                                     <col width="50px">
-                                    <% if (world.config.victory_points) { -%>
+                                    <% if (world.config && world.config.victory_points) { -%>
                                         <col width="40px">
                                     <% } -%>
                                     <col width="50px">
@@ -106,7 +106,7 @@
                                         <th>Player</th>
                                         <th>Tribe</th>
                                         <th>Points</th>
-                                        <% if (world.config.victory_points) { -%>
+                                        <% if (world.config && world.config.victory_points) { -%>
                                             <th title="Victory Points">VP</th>
                                         <% } -%>
                                         <th>Villages</th>
@@ -126,7 +126,7 @@
 
                                             <td><%= formatNumbers(player.points) %></td>
 
-                                            <% if (world.config.victory_points) { -%>
+                                            <% if (world.config && world.config.victory_points) { -%>
                                                 <td><%= formatNumbers(player.victory_points) %></td>
                                             <% } -%>
 
