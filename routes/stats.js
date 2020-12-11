@@ -30,14 +30,15 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
     const marketId = req.params.marketId
     const marketWorlds = await db.any(sql.stats.marketWorlds, {marketId})
+    const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num)
 
     if (!marketWorlds.length) {
         throw createError(404, 'This server does not exist or does not have any available world')
     }
 
     const worlds = [
-        ['Open Worlds', marketWorlds.filter(world => world.open)],
-        ['Closed Worlds', marketWorlds.filter(world => !world.open)]
+        ['Open Worlds', sortedWorlds.filter(world => world.open)],
+        ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
     ]
 
     res.render('stats-server', {
@@ -45,7 +46,7 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
         marketId,
         worlds,
         navigation: [
-            `<a href="/">${settings.site_name}</a>`,
+            `<a href="/stats/">${settings.site_name}</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`
         ],
         exportValues: {

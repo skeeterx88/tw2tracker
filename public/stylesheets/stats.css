@@ -221,13 +221,9 @@ div.world-title {
     margin-bottom: 10px;
 }
 
-#worlds {
-
-}
-
 #worlds .world {
     color: #311a11;
-    width: 220px;
+    width: 230px;
     font-size: 0.8em;
     border-color: #b18e76;
     border-radius: 1px;
@@ -281,6 +277,16 @@ div.world-title {
     border: none;
     padding: 0px;
     margin-left: 15px;
+}
+
+#worlds .flag {
+    height: 14px;
+    line-height: 6px;
+}
+
+sup {
+    font-weight: normal;
+    font-size: 0.7em;
 }
 
 @media (max-width: 800px) {
