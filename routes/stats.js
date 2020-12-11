@@ -35,14 +35,15 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
         throw createError(404, 'This server does not exist or does not have any available world')
     }
 
-    const openWorlds = marketWorlds.filter(world => world.open)
-    const closedWorlds = marketWorlds.filter(world => !world.open)
+    const worlds = [
+        ['Open Worlds', marketWorlds.filter(world => world.open)],
+        ['Closed Worlds', marketWorlds.filter(world => !world.open)]
+    ]
 
     res.render('stats-server', {
         title: `${marketId.toUpperCase()} - ${settings.site_name}`,
         marketId,
-        openWorlds,
-        closedWorlds,
+        worlds,
         navigation: [
             `<a href="/">${settings.site_name}</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`

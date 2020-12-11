@@ -222,8 +222,7 @@ div.world-title {
 }
 
 #worlds {
-    margin: 0 auto;
-    width: 90%;
+    
 }
 
 #worlds .world {
@@ -238,7 +237,7 @@ div.world-title {
     cursor: pointer;
     border-style: outset;
     border-width: 2px;
-    float: left;
+    display: inline-block;
     margin: 5px;
 }
 
