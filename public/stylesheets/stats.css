@@ -326,4 +326,22 @@ sup {
     .content > div.right-really-small {
         width: 100%;
     }
+
+    menu {
+        margin-bottom: 0px;
+    }
+
+    menu li {
+        width: 80px;
+        padding: 1px 0px;
+        text-align: center;
+        border-radius: 1px;
+        margin-left: 3px;
+        margin-right: 3px;
+        margin-bottom: 10px;
+    }
+
+    menu li.donate {
+        margin-left: 3px;
+    }
 }

@@ -65,9 +65,68 @@ header {
 }
 
 menu {
+    position: relative;
     padding: 0px;
-    margin: 0px;
+    margin-left: 10px;
+    margin-bottom: -3px;
+    font-size: 0.9em;
+}
+
+menu a,
+menu a:hover {
+    color: white;
+}
+
+menu li {
+    width: 100px;
+    display: inline-block;
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #364956 0%, #3f5361 70%, #435c6d 70%);
+    padding: 4px 8px 8px 8px;
+    margin: 0 8px;
     text-align: center;
+    border-radius: 1px 1px 0px 0px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0px #000;
+    box-shadow: 0px 0px 0px 1px #442810,
+                0px 0px 0px 2px #c17a4a,
+                0px 0px 0px 3px #8f5632,
+                0px 0px 0px 4px #201612,
+                inset 1px 1px 3px #ffffff40,
+                inset -1px -1px 1px #00000040;
+}
+
+menu li:hover {
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 0%, #3f5361 70%, #4c6271 70%);
+}
+
+menu li.discord {
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7289da 0%, #3f5361 70%, #4c6271 70%);
+}
+
+menu li.discord:hover {
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #4167ff 10%, #3f5361 70%, #4c6271 70%);
+}
+
+menu li.donate {
+    margin-left: 50px;
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #d2c741 0%, #3f5361 70%, #435c6d 70%);
+}
+
+menu li.donate:hover {
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #ffee20 20%, #3f5361 70%, #435c6d 70%);
+}
+
+main {
+    position: relative;
+    margin: 0 auto;
+    padding: 10px;
+    background: url(/images/noise.png),
+                url(/images/content-border-left.webp) left repeat-y,
+                url(/images/content-border-right.webp) right repeat-y,
+                url(/images/content-border-top.webp) top repeat-x,
+                url(/images/content-border-bottom.webp) bottom repeat-x,
+                #e8d5a5;
 }
 
 .content-border {
@@ -119,26 +178,6 @@ menu {
     background-image: linear-gradient(#c75f5f, #7d1616);
 }
 
-menu li {
-    width: 100px;
-    margin: 15px 10px;
-    display: inline-block;
-    background: url(/images/noise.png), #e8d5a5;
-    padding: 10px;
-    text-align: center;
-}
-
-main {
-    margin: 0 auto;
-    background: url(/images/noise.png),
-                url(/images/content-border-left.webp) left repeat-y,
-                url(/images/content-border-right.webp) right repeat-y,
-                url(/images/content-border-top.webp) top repeat-x,
-                url(/images/content-border-bottom.webp) bottom repeat-x,
-                #e8d5a5;
-    padding: 10px;
-}
-
 div.modal {
     width: 630px;
     margin: 0 auto;
@@ -148,4 +187,21 @@ div.modal {
     text-shadow: 1px 1px 0px #00000090;
     z-index: 7;
     transition: visibility 0.02s linear, opacity 0.02s linear;
+}
+
+.icon {
+    background-size: 18px;
+    width: 18px;
+    height: 18px;
+    vertical-align: bottom;
+    display: inline-block;
+    background-repeat: no-repeat;
+}
+
+.icon-discord {
+    background-image: url(/images/icons/discord.svg);
+}
+
+.icon-heart {
+    background-image: url(/images/icons/heart.svg);
 }
