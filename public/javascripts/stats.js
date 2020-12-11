@@ -57,6 +57,8 @@
 
         map.init()
 
+        addEventListener('resize', map.recalcSize)
+
         await loader.loadInfo
 
         if (typeof mapHighlights !== 'undefined') {
