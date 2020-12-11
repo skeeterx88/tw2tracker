@@ -222,7 +222,7 @@ div.world-title {
 }
 
 #worlds {
-    
+
 }
 
 #worlds .world {
@@ -303,25 +303,13 @@ div.world-title {
         flex-direction: column;
     }
 
-    .content > div.left {
-        width: 100%;
-        margin-right: 0px;
-    }
-
-    .content > div.right {
-        width: 100%;
-        margin-left: 0px;
-    }
-
-    .content > div.single {
-        width: 100%;
-    }
-
-    .content > div.left-big {
-        width: 100%;
-    }
-
-    .content > div.right-small {
+    .content > div.single,
+    .content > div.left,
+    .content > div.right,
+    .content > div.left-big,
+    .content > div.right-small,
+    .content > div.left-really-big,
+    .content > div.right-really-small {
         width: 100%;
     }
 }
