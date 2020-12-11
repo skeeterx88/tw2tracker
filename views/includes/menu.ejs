@@ -1,5 +1,9 @@
 <menu>
-    <a href="/stats"><li>Stats</li></a>
+    <% if (typeof marketId !== 'undefined') { -%>
+        <a href="/stats/<%= marketId %>"><li>Stats</li></a>
+    <% } else { -%>
+        <a href="/stats"><li>Stats</li></a>
+    <% } -%>
     
     <% if (typeof marketId !== 'undefined') { -%>
         <a href="/maps/<%= marketId %>"><li>Maps</li></a>
