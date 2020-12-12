@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('includes/head-stats.ejs') %>
+    <%- include('../head.ejs') %>
     <body>
         <header></header>
-        <%- include('includes/menu.ejs') %>
+        <%- include('../menu.ejs') %>
 
         <main class="content-border">
-            <%- include('includes/navigation.ejs') %>
+            <%- include('../navigation.ejs') %>
 
             <div class="content">
                 <div class="left">
-                    <section id="tribe">
-                        <h2>Tribe profile</h2>
+                    <section id="player">
+                        <h2>Player profile</h2>
 
                         <div class="content-border">
                             <table class="vertical">
@@ -22,78 +22,68 @@
                                 <tbody>
                                     <tr>
                                         <th>Rank:</th>
-                                        <td><%= formatNumbers(tribe.rank) %></td>
+                                        <td><%= formatNumbers(player.rank) %></td>
                                     </tr>
                                     <tr>
                                         <th>Name:</th>
-                                        <td><%= tribe.name %></td>
+                                        <td><%= player.name %></td>
                                     </tr>
                                     <tr>
-                                        <th>Tag:</th>
-                                        <td><%= tribe.tag %></td>
+                                        <th>Tribe:</th>
+                                        <td>
+                                            <% if (tribe) { %>
+                                                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %> (<%= tribe.tag %>)</a>
+                                            <% } else { %>
+                                                No tribe
+                                            <% } %>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Villages:</th>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/villages"><%= formatNumbers(tribe.villages) %></a></td>
+                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/villages"><%= formatNumbers(player.villages) %></a></td>
                                     </tr>
                                     <tr>
                                         <th>Points:</th>
-                                        <td><%= formatNumbers(tribe.points) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Members:</th>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/members"><%= formatNumbers(tribe.members) %></a></td>
+                                        <td><%= formatNumbers(player.points) %></td>
                                     </tr>
                                     <tr>
                                         <th>Bash Attack:</th>
-                                        <td><%= formatNumbers(tribe.bash_points_off) %></td>
+                                        <td><%= formatNumbers(player.bash_points_off) %></td>
                                     </tr>
                                     <tr>
                                         <th>Bash Defense:</th>
-                                        <td><%= formatNumbers(tribe.bash_points_def) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Average Points/Member:</th>
-                                        <td><%= formatNumbers(tribe.points_per_member) %></td>
+                                        <td><%= formatNumbers(player.bash_points_def) %></td>
                                     </tr>
                                     <tr>
                                         <th>Average Points/Village:</th>
-                                        <td><%= formatNumbers(tribe.points_per_villages) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Member Changes:</th>
-                                        <td>-</td>
+                                        <td><%= formatNumbers(player.points_per_villages) %></td>
                                     </tr>
                                     <tr>
                                         <th>Village Conquers:</th>
                                         <td>
-                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests"><%= formatNumbers(conquestCount[conquestTypes.GAIN] + conquestCount[conquestTypes.LOSS]) %></a>
-                                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/<%= conquestTypes.GAIN %>"><%= formatNumbers(conquestCount[conquestTypes.GAIN]) %></a>
-                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/<%= conquestTypes.LOSS %>"><%= formatNumbers(conquestCount[conquestTypes.LOSS]) %></a>)
+                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestCount[conquestTypes.GAIN] + conquestCount[conquestTypes.LOSS]) %></a>
+                                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/<%= conquestTypes.GAIN %>"><%= formatNumbers(conquestCount[conquestTypes.GAIN]) %></a>
+                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/<%= conquestTypes.LOSS %>"><%= formatNumbers(conquestCount[conquestTypes.LOSS]) %></a>)
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Best Rank:</th>
-                                        <td><%= formatNumbers(tribe.best_rank) %> <small class="right"><%= formatDate(tribe.best_rank_date) %></small></td>
+                                        <td><%= formatNumbers(player.best_rank) %> <small class="right"><%= formatDate(player.best_rank_date) %></small></td>
                                     </tr>
                                     <tr>
                                         <th>Most Points:</th>
-                                        <td><%= formatNumbers(tribe.best_points) %> <small class="right"><%= formatDate(tribe.best_points_date) %></small></td>
+                                        <td><%= formatNumbers(player.best_points) %> <small class="right"><%= formatDate(player.best_points_date) %></small></td>
                                     </tr>
                                     <tr>
                                         <th>Most Villages:</th>
-                                        <td><%= formatNumbers(tribe.best_villages) %> <small class="right"><%= formatDate(tribe.best_villages_date) %></small></td>
-                                    </tr>
-                                    <tr>
-                                        <th>First seen:</th>
-                                        <td><%= formatDate(tribe.first_seen) %></td>
+                                        <td><%= formatNumbers(player.best_villages) %> <small class="right"><%= formatDate(player.best_villages_date) %></small></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <div class="actions">
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/history">View tribe history</a>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/history">View player history</a>
                         </div>
                     </section>
                 </div>
@@ -118,7 +108,7 @@
                 worldNumber,
                 mapHighlights,
                 mapHighlightsType,
-                tribe
+                player
             } = <%- JSON.stringify(exportValues) %>
         </script>
         <script type="text/javascript" src="/javascripts/map.js"></script>

@@ -34,7 +34,7 @@ router.get('/', asyncRouter(async function (req, res, next) {
         }
     })
 
-    res.render('maps-home', {
+    res.render('maps/servers', {
         title: `Maps - Server List - ${settings.site_name}`,
         marketStats,
         navigation: [
@@ -64,7 +64,7 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
         ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
     ]
 
-    res.render('maps-server', {
+    res.render('maps/worlds', {
         title: `Maps ${marketId.toUpperCase()} - World List - ${settings.site_name}`,
         marketId,
         worlds,
@@ -103,7 +103,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
     const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
 
-    res.render('map', {
+    res.render('maps/map', {
         title: `Map ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         world,
@@ -149,7 +149,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
 
     db.query(sql.maps.updateShareAccess, [mapShareId])
 
-    res.render('map', {
+    res.render('maps/map', {
         title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${settings.site_name}`,
         marketId,
         world,

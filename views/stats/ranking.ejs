@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('includes/head-stats.ejs') %>
+    <%- include('../head.ejs') %>
     <body>
         <header></header>
-        <%- include('includes/menu.ejs') %>
+        <%- include('../menu.ejs') %>
 
         <main class="content-border">
-            <%- include('includes/navigation.ejs') %>
+            <%- include('../navigation.ejs') %>
 
             <div class="content">
                 <div class="left">
                     <h2>Ranking</h2>
 
                     <div class="content-border">
-                        <%- include('rankings/' + category + '.ejs') %>
-                        <%- include('includes/pagination.ejs') %>
+                        <%- include('ranking/' + category + '.ejs') %>
+                        <%- include('../pagination.ejs') %>
                     </div>
                 </div>
 

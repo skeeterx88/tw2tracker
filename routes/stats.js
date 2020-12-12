@@ -38,7 +38,7 @@ const homeRouter = asyncRouter(async function (req, res, next) {
         }
     })
 
-    res.render('stats-home', {
+    res.render('stats/servers', {
         title: settings.site_name,
         marketStats,
         navigation: [
@@ -71,7 +71,7 @@ router.get('/stats/:marketId', asyncRouter(async function (req, res, next) {
         ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
     ]
 
-    res.render('stats-server', {
+    res.render('stats/worlds', {
         title: `${marketId.toUpperCase()} - ${settings.site_name}`,
         marketId,
         worlds,
@@ -115,7 +115,7 @@ router.get('/stats/:marketId/:worldNumber', asyncRouter(async function (req, res
         db.any(sql.stats.worldLastConquests, {worldId})
     ])
 
-    res.render('stats', {
+    res.render('stats/world', {
         title: `${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -159,7 +159,7 @@ router.get('/stats/:marketId/:worldNumber/conquests', asyncRouter(async function
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
     const conquests = await db.any(sql.stats.worldConquests, {worldId})
 
-    res.render('stats-conquests', {
+    res.render('stats/conquests', {
         title: `${marketId.toUpperCase()}/${world.name} - Conquests - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -210,7 +210,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
-    res.render('stats-tribe', {
+    res.render('stats/tribe', {
         title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -301,7 +301,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?', asy
 
     navigationTitle = navigationTitle.join(' ')
 
-    res.render('stats-tribe-conquests', {
+    res.render('stats/tribe-conquests', {
         title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -357,7 +357,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(
     const members = await db.any(sql.worlds.tribeMembers, {worldId, tribeId})
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
-    res.render('stats-tribe-members', {
+    res.render('stats/tribe-members', {
         title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -382,7 +382,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(
     })
 }))
 
-const tribeVillagesRouter = async function (req, res, next) {
+const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -417,7 +417,7 @@ const tribeVillagesRouter = async function (req, res, next) {
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
-    res.render('stats-tribe-villages', {
+    res.render('stats/tribe-villages', {
         title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -441,10 +441,10 @@ const tribeVillagesRouter = async function (req, res, next) {
         },
         ...utils.ejsHelpers
     })
-}
+})
 
-router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages', asyncRouter(tribeVillagesRouter))
-router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', asyncRouter(tribeVillagesRouter))
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages', tribeVillagesRouter)
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', tribeVillagesRouter)
 
 router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -483,7 +483,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         tribe = await db.one(sql.worlds.tribeName, {worldId, tribeId: player.tribe_id})
     }
 
-    res.render('stats-player', {
+    res.render('stats/player', {
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -537,7 +537,7 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/villages', async
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
-    res.render('stats-player-villages', {
+    res.render('stats/player-villages', {
         title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -627,7 +627,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', a
 
     navigationTitle = navigationTitle.join(' ')
 
-    res.render('stats-player-conquests', {
+    res.render('stats/player-conquests', {
         title: `Player ${player.name} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -682,7 +682,7 @@ router.get('/stats/:marketId/:worldNumber/villages/:village_id', asyncRouter(asy
     const conquests = await db.any(sql.stats.villageConquestHistory, {worldId, village_id})
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
-    res.render('stats-village', {
+    res.render('stats/village', {
         title: `Village ${village.name} (${village.x}|${village.y}) - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -783,7 +783,7 @@ const routerSearch = async function (req, res, next) {
     const results = allResults.slice(offset, offset + limit)
     const total = allResults.length
 
-    return res.render('search', {
+    return res.render('stats/search', {
         title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
@@ -860,7 +860,7 @@ const routerRanking = async function (req, res, next) {
 
     const capitalizedCategory = utils.capitalize(category)
 
-    res.render('ranking', {
+    res.render('stats/ranking', {
         title: `${capitalizedCategory} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,

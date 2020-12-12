@@ -9,7 +9,7 @@
 
     <% if (pagination.showGotoFirst) { -%>
         <td>
-            <a class="page" href="/stats<%= pagination.path %>/">&lt;&lt;&lt; First</a>
+            <a class="page" href="<%= pagination.path %>/">&lt;&lt;&lt; First</a>
         </td>
     <% } else { -%>
         <td></td>
@@ -17,7 +17,7 @@
 
     <% if (pagination.showGotoPrev) { -%>
         <td>
-            <a class="page" href="/stats<%= pagination.path %>/page/<%= (pagination.current - 1) %>">&lt; Previous</a>
+            <a class="page" href="<%= pagination.path %>/page/<%= (pagination.current - 1) %>">&lt; Previous</a>
         </td>
     <% } else { -%>
         <td></td>
@@ -26,16 +26,16 @@
     <td>
         <% for (let i = pagination.start; i <= pagination.end; i++) { -%>
             <% if (i === pagination.current) { -%>
-                <span class="page current"><a href="/stats<%= pagination.path %>/page/<%= i %>"><%= i %></a></span>
+                <span class="page current"><a href="<%= pagination.path %>/page/<%= i %>"><%= i %></a></span>
             <% } else { -%>
-                <a class="page" href="/stats<%= pagination.path %>/page/<%= i %>"><%= i %></a>
+                <a class="page" href="<%= pagination.path %>/page/<%= i %>"><%= i %></a>
             <% } -%>
         <% } -%>
     </td>
 
     <% if (pagination.showGotoNext) { -%>
         <td>
-            <a class="page" href="/stats<%= pagination.path %>/page/<%= (pagination.current + 1) %>">Next &gt;</a>
+            <a class="page" href="<%= pagination.path %>/page/<%= (pagination.current + 1) %>">Next &gt;</a>
         </td>
     <% } else { -%>
         <td></td>
@@ -43,7 +43,7 @@
 
     <% if (pagination.showGotoLast) { -%>
         <td>
-            <a class="page" href="/stats<%= pagination.path %>/page/<%= pagination.last %>">Last &gt;&gt;&gt;</a>
+            <a class="page" href="<%= pagination.path %>/page/<%= pagination.last %>">Last &gt;&gt;&gt;</a>
         </td>
     <% } else { -%>
         <td></td>

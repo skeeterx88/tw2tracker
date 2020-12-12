@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('includes/head-stats.ejs') %>
+    <%- include('../head.ejs') %>
     <body>
         <header></header>
-        <%- include('includes/menu.ejs') %>
+        <%- include('../menu.ejs') %>
 
         <main class="content-border">
-            <%- include('includes/navigation.ejs') %>
+            <%- include('../navigation.ejs') %>
 
             <div class="content">
                 <div class="left-really-big">
                     <section id="players">
-                        <h2><%= navigationTitle %></h2>
+                        <h2>World Conquests</h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
                                 <colgroup>
-                                    <col width="1%">
                                     <col width="*">
                                     <col width="5%">
                                     <col width="*">
@@ -25,7 +24,6 @@
                                 </colgroup>
 
                                 <thead>
-                                    <th></th>
                                     <th>Village</th>
                                     <th>Points</th>
                                     <th>Old owner</th>
@@ -41,7 +39,6 @@
                                     <% } else { -%>
                                         <% for (let conquest of conquests) { %>
                                             <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
-                                                <td><span class="conquest-<%= conquest.type %>"></span></td>
                                                 <td>
                                                     <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
                                                 </td>
@@ -101,10 +98,7 @@
         <script type="text/javascript">
             const {
                 marketId,
-                worldNumber,
-                player,
-                mapHighlights,
-                mapHighlightsType
+                worldNumber
             } = <%- JSON.stringify(exportValues) %>
         </script>
         <script type="text/javascript" src="/javascripts/map.js"></script>

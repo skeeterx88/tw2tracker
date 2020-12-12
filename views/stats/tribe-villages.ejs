@@ -1,51 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('includes/head-stats.ejs') %>
+    <%- include('../head.ejs') %>
     <body>
         <header></header>
-        <%- include('includes/menu.ejs') %>
+        <%- include('../menu.ejs') %>
 
         <main class="content-border">
-            <%- include('includes/navigation.ejs') %>
+            <%- include('../navigation.ejs') %>
 
             <div class="content">
                 <div class="left">
                     <section id="players">
-                        <h2>Tribe Members</h2>
+                        <h2>Tribe Villages</h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
                                 <colgroup>
-                                    <col width="5%">
                                     <col width="*">
-                                    <col width="10%">
-                                    <col width="10%">
+                                    <col width="70px">
+                                    <col width="60px">
+                                    <col width="*">
                                 </colgroup>
-
                                 <thead>
-                                    <th>Rank</th>
-                                    <th>Name</th>
-                                    <th>Points</th>
-                                    <th>Villages</th>
+                                    <tr>
+                                        <th>Village</th>
+                                        <th>Coords</th>
+                                        <th>Points</th>
+                                        <th>Owner</th>
+                                    </tr>
                                 </thead>
-
                                 <tbody>
-                                    <% if (!members.length) { %>
-                                        <tr>
-                                            <td colspan="*">This triba does not have any members</td>
-                                        </tr>
-                                    <% } %>
-
-                                    <% for (let member of members) { %>
-                                        <tr data-id="<%= member.id %>" data-highlight-type="players">
-                                            <td><%= formatNumbers(member.rank) %></td>
-                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
-                                            <td><%= formatNumbers(member.points) %></td>
-                                            <td><%= formatNumbers(member.villages) %></td>
+                                    <% for (let village of villages) { %>
+                                        <tr data-id="<%= village.village_id %>" data-highlight-type="villages">
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.village_id %>/"><%= village.village_name %></a></td>
+                                            <td><%= village.village_x %>|<%= village.village_y %></td>
+                                            <td><%= formatNumbers(village.village_points) %></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
                                         </tr>
                                     <% } %>
                                 </tbody>
                             </table>
+
+                            <%- include('../pagination.ejs') %>
                         </div>
                     </section>
                 </div>

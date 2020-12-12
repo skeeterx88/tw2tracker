@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('includes/head-stats.ejs') %>
+    <%- include('../head.ejs') %>
     <body>
         <header></header>
-        <%- include('includes/menu.ejs') %>
+        <%- include('../menu.ejs') %>
 
         <main class="content-border">
-            <%- include('includes/navigation.ejs') %>
+            <%- include('../navigation.ejs') %>
 
             <div class="content">
                 <div class="single">
@@ -16,7 +16,7 @@
                             <a href="/stats/<%= marketId %>/<%= world.num %>/">Go back</a>
                         <% } else { %>
                             <%- include('search/' + category + '.ejs') %>
-                            <%- include('includes/pagination.ejs') %>
+                            <%- include('../pagination.ejs') %>
                         <% } %>
                     </section>
                 </div>
