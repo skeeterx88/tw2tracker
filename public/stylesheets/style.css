@@ -78,11 +78,11 @@ menu a:hover {
 }
 
 menu li {
-    width: 100px;
+    width: 90px;
     display: inline-block;
     background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #364956 0%, #3f5361 70%, #435c6d 70%);
-    padding: 4px 8px 8px 8px;
-    margin: 0 8px;
+    padding: 4px 4px 8px 4px;
+    margin: 0 4px;
     text-align: center;
     border-radius: 1px 1px 0px 0px;
     font-weight: bold;
@@ -190,9 +190,9 @@ div.modal {
 }
 
 .icon {
-    background-size: 18px;
-    width: 18px;
-    height: 18px;
+    background-size: 15px;
+    width: 15px;
+    height: 15px;
     vertical-align: bottom;
     display: inline-block;
     background-repeat: no-repeat;
