@@ -26,20 +26,21 @@ const homeRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
     const worlds = await db.any(sql.worlds.all)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
-    const markets = marketsIds.map(function (marketId) {
+
+    const marketStats = marketsIds.map(function (id) {
         return {
-            id: marketId,
-            player_count: worlds.reduce((base, next) => next.market === marketId ? base + next.player_count : base, 0),
-            tribe_count: worlds.reduce((base, next) => next.market === marketId ? base + next.tribe_count : base, 0),
-            village_count: worlds.reduce((base, next) => next.market === marketId ? base + next.village_count : base, 0),
-            open_world_count: worlds.reduce((base, next) => next.market === marketId && next.open ? base + 1 : base, 0),
-            closed_world_count: worlds.reduce((base, next) => next.market === marketId && !next.open ? base + 1 : base, 0)
+            id,
+            players: worlds.reduce((base, next) => next.market === id ? base + next.player_count : base, 0),
+            tribes: worlds.reduce((base, next) => next.market === id ? base + next.tribe_count : base, 0),
+            villages: worlds.reduce((base, next) => next.market === id ? base + next.village_count : base, 0),
+            openWorld: worlds.filter((world) => world.market === id).length,
+            closedWorld: worlds.filter((world) => world.market === id).length
         }
     })
 
     res.render('stats-home', {
         title: settings.site_name,
-        markets,
+        marketStats,
         navigation: [
             `<a href="/stats">Stats</a>`,
             'Server List'

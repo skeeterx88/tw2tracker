@@ -11,7 +11,7 @@
             <div class="content">
                 <div class="single">
                     <section id="markets">
-                        <% for (let market of markets) { -%>
+                        <% for (let market of marketStats) { -%>
                             <div class="market">
                                 <a href="/stats/<%= market.id %>">
                                     <div class="market-title">
@@ -22,9 +22,9 @@
                                             <fieldset>
                                                 <legend>Statistics:</legend>
                                                 <ul>
-                                                    <li><%= formatNumbers(market.player_count) %> players</li>
-                                                    <li><%= formatNumbers(market.tribe_count) %> tribes</li>
-                                                    <li><%= formatNumbers(market.village_count) %> villages</li>
+                                                    <li><%= formatNumbers(market.players) %> players</li>
+                                                    <li><%= formatNumbers(market.tribes) %> tribes</li>
+                                                    <li><%= formatNumbers(market.villages) %> villages</li>
                                                 </ul>
                                             </fieldset>
                                         </div>
@@ -32,8 +32,8 @@
                                             <fieldset>
                                                 <legend>Worlds:</legend>
                                                 <ul>
-                                                    <li>Open: <%= formatNumbers(market.open_world_count) %></li>
-                                                    <li>Closed: <%= formatNumbers(market.closed_world_count) %></li>
+                                                    <li>Open: <%= formatNumbers(market.openWorld) %></li>
+                                                    <li>Closed: <%= formatNumbers(market.closedWorld) %></li>
                                                 </ul>
                                             </fieldset>
                                         </div>
