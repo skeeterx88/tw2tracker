@@ -12,8 +12,8 @@
                 <div class="single">
                     <section id="markets">
                         <% for (let market of marketStats) { -%>
-                            <div class="market">
-                                <a href="/stats/<%= market.id %>">
+                            <a href="/stats/<%= market.id %>">
+                                <div class="market">
                                     <div class="market-title">
                                         <span class="flag flag-<%= market.id %>"><%= market.id.toUpperCase() %></span>
                                     </div>
@@ -38,8 +38,8 @@
                                             </fieldset>
                                         </div>
                                     </div>
-                                </a>
-                            </div>
+                                </div>
+                            </a>
                         <% } -%>
                     </section>
                 </div>

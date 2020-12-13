@@ -17,8 +17,8 @@
                                     <h2><%= label %></h2>
                                     <div>
                                         <% for (let world of data) { -%>
-                                            <div class="world">
-                                                <a href="/stats/<%= marketId %>/<%= world.num %>">
+                                            <a href="/stats/<%= marketId %>/<%= world.num %>">
+                                                <div class="world">
                                                     <div class="world-title">
                                                         <span class="flag flag-<%= marketId %>"><%= world.name %><sup><%= world.num %></sup></span>
                                                     </div>
@@ -46,8 +46,8 @@
                                                             </div>
                                                         <% } -%>
                                                     </div>
-                                                </a>
-                                            </div>
+                                                </div>
+                                            </a>
                                         <% } -%>
                                     </div>
                                 </div>

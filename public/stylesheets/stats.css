@@ -221,10 +221,17 @@ div.world-title {
     margin-bottom: 10px;
 }
 
+#worlds .world {
+    width: 250px;
+}
+
+#markets .market {
+    width: 170px;
+}
+
 #worlds .world,
 #markets .market {
     color: #311a11;
-    width: 235px;
     font-size: 0.8em;
     border-color: #b18e76;
     border-radius: 1px;
