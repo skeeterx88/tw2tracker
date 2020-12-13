@@ -29,8 +29,8 @@ router.get('/', asyncRouter(async function (req, res, next) {
             players: worlds.reduce((base, next) => next.market === id ? base + next.player_count : base, 0),
             tribes: worlds.reduce((base, next) => next.market === id ? base + next.tribe_count : base, 0),
             villages: worlds.reduce((base, next) => next.market === id ? base + next.village_count : base, 0),
-            openWorld: worlds.filter((world) => world.market === id).length,
-            closedWorld: worlds.filter((world) => world.market === id).length
+            openWorld: worlds.filter((world) => world.market === id && world.open).length,
+            closedWorld: worlds.filter((world) => world.market === id && !world.open).length
         }
     })
 
