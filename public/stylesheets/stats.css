@@ -248,6 +248,7 @@ div.world-title {
 #worlds .world:hover,
 #markets .market:hover {
     border-color: #dc9750;
+    background: url(/images/noise.png) #ffe49d40;
 }
 
 #worlds .world a,
