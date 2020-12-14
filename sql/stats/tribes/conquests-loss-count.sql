@@ -1,3 +1,3 @@
 SELECT COUNT(*)::int
 FROM ${worldId:name}.conquests
-WHERE new_owner = ${playerId}
+WHERE old_owner_tribe_id = ${tribeId}
