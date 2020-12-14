@@ -648,15 +648,15 @@ const commitDataDatabase = async function (data, worldId) {
 
             const [best_rank, best_points, best_villages] = tribesBestValues.get(tribe_id) || []
 
-            if (!best_rank || tribe.rank > best_rank) {
+            if (!best_rank || tribe.rank <= best_rank) {
                 this.none(sql.worlds.update.tribeBestRank, {worldId, rank: tribe.rank, tribe_id})
             }
             
-            if (!best_points || tribe.points > best_points) {
+            if (!best_points || tribe.points >= best_points) {
                 this.none(sql.worlds.update.tribeBestPoints, {worldId, points: tribe.points, tribe_id})
             }
 
-            if (!best_villages || tribe.villages > best_villages) {
+            if (!best_villages || tribe.villages >= best_villages) {
                 this.none(sql.worlds.update.tribeBestVillages, {worldId, villages: tribe.villages, tribe_id})
             }
         }
@@ -666,7 +666,7 @@ const commitDataDatabase = async function (data, worldId) {
 
             const [best_rank, best_points, best_villages] = playersBestValues.get(character_id) || []
 
-            if (!best_rank || player.rank >= best_rank) {
+            if (!best_rank || player.rank <= best_rank) {
                 this.none(sql.worlds.update.playerBestRank, {worldId, rank: player.rank, character_id})
             }
 
