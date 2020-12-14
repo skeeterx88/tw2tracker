@@ -573,7 +573,7 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/villages', async
     })
 }))
 
-router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', asyncRouter(async function (req, res, next) {
+const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -601,21 +601,30 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', a
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
     let conquests
+    let total
     let navigationTitle = ['Conquests']
+
+    const page = req.params.page && !isNaN(req.params.page)
+        ? Math.max(1, parseInt(req.params.page, 10))
+        : 1
+    const offset = settings.ranking_items_per_page * (page - 1)
+    const limit = settings.ranking_items_per_page
 
     switch (req.params.type) {
         case undefined: {
-            conquests = await db.any(sql.stats.players.conquests, {worldId, playerId})
+            conquests = await db.any(sql.stats.players.conquests, {worldId, playerId, offset, limit})
+            total = parseInt((await db.one(sql.stats.players.conquestsCount, {worldId, playerId})).count, 10)
             break
         }
         case conquestTypes.GAIN: {
-            console.log(sql.stats.players.conquestsGain)
-            conquests = await db.any(sql.stats.players.conquestsGain, {worldId, playerId})
+            conquests = await db.any(sql.stats.players.conquestsGain, {worldId, playerId, offset, limit})
+            total = parseInt((await db.one(sql.stats.players.conquestsGainCount, {worldId, playerId})).count, 10)
             navigationTitle.push('Gains')
             break
         }
         case conquestTypes.LOSS: {
-            conquests = await db.any(sql.stats.players.conquestsLoss, {worldId, playerId})
+            conquests = await db.any(sql.stats.players.conquestsLoss, {worldId, playerId, offset, limit})
+            total = parseInt((await db.one(sql.stats.players.conquestsLossCount, {worldId, playerId})).count, 10)
             navigationTitle.push('Losses')
             break
         }
@@ -646,7 +655,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', a
         conquests,
         conquestTypes,
         navigationTitle,
-        // pagination: utils.createPagination(page, total, limit, req.path),
+        pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -663,7 +672,10 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', a
         },
         ...utils.ejsHelpers
     })
-}))
+})
+
+router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', playerConquestsRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?/page/:page', playerConquestsRouter)
 
 router.get('/stats/:marketId/:worldNumber/villages/:village_id', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {

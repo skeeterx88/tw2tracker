@@ -22,3 +22,4 @@ LEFT OUTER JOIN ${worldId:name}.villages
 ON (${worldId:name}.villages.id = conquests.village_id)
 WHERE new_owner = ${playerId}
 ORDER BY conquests.date DESC
+LIMIT ${limit} OFFSET ${offset}
