@@ -140,7 +140,7 @@ router.get('/stats/:marketId/:worldNumber', asyncRouter(async function (req, res
     })
 }))
 
-router.get('/stats/:marketId/:worldNumber/conquests', asyncRouter(async function (req, res, next) {
+const conquestsRouter = asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -156,8 +156,15 @@ router.get('/stats/:marketId/:worldNumber/conquests', asyncRouter(async function
         throw createError(404, 'This world does not exist')
     }
 
+    const page = req.params.page && !isNaN(req.params.page)
+        ? Math.max(1, parseInt(req.params.page, 10))
+        : 1
+    const offset = settings.ranking_items_per_page * (page - 1)
+    const limit = settings.ranking_items_per_page
+
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const conquests = await db.any(sql.stats.worldConquests, {worldId})
+    const conquests = await db.any(sql.stats.worldConquests, {worldId, offset, limit})
+    const total = parseInt((await db.one(sql.stats.worldConquestsCount, {worldId})).count, 10)
 
     res.render('stats/conquests', {
         title: `${marketId.toUpperCase()}/${world.name} - Conquests - ${settings.site_name}`,
@@ -165,6 +172,7 @@ router.get('/stats/:marketId/:worldNumber/conquests', asyncRouter(async function
         worldNumber,
         world,
         conquests,
+        pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -177,7 +185,10 @@ router.get('/stats/:marketId/:worldNumber/conquests', asyncRouter(async function
         },
         ...utils.ejsHelpers
     })
-}))
+})
+
+router.get('/stats/:marketId/:worldNumber/conquests', conquestsRouter)
+router.get('/stats/:marketId/:worldNumber/conquests/page/:page', conquestsRouter)
 
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
