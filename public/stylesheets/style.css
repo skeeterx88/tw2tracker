@@ -104,7 +104,7 @@ menu li.donate {
     margin-left: 50px;
 }
 
-main {
+main, footer {
     position: relative;
     margin: 0 auto;
     padding: 10px;
@@ -114,6 +114,12 @@ main {
                 url(/images/content-border-top.webp) top repeat-x,
                 url(/images/content-border-bottom.webp) bottom repeat-x,
                 #e8d5a5;
+}
+
+footer {
+    margin-top: 10px;
+    margin-bottom: 50px;
+    text-align: center;
 }
 
 .content-border {
