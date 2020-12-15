@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.conquests (
 
 CREATE TABLE IF NOT EXISTS ${worldId:name}.player_achievements (
     id SERIAL PRIMARY KEY,
-    character_id,
+    character_id INT,
     type VARCHAR (50) REFERENCES main.achievement_types(name),
     category achievement_categories,
     level SMALLINT NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.player_achievements (
 
 CREATE TABLE IF NOT EXISTS ${worldId:name}.tribe_achievements (
     id SERIAL PRIMARY KEY,
-    tribe_id,
+    tribe_id INT,
     type VARCHAR (50) REFERENCES main.achievement_types(name),
     category achievement_categories,
     level SMALLINT NOT NULL,
