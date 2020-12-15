@@ -864,6 +864,7 @@ const commitDataDatabase = async function (data, worldId) {
         }
 
         const currentPlayers = new Map(data.players)
+        const oldPlayers = new Map(await this.map(sql.worlds.players, {worldId}, player => [player.id, player]))
         const currentTribes = new Map(data.tribes)
         const currentVillages = new Map(data.villages)
         const currentVillagesId = Array.from(currentVillages.keys())
@@ -919,6 +920,26 @@ const commitDataDatabase = async function (data, worldId) {
                     village_points_then: village.points,
                     ...tribeData
                 })
+            }
+        }
+
+        for (let [character_id, player] of currentPlayers.entries()) {
+            const oldPlayer = oldPlayers.get(character_id)
+
+            if (player.tribe_id !== oldPlayers.tribe_id) {
+                let oldTribe = await this.any(sql.worlds.tribe, {worldId, tribeId: oldPlayers.tribe_id})
+                let newTribe = await this.any(sql.worlds.tribe, {worldId, tribeId: player.tribe_id})
+
+                const data = {
+                    character_id,
+                    old_tribe: oldPlayers.tribe_id,
+                    new_tribe: player.tribe_id
+                }
+
+                data.old_tribe_tag_then = oldTribe.length ? oldTribe[0].tag : null
+                data.new_tribe_tag_then = newTribe.length ? newTribe[0].tag : null
+
+                this.none(sql.worlds.insert.tribeChange, {worldId, ...data})
             }
         }
 
