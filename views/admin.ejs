@@ -9,24 +9,24 @@
     <h1><%= title %></h1>
 
     <!-- <ul>
-        <li><span class="flag flag-de"></span></li>
-        <li><span class="flag flag-en"></span></li>
-        <li><span class="flag flag-br"></span></li>
-        <li><span class="flag flag-pl"></span></li>
-        <li><span class="flag flag-nl"></span></li>
-        <li><span class="flag flag-fr"></span></li>
-        <li><span class="flag flag-ru"></span></li>
-        <li><span class="flag flag-zz"></span></li>
-        <li><span class="flag flag-us"></span></li>
-        <li><span class="flag flag-es"></span></li>
-        <li><span class="flag flag-it"></span></li>
-        <li><span class="flag flag-gr"></span></li>
-        <li><span class="flag flag-tr"></span></li>
-        <li><span class="flag flag-cz"></span></li>
-        <li><span class="flag flag-pt"></span></li>
-        <li><span class="flag flag-sk"></span></li>
-        <li><span class="flag flag-ro"></span></li>
-        <li><span class="flag flag-hu"></span></li>
+        <li><span class="flag-de"></span></li>
+        <li><span class="flag-en"></span></li>
+        <li><span class="flag-br"></span></li>
+        <li><span class="flag-pl"></span></li>
+        <li><span class="flag-nl"></span></li>
+        <li><span class="flag-fr"></span></li>
+        <li><span class="flag-ru"></span></li>
+        <li><span class="flag-zz"></span></li>
+        <li><span class="flag-us"></span></li>
+        <li><span class="flag-es"></span></li>
+        <li><span class="flag-it"></span></li>
+        <li><span class="flag-gr"></span></li>
+        <li><span class="flag-tr"></span></li>
+        <li><span class="flag-cz"></span></li>
+        <li><span class="flag-pt"></span></li>
+        <li><span class="flag-sk"></span></li>
+        <li><span class="flag-ro"></span></li>
+        <li><span class="flag-hu"></span></li>
     </ul> -->
 
     <h2>Settings</h2>
@@ -63,7 +63,7 @@
         <% const market_enabled = market.enabled ? 'Yes' : 'No' %>
 
         <div class="market">
-            <span class="flag flag-<%= market.id %>"></span>
+            <span class="flag-<%= market.id %>"></span>
             <span><%= market.id %></span>
 
             <div class="long-info">
@@ -86,7 +86,7 @@
         <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
 
         <div class="world">
-            <span class="flag flag-<%= world.market %>"></span>
+            <span class="flag-<%= world.market %>"></span>
             <span><%= world.market %><%= world.num %> (<%= world.name %></span>)
             <div class="short-info">
                 <span class="last-sync">Last sync: <strong><%= formatNumbers(world_last_sync) %></strong></span>
