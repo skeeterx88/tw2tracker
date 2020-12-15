@@ -371,8 +371,7 @@ sup {
     }
 
     menu .icon {
-        mask-size: 13px;
         height: 13px;
-        width: 15px;
+        background-size: 12px;
     }
 }

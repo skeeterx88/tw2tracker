@@ -177,20 +177,18 @@ div.modal {
 }
 
 menu .icon {
-    mask-size: 16px;
-    mask-repeat: no-repeat;
-    background: white;
     width: 15px;
-    height: 15px;
-    vertical-align: bottom;
+    height: 16px;
     display: inline-block;
     background-repeat: no-repeat;
+    background-size: 15px;
+    vertical-align: middle;
 }
 
 menu .icon-discord {
-    mask-image: url(/images/icons/discord.svg);
+    background-image: url(/images/icons/discord.svg);
 }
 
 menu .icon-heart {
-    mask-image: url(/images/icons/heart.svg);
+    background-image: url(/images/icons/heart.svg);
 }
