@@ -863,24 +863,6 @@ const commitDataDatabase = async function (data, worldId) {
             this.none(sql.worlds.insert.province, {worldId, province_id, province_name})
         }
 
-        for (let [character_id, achievements] of data.playersAchievement) {
-            const achievementCount = (await this.one(sql.stats.players.achievementCount, {worldId, character_id})).count
-
-            if (achievements.length > achievementCount) {
-                for (let achievement of achievements.slice(achievementCount)) {
-                    this.none(sql.worlds.insert.playerAchievement, {
-                        worldId,
-                        character_id,
-                        type: achievement.type,
-                        category: achievement.category,
-                        level: achievement.level,
-                        period: achievement.period || null,
-                        time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
-                    })
-                }
-            }
-        }
-
         const currentPlayers = new Map(data.players)
         const currentTribes = new Map(data.tribes)
         const currentVillages = new Map(data.villages)
