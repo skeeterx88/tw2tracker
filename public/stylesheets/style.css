@@ -4,6 +4,14 @@ html {
     font-size: 14px;
     font-family: 'Trebuchet MS', 'Lucida Grande', Helvetica, Arial, sans-serif;
     background: url(/images/background-scene.webp) top no-repeat, url(/images/noise-2.png), #88785F;
+    margin: 0px;
+    color: #50311d;
+}
+
+body {
+    width: 90vw;
+    margin: auto;
+    padding: 10px;
 }
 
 input,
@@ -13,15 +21,9 @@ button {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-html {
-    margin: 0px;
-    color: #50311d;
-}
-
-body {
-    width: 90vw;
-    margin: auto;
-    padding: 10px;
+table {
+    background: #ab80455e;
+    width: 100%;
 }
 
 code {
@@ -53,6 +55,15 @@ h1 {
 h2 {
     font-size: 1.3em;
     margin: 5px 0;
+}
+
+sup {
+    font-weight: normal;
+    font-size: 0.7em;
+}
+
+section {
+    margin-bottom: 15px;
 }
 
 header {
@@ -120,6 +131,81 @@ footer {
     margin-top: 10px;
     margin-bottom: 50px;
     text-align: center;
+}
+
+section .actions {
+    margin: 12px 0px;
+}
+
+small {
+    padding: 2px 0px;
+    font-size: 0.8em;
+}
+
+table.vertical th,
+table.vertical td {
+    text-align: left;
+}
+
+.right {
+    float: right;
+}
+
+table.vertical th {
+    background: #ab804521;
+}
+
+th {
+    background: #ab80455e;
+}
+
+tr:nth-child(even) {
+    background: #bd9b6c4f;
+}
+
+td, th {
+    text-align: center;
+    height: 20px;
+    padding: 1px 3px 1px 3px;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+}
+
+.content > div.left {
+    width: 60%;
+    margin-right: 6px;
+}
+
+.content > div.right {
+    width: 40%;
+    margin-left: 6px;
+}
+
+.content > div.left-big {
+    width: 70%;
+    margin-right: 6px;
+}
+
+.content > div.right-small {
+    width: 30%;
+    margin-left: 6px;
+}
+
+.content > div.left-really-big {
+    width: 80%;
+    margin-right: 6px;
+}
+
+.content > div.right-really-small {
+    width: 20%;
+    margin-left: 6px;
+}
+
+.content > div.single {
+    width: 100%;
 }
 
 .content-border {
@@ -197,4 +283,289 @@ menu .icon-discord {
 
 menu .icon-heart {
     background-image: url(/images/icons/heart.svg);
+}
+
+#search .wrapper {
+    padding: 10px;
+    background: #ab80455e;
+    text-align: center;
+}
+
+#search form {
+    width: 100%;
+}
+
+#search form > div {
+    display: block;
+}
+
+#search form .submit-buttons {
+    margin-top: 5px;
+}
+
+#search form input[type="text"] {
+    width: 75%;
+    height: 22px;
+    border-radius: 1px;
+    border: 1px solid #8d5b39;
+    padding: 1px 5px;
+    background: url(/images/noise.png) #a07246;
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset 1px 1px 3px #00000095;
+}
+
+#search form input[type="text"]:focus {
+    border: 1px solid #b17a55;
+}
+
+#search form input[type="text"]::placeholder {
+    color: #333;
+    text-shadow: none;
+}
+
+#search form input[type="submit"] {
+    height: 26px;
+    padding: 0px 5px;
+    outline: none;
+    cursor: pointer;
+    color: #e0bfbf;
+    text-shadow: 1px 1px 0px #000;
+    border-radius: 1px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #794929;
+    background: url(/images/noise.png), linear-gradient(#8d5b39, #583f2d);
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                2px 2px 2px #000,
+                inset -1px -1px 2px #000;
+}
+
+#search form input[type="submit"]:hover,
+#search form input[type="submit"]:focus {
+    background: url(/images/noise.png), linear-gradient(#af7046, #583f2d);
+}
+
+div.world-title {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#worlds .world {
+    width: 250px;
+}
+
+#markets .market {
+    width: 170px;
+}
+
+#worlds .world,
+#markets .market {
+    color: #311a11;
+    font-size: 0.8em;
+    border-color: #b18e76;
+    border-radius: 1px;
+    background: url(/images/noise.png) #f9eed166;
+    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e, 2px 2px 2px #000;
+    padding: 5px 0px;
+    cursor: pointer;
+    border-style: outset;
+    border-width: 2px;
+    display: inline-block;
+    margin: 5px;
+}
+
+#worlds .world:hover,
+#markets .market:hover {
+    border-color: #dc9750;
+    background: url(/images/noise.png) #ffe49d40;
+}
+
+#worlds .world a,
+#markets .market a {
+    color: inherit;
+    font-weight: normal;
+}
+
+#worlds .world-title,
+#markets .market-title {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #693a00;
+    text-align: center;
+    cursor: pointer;
+    line-height: 18px;
+    margin-bottom: 5px;
+}
+
+#worlds .info,
+#markets .info {
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: -4px;
+}
+
+#worlds fieldset,
+#markets fieldset {
+    border: none;
+    padding: 0px;
+    margin-left: 15px;
+}
+
+#worlds fieldset legend,
+#markets fieldset legend {
+    margin-left: -10px;
+    font-weight: bold;
+    color: #100a07;
+}
+
+#worlds fieldset,
+#markets fieldset {
+    border: none;
+    padding: 0px;
+    margin-left: 15px;
+}
+
+#markets .stats,
+#markets .worlds,
+#worlds .stats,
+#worlds .settings {
+    float: left;
+}
+
+#worlds .stats ul,
+#worlds .settings ul,
+
+#markets .stats ul,
+#markets .worlds ul {
+    margin: 0px;
+    padding: 0px;
+}
+
+#worlds .flag {
+    height: 14px;
+    line-height: 6px;
+}
+
+.pagination {
+    background: #ab80455e;
+    width: 100%;
+    text-align: center;
+    padding: 3px 0px;
+    border-top: 1px solid #5e351b3d;
+}
+
+.pagination .page {
+    padding: 3px 4px;
+}
+
+.pagination .current {
+    background: #a276384f;
+    border-radius: 3px;
+}
+
+#map {
+    height: 481px;
+    background: #436213;
+    margin: 5px 0px;
+}
+
+#tribes .top-colors {
+    width: 8px;
+    height: 8px;
+    position: relative;
+    border-radius: 1px;
+    border: 1px solid #8d5b39;
+    background-image: url(/images/noise.png);
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e,
+                1px 1px 2px #000;
+    display: inline-block;
+}
+
+table.quick-highlight tbody tr:hover td {
+    background: #e0b47657;
+}
+
+.world-map {
+    position: sticky;
+    top: 0;
+}
+
+span.conquest-gain,
+span.conquest-loss,
+span.conquest-self {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 7px;
+    box-shadow: 1px 1px 0px #00000050;
+}
+
+span.conquest-gain {
+    background: #21bf32 radial-gradient(circle at 70% 60%, #21bf32, #00de18);
+}
+
+span.conquest-loss {
+    background: #e20000 radial-gradient(circle at 70% 60%, #e20000, #f45a5a);
+}
+
+span.conquest-self {
+    background: #e1d400 radial-gradient(circle at 70% 60%, #ffef00, #e1d400);
+}
+
+@media (max-width: 800px) {
+    html {
+        font-size: 12px;
+    }
+
+    body {
+        width: 95vw;
+    }
+
+    header {
+        height: 8em;
+        background-size: 25em;
+        margin-bottom: 10px;
+        filter: drop-shadow(10px 10px 12px #00000090);
+    }
+
+    .content {
+        flex-direction: column;
+    }
+
+    .content > div.single,
+    .content > div.left,
+    .content > div.right,
+    .content > div.left-big,
+    .content > div.right-small,
+    .content > div.left-really-big,
+    .content > div.right-really-small {
+        width: 100%;
+    }
+
+    menu {
+        margin-bottom: 0px;
+    }
+
+    menu li {
+        width: 80px;
+        padding: 1px 0px;
+        text-align: center;
+        border-radius: 1px;
+        margin-left: 3px;
+        margin-right: 3px;
+        margin-bottom: 10px;
+    }
+
+    menu li.donate {
+        margin-left: 3px;
+    }
+
+    menu .icon {
+        height: 13px;
+        background-size: 12px;
+    }
 }
