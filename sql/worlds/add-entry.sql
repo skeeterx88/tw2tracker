@@ -99,4 +99,24 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.conquests (
     old_owner_tribe_tag_then VARCHAR (3) NULL,
     new_owner_tribe_id INT REFERENCES ${worldId:name}.tribes(id) NULL,
     new_owner_tribe_tag_then VARCHAR (3) NULL
-)
+);
+
+CREATE TABLE IF NOT EXISTS ${worldId:name}.player_achievements (
+    id SERIAL PRIMARY KEY,
+    character_id,
+    type VARCHAR (50) REFERENCES main.achievement_types(name),
+    category achievement_categories,
+    level SMALLINT NOT NULL,
+    period VARCHAR (20),
+    time_last_level TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ${worldId:name}.tribe_achievements (
+    id SERIAL PRIMARY KEY,
+    tribe_id,
+    type VARCHAR (50) REFERENCES main.achievement_types(name),
+    category achievement_categories,
+    level SMALLINT NOT NULL,
+    period VARCHAR (20),
+    time_last_level TIMESTAMP
+);

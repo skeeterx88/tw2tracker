@@ -3,6 +3,7 @@ const sql = require('./sql')
 const utils = require('./utils')
 const {log, worldEntryExists} = utils
 const Scrapper = require('./scrapper.js')
+const ScrapperAchievements = require('./scrapper-achievements.js')
 const readyState = require('./ready-state.js')
 const getSettings = require('./settings')
 const Events = require('./events.js')
@@ -30,11 +31,17 @@ const {
     SCRAPPE_WORLD_END,
     SCRAPPE_ALL_WORLD_START,
     SCRAPPE_ALL_WORLD_END,
-    IGNORE_LAST_SYNC
+    IGNORE_LAST_SYNC,
+    SCRAPPE_ACHIEVEMENT_WORLD_START,
+    SCRAPPE_ACHIEVEMENT_WORLD_END,
+    SCRAPPE_ACHIEVEMENT_ALL_WORLD_START,
+    SCRAPPE_ACHIEVEMENT_ALL_WORLD_END
 } = require('./constants.js')
 
 let syncInProgress = false
 let syncAllInProgress = false
+let syncAchievementInProgress = false
+let syncAllAchievementInProgress = false
 
 Events.on(SCRAPPE_WORLD_START, function () {
     syncInProgress = true
@@ -50,6 +57,22 @@ Events.on(SCRAPPE_WORLD_START, function () {
 
 Events.on(SCRAPPE_WORLD_END, function () {
     syncAllInProgress = false
+})
+
+Events.on(SCRAPPE_ACHIEVEMENT_WORLD_START, function () {
+    syncAchievementInProgress = true
+})
+
+Events.on(SCRAPPE_ACHIEVEMENT_WORLD_END, function () {
+    syncAchievementInProgress = false
+})
+
+Events.on(SCRAPPE_ACHIEVEMENT_ALL_WORLD_START, function () {
+    syncAllAchievementInProgress = true
+})
+
+Events.on(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END, function () {
+    syncAllAchievementInProgress = false
 })
 
 let browser = null
@@ -128,8 +151,8 @@ Sync.init = async function () {
 
         if (development) {
             // // SKIP WORLD SYNC AND COMMIT "FAKE" DATA TO DB/FS.
-            // const worldNumber = 52
-            // const marketId = 'br'
+            // const worldNumber = 8
+            // const marketId = 'zz'
             // const worldId = marketId + worldNumber
             // const data = JSON.parse(await fs.promises.readFile(path.join('.', 'data', `${worldId}.freeze.json`)))
             // await commitDataDatabase(data, worldId)
@@ -138,8 +161,11 @@ Sync.init = async function () {
             // await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
             // await Sync.allWorlds()
-            // await Sync.world('br', 52)
+            // await Sync.world('br', 48)
             // await Sync.registerWorlds()
+            
+            // await Sync.worldAchievements('br', 48)
+            // await Sync.allWorldsAchievements()
         }
     } catch (error) {
         log(colors.red(error))
@@ -152,6 +178,7 @@ Sync.daemon = async function () {
 
     const {
         scrappe_all_interval,
+        scrappe_achievements_all_interval,
         register_worlds_interval,
         clean_shares_check_interval
     } = await db.one(sql.settings.intervals)
@@ -159,6 +186,11 @@ Sync.daemon = async function () {
     const scrapeWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
         await Sync.allWorlds()
         log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+    })
+
+    const scrapeAchievementsWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
+        await Sync.allWorldsAchievements()
+        log('Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const registerWorldsJob = schedule.scheduleJob(register_worlds_interval, async function () {
@@ -173,6 +205,7 @@ Sync.daemon = async function () {
     })
 
     log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+    log('Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     log('Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     log('Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()), log.DECREASE)
 }
@@ -573,7 +606,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         Events.trigger(SCRAPPE_WORLD_END)
     } catch (error) {
-        log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
+        log(colors.red(`Failed to synchronize ${worldId}: ${error.stack}`))
         log.decrease()
 
         if (page) {
@@ -586,6 +619,153 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             await db.query(sql.worlds.updateSyncStatus, [SYNC_FAIL, marketId, worldNumber])
             Events.trigger(SCRAPPE_WORLD_END)
 
+            throw new Error(error.message)
+        }
+    }
+}
+
+Sync.allWorldsAchievements = async function (flag) {
+    log()
+    log('Sync.allWorldsAchievements()', log.INCREASE)
+
+    Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_START)
+
+    const failedToSync = []
+    const perf = utils.perf(utils.perf.MINUTES)
+
+    let worlds
+
+    if (development) {
+        worlds = [
+            {market: 'zz', num: 8},
+            {market: 'br', num: 52}
+        ]
+    } else {
+        worlds = await db.any(sql.worlds.allOpen)
+    }
+
+    await puppeteerBrowser()
+
+    for (let world of worlds) {
+        try {
+            await Sync.worldAchievements(world.market, world.num, flag)
+        } catch (error) {
+            failedToSync.push({
+                marketId: world.market,
+                worldNumber: world.num,
+                message: error.message
+            })
+        }
+    }
+
+    const time = perf.end()
+
+    await puppeteerClose()
+
+    Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END)
+
+    if (failedToSync.length) {
+        if (failedToSync.length === worlds.length) {
+            log()
+            log('All worlds achievements failed to sync:')
+            log.increase()
+
+            for (let fail of failedToSync) {
+                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
+            }
+
+            log.decrease()
+            log()
+            log(`Finished in ${time}`)
+            log.decrease()
+
+            return SYNC_ERROR_ALL
+        } else {
+            log()
+            log('Some worlds achievements failed to sync:')
+            log.increase()
+
+            for (let fail of failedToSync) {
+                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
+            }
+
+            log.decrease()
+            log()
+            log(`Finished in ${time}`)
+            log.decrease()
+
+            return SYNC_ERROR_SOME
+        }
+    } else {
+        log()
+        log(`Finished in ${time}`)
+        log.decrease()
+
+        return SYNC_SUCCESS_ALL
+    }
+}
+
+Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 1) {
+    const worldId = marketId + worldNumber
+
+    Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_START)
+
+    log()
+    log(`Sync.worldAchievements() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    log.increase()
+
+    let page
+
+    try {
+        const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
+
+        let worldInfo
+
+        try {
+            worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
+        } catch (e) {
+            throw new Error(`World ${worldId} not found.`)
+        }
+
+        if (!worldInfo.open) {
+            throw new Error(`World ${worldId} is closed`)
+        }
+
+        page = await puppeteerPage()
+
+        const perf = utils.perf()
+
+        const account = await Sync.auth(marketId, accountCredentials)
+        const urlId = marketId === 'zz' ? 'beta' : marketId
+        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
+        await page.evaluate(readyState)
+
+        const achievements = await utils.timeout(async function () {
+            return await page.evaluate(ScrapperAchievements)
+        }, 1000000, 'ScrapperAchievements evaluation timeout')
+
+        await commitAchievementsDatabase(achievements, worldId)
+
+        const time = perf.end()
+
+        log(`Finished in ${time}`)
+        log.decrease()
+
+        await page.close()
+
+        Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_END)
+    } catch (error) {
+        log(colors.red(`Failed to synchronize achievements ${worldId}: ${error.stack}`))
+        log.decrease()
+
+        if (page) {
+            await page.close()
+        }
+
+        if (attempt < 3) {
+            return await Sync.worldAchievements(marketId, worldNumber, flag, ++attempt)
+        } else {
+            Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_END)
             throw new Error(error.message)
         }
     }
@@ -683,6 +863,24 @@ const commitDataDatabase = async function (data, worldId) {
             this.none(sql.worlds.insert.province, {worldId, province_id, province_name})
         }
 
+        for (let [character_id, achievements] of data.playersAchievement) {
+            const achievementCount = (await this.one(sql.stats.players.achievementCount, {worldId, character_id})).count
+
+            if (achievements.length > achievementCount) {
+                for (let achievement of achievements.slice(achievementCount)) {
+                    this.none(sql.worlds.insert.playerAchievement, {
+                        worldId,
+                        character_id,
+                        type: achievement.type,
+                        category: achievement.category,
+                        level: achievement.level,
+                        period: achievement.period || null,
+                        time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
+                    })
+                }
+            }
+        }
+
         const currentPlayers = new Map(data.players)
         const currentTribes = new Map(data.tribes)
         const currentVillages = new Map(data.villages)
@@ -766,6 +964,52 @@ const commitDataDatabase = async function (data, worldId) {
     const time = perf.end()
 
     log(`Writed data to database in ${time}`)
+}
+
+const commitAchievementsDatabase = async function (data, worldId) {
+    const perf = utils.perf()
+
+    await db.tx(async function () {
+        for (let [character_id, achievements] of data.playersAchievements) {
+            const achievementCount = (await this.one(sql.stats.players.achievementsCount, {worldId, character_id})).count
+
+            if (achievements.length > achievementCount) {
+                for (let achievement of achievements.slice(achievementCount)) {
+                    this.none(sql.worlds.insert.playerAchievements, {
+                        worldId,
+                        character_id,
+                        type: achievement.type,
+                        category: achievement.category,
+                        level: achievement.level,
+                        period: achievement.period || null,
+                        time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
+                    })
+                }
+            }
+        }
+
+        for (let [tribe_id, achievements] of data.tribesAchievements) {
+            const achievementCount = (await this.one(sql.stats.tribes.achievementsCount, {worldId, tribe_id})).count
+
+            if (achievements.length > achievementCount) {
+                for (let achievement of achievements.slice(achievementCount)) {
+                    this.none(sql.worlds.insert.tribeAchievements, {
+                        worldId,
+                        tribe_id,
+                        type: achievement.type,
+                        category: achievement.category,
+                        level: achievement.level,
+                        period: achievement.period || null,
+                        time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
+                    })
+                }
+            }
+        }
+    })
+
+    const time = perf.end()
+
+    log(`Writed achievements data to database in ${time}`)
 }
 
 const commitDataFilesystem = async function (worldId) {
