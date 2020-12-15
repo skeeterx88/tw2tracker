@@ -120,3 +120,13 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.tribe_achievements (
     period VARCHAR (20),
     time_last_level TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS ${worldId:name}.tribe_changes (
+    id SERIAL PRIMARY KEY,
+    character_id INT REFERENCES ${worldId:name}.players(id) NULL,
+    old_tribe INT REFERENCES ${worldId:name}.tribes(id) NULL,
+    new_tribe INT REFERENCES ${worldId:name}.tribes(id) NULL,
+    date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
+    old_tribe_tag_then VARCHAR (3) NULL,
+    new_tribe_tag_then VARCHAR (3) NULL
+);
