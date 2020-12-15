@@ -80,7 +80,7 @@ menu a:hover {
 menu li {
     width: 90px;
     display: inline-block;
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #364956 0%, #3f5361 70%, #435c6d 70%);
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 0%, #3f5361 70%, #4c6271 70%);
     padding: 4px 4px 8px 4px;
     margin: 0 4px;
     text-align: center;
@@ -97,24 +97,11 @@ menu li {
 }
 
 menu li:hover {
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 0%, #3f5361 70%, #4c6271 70%);
-}
-
-menu li.discord {
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7289da 0%, #3f5361 70%, #4c6271 70%);
-}
-
-menu li.discord:hover {
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #4167ff 10%, #3f5361 70%, #4c6271 70%);
+    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 20%, #3f5361 70%, #4c6271 70%);
 }
 
 menu li.donate {
     margin-left: 50px;
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #d2c741 0%, #3f5361 70%, #435c6d 70%);
-}
-
-menu li.donate:hover {
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #ffee20 20%, #3f5361 70%, #435c6d 70%);
 }
 
 main {
@@ -189,8 +176,10 @@ div.modal {
     transition: visibility 0.02s linear, opacity 0.02s linear;
 }
 
-.icon {
-    background-size: 15px;
+menu .icon {
+    mask-size: 16px;
+    mask-repeat: no-repeat;
+    background: white;
     width: 15px;
     height: 15px;
     vertical-align: bottom;
@@ -198,10 +187,10 @@ div.modal {
     background-repeat: no-repeat;
 }
 
-.icon-discord {
-    background-image: url(/images/icons/discord.svg);
+menu .icon-discord {
+    mask-image: url(/images/icons/discord.svg);
 }
 
-.icon-heart {
-    background-image: url(/images/icons/heart.svg);
+menu .icon-heart {
+    mask-image: url(/images/icons/heart.svg);
 }
