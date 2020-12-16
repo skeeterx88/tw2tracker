@@ -353,6 +353,11 @@ div.world-title {
     margin-bottom: 10px;
 }
 
+#worlds a:hover,
+#markets a:hover {
+    text-decoration: none;
+}
+
 #worlds .world {
     width: 250px;
 }
