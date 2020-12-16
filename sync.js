@@ -431,7 +431,7 @@ Sync.allWorlds = async function (flag) {
 
     const time = perf.end()
 
-    await puppeteerClose()
+    // await puppeteerClose()
 
     Events.trigger(SCRAPPE_ALL_WORLD_END)
 
@@ -660,7 +660,7 @@ Sync.allWorldsAchievements = async function (flag) {
 
     const time = perf.end()
 
-    await puppeteerClose()
+    // await puppeteerClose()
 
     Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END)
 
