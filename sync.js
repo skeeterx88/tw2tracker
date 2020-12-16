@@ -79,24 +79,26 @@ Events.on(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END, function () {
 let browser = null
 
 const initBrowser = async function () {
-    browser = await puppeteer.launch({headless: 0, executablePath: '/usr/bin/chromium'})
+    browser = await puppeteer.launch({headless: true, executablePath: '/usr/bin/chromium'})
 }
 
-const puppeteerPage = async function (browserId) {
+const puppeteerPage = async function (logId) {
     const page = await browser.newPage()
 
     return page.on('console', function (msg) {
-        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) log(msg._text)
+        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) log(logId, msg._text)
     })
 }
 
 const Sync = {}
 
 Sync.init = async function () {
-    log('Sync.init()')
+    await fs.promises.mkdir('logs', {recursive: true})
+
+    log(log.GENERAL, 'Sync.init()')
 
     process.on('SIGTERM', async function () {
-        log(colors.red('Stopping tw2-tracker! Waiting pendent tasks...'))
+        log(log.GENERAL, colors.red('Stopping tw2-tracker! Waiting pendent tasks...'))
 
         if (syncInProgress) {
             await Events.on(SCRAPPE_WORLD_END)
@@ -151,13 +153,14 @@ Sync.init = async function () {
             // await Sync.allWorldsAchievements()
         }
     } catch (error) {
-        log(colors.red(error))
+        log(log.GENERAL, colors.red(error))
     }
 }
 
 Sync.daemon = async function () {
-    log()
-    log('Sync.daemon()', log.INCREASE)
+    log(log.GENERAL)
+    log(log.GENERAL, 'Sync.daemon()')
+    log.increase(log.GENERAL)
 
     const {
         scrappe_all_interval,
@@ -168,34 +171,36 @@ Sync.daemon = async function () {
 
     const scrapeWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
         await Sync.allWorlds()
-        log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+        log(log.GENERAL, 'Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const scrapeAchievementsWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
         await Sync.allWorldsAchievements()
-        log('Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
+        log(log.GENERAL, 'Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const registerWorldsJob = schedule.scheduleJob(register_worlds_interval, async function () {
         await Sync.markets()
         await Sync.registerWorlds()
-        log('Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
+        log(log.GENERAL, 'Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const cleanSharesJob = schedule.scheduleJob(clean_shares_check_interval, async function () {
         await Sync.cleanExpiredShares()
-        log('Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
+        log(log.GENERAL, 'Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
     })
 
-    log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
-    log('Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
-    log('Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
-    log('Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()), log.DECREASE)
+    log(log.GENERAL, 'Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+    log(log.GENERAL, 'Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
+    log(log.GENERAL, 'Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
+    log(log.GENERAL, 'Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
+    log.decrease(log.GENERAL)
 }
 
 Sync.registerWorlds = async function () {
-    log()
-    log('Sync.registerWorlds()', log.INCREASE)
+    log(log.GENERAL)
+    log(log.GENERAL, 'Sync.registerWorlds()')
+    log.increase(log.GENERAL)
 
     await db.query(sql.state.update.registerWorlds)
     const markets = development ? devAccounts : await db.any(sql.markets.withAccount)
@@ -237,7 +242,7 @@ Sync.registerWorlds = async function () {
                 }
 
                 if (!await utils.worldEntryExists(worldId)) {
-                    log(`Creating world entry for ${worldId}`)
+                    log(log.GENERAL, `Creating world entry for ${worldId}`)
 
                     await db.query(sql.worlds.addEntry, {
                         worldId,
@@ -249,17 +254,18 @@ Sync.registerWorlds = async function () {
                 }
             }
         } catch (error) {
-            log(colors.red(`Failed to register worlds on market ${marketId}: ${error.message}`))
+            log(log.GENERAL, colors.red(`Failed to register worlds on market ${marketId}: ${error.message}`))
         }
     }
 
-    log.decrease()
+    log.decrease(log.GENERAL)
 }
 
 Sync.registerCharacter = async function (marketId, worldNumber) {
-    log(`Sync.registerCharacter() ${marketId}${worldNumber}`, log.INCREASE)
+    log(log.GENERAL, `Sync.registerCharacter() ${marketId}${worldNumber}`)
+    log.increase(log.GENERAL)
 
-    const page = await puppeteerPage()
+    const page = await puppeteerPage(log.GENERAL)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
     await page.waitFor(2000)
 
@@ -278,11 +284,12 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
     await page.waitFor(2000)
 
-    log('Character created', log.DECREASE)
+    log(log.GENERAL, 'Character created')
+    log.decrease(log.GENERAL)
 }
 
 Sync.auth = async function (marketId, {account_name, account_password}, auth_attempt = 1) {
-    log(`Sync.auth() market:${marketId}`)
+    log(log.GENERAL, `Sync.auth() market:${marketId}`)
 
     if (hasOwn.call(auths, marketId)) {
         return await auths[marketId]
@@ -294,7 +301,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
         auths[marketId] = utils.timeout(async function () {
             const urlId = marketId === 'zz' ? 'beta' : marketId
 
-            page = await puppeteerPage()
+            page = await puppeteerPage(log.GENERAL)
             await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
             await page.waitFor(1000)
 
@@ -359,7 +366,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
         if (auth_attempt < 3) {
             auth_attempt++
 
-            log(colors.red(`Error trying to auth (${error.message})`))
+            log(log.GENERAL, colors.red(`Error trying to auth (${error.message})`))
 
             return await Sync.auth(marketId, {
                 account_name,
@@ -372,11 +379,12 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
 }
 
 Sync.allWorlds = async function (flag) {
-    log()
-    log('Sync.allWorlds()', log.INCREASE)
+    log(log.GENERAL)
+    log(log.GENERAL, 'Sync.allWorlds()')
+    log.increase(log.GENERAL)
 
     if (syncAllInProgress) {
-        log(colors.red('\nA Scrappe All Worlds is already in progress\n'), log.ZERO)
+        log(log.GENERAL, colors.red('\nA Scrappe All Worlds is already in progress\n'))
         return false
     }
 
@@ -397,7 +405,6 @@ Sync.allWorlds = async function (flag) {
     }
 
     await db.query(sql.state.update.lastScrappeAll)
-    await puppeteerBrowser()
 
     for (let world of worlds) {
         try {
@@ -417,40 +424,40 @@ Sync.allWorlds = async function (flag) {
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
-            log()
-            log('All worlds failed to sync:')
-            log.increase()
+            log(log.GENERAL)
+            log(log.GENERAL, 'All worlds failed to sync:')
+            log.increase(log.GENERAL)
 
             for (let fail of failedToSync) {
-                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
+                log(log.GENERAL, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
             }
 
-            log.decrease()
-            log()
-            log(`Finished in ${time}`)
-            log.decrease()
+            log.decrease(log.GENERAL)
+            log(log.GENERAL)
+            log(log.GENERAL, `Finished in ${time}`)
+            log.decrease(log.GENERAL)
 
             return SYNC_ERROR_ALL
         } else {
-            log()
-            log('Some worlds failed to sync:')
-            log.increase()
+            log(log.GENERAL)
+            log(log.GENERAL, 'Some worlds failed to sync:')
+            log.increase(log.GENERAL)
 
             for (let fail of failedToSync) {
-                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
+                log(log.GENERAL, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
             }
 
-            log.decrease()
-            log()
-            log(`Finished in ${time}`)
-            log.decrease()
+            log.decrease(log.GENERAL)
+            log(log.GENERAL)
+            log(log.GENERAL, `Finished in ${time}`)
+            log.decrease(log.GENERAL)
 
             return SYNC_ERROR_SOME
         }
     } else {
-        log()
-        log(`Finished in ${time}`)
-        log.decrease()
+        log(log.GENERAL)
+        log(log.GENERAL, `Finished in ${time}`)
+        log.decrease(log.GENERAL)
 
         return SYNC_SUCCESS_ALL
     }
@@ -461,9 +468,9 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
     Events.trigger(SCRAPPE_WORLD_START)
 
-    log()
-    log(`Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
-    log.increase()
+    log(log.GENERAL)
+    log(log.GENERAL, `Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    log.increase(log.GENERAL)
 
     let page
 
@@ -491,7 +498,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             }
         }
 
-        page = await puppeteerPage()
+        page = await puppeteerPage(log.GENERAL)
 
         const perf = utils.perf()
 
@@ -512,7 +519,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         try {
             await fs.promises.access(path.join('.', 'data', worldId, 'struct'))
         } catch (e) {
-            log('Scrapper: Fetching map structure')
+            log(log.GENERAL, 'Scrapper: Fetching map structure')
 
             const structPath = await page.evaluate(function () {
                 const cdn = require('cdn')
@@ -525,7 +532,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         if (!worldInfo.config) {
             try {
-                log('Scrapper: Fetching world config')
+                log(log.GENERAL, 'Scrapper: Fetching world config')
 
                 const worldConfig = await page.evaluate(function () {
                     const modelDataService = injector.get('modelDataService')
@@ -560,7 +567,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
                     worldConfig
                 })
             } catch (error) {
-                log(colors.red(`Error trying to fetch world config: ${error.message}`))
+                log(log.GENERAL, colors.red(`Error trying to fetch world config: ${error.message}`))
             }
         }
 
@@ -579,15 +586,15 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         const time = perf.end()
 
-        log(`Finished in ${time}`)
-        log.decrease()
+        log(log.GENERAL, `Finished in ${time}`)
+        log.decrease(log.GENERAL)
 
         await page.close()
 
         Events.trigger(SCRAPPE_WORLD_END)
     } catch (error) {
-        log(colors.red(`Failed to synchronize ${worldId}: ${error.stack}`))
-        log.decrease()
+        log(log.GENERAL, colors.red(`Failed to synchronize ${worldId}: ${error.stack}`))
+        log.decrease(log.GENERAL)
 
         if (page) {
             await page.close()
@@ -605,8 +612,9 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 }
 
 Sync.allWorldsAchievements = async function (flag) {
-    log()
-    log('Sync.allWorldsAchievements()', log.INCREASE)
+    log(log.ACHIEVEMENTS)
+    log(log.ACHIEVEMENTS, 'Sync.allWorldsAchievements()')
+    log.increase(log.ACHIEVEMENTS)
 
     Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_START)
 
@@ -623,8 +631,6 @@ Sync.allWorldsAchievements = async function (flag) {
     } else {
         worlds = await db.any(sql.worlds.allOpen)
     }
-
-    await puppeteerBrowser()
 
     for (let world of worlds) {
         try {
@@ -644,40 +650,40 @@ Sync.allWorldsAchievements = async function (flag) {
 
     if (failedToSync.length) {
         if (failedToSync.length === worlds.length) {
-            log()
-            log('All worlds achievements failed to sync:')
-            log.increase()
+            log(log.ACHIEVEMENTS)
+            log(log.ACHIEVEMENTS, 'All worlds achievements failed to sync:')
+            log.increase(log.ACHIEVEMENTS)
 
             for (let fail of failedToSync) {
                 log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
             }
 
-            log.decrease()
-            log()
-            log(`Finished in ${time}`)
-            log.decrease()
+            log.decrease(log.ACHIEVEMENTS)
+            log(log.ACHIEVEMENTS)
+            log(log.ACHIEVEMENTS, `Finished in ${time}`)
+            log.decrease(log.ACHIEVEMENTS)
 
             return SYNC_ERROR_ALL
         } else {
-            log()
-            log('Some worlds achievements failed to sync:')
-            log.increase()
+            log(log.ACHIEVEMENTS)
+            log(log.ACHIEVEMENTS, 'Some worlds achievements failed to sync:')
+            log.increase(log.ACHIEVEMENTS)
 
             for (let fail of failedToSync) {
                 log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
             }
 
-            log.decrease()
-            log()
-            log(`Finished in ${time}`)
-            log.decrease()
+            log.decrease(log.ACHIEVEMENTS)
+            log(log.ACHIEVEMENTS)
+            log(log.ACHIEVEMENTS, `Finished in ${time}`)
+            log.decrease(log.ACHIEVEMENTS)
 
             return SYNC_ERROR_SOME
         }
     } else {
-        log()
-        log(`Finished in ${time}`)
-        log.decrease()
+        log(log.ACHIEVEMENTS)
+        log(log.ACHIEVEMENTS, `Finished in ${time}`)
+        log.decrease(log.ACHIEVEMENTS)
 
         return SYNC_SUCCESS_ALL
     }
@@ -688,9 +694,9 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 
     Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_START)
 
-    log()
-    log(`Sync.worldAchievements() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
-    log.increase()
+    log(log.ACHIEVEMENTS)
+    log(log.ACHIEVEMENTS, `Sync.worldAchievements() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    log.increase(log.ACHIEVEMENTS)
 
     let page
 
@@ -709,7 +715,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
             throw new Error(`World ${worldId} is closed`)
         }
 
-        page = await puppeteerPage()
+        page = await puppeteerPage(log.ACHIEVEMENTS)
 
         const perf = utils.perf()
 
@@ -726,15 +732,15 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 
         const time = perf.end()
 
-        log(`Finished in ${time}`)
-        log.decrease()
+        log(log.ACHIEVEMENTS, `Finished in ${time}`)
+        log.decrease(log.ACHIEVEMENTS)
 
         await page.close()
 
         Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_END)
     } catch (error) {
-        log(colors.red(`Failed to synchronize achievements ${worldId}: ${error.stack}`))
-        log.decrease()
+        log(log.ACHIEVEMENTS, colors.red(`Failed to synchronize achievements ${worldId}: ${error.stack}`))
+        log.decrease(log.ACHIEVEMENTS)
 
         if (page) {
             await page.close()
@@ -750,7 +756,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 }
 
 Sync.markets = async function () {
-    log('Sync.markets()')
+    log(log.GENERAL, 'Sync.markets()')
 
     await db.query(sql.state.update.lastFetchMarkets)
 
@@ -944,7 +950,7 @@ const commitDataDatabase = async function (data, worldId) {
 
     const time = perf.end()
 
-    log(`Writed data to database in ${time}`)
+    log(log.GENERAL, `Writed data to database in ${time}`)
 }
 
 const commitAchievementsDatabase = async function (data, worldId) {
@@ -990,7 +996,7 @@ const commitAchievementsDatabase = async function (data, worldId) {
 
     const time = perf.end()
 
-    log(`Writed achievements data to database in ${time}`)
+    log(log.GENERAL, `Writed achievements data to database in ${time}`)
 }
 
 const commitDataFilesystem = async function (worldId) {
@@ -1068,13 +1074,14 @@ const commitDataFilesystem = async function (worldId) {
         const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
         await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
     } catch (error) {
-        log.increase()
-        log(colors.red(`Failed to write to filesystem: ${error.message}`), log.DECREASE)
+        log.increase(log.GENERAL)
+        log(log.GENERAL, colors.red(`Failed to write to filesystem: ${error.message}`))
+        log.decrease(log.GENERAL)
     }
 
     const time = perf.end()
 
-    log(`Writed data to filesystem in ${time}`)
+    log(log.GENERAL, `Writed data to filesystem in ${time}`)
 
     return false
 }

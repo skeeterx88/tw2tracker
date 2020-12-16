@@ -2,6 +2,8 @@ const {db} = require('./db')
 const sql = require('./sql')
 const https = require('https')
 const crypto = require('crypto')
+const path = require('path')
+const fs = require('fs')
 
 const noop = function () {}
 
@@ -113,62 +115,57 @@ const log = function () {
     const args = Array.from(arguments)
     const empty = ' ·'
     const message = []
+    const id = args[0]
+
+    if (!id || !hasOwn.call(log, id)) {
+        return false
+    }
 
     switch (args.length) {
-        case 0: {
-            message.push(empty.repeat(log.level))
-            break
-        }
         case 1: {
-            message.push(empty.repeat(log.level))
-            message.push(args[0])
+            message.push(empty.repeat(log[id].level))
             break
         }
         default: {
-            const last = args[args.length - 1]
-            const left = args.slice(0, args.length - 1)
-
-            if (typeof last === 'string') {
-                switch (last) {
-                    case log.INCREASE: {
-                        message.push(empty.repeat(log.level))
-                        message.push(...left)
-                        log.increase()
-                        break
-                    }
-                    case log.DECREASE: {
-                        message.push(empty.repeat(log.level))
-                        message.push(...left)
-                        log.decrease()
-                        break
-                    }
-                    case log.ZERO: {
-                        message.push(...left)
-                        break
-                    }
-                    default: {
-                        message.push(empty.repeat(log.level))
-                        message.push(...args)
-                    }
-                }
-            }
+            message.push(empty.repeat(log[id].level))
+            message.push(...args.slice(1))
+            break
         }
     }
 
-    console.log(...message)
+    const file = path.join('.', 'logs', id + '.log')
+    const date = new Date().toISOString().replace('T', ' ').substr(0, 19)
+
+    fs.appendFile(file, [date, ...message, '\n'].join(' '), async function (error) {
+        if (error && error.code === 'ENOENT') {
+            await fs.promises.writeFile(file, '')
+            log(...args)
+        }
+    })
+
+    if (id === log.GENERAL) {
+        console.log(...message)
+    }
 }
 
-log.level = 0
+
+
+log.GENERAL = 'general'
+log.ACHIEVEMENTS = 'achievements'
+
 log.INCREASE = 'log_increase'
 log.DECREASE = 'log_decrease'
 log.ZERO = 'log_zero'
 
-log.increase = function () {
-    log.level++
+log[log.GENERAL] = {level: 0}
+log[log.ACHIEVEMENTS] = {level: 0}
+
+log.increase = function (id) {
+    log[id].level++
 }
 
-log.decrease = function () {
-    log.level = Math.max(0, log.level - 1)
+log.decrease = function (id) {
+    log[id].level = Math.max(0, log[id].level - 1)
 }
 
 const timeout = function (handler, time, errorMessage) {
