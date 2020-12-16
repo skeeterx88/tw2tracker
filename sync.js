@@ -1,7 +1,7 @@
 const {db} = require('./db')
 const sql = require('./sql')
 const utils = require('./utils')
-const {log, worldEntryExists} = utils
+const {log, hasOwn} = utils
 const Scrapper = require('./scrapper.js')
 const ScrapperAchievements = require('./scrapper-achievements.js')
 const readyState = require('./ready-state.js')
@@ -11,10 +11,11 @@ const fs = require('fs')
 const schedule = require('node-schedule')
 const zlib = require('zlib')
 const path = require('path')
-const hasOwn = Object.prototype.hasOwnProperty
 const colors = require('colors/safe')
 const development = process.env.NODE_ENV === 'development'
-let authenticatedMarkets = {}
+const puppeteer = require('puppeteer-core')
+
+const auths = {}
 
 const devAccounts = [
     {id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'},
@@ -77,36 +78,16 @@ Events.on(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END, function () {
 
 let browser = null
 
-const puppeteerBrowser = async function () {
-    if (!browser) {
-        const puppeteer = require('puppeteer-core')
-
-        browser = await puppeteer.launch({
-            headless: true,
-            executablePath: '/usr/bin/chromium'
-        })
-    }
+const initBrowser = async function () {
+    browser = await puppeteer.launch({headless: 0, executablePath: '/usr/bin/chromium'})
 }
 
-const puppeteerClose = async function () {
-    if (browser) {
-        await browser.close()
-        browser = null
-        authenticatedMarkets = {}
-    }
-}
-
-const puppeteerPage = async function () {
-    await puppeteerBrowser()
+const puppeteerPage = async function (browserId) {
     const page = await browser.newPage()
 
-    page.on('console', function (msg) {
-        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) {
-            log(msg._text)
-        }
+    return page.on('console', function (msg) {
+        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) log(msg._text)
     })
-
-    return page
 }
 
 const Sync = {}
@@ -129,6 +110,8 @@ Sync.init = async function () {
 
         process.exit(0)
     })
+
+    await initBrowser()
 
     const state = await db.one(sql.state.all)
 
@@ -253,7 +236,7 @@ Sync.registerWorlds = async function () {
                     await Sync.registerCharacter(marketId, worldNumber)
                 }
 
-                if (!await worldEntryExists(worldId)) {
+                if (!await utils.worldEntryExists(worldId)) {
                     log(`Creating world entry for ${worldId}`)
 
                     await db.query(sql.worlds.addEntry, {
@@ -301,16 +284,17 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
 Sync.auth = async function (marketId, {account_name, account_password}, auth_attempt = 1) {
     log(`Sync.auth() market:${marketId}`)
 
-    if (marketId in authenticatedMarkets && authenticatedMarkets[marketId].name === account_name) {
-        return authenticatedMarkets[marketId]
+    if (hasOwn.call(auths, marketId)) {
+        return await auths[marketId]
     }
 
-    const page = await puppeteerPage()
+    let page
 
     try {
-        const account = await utils.timeout(async function () {
+        auths[marketId] = utils.timeout(async function () {
             const urlId = marketId === 'zz' ? 'beta' : marketId
 
+            page = await puppeteerPage()
             await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
             await page.waitFor(1000)
 
@@ -363,14 +347,12 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
                 throw new Error(`Authentication to market:${marketId} failed "unknown reason"`)
             }
 
-            authenticatedMarkets[marketId] = account
+            await page.close()
 
             return account
         }, 60000, 'Auth took more than 1 minute')
 
-        await page.close()
-
-        return account
+        return await auths[marketId]
     } catch (error) {
         await page.close()
 
@@ -430,8 +412,6 @@ Sync.allWorlds = async function (flag) {
     }
 
     const time = perf.end()
-
-    // await puppeteerClose()
 
     Events.trigger(SCRAPPE_ALL_WORLD_END)
 
@@ -659,8 +639,6 @@ Sync.allWorldsAchievements = async function (flag) {
     }
 
     const time = perf.end()
-
-    // await puppeteerClose()
 
     Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END)
 
