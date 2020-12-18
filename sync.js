@@ -289,11 +289,11 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
 }
 
 Sync.auth = async function (marketId, {account_name, account_password}, auth_attempt = 1) {
-    log(log.GENERAL, `Sync.auth() market:${marketId}`)
-
     if (hasOwn.call(auths, marketId)) {
         return await auths[marketId]
     }
+
+    log(log.GENERAL, `Sync.auth() market:${marketId}`)
 
     let page
 
