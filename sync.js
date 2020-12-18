@@ -996,7 +996,7 @@ const commitAchievementsDatabase = async function (data, worldId) {
 
     const time = perf.end()
 
-    log(log.GENERAL, `Writed achievements data to database in ${time}`)
+    log(log.ACHIEVEMENTS, `Writed achievements data to database in ${time}`)
 }
 
 const commitDataFilesystem = async function (worldId) {
