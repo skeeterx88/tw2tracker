@@ -1,17 +1,7 @@
 <menu>
     <a href="/"><li>Home</li></a>
-
-    <% if (typeof marketId !== 'undefined') { -%>
-        <a href="/stats/<%= marketId %>"><li>Stats</li></a>
-    <% } else { -%>
-        <a href="/stats"><li>Stats</li></a>
-    <% } -%>
-    
-    <% if (typeof marketId !== 'undefined') { -%>
-        <a href="/maps/<%= marketId %>"><li>Maps</li></a>
-    <% } else { -%>
-        <a href="/maps"><li>Maps</li></a>
-    <% } -%>
+    <a href="/stats"><li>Stats</li></a>
+    <a href="/maps"><li>Maps</li></a>
 
     <a href="https://www.paypal.com/donate/?hosted_button_id=6R95QYGKFNLCE"><li class="donate"><span class="icon icon-heart"></span> Donate</li></a>
     <a href="https://discord.gg/UwQ32D3t5p"><li class="discord"><span class="icon icon-discord"></span> Discord</li></a>
