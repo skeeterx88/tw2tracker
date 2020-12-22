@@ -221,6 +221,21 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
 
     const world = await db.one(sql.worlds.one, [marketId, worldNumber])
 
+    const achievementTypes = new Map(await db.map(sql.stats.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievements = await db.any(sql.stats.tribes.achievements, {worldId, id: tribe.id})
+
+    let achievementPoints = achievements.reduce(function (sum, next) {
+        const {type, level} = next
+        const data = achievementTypes.get(type)
+
+        if (level && data.points) {
+            const typePoints = data.points.slice(0, level).reduce((sum, next) => sum + next)
+            return sum + typePoints
+        } else {
+            return sum
+        }
+    }, 0)
+
     res.render('stats/tribe', {
         title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
@@ -229,6 +244,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
         tribe,
         conquestCount,
         conquestTypes,
+        achievementPoints,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -507,6 +523,21 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         tribe = await db.one(sql.worlds.tribeName, {worldId, tribeId: player.tribe_id})
     }
 
+    const achievementTypes = new Map(await db.map(sql.stats.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievements = await db.any(sql.stats.players.achievements, {worldId, id: playerId})
+
+    let achievementPoints = achievements.reduce(function (sum, next) {
+        const {type, level} = next
+        const data = achievementTypes.get(type)
+
+        if (level && data.points) {
+            const typePoints = data.points.slice(0, level).reduce((sum, next) => sum + next)
+            return sum + typePoints
+        } else {
+            return sum
+        }
+    }, 0)
+
     res.render('stats/player', {
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
@@ -515,6 +546,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         tribe,
         conquestCount,
         conquestTypes,
+        achievementPoints,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
