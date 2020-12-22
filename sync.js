@@ -145,6 +145,12 @@ Sync.init = async function () {
             // await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
             // await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
+            // const worldNumber = 52
+            // const marketId = 'br'
+            // const worldId = marketId + worldNumber
+            // const achievements = JSON.parse(await fs.promises.readFile(path.join('.', 'data', `${worldId}-achievements.freeze.json`)))
+            // await commitAchievementsDatabase(achievements, worldId)
+
             // await Sync.allWorlds()
             // await Sync.world('br', 48)
             // await Sync.registerWorlds()
@@ -577,7 +583,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
         // await fs.promises.writeFile(path.join('.', 'data', `${worldId}.freeze.json`), JSON.stringify(data))
-        // process.exit()
+        // return
 
         await commitDataDatabase(data, worldId)
         await commitDataFilesystem(worldId)
@@ -727,6 +733,10 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
         const achievements = await utils.timeout(async function () {
             return await page.evaluate(ScrapperAchievements)
         }, 1000000, 'ScrapperAchievements evaluation timeout')
+
+        // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
+        // await fs.promises.writeFile(path.join('.', 'data', `${worldId}-achievements.freeze.json`), JSON.stringify(achievements))
+        // return
 
         await commitAchievementsDatabase(achievements, worldId)
 
@@ -953,44 +963,102 @@ const commitDataDatabase = async function (data, worldId) {
     log(log.GENERAL, `Writed data to database in ${time}`)
 }
 
+const mapAchievements = function (achievements) {
+    const unique = {}
+    const repeatable = {}
+
+    for (let achievement of achievements) {
+        if (achievement.category === 'repeatable') {
+            if (!hasOwn.call(repeatable, achievement.type)) {
+                repeatable[achievement.type] = []
+            }
+
+            repeatable[achievement.type].push(achievement)
+        } else {
+            unique[achievement.type] = achievement
+        }
+    }
+
+    return {unique, repeatable}
+}
+
+const getMissingAchievements = async function (achievementsType, achievements, worldId) {
+    const achievementsToCommit = []
+
+    for (let [id, newAchievementsRaw] of achievements) {
+        let achievementsToMerge = []
+        const oldAchievementsRaw = await db.any(sql.stats[achievementsType].achievements, {worldId, id})
+
+        if (oldAchievementsRaw.length === newAchievementsRaw.length) {
+            continue
+        }
+
+        if (oldAchievementsRaw.length) {
+            const oldAchievements = mapAchievements(oldAchievementsRaw)
+            const newAchievements = mapAchievements(newAchievementsRaw)
+
+            for (let type of Object.keys(newAchievements.repeatable)) {
+                const newRepeatable = newAchievements.repeatable[type]
+                const oldRepeatable = oldAchievements.repeatable[type]
+
+                if (!oldRepeatable) {
+                    achievementsToMerge.push(...newRepeatable)
+                } else if (oldRepeatable.length !== newRepeatable.length) {
+                    achievementsToMerge.push(...newRepeatable.slice(oldRepeatable.length, newRepeatable.length))
+                }
+            }
+
+            const oldUniqueTypes = Object.keys(oldAchievements.unique)
+            const newUniqueTypes = Object.keys(newAchievements.unique)
+            const missingTypes = newUniqueTypes.filter(type => !oldUniqueTypes.includes(type))
+
+            for (let type of missingTypes) {
+                achievementsToMerge.push(newAchievements.unique[type])
+            }
+        } else {
+            achievementsToMerge.push(...newAchievementsRaw)
+        }
+
+        achievementsToMerge = achievementsToMerge.map(function (achievement) {
+            achievement.id = id
+            return achievement
+        })
+
+        achievementsToCommit.push(...achievementsToMerge)
+    }
+
+    return achievementsToCommit
+}
+
 const commitAchievementsDatabase = async function (data, worldId) {
     const perf = utils.perf()
 
-    await db.tx(async function () {
-        for (let [character_id, achievements] of data.playersAchievements) {
-            const achievementCount = (await this.one(sql.stats.players.achievementsCount, {worldId, character_id})).count
+    const newPlayersAchievements = await getMissingAchievements('players', data.playersAchievements, worldId)
+    const newTribesAchievements = await getMissingAchievements('tribes', data.tribesAchievements, worldId)
 
-            if (achievements.length > achievementCount) {
-                for (let achievement of achievements.slice(achievementCount)) {
-                    this.none(sql.worlds.insert.playerAchievements, {
-                        worldId,
-                        character_id,
-                        type: achievement.type,
-                        category: achievement.category,
-                        level: achievement.level,
-                        period: achievement.period || null,
-                        time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
-                    })
-                }
-            }
+    await db.tx(async function () {
+        for (let achievement of newPlayersAchievements) {
+            this.none(sql.worlds.insert.playerAchievements, {
+                worldId,
+                id: achievement.id,
+                type: achievement.type,
+                category: achievement.category,
+                level: achievement.level,
+                period: achievement.period || null,
+                time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
+            })
         }
 
-        for (let [tribe_id, achievements] of data.tribesAchievements) {
-            const achievementCount = (await this.one(sql.stats.tribes.achievementsCount, {worldId, tribe_id})).count
-
-            if (achievements.length > achievementCount) {
-                for (let achievement of achievements.slice(achievementCount)) {
-                    this.none(sql.worlds.insert.tribeAchievements, {
-                        worldId,
-                        tribe_id,
-                        type: achievement.type,
-                        category: achievement.category,
-                        level: achievement.level,
-                        period: achievement.period || null,
-                        time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
-                    })
-                }
-            }
+        for (let achievement of newTribesAchievements) {
+            this.none(sql.worlds.insert.tribeAchievements, {
+                worldId,
+                id: achievement.id,
+                type: achievement.type,
+                category: achievement.category,
+                level: achievement.level,
+                period: achievement.period || null,
+                time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
+            })
         }
     })
 

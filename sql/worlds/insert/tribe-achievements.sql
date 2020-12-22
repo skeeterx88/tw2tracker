@@ -6,7 +6,7 @@ INSERT INTO ${worldId:name}.tribe_achievements (
     period,
     time_last_level
 ) VALUES (
-    ${tribe_id},
+    ${id},
     ${type},
     ${category},
     ${level},

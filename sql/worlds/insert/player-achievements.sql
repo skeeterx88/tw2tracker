@@ -6,7 +6,7 @@ INSERT INTO ${worldId:name}.player_achievements (
     period,
     time_last_level
 ) VALUES (
-    ${character_id},
+    ${id},
     ${type},
     ${category},
     ${level},
