@@ -28,6 +28,9 @@ const {
     SYNC_SUCCESS_ALL,
     SYNC_ERROR_ALL,
     SYNC_ERROR_SOME,
+    SYNC_ACHIEVEMENTS_SUCCESS_ALL,
+    SYNC_ACHIEVEMENTS_ERROR_ALL,
+    SYNC_ACHIEVEMENTS_ERROR_SOME,
     SCRAPPE_WORLD_START,
     SCRAPPE_WORLD_END,
     SCRAPPE_ALL_WORLD_START,
@@ -624,43 +627,28 @@ Sync.allWorldsAchievements = async function (flag) {
     Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END)
 
     if (failedToSync.length) {
-        if (failedToSync.length === worlds.length) {
-            log(log.ACHIEVEMENTS)
-            log(log.ACHIEVEMENTS, 'All worlds achievements failed to sync:')
-            log.increase(log.ACHIEVEMENTS)
+        const allFail = failedToSync.length === worlds.length
 
-            for (let fail of failedToSync) {
-                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
-            }
+        log(log.ACHIEVEMENTS)
+        log(log.ACHIEVEMENTS, `${allFail ? 'All' : 'Some'} worlds achievements failed to sync:`)
+        log.increase(log.ACHIEVEMENTS)
 
-            log.decrease(log.ACHIEVEMENTS)
-            log(log.ACHIEVEMENTS)
-            log(log.ACHIEVEMENTS, `Finished in ${time}`)
-            log.decrease(log.ACHIEVEMENTS)
-
-            return SYNC_ERROR_ALL
-        } else {
-            log(log.ACHIEVEMENTS)
-            log(log.ACHIEVEMENTS, 'Some worlds achievements failed to sync:')
-            log.increase(log.ACHIEVEMENTS)
-
-            for (let fail of failedToSync) {
-                log((fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
-            }
-
-            log.decrease(log.ACHIEVEMENTS)
-            log(log.ACHIEVEMENTS)
-            log(log.ACHIEVEMENTS, `Finished in ${time}`)
-            log.decrease(log.ACHIEVEMENTS)
-
-            return SYNC_ERROR_SOME
+        for (let fail of failedToSync) {
+            log(log.ACHIEVEMENTS, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
         }
+
+        log.decrease(log.ACHIEVEMENTS)
+        log(log.ACHIEVEMENTS)
+        log(log.ACHIEVEMENTS, `Finished in ${time}`)
+        log.decrease(log.ACHIEVEMENTS)
+
+        return allFail ? SYNC_ACHIEVEMENTS_ERROR_ALL : SYNC_ACHIEVEMENTS_ERROR_SOME
     } else {
         log(log.ACHIEVEMENTS)
         log(log.ACHIEVEMENTS, `Finished in ${time}`)
         log.decrease(log.ACHIEVEMENTS)
 
-        return SYNC_SUCCESS_ALL
+        return SYNC_ACHIEVEMENTS_SUCCESS_ALL
     }
 }
 
