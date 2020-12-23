@@ -809,7 +809,7 @@ const commitDataDatabase = async function (data, worldId) {
             if (!best_rank || tribe.rank <= best_rank) {
                 this.none(sql.worlds.update.tribeBestRank, {worldId, rank: tribe.rank, tribe_id})
             }
-            
+
             if (!best_points || tribe.points >= best_points) {
                 this.none(sql.worlds.update.tribeBestPoints, {worldId, points: tribe.points, tribe_id})
             }
@@ -902,33 +902,23 @@ const commitDataDatabase = async function (data, worldId) {
         }
 
         for (let [character_id, playerNewData] of currentPlayers.entries()) {
-            let oldTribe
-            let newTribe
-
             const playerOldData = oldPlayers.get(character_id)
 
-            if (!playerOldData) {
-                if (!playerNewData.tribe_id) {
-                    continue
-                }
+            const oldTribeId = playerOldData ? playerOldData.tribe_id : null
+            const newTribeId = playerNewData.tribe_id
 
-                oldTribe = null
-                newTribe = await this.one(sql.worlds.tribe, {worldId, tribeId: playerNewData.tribe_id})
-            } else if (playerNewData.tribe_id !== playerOldData.tribe_id) {
-                oldTribe = playerOldData.tribe_id ? await this.one(sql.worlds.tribe, {worldId, tribeId: playerOldData.tribe_id}) : []
-                newTribe = playerNewData.tribe_id ? await this.one(sql.worlds.tribe, {worldId, tribeId: playerNewData.tribe_id}) : []
-            } else {
-                continue
+            if (oldTribeId !== newTribeId) {
+                const oldTribe = oldTribeId ? await this.one(sql.worlds.tribe, {worldId, tribeId: oldTribeId}) : null
+                const newTribe = newTribeId ? await this.one(sql.worlds.tribe, {worldId, tribeId: newTribeId}) : null
+
+                this.none(sql.worlds.insert.tribeChange, {
+                    character_id,
+                    old_tribe: oldTribeId,
+                    new_tribe: newTribeId,
+                    old_tribe_tag_then: oldTribe ? oldTribe.tag : null,
+                    new_tribe_tag_then: newTribe ? newTribe.tag : null
+                })
             }
-
-            const data = {}
-            data.character_id = character_id
-            data.old_tribe = playerOldData ? playerOldData.tribe_id : null
-            data.new_tribe = playerNewData.tribe_id
-            data.old_tribe_tag_then = data.old_tribe ? oldTribe.tag : null
-            data.new_tribe_tag_then = data.new_tribe ? newTribe.tag : null
-
-            this.none(sql.worlds.insert.tribeChange, {worldId, ...data})
         }
 
         for (let [character_id, villages_id] of data.villagesByPlayer) {
