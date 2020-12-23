@@ -413,37 +413,22 @@ Sync.allWorlds = async function (flag) {
     Events.trigger(SCRAPPE_ALL_WORLD_END)
 
     if (failedToSync.length) {
-        if (failedToSync.length === worlds.length) {
-            log(log.GENERAL)
-            log(log.GENERAL, 'All worlds failed to sync:')
-            log.increase(log.GENERAL)
+        const allFail = failedToSync.length === worlds.length
 
-            for (let fail of failedToSync) {
-                log(log.GENERAL, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
-            }
+        log(log.GENERAL)
+        log(log.GENERAL, `${allFail ? 'All' : 'Some'} worlds failed to sync:`)
+        log.increase(log.GENERAL)
 
-            log.decrease(log.GENERAL)
-            log(log.GENERAL)
-            log(log.GENERAL, `Finished in ${time}`)
-            log.decrease(log.GENERAL)
-
-            return SYNC_ERROR_ALL
-        } else {
-            log(log.GENERAL)
-            log(log.GENERAL, 'Some worlds failed to sync:')
-            log.increase(log.GENERAL)
-
-            for (let fail of failedToSync) {
-                log(log.GENERAL, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
-            }
-
-            log.decrease(log.GENERAL)
-            log(log.GENERAL)
-            log(log.GENERAL, `Finished in ${time}`)
-            log.decrease(log.GENERAL)
-
-            return SYNC_ERROR_SOME
+        for (let fail of failedToSync) {
+            log(log.GENERAL, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
         }
+
+        log.decrease(log.GENERAL)
+        log(log.GENERAL)
+        log(log.GENERAL, `Finished in ${time}`)
+        log.decrease(log.GENERAL)
+
+        return allFail ? SYNC_ERROR_ALL : SYNC_ERROR_SOME
     } else {
         log(log.GENERAL)
         log(log.GENERAL, `Finished in ${time}`)
