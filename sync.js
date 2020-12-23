@@ -931,8 +931,6 @@ const commitDataDatabase = async function (data, worldId) {
             players: data.players.length,
             tribes: data.tribes.length
         })
-
-        return
     })
 
     await db.query(sql.worlds.update.stats, {
