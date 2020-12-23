@@ -349,7 +349,9 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
 
         return await auths[marketId]
     } catch (error) {
-        await page.close()
+        if (page) {
+            await page.close()
+        }
 
         if (auth_attempt < 3) {
             auth_attempt++
