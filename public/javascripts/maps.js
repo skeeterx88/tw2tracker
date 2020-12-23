@@ -669,7 +669,6 @@
                 $button.classList.add('market')
                 $button.classList.add('text-container')
                 $flag.innerText = market
-                $flag.classList.add('flag')
                 $flag.classList.add(`flag-${market}`)
 
                 $button.appendChild($flag)
