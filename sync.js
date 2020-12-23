@@ -917,24 +917,34 @@ const commitDataDatabase = async function (data, worldId) {
             }
         }
 
-        for (let [character_id, playerCurrentData] of currentPlayers.entries()) {
+        for (let [character_id, playerNewData] of currentPlayers.entries()) {
+            let oldTribe
+            let newTribe
+
             const playerOldData = oldPlayers.get(character_id)
 
-            if (!playerOldData || playerCurrentData.tribe_id !== playerOldData.tribe_id) {
-                let oldTribe = await this.any(sql.worlds.tribe, {worldId, tribeId: playerOldData.tribe_id})
-                let newTribe = await this.any(sql.worlds.tribe, {worldId, tribeId: playerCurrentData.tribe_id})
-
-                const data = {
-                    character_id,
-                    old_tribe: playerOldData.tribe_id,
-                    new_tribe: playerCurrentData.tribe_id
+            if (!playerOldData) {
+                if (!playerNewData.tribe_id) {
+                    continue
                 }
 
-                data.old_tribe_tag_then = oldTribe.length ? oldTribe[0].tag : null
-                data.new_tribe_tag_then = newTribe.length ? newTribe[0].tag : null
-
-                this.none(sql.worlds.insert.tribeChange, {worldId, ...data})
+                oldTribe = null
+                newTribe = await this.one(sql.worlds.tribe, {worldId, tribeId: playerNewData.tribe_id})
+            } else if (playerNewData.tribe_id !== playerOldData.tribe_id) {
+                oldTribe = playerOldData.tribe_id ? await this.one(sql.worlds.tribe, {worldId, tribeId: playerOldData.tribe_id}) : []
+                newTribe = playerNewData.tribe_id ? await this.one(sql.worlds.tribe, {worldId, tribeId: playerNewData.tribe_id}) : []
+            } else {
+                continue
             }
+
+            const data = {}
+            data.character_id = character_id
+            data.old_tribe = playerOldData ? playerOldData.tribe_id : null
+            data.new_tribe = playerNewData.tribe_id
+            data.old_tribe_tag_then = data.old_tribe ? oldTribe.tag : null
+            data.new_tribe_tag_then = data.new_tribe ? newTribe.tag : null
+
+            this.none(sql.worlds.insert.tribeChange, {worldId, ...data})
         }
 
         for (let [character_id, villages_id] of data.villagesByPlayer) {
