@@ -41,8 +41,6 @@ const {
 
 let syncInProgress = false
 let syncAllInProgress = false
-let syncAchievementInProgress = false
-let syncAllAchievementInProgress = false
 
 Events.on(SCRAPPE_WORLD_START, function () {
     syncInProgress = true
@@ -58,22 +56,6 @@ Events.on(SCRAPPE_WORLD_START, function () {
 
 Events.on(SCRAPPE_WORLD_END, function () {
     syncAllInProgress = false
-})
-
-Events.on(SCRAPPE_ACHIEVEMENT_WORLD_START, function () {
-    syncAchievementInProgress = true
-})
-
-Events.on(SCRAPPE_ACHIEVEMENT_WORLD_END, function () {
-    syncAchievementInProgress = false
-})
-
-Events.on(SCRAPPE_ACHIEVEMENT_ALL_WORLD_START, function () {
-    syncAllAchievementInProgress = true
-})
-
-Events.on(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END, function () {
-    syncAllAchievementInProgress = false
 })
 
 let browser = null
