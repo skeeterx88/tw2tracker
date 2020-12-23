@@ -162,7 +162,7 @@ Sync.daemon = async function () {
         log(log.GENERAL, 'Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const scrapeAchievementsWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
+    const scrapeAchievementsWorldsJob = schedule.scheduleJob(scrappe_achievements_all_interval, async function () {
         await Sync.allWorldsAchievements()
         log(log.GENERAL, 'Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     })
