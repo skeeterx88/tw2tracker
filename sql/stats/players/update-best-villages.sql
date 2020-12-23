@@ -1,4 +1,4 @@
-UPDATE ${worldId:name}.tribes
+UPDATE ${worldId:name}.players
 SET best_villages = ${villages},
     best_villages_date = TIMEZONE('UTC', NOW())
-WHERE id = ${tribe_id}
+WHERE id = ${id}

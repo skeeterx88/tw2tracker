@@ -771,42 +771,28 @@ const commitDataDatabase = async function (data, worldId) {
     const perf = utils.perf()
 
     await db.tx(async function () {
-        const tribesBestValues = new Map(await db.map(sql.worlds.tribesBestValues, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]]))
-        const playersBestValues = new Map(await db.map(sql.worlds.playersBestValues, {worldId}, (player) => [player.id, [player.best_rank, player.best_points, player.best_villages]]))
-
-        for (let [tribe_id, tribe] of data.tribes) {
-            this.none(sql.worlds.insert.tribe, {worldId, tribe_id, ...tribe})
-
-            const [best_rank, best_points, best_villages] = tribesBestValues.get(tribe_id) || []
-
-            if (!best_rank || tribe.rank <= best_rank) {
-                this.none(sql.worlds.update.tribeBestRank, {worldId, rank: tribe.rank, tribe_id})
-            }
-
-            if (!best_points || tribe.points >= best_points) {
-                this.none(sql.worlds.update.tribeBestPoints, {worldId, points: tribe.points, tribe_id})
-            }
-
-            if (!best_villages || tribe.villages >= best_villages) {
-                this.none(sql.worlds.update.tribeBestVillages, {worldId, villages: tribe.villages, tribe_id})
-            }
+        const bestValues = {
+            tribes: new Map(await db.map(sql.worlds.tribesBestValues, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]])),
+            players: new Map(await db.map(sql.worlds.playersBestValues, {worldId}, (player) => [player.id, [player.best_rank, player.best_points, player.best_villages]]))
         }
 
-        for (let [character_id, player] of data.players) {
-            this.none(sql.worlds.insert.player, {worldId, character_id, ...player})
+        for (let type of ['tribes', 'players']) {
+            for (let [id, subject] of data[type]) {
+                this.none(sql.stats[type].addOrUpdate, {worldId, id, ...subject})
 
-            const [best_rank, best_points, best_villages] = playersBestValues.get(character_id) || []
+                const [best_rank, best_points, best_villages] = bestValues[type].get(id) || []
 
-            if (!best_rank || player.rank <= best_rank) {
-                this.none(sql.worlds.update.playerBestRank, {worldId, rank: player.rank, character_id})
-            }
+                if (!best_rank || subject.rank <= best_rank) {
+                    this.none(sql.stats[type].updateBestRank, {worldId, rank: subject.rank, id})
+                }
 
-            if (!best_points || player.points >= best_points) {
-                this.none(sql.worlds.update.playerBestPoints, {worldId, points: player.points, character_id})
-            }
+                if (!best_points || subject.points >= best_points) {
+                    this.none(sql.stats[type].updateBestPoints, {worldId, points: subject.points, id})
+                }
 
-            if (!best_villages || player.villages >= best_villages) {
-                this.none(sql.worlds.update.playerBestVillages, {worldId, villages: player.villages, character_id})
+                if (!best_villages || subject.villages >= best_villages) {
+                    this.none(sql.stats[type].updateBestVillages, {worldId, villages: subject.villages, id})
+                }
             }
         }
 
