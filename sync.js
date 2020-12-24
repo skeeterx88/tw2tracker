@@ -417,22 +417,11 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     let page
 
     try {
-        const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
+        const world = await getWorld(marketId, worldNumber)
+        const credentials = await db.one(sql.markets.oneWithAccount, [marketId])
 
-        let worldInfo
-
-        try {
-            worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-        } catch (e) {
-            throw new Error(`World ${worldId} not found.`)
-        }
-
-        if (!worldInfo.open) {
-            throw new Error(`World ${worldId} is closed`)
-        }
-
-        if (flag !== enums.IGNORE_LAST_SYNC && worldInfo.last_sync) {
-            const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
+        if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
+            const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60
             const settings = await getSettings()
 
             if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
@@ -444,7 +433,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         const perf = utils.perf()
 
-        const account = await Sync.auth(marketId, accountCredentials)
+        const account = await Sync.auth(marketId, credentials)
         const worldCharacter = account.characters.find(({world_id}) => world_id === worldId)
 
         if (!worldCharacter) {
@@ -472,7 +461,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             await downloadMapStruct(`https://${urlId}.tribalwars2.com/${structPath}`, worldId)
         }
 
-        if (!worldInfo.config) {
+        if (!world.config) {
             try {
                 log(log.GENERAL, 'Scrapper: Fetching world config')
 
@@ -628,25 +617,15 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
     let page
 
     try {
-        const accountCredentials = await db.one(sql.markets.oneWithAccount, [marketId])
+        await getWorld(marketId, worldNumber)
 
-        let worldInfo
-
-        try {
-            worldInfo = await db.one(sql.worlds.one, [marketId, worldNumber])
-        } catch (e) {
-            throw new Error(`World ${worldId} not found.`)
-        }
-
-        if (!worldInfo.open) {
-            throw new Error(`World ${worldId} is closed`)
-        }
+        const credentials = await db.one(sql.markets.oneWithAccount, [marketId])
 
         page = await createPuppeteerPage(log.ACHIEVEMENTS)
 
         const perf = utils.perf()
 
-        const account = await Sync.auth(marketId, accountCredentials)
+        const account = await Sync.auth(marketId, credentials)
         const urlId = marketId === 'zz' ? 'beta' : marketId
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
         await page.evaluate(readyState)
@@ -1069,6 +1048,22 @@ async function createPuppeteerPage (logId) {
     return page.on('console', function (msg) {
         if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) log(logId, msg._text)
     })
+}
+
+async function getWorld (marketId, worldNumber) {
+    let world
+
+    try {
+        world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    } catch (e) {
+        throw new Error(`World ${marketId + worldNumber} not found.`)
+    }
+
+    if (!world.open) {
+        throw new Error(`World ${marketId + worldNumber} is closed`)
+    }
+
+    return world
 }
 
 module.exports = Sync
