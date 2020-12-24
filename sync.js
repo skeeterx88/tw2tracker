@@ -714,6 +714,15 @@ const commitDataDatabase = async function (data, worldId) {
     const perf = utils.perf()
 
     await db.tx(async function () {
+        const playersNew = new Map(data.players)
+        const playersOld = new Map(await this.map(sql.worlds.players, {worldId}, player => [player.id, player]))
+        const tribesNew = new Map(data.tribes)
+        const villagesNew = new Map(data.villages)
+        const villagesNewIds = Array.from(villagesNew.keys())
+        const villagesOld = new Map(await this.map(sql.worlds.villages, {worldId}, village => [village.id, village]))
+        const villagesOldIds = Array.from(villagesOld.keys())
+        const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId))
+
         const bestValues = {
             tribes: new Map(await db.map(sql.worlds.tribesBestValues, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]])),
             players: new Map(await db.map(sql.worlds.playersBestValues, {worldId}, (player) => [player.id, [player.best_rank, player.best_points, player.best_villages]]))
@@ -742,15 +751,6 @@ const commitDataDatabase = async function (data, worldId) {
         for (let [province_name, province_id] of data.provinces) {
             this.none(sql.worlds.insert.province, {worldId, province_id, province_name})
         }
-
-        const playersNew = new Map(data.players)
-        const playersOld = new Map(await this.map(sql.worlds.players, {worldId}, player => [player.id, player]))
-        const tribesNew = new Map(data.tribes)
-        const villagesNew = new Map(data.villages)
-        const villagesNewIds = Array.from(villagesNew.keys())
-        const villagesOld = new Map(await this.map(sql.worlds.villages, {worldId}, village => [village.id, village]))
-        const villagesOldIds = Array.from(villagesOld.keys())
-        const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId))
 
         for (let [village_id, village] of data.villages) {
             this.none(sql.worlds.insert.village, {worldId, village_id, ...village})
@@ -784,14 +784,6 @@ const commitDataDatabase = async function (data, worldId) {
                     tribeData.old_owner_tribe_tag_then = tribesNew.get(oldOwner.tribe_id).tag
                 }
 
-                // console.log('commit conquest', {
-                //     worldId,
-                //     village_id,
-                //     newOwner: newOwnerId,
-                //     oldOwner: oldOwnerId,
-                //     ...tribeData
-                // })
-
                 await this.none(sql.worlds.insert.conquest, {
                     worldId,
                     village_id,
@@ -814,6 +806,7 @@ const commitDataDatabase = async function (data, worldId) {
                 const newTribe = newTribeId ? await this.one(sql.worlds.tribe, {worldId, tribeId: newTribeId}) : null
 
                 this.none(sql.worlds.insert.tribeChange, {
+                    worldId,
                     character_id,
                     old_tribe: oldTribeId,
                     new_tribe: newTribeId,
