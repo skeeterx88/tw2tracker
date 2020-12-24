@@ -82,19 +82,14 @@ Sync.init = async function () {
     }
 
     try {
-        if (!development) {
-            await Sync.daemon()
-        }
-
         if (development) {
-            // // SKIP WORLD SYNC AND COMMIT "FAKE" DATA TO DB/FS.
             // const worldNumber = 8
             // const marketId = 'zz'
             // const worldId = marketId + worldNumber
             // const data = JSON.parse(await fs.promises.readFile(path.join('.', 'data', `${worldId}.freeze.json`)))
             // await commitDataDatabase(data, worldId)
             // await commitDataFilesystem(worldId)
-            // await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
+            // await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])
             // await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
             // const worldNumber = 52
@@ -104,11 +99,13 @@ Sync.init = async function () {
             // await commitAchievementsDatabase(achievements, worldId)
 
             // await Sync.allWorlds()
-            // await Sync.world('br', 48)
+            // await Sync.world('br', 52)
             // await Sync.registerWorlds()
-            
-            // await Sync.worldAchievements('br', 48)
+
+            // await Sync.worldAchievements('br', 52)
             // await Sync.allWorldsAchievements()
+        } else {
+            await Sync.daemon()
         }
     } catch (error) {
         log(log.GENERAL, colors.red(error))
