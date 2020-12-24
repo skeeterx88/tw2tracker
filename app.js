@@ -5,7 +5,7 @@
     if (!await utils.schemaExists('main')) {
         const {db} = require('./db')
         const sql = require('./sql')
-        await db.query(sql.mainSchema)
+        await db.query(sql.createSchema)
     }
 
     const server = require('./server')

@@ -199,7 +199,7 @@ Sync.registerWorlds = async function () {
                 if (!await utils.worldEntryExists(worldId)) {
                     log(log.GENERAL, `Creating world entry for ${worldId}`)
 
-                    await db.query(sql.worlds.addEntry, {
+                    await db.query(sql.createWorldSchema, {
                         worldId,
                         marketId,
                         worldNumber,
