@@ -14,70 +14,37 @@ const path = require('path')
 const colors = require('colors/safe')
 const development = process.env.NODE_ENV === 'development'
 const puppeteer = require('puppeteer-core')
-
+const enums = require('./enums.js')
 const auths = {}
+
+let browser = null
+let syncInProgress = false
+let syncAllInProgress = false
 
 const devAccounts = [
     {id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'},
     {id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'}
 ]
 
-const {
-    SYNC_SUCCESS,
-    SYNC_FAIL,
-    SYNC_SUCCESS_ALL,
-    SYNC_ERROR_ALL,
-    SYNC_ERROR_SOME,
-    SYNC_ACHIEVEMENTS_SUCCESS_ALL,
-    SYNC_ACHIEVEMENTS_ERROR_ALL,
-    SYNC_ACHIEVEMENTS_ERROR_SOME,
-    SCRAPPE_WORLD_START,
-    SCRAPPE_WORLD_END,
-    SCRAPPE_ALL_WORLD_START,
-    SCRAPPE_ALL_WORLD_END,
-    IGNORE_LAST_SYNC,
-    SCRAPPE_ACHIEVEMENT_WORLD_START,
-    SCRAPPE_ACHIEVEMENT_WORLD_END,
-    SCRAPPE_ACHIEVEMENT_ALL_WORLD_START,
-    SCRAPPE_ACHIEVEMENT_ALL_WORLD_END
-} = require('./constants.js')
-
-let syncInProgress = false
-let syncAllInProgress = false
-
-Events.on(SCRAPPE_WORLD_START, function () {
-    syncInProgress = true
-})
-
-Events.on(SCRAPPE_WORLD_END, function () {
-    syncInProgress = false
-})
-
-Events.on(SCRAPPE_WORLD_START, function () {
-    syncAllInProgress = true
-})
-
-Events.on(SCRAPPE_WORLD_END, function () {
-    syncAllInProgress = false
-})
-
-let browser = null
-
-const initBrowser = async function () {
-    browser = await puppeteer.launch({headless: true, executablePath: '/usr/bin/chromium'})
-}
-
-const puppeteerPage = async function (logId) {
-    const page = await browser.newPage()
-
-    return page.on('console', function (msg) {
-        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) log(logId, msg._text)
-    })
-}
-
 const Sync = {}
 
 Sync.init = async function () {
+    Events.on(enums.SCRAPPE_WORLD_START, function () {
+        syncInProgress = true
+    })
+
+    Events.on(enums.SCRAPPE_WORLD_END, function () {
+        syncInProgress = false
+    })
+
+    Events.on(enums.SCRAPPE_WORLD_START, function () {
+        syncAllInProgress = true
+    })
+
+    Events.on(enums.SCRAPPE_WORLD_END, function () {
+        syncAllInProgress = false
+    })
+
     await fs.promises.mkdir('logs', {recursive: true})
 
     log(log.GENERAL, 'Sync.init()')
@@ -86,7 +53,7 @@ Sync.init = async function () {
         log(log.GENERAL, colors.red('Stopping tw2-tracker! Waiting pendent tasks...'))
 
         if (syncInProgress) {
-            await Events.on(SCRAPPE_WORLD_END)
+            await Events.on(enums.SCRAPPE_WORLD_END)
         }
 
         if (browser) {
@@ -98,7 +65,7 @@ Sync.init = async function () {
         process.exit(0)
     })
 
-    await initBrowser()
+    await initPuppeteerBrowser()
 
     const state = await db.one(sql.state.all)
 
@@ -256,7 +223,7 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
     log(log.GENERAL, `Sync.registerCharacter() ${marketId}${worldNumber}`)
     log.increase(log.GENERAL)
 
-    const page = await puppeteerPage(log.GENERAL)
+    const page = await createPuppeteerPage(log.GENERAL)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
     await page.waitFor(2000)
 
@@ -292,7 +259,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
         auths[marketId] = utils.timeout(async function () {
             const urlId = marketId === 'zz' ? 'beta' : marketId
 
-            page = await puppeteerPage(log.GENERAL)
+            page = await createPuppeteerPage(log.GENERAL)
             await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
             await page.waitFor(1000)
 
@@ -381,7 +348,7 @@ Sync.allWorlds = async function (flag) {
         return false
     }
 
-    Events.trigger(SCRAPPE_ALL_WORLD_START)
+    Events.trigger(enums.SCRAPPE_ALL_WORLD_START)
 
     const failedToSync = []
     const perf = utils.perf(utils.perf.MINUTES)
@@ -413,7 +380,7 @@ Sync.allWorlds = async function (flag) {
 
     const time = perf.end()
 
-    Events.trigger(SCRAPPE_ALL_WORLD_END)
+    Events.trigger(enums.SCRAPPE_ALL_WORLD_END)
 
     if (failedToSync.length) {
         const allFail = failedToSync.length === worlds.length
@@ -431,20 +398,20 @@ Sync.allWorlds = async function (flag) {
         log(log.GENERAL, `Finished in ${time}`)
         log.decrease(log.GENERAL)
 
-        return allFail ? SYNC_ERROR_ALL : SYNC_ERROR_SOME
+        return allFail ? enums.SYNC_ERROR_ALL : enums.SYNC_ERROR_SOME
     } else {
         log(log.GENERAL)
         log(log.GENERAL, `Finished in ${time}`)
         log.decrease(log.GENERAL)
 
-        return SYNC_SUCCESS_ALL
+        return enums.SYNC_SUCCESS_ALL
     }
 }
 
 Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
-    Events.trigger(SCRAPPE_WORLD_START)
+    Events.trigger(enums.SCRAPPE_WORLD_START)
 
     log(log.GENERAL)
     log(log.GENERAL, `Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
@@ -467,7 +434,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             throw new Error(`World ${worldId} is closed`)
         }
 
-        if (flag !== IGNORE_LAST_SYNC && worldInfo.last_sync) {
+        if (flag !== enums.IGNORE_LAST_SYNC && worldInfo.last_sync) {
             const minutesSinceLastSync = (Date.now() - worldInfo.last_sync.getTime()) / 1000 / 60
             const settings = await getSettings()
 
@@ -476,7 +443,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             }
         }
 
-        page = await puppeteerPage(log.GENERAL)
+        page = await createPuppeteerPage(log.GENERAL)
 
         const perf = utils.perf()
 
@@ -559,7 +526,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await commitDataDatabase(data, worldId)
         await commitDataFilesystem(worldId)
-        await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])        
+        await db.query(sql.worlds.updateSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
         await db.query(sql.worlds.updateSync, [marketId, worldNumber])
 
         const time = perf.end()
@@ -569,7 +536,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await page.close()
 
-        Events.trigger(SCRAPPE_WORLD_END)
+        Events.trigger(enums.SCRAPPE_WORLD_END)
     } catch (error) {
         log(log.GENERAL, colors.red(`Failed to synchronize ${worldId}: ${error.stack}`))
         log.decrease(log.GENERAL)
@@ -581,8 +548,8 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < 3) {
             return await Sync.world(marketId, worldNumber, flag, ++attempt)
         } else {
-            await db.query(sql.worlds.updateSyncStatus, [SYNC_FAIL, marketId, worldNumber])
-            Events.trigger(SCRAPPE_WORLD_END)
+            await db.query(sql.worlds.updateSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
+            Events.trigger(enums.SCRAPPE_WORLD_END)
 
             throw new Error(error.message)
         }
@@ -594,7 +561,7 @@ Sync.allWorldsAchievements = async function (flag) {
     log(log.ACHIEVEMENTS, 'Sync.allWorldsAchievements()')
     log.increase(log.ACHIEVEMENTS)
 
-    Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_START)
+    Events.trigger(enums.SCRAPPE_ACHIEVEMENT_ALL_WORLD_START)
 
     const failedToSync = []
     const perf = utils.perf(utils.perf.MINUTES)
@@ -624,7 +591,7 @@ Sync.allWorldsAchievements = async function (flag) {
 
     const time = perf.end()
 
-    Events.trigger(SCRAPPE_ACHIEVEMENT_ALL_WORLD_END)
+    Events.trigger(enums.SCRAPPE_ACHIEVEMENT_ALL_WORLD_END)
 
     if (failedToSync.length) {
         const allFail = failedToSync.length === worlds.length
@@ -642,20 +609,20 @@ Sync.allWorldsAchievements = async function (flag) {
         log(log.ACHIEVEMENTS, `Finished in ${time}`)
         log.decrease(log.ACHIEVEMENTS)
 
-        return allFail ? SYNC_ACHIEVEMENTS_ERROR_ALL : SYNC_ACHIEVEMENTS_ERROR_SOME
+        return allFail ? enums.SYNC_ACHIEVEMENTS_ERROR_ALL : enums.SYNC_ACHIEVEMENTS_ERROR_SOME
     } else {
         log(log.ACHIEVEMENTS)
         log(log.ACHIEVEMENTS, `Finished in ${time}`)
         log.decrease(log.ACHIEVEMENTS)
 
-        return SYNC_ACHIEVEMENTS_SUCCESS_ALL
+        return enums.SYNC_ACHIEVEMENTS_SUCCESS_ALL
     }
 }
 
 Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
-    Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_START)
+    Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_START)
 
     log(log.ACHIEVEMENTS)
     log(log.ACHIEVEMENTS, `Sync.worldAchievements() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
@@ -678,7 +645,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
             throw new Error(`World ${worldId} is closed`)
         }
 
-        page = await puppeteerPage(log.ACHIEVEMENTS)
+        page = await createPuppeteerPage(log.ACHIEVEMENTS)
 
         const perf = utils.perf()
 
@@ -704,7 +671,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 
         await page.close()
 
-        Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_END)
+        Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_END)
     } catch (error) {
         log(log.ACHIEVEMENTS, colors.red(`Failed to synchronize achievements ${worldId}: ${error.stack}`))
         log.decrease(log.ACHIEVEMENTS)
@@ -716,7 +683,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
         if (attempt < 3) {
             return await Sync.worldAchievements(marketId, worldNumber, flag, ++attempt)
         } else {
-            Events.trigger(SCRAPPE_ACHIEVEMENT_WORLD_END)
+            Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_END)
             throw new Error(error.message)
         }
     }
@@ -1093,6 +1060,18 @@ const commitDataFilesystem = async function (worldId) {
     log(log.GENERAL, `Writed data to filesystem in ${time}`)
 
     return false
+}
+
+async function initPuppeteerBrowser () {
+    browser = await puppeteer.launch({headless: true, executablePath: '/usr/bin/chromium'})
+}
+
+async function createPuppeteerPage (logId) {
+    const page = await browser.newPage()
+
+    return page.on('console', function (msg) {
+        if (msg._type === 'log' && msg._text.startsWith('Scrapper:')) log(logId, msg._text)
+    })
 }
 
 module.exports = Sync
