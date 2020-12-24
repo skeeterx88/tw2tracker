@@ -1,3 +1,2 @@
-SELECT *
-FROM main.worlds
+SELECT * FROM main.worlds
 ORDER BY market ASC, num ASC

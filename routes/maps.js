@@ -20,7 +20,7 @@ const mapShareTypes = {
 
 router.get('/', asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
-    const worlds = await db.any(sql.worlds.all)
+    const worlds = await db.any(sql.getOpenWorlds)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
 
     const marketStats = marketsIds.map(function (id) {
@@ -52,7 +52,8 @@ router.get('/:marketId', asyncRouter(async function (req, res, next) {
 
     const settings = await getSettings()
     const marketId = req.params.marketId
-    const marketWorlds = await db.any(sql.stats.marketWorlds, {marketId})
+    const allWorlds = await db.any(sql.getSyncedWorlds)
+    const marketWorlds = allWorlds.filter((world) => world.market === marketId)
     const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num)
 
     if (!marketWorlds.length) {
@@ -100,7 +101,7 @@ router.get('/:marketId/:worldNumber', asyncRouter(async function (req, res, next
         throw createError(404, 'This world does not exist')
     }
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
 
     res.render('maps/map', {
@@ -135,7 +136,7 @@ router.get('/:marketId/:worldNumber/share/:mapShareId', asyncRouter(async functi
         throw createError(404, 'This world does not exist')
     }
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
 
     try {
@@ -211,7 +212,7 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async fu
 }))
 
 router.get('/api/get-open-worlds', asyncRouter(async function (req, res) {
-    const allWorlds = await db.any(sql.worlds.allOpen)
+    const allWorlds = await db.any(sql.getOpenWorlds)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allWorlds))
 }))

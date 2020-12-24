@@ -24,7 +24,7 @@ const conquestTypes = {
 
 const homeRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
-    const worlds = await db.any(sql.worlds.all)
+    const worlds = await db.any(sql.getOpenWorlds)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
 
     const marketStats = marketsIds.map(function (id) {
@@ -59,7 +59,8 @@ router.get('/stats/:marketId', asyncRouter(async function (req, res, next) {
 
     const settings = await getSettings()
     const marketId = req.params.marketId
-    const marketWorlds = await db.any(sql.stats.marketWorlds, {marketId})
+    const allWorlds = await db.any(sql.getSyncedWorlds)
+    const marketWorlds = allWorlds.filter((world) => world.market === marketId)
     const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num)
 
     if (!marketWorlds.length) {
@@ -109,10 +110,10 @@ router.get('/stats/:marketId/:worldNumber', asyncRouter(async function (req, res
         tribes,
         lastConquests
     ] = await Promise.all([
-        db.one(sql.worlds.one, [marketId, worldNumber]),
-        db.any(sql.stats.worldTopPlayers, {worldId}),
-        db.any(sql.stats.worldTopTribes, {worldId}),
-        db.any(sql.stats.worldLastConquests, {worldId})
+        db.one(sql.getWorld, [marketId, worldNumber]),
+        db.any(sql.getWorldTopPlayers, {worldId}),
+        db.any(sql.getWorldTopTribes, {worldId}),
+        db.any(sql.getWorldLastConquests, {worldId})
     ])
 
     res.render('stats/world', {
@@ -162,9 +163,9 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
     const offset = settings.ranking_items_per_page * (page - 1)
     const limit = settings.ranking_items_per_page
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
-    const conquests = await db.any(sql.stats.worldConquests, {worldId, offset, limit})
-    const total = parseInt((await db.one(sql.stats.worldConquestsCount, {worldId})).count, 10)
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+    const conquests = await db.any(sql.getWorldConquests, {worldId, offset, limit})
+    const total = parseInt((await db.one(sql.getWorldConquestsCount, {worldId})).count, 10)
 
     res.render('stats/conquests', {
         title: `${marketId.toUpperCase()}/${world.name} - Conquests - ${settings.site_name}`,
@@ -210,19 +211,19 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
     let tribe
 
     try {
-        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
+        tribe = await db.one(sql.getTribe, {worldId, tribeId})
     } catch (error) {
         throw createError(404, 'This tribe does not exist')
     }
 
-    let conquestCount = await db.one(sql.stats.tribes.conquestsBothCount, {worldId, tribeId})
+    let conquestCount = await db.one(sql.getTribeConquestsCount, {worldId, tribeId})
     conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
     conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    const achievementTypes = new Map(await db.map(sql.stats.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
-    const achievements = await db.any(sql.stats.tribes.achievements, {worldId, id: tribe.id})
+    const achievementTypes = new Map(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribe.id})
 
     let achievementPoints = achievements.reduce(function (sum, next) {
         const {type, level} = next
@@ -282,12 +283,12 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
     let tribe
 
     try {
-        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
+        tribe = await db.one(sql.getTribe, {worldId, tribeId})
     } catch (error) {
         throw createError(404, 'This tribe does not exist')
     }
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let conquests
     let total
@@ -301,20 +302,20 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
 
     switch (req.params.type) {
         case undefined: {
-            conquests = await db.any(sql.stats.tribes.conquests, {worldId, tribeId, offset, limit})
-            total = await db.one(sql.stats.tribes.conquestsBothCount, {worldId, tribeId})
+            conquests = await db.any(sql.getTribeConquests, {worldId, tribeId, offset, limit})
+            total = await db.one(sql.getTribeConquestsCount, {worldId, tribeId})
             total = total[conquestTypes.GAIN] + total[conquestTypes.LOSS]
             break
         }
         case conquestTypes.GAIN: {
-            conquests = await db.any(sql.stats.tribes.conquestsGain, {worldId, tribeId, offset, limit})
-            total = (await db.one(sql.stats.tribes.conquestsGainCount, {worldId, tribeId})).count
+            conquests = await db.any(sql.getTribeConquestsGain, {worldId, tribeId, offset, limit})
+            total = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count
             navigationTitle.push('Gains')
             break
         }
         case conquestTypes.LOSS: {
-            conquests = await db.any(sql.stats.tribes.conquestsLoss, {worldId, tribeId, offset, limit})
-            total = (await db.one(sql.stats.tribes.conquestsLossCount, {worldId, tribeId})).count
+            conquests = await db.any(sql.getTribeConquestsLoss, {worldId, tribeId, offset, limit})
+            total = (await db.one(sql.getTribeConquestsLossCount, {worldId, tribeId})).count
             navigationTitle.push('Losses')
             break
         }
@@ -389,13 +390,13 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/members', asyncRouter(
     let tribe
 
     try {
-        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
+        tribe = await db.one(sql.getTribe, {worldId, tribeId})
     } catch (error) {
         throw createError(404, 'This tribe does not exist')
     }
 
-    const members = await db.any(sql.worlds.tribeMembers, {worldId, tribeId})
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const members = await db.any(sql.getTribeMembers, {worldId, tribeId})
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     res.render('stats/tribe-members', {
         title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -446,16 +447,16 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
     let tribe
 
     try {
-        tribe = await db.one(sql.worlds.tribe, {worldId, tribeId})
+        tribe = await db.one(sql.getTribe, {worldId, tribeId})
     } catch (error) {
         throw createError(404, 'This tribe does not exist')
     }
 
-    const allVillages = await db.any(sql.worlds.tribeVillages, {worldId, tribeId})
+    const allVillages = await db.any(sql.getTribeVillages, {worldId, tribeId})
     const villages = allVillages.slice(offset, offset + limit)
     const total = allVillages.length
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     res.render('stats/tribe-villages', {
         title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -506,25 +507,25 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
     let player
 
     try {
-        player = await db.one(sql.worlds.player, {worldId, playerId})
+        player = await db.one(sql.getPlayer, {worldId, playerId})
     } catch (error) {
         throw createError(404, 'This player does not exist')
     }
 
-    let conquestCount = await db.one(sql.stats.players.conquestCount, {worldId, playerId})
+    let conquestCount = await db.one(sql.getPlayerConquestCount, {worldId, playerId})
     conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
     conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let tribe = false
 
     if (player.tribe_id) {
-        tribe = await db.one(sql.worlds.tribeName, {worldId, tribeId: player.tribe_id})
+        tribe = await db.one(sql.getTribe, {worldId, tribeId: player.tribe_id})
     }
 
-    const achievementTypes = new Map(await db.map(sql.stats.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
-    const achievements = await db.any(sql.stats.players.achievements, {worldId, id: playerId})
+    const achievementTypes = new Map(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
 
     let achievementPoints = achievements.reduce(function (sum, next) {
         const {type, level} = next
@@ -585,13 +586,13 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/villages', async
     let villages
 
     try {
-        player = await db.one(sql.worlds.player, {worldId, playerId})
-        villages = await db.any(sql.worlds.playerVillages, {worldId, playerId})
+        player = await db.one(sql.getPlayer, {worldId, playerId})
+        villages = await db.any(sql.getPlayerVillages, {worldId, playerId})
     } catch (error) {
         throw createError(404, 'This player does not exist')
     }
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     res.render('stats/player-villages', {
         title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -638,12 +639,12 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     let player
 
     try {
-        player = await db.one(sql.worlds.player, {worldId, playerId})
+        player = await db.one(sql.getPlayer, {worldId, playerId})
     } catch (error) {
         throw createError(404, 'This player does not exist')
     }
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let conquests
     let total
@@ -657,19 +658,19 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
 
     switch (req.params.type) {
         case undefined: {
-            conquests = await db.any(sql.stats.players.conquests, {worldId, playerId, offset, limit})
-            total = (await db.one(sql.stats.players.conquestsCount, {worldId, playerId})).count
+            conquests = await db.any(sql.getPlayerConquests, {worldId, playerId, offset, limit})
+            total = (await db.one(sql.getPlayerConquestsCount, {worldId, playerId})).count
             break
         }
         case conquestTypes.GAIN: {
-            conquests = await db.any(sql.stats.players.conquestsGain, {worldId, playerId, offset, limit})
-            total = (await db.one(sql.stats.players.conquestsGainCount, {worldId, playerId})).count
+            conquests = await db.any(sql.getPlayerConquestsGain, {worldId, playerId, offset, limit})
+            total = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count
             navigationTitle.push('Gains')
             break
         }
         case conquestTypes.LOSS: {
-            conquests = await db.any(sql.stats.players.conquestsLoss, {worldId, playerId, offset, limit})
-            total = (await db.one(sql.stats.players.conquestsLossCount, {worldId, playerId})).count
+            conquests = await db.any(sql.getPlayerConquestsLoss, {worldId, playerId, offset, limit})
+            total = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count
             navigationTitle.push('Losses')
             break
         }
@@ -742,13 +743,13 @@ router.get('/stats/:marketId/:worldNumber/villages/:village_id', asyncRouter(asy
     let village
 
     try {
-        village = await db.one(sql.stats.village, {worldId, village_id})
+        village = await db.one(sql.getVillage, {worldId, village_id})
     } catch (error) {
         throw createError(404, 'This village does not exist')
     }
 
-    const conquests = await db.any(sql.stats.villageConquestHistory, {worldId, village_id})
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const conquests = await db.any(sql.getVillageConquests, {worldId, village_id})
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     res.render('stats/village', {
         title: `Village ${village.name} (${village.x}|${village.y}) - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -831,7 +832,7 @@ const routerSearch = async function (req, res, next) {
     const limit = settings.ranking_items_per_page
     const offset = limit * (page - 1)
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const rawQuery = decodeURIComponent(req.params.query)
 
     if (!rawQuery) {
@@ -847,7 +848,7 @@ const routerSearch = async function (req, res, next) {
     }
 
     const query = '%' + rawQuery + '%'
-    const allResults = await db.any(sql.stats.search[category], {worldId, query})
+    const allResults = await db.any(sql.search[category], {worldId, query})
     const results = allResults.slice(offset, offset + limit)
     const total = allResults.length
 
@@ -904,7 +905,7 @@ const routerRanking = async function (req, res, next) {
         : 1
     const offset = settings.ranking_items_per_page * (page - 1)
 
-    const world = await db.one(sql.worlds.one, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const limit = settings.ranking_items_per_page
 
     let players
@@ -913,14 +914,14 @@ const routerRanking = async function (req, res, next) {
 
     switch (category) {
         case RANKING_CATEGORIES.players: {
-            players = await db.any(sql.stats.rankingPlayers, {worldId, offset, limit})
-            total = await db.one(sql.stats.playerCount, {worldId})
+            players = await db.any(sql.getWorldRankingPlayers, {worldId, offset, limit})
+            total = await db.one(sql.getWorldPlayerCount, {worldId})
             total = parseInt(total.count, 10)
             break
         }
         case RANKING_CATEGORIES.tribes: {
-            tribes = await db.any(sql.stats.rankingTribes, {worldId, offset, limit})
-            total = await db.one(sql.stats.tribeCount, {worldId})
+            tribes = await db.any(sql.getWorldRankingTribes, {worldId, offset, limit})
+            total = await db.one(sql.getWorldTribeCount, {worldId})
             total = parseInt(total.count, 10)
             break
         }

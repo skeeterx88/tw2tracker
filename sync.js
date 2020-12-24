@@ -89,8 +89,8 @@ Sync.init = async function () {
             // const data = JSON.parse(await fs.promises.readFile(path.join('.', 'data', `${worldId}.freeze.json`)))
             // await commitDataDatabase(data, worldId)
             // await commitDataFilesystem(worldId)
-            // await db.query(sql.worlds.updateSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])
-            // await db.query(sql.worlds.updateSync, [marketId, worldNumber])
+            // await db.query(sql.updateWorldSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])
+            // await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
 
             // const worldNumber = 52
             // const marketId = 'br'
@@ -358,7 +358,7 @@ Sync.allWorlds = async function (flag) {
             {market: 'br', num: 52}
         ]
     } else {
-        worlds = await db.any(sql.worlds.allOpen)
+        worlds = await db.any(sql.getOpenWorlds)
     }
 
     await db.query(sql.state.update.lastScrappeAll)
@@ -439,7 +439,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         if (!worldCharacter) {
             await Sync.registerCharacter(marketId, worldNumber)
         } else if (!worldCharacter.allow_login) {
-            await db.query(sql.worlds.lock, [marketId, worldNumber])
+            await db.query(sql.closeWorld, [marketId, worldNumber])
             throw new Error('world is not open')
         }
 
@@ -493,7 +493,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
                     }
                 })
 
-                await db.none(sql.worlds.insert.config, {
+                await db.none(sql.updateWorldConfig, {
                     worldId,
                     worldConfig
                 })
@@ -512,8 +512,8 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await commitDataDatabase(data, worldId)
         await commitDataFilesystem(worldId)
-        await db.query(sql.worlds.updateSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
-        await db.query(sql.worlds.updateSync, [marketId, worldNumber])
+        await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
+        await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
 
         const time = perf.end()
 
@@ -534,7 +534,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < 3) {
             return await Sync.world(marketId, worldNumber, flag, ++attempt)
         } else {
-            await db.query(sql.worlds.updateSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
+            await db.query(sql.updateWorldSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
             Events.trigger(enums.SCRAPPE_WORLD_END)
 
             throw new Error(error.message)
@@ -560,7 +560,7 @@ Sync.allWorldsAchievements = async function (flag) {
             {market: 'br', num: 52}
         ]
     } else {
-        worlds = await db.any(sql.worlds.allOpen)
+        worlds = await db.any(sql.getOpenWorlds)
     }
 
     for (let world of worlds) {
@@ -715,45 +715,60 @@ const commitDataDatabase = async function (data, worldId) {
 
     await db.tx(async function () {
         const playersNew = new Map(data.players)
-        const playersOld = new Map(await this.map(sql.worlds.players, {worldId}, player => [player.id, player]))
+        const playersOld = new Map(await this.map(sql.worldPlayers, {worldId}, player => [player.id, player]))
         const tribesNew = new Map(data.tribes)
         const villagesNew = new Map(data.villages)
         const villagesNewIds = Array.from(villagesNew.keys())
-        const villagesOld = new Map(await this.map(sql.worlds.villages, {worldId}, village => [village.id, village]))
+        const villagesOld = new Map(await this.map(sql.worldVillages, {worldId}, village => [village.id, village]))
         const villagesOldIds = Array.from(villagesOld.keys())
         const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId))
 
-        const bestValues = {
-            tribes: new Map(await db.map(sql.worlds.tribesBestValues, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]])),
-            players: new Map(await db.map(sql.worlds.playersBestValues, {worldId}, (player) => [player.id, [player.best_rank, player.best_points, player.best_villages]]))
+        const records = {
+            tribes: new Map(await db.map(sql.getTribesRecords, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]])),
+            players: new Map(await db.map(sql.getPlayersRecords, {worldId}, (player) => [player.id, [player.best_rank, player.best_points, player.best_villages]]))
+        }
+
+        const sqlSubjectMap = {
+            players: {
+                updateData: sql.updatePlayer,
+                updateRecordRank: sql.updatePlayerRecordRank,
+                updateRecordPoints: sql.updatePlayerRecordPoints,
+                updateRecordVillages: sql.updatePlayerRecordVillages
+            },
+            tribes: {
+                updateData: sql.updateTribe,
+                updateRecordRank: sql.updateTribeRecordRank,
+                updateRecordPoints: sql.updateTribeRecordPoints,
+                updateRecordVillages: sql.updateTribeRecordVillages
+            }
         }
 
         for (let type of ['tribes', 'players']) {
             for (let [id, subject] of data[type]) {
-                this.none(sql.stats[type].addOrUpdate, {worldId, id, ...subject})
+                this.none(sqlSubjectMap[type].data, {worldId, id, ...subject})
 
-                const [best_rank, best_points, best_villages] = bestValues[type].get(id) || []
+                const [best_rank, best_points, best_villages] = records[type].get(id) || []
 
                 if (!best_rank || subject.rank <= best_rank) {
-                    this.none(sql.stats[type].updateBestRank, {worldId, rank: subject.rank, id})
+                    this.none(sqlSubjectMap[type].updateRecordRank, {worldId, rank: subject.rank, id})
                 }
 
                 if (!best_points || subject.points >= best_points) {
-                    this.none(sql.stats[type].updateBestPoints, {worldId, points: subject.points, id})
+                    this.none(sqlSubjectMap[type].updateRecordPoints, {worldId, points: subject.points, id})
                 }
 
                 if (!best_villages || subject.villages >= best_villages) {
-                    this.none(sql.stats[type].updateBestVillages, {worldId, villages: subject.villages, id})
+                    this.none(sqlSubjectMap[type].updateRecordVillages, {worldId, villages: subject.villages, id})
                 }
             }
         }
 
         for (let [province_name, province_id] of data.provinces) {
-            this.none(sql.worlds.insert.province, {worldId, province_id, province_name})
+            this.none(sql.addProvince, {worldId, province_id, province_name})
         }
 
         for (let [village_id, village] of data.villages) {
-            this.none(sql.worlds.insert.village, {worldId, village_id, ...village})
+            this.none(sql.addVillage, {worldId, village_id, ...village})
         }
 
         for (let [village_id, village] of villagesNew.entries()) {
@@ -784,7 +799,7 @@ const commitDataDatabase = async function (data, worldId) {
                     tribeData.old_owner_tribe_tag_then = tribesNew.get(oldOwner.tribe_id).tag
                 }
 
-                await this.none(sql.worlds.insert.conquest, {
+                await this.none(sql.addConquest, {
                     worldId,
                     village_id,
                     newOwner: newOwnerId,
@@ -802,10 +817,10 @@ const commitDataDatabase = async function (data, worldId) {
             const newTribeId = playerNewData.tribe_id
 
             if (oldTribeId !== newTribeId) {
-                const oldTribe = oldTribeId ? await this.one(sql.worlds.tribe, {worldId, tribeId: oldTribeId}) : null
-                const newTribe = newTribeId ? await this.one(sql.worlds.tribe, {worldId, tribeId: newTribeId}) : null
+                const oldTribe = oldTribeId ? await this.one(sql.getTribe, {worldId, tribeId: oldTribeId}) : null
+                const newTribe = newTribeId ? await this.one(sql.getTribe, {worldId, tribeId: newTribeId}) : null
 
-                this.none(sql.worlds.insert.tribeChange, {
+                this.none(sql.addTribeMemberChange, {
                     worldId,
                     character_id,
                     old_tribe: oldTribeId,
@@ -817,10 +832,10 @@ const commitDataDatabase = async function (data, worldId) {
         }
 
         for (let [character_id, villages_id] of data.villagesByPlayer) {
-            this.none(sql.worlds.insert.playerVillages, {worldId, character_id, villages_id})
+            this.none(sql.updatePlayerVillages, {worldId, character_id, villages_id})
         }
 
-        this.none(sql.worlds.update.stats, {
+        this.none(sql.updateWorldStats, {
             worldId,
             villages: data.villages.length,
             players: data.players.length,
@@ -828,7 +843,7 @@ const commitDataDatabase = async function (data, worldId) {
         })
     })
 
-    await db.query(sql.worlds.update.stats, {
+    await db.query(sql.updateWorldStats, {
         worldId,
         villages: data.villages.length,
         players: data.players.length,
@@ -859,12 +874,17 @@ const mapAchievements = function (achievements) {
     return {unique, repeatable}
 }
 
-const getMissingAchievements = async function (achievementsType, achievements, worldId) {
+const getMissingAchievements = async function (subjectType, achievements, worldId) {
     const achievementsToCommit = []
+
+    const sqlAchievementsMap = {
+        players: sql.getPlayerAchievements,
+        tribes: sql.getTribeAchievements
+    }
 
     for (let [id, newAchievementsRaw] of achievements) {
         let achievementsToMerge = []
-        const oldAchievementsRaw = await db.any(sql.stats[achievementsType].achievements, {worldId, id})
+        const oldAchievementsRaw = await db.any(sqlAchievementsMap[subjectType], {worldId, id})
 
         if (oldAchievementsRaw.length === newAchievementsRaw.length) {
             continue
@@ -915,7 +935,7 @@ const commitAchievementsDatabase = async function (data, worldId) {
 
     await db.tx(async function () {
         for (let achievement of newPlayersAchievements) {
-            this.none(sql.worlds.insert.playerAchievements, {
+            this.none(sql.addPlayerAchievement, {
                 worldId,
                 id: achievement.id,
                 type: achievement.type,
@@ -927,7 +947,7 @@ const commitAchievementsDatabase = async function (data, worldId) {
         }
 
         for (let achievement of newTribesAchievements) {
-            this.none(sql.worlds.insert.tribeAchievements, {
+            this.none(sql.addTribeAchievement, {
                 worldId,
                 id: achievement.id,
                 type: achievement.type,
@@ -948,10 +968,10 @@ const commitDataFilesystem = async function (worldId) {
     const perf = utils.perf()
 
     try {
-        const players = await db.any(sql.worlds.getData, {worldId, table: 'players'})
-        const villages = await db.any(sql.worlds.getData, {worldId, table: 'villages'})
-        const tribes = await db.any(sql.worlds.getData, {worldId, table: 'tribes'})
-        const provinces = await db.any(sql.worlds.getData, {worldId, table: 'provinces'})
+        const players = await db.any(sql.getWorldData, {worldId, table: 'players'})
+        const villages = await db.any(sql.getWorldData, {worldId, table: 'villages'})
+        const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes'})
+        const provinces = await db.any(sql.getWorldData, {worldId, table: 'provinces'})
 
         const parsedPlayers = {}
         const parsedTribes = {}
@@ -1047,7 +1067,7 @@ async function getWorld (marketId, worldNumber) {
     let world
 
     try {
-        world = await db.one(sql.worlds.one, [marketId, worldNumber])
+        world = await db.one(sql.getWorld, [marketId, worldNumber])
     } catch (e) {
         throw new Error(`World ${marketId + worldNumber} not found.`)
     }

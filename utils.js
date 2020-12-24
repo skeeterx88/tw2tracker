@@ -13,7 +13,7 @@ const schemaExists = async function (schemaName) {
 }
 
 const worldEntryExists = async function (worldId) {
-    const worldEntry = await db.one(sql.worlds.exists, {worldId})
+    const worldEntry = await db.one(sql.worldExists, {worldId})
     return worldEntry.exists
 }
 

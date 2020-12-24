@@ -11,7 +11,7 @@ const getSettings = require('../settings')
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
 router.get('/', ensureLoggedIn, async function (req, res) {
-    const worlds = await db.any(sql.worlds.all)
+    const worlds = await db.any(sql.getWorlds)
     const markets = await db.any(sql.markets.all)
     const settings = await getSettings()
 
@@ -45,7 +45,7 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
-    const worlds = await db.map(sql.worlds.all, [], world => world.num)
+    const worlds = await db.map(sql.getWorlds, [], world => world.num)
 
     const response = {}
 
@@ -74,7 +74,7 @@ router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async funct
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
-    const worlds = await db.map(sql.worlds.all, [], world => world.num)
+    const worlds = await db.map(sql.getWorlds, [], world => world.num)
 
     const response = {}
 
