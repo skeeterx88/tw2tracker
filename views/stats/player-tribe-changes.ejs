@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../head.ejs') %>
+    <body>
+        <header></header>
+        <%- include('../menu.ejs') %>
+
+        <main class="content-border">
+            <%- include('../navigation.ejs') %>
+
+            <div class="content">
+                <div class="single">
+                    <h2>Player tribe changes</h2>
+                    <table class="content-border">
+                        <colgroup>
+                            <col width="10px">
+                            <col width="*">
+                            <col width="*">
+                            <col width="*">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Old tribe</th>
+                                <th>New tribe</th>
+                                <th>Date/Hour</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (let change of tribeChanges) { %>
+                                <tr>
+                                    <td><%= changeIndex++ %></td>
+                                    <% if (change.old_tribe) { -%>
+                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
+                                    <% } else { -%>
+                                        <td>None</td>
+                                    <% } -%>
+
+                                    <% if (change.new_tribe) { -%>
+                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
+                                    <% } else { -%>
+                                        <td>None</td>
+                                    <% } -%>
+
+                                    <td><%= formatDate(change.date, 'hours-only') %></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../footer.ejs') %>
+
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
+    </body>
+</html>

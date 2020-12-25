@@ -59,6 +59,10 @@
                                         <td><%= formatNumbers(player.points_per_villages) %></td>
                                     </tr>
                                     <tr>
+                                        <th>Tribe Changes:</th>
+                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/tribe-changes"><%= formatNumbers(tribeChangesCount) %></a></td>
+                                    </tr>
+                                    <tr>
                                         <th>Village Conquers:</th>
                                         <td>
                                             <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestCount[conquestTypes.GAIN] + conquestCount[conquestTypes.LOSS]) %></a>
