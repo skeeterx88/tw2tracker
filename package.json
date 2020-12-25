@@ -5,6 +5,7 @@
   "scripts": {
     "autoreload": "nodemon app.js",
     "start": "node app.js",
+    "debug": "node --inspect-brk app.js",
     "install-unit": "node install-unit.js",
     "eslint": "eslint *.js routes/*.js"
   },
