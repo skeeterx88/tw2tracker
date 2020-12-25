@@ -249,38 +249,6 @@ module.exports = async function () {
         })
     }
 
-    const loadPlayersAchievements = async function () {
-        const playersId = Array.from(players.keys()).slice(0, 50)
-
-        console.log(`Scrapper: playersId: ${playersId.length}`)
-
-        for (let i = 0, l = playersId.length; i < l; i += 4) {
-            await Promise.all([
-                loadPlayerAchievements(playersId[i]),
-                loadPlayerAchievements(playersId[i + 1]),
-                loadPlayerAchievements(playersId[i + 2]),
-                loadPlayerAchievements(playersId[i + 3])
-            ])
-
-            console.log(`Scrapper: achievements progress: ${i}/${playersId.length}`)
-        }
-    }
-
-    const loadPlayerAchievements = function (character_id) {
-        return new Promise(function (resolve) {
-            if (!character_id) {
-                return resolve()
-            }
-
-            socketService.emit(routeProvider.ACHIEVEMENT_GET_CHAR_ACHIEVEMENTS, {
-                character_id
-            }, function ({achievements}) {
-                playersAchievement.set(character_id, achievements)
-                resolve()
-            })
-        })
-    }
-
     const processPlayers = async function () {
         let offset = 0
 

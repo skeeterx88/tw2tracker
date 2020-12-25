@@ -1,12 +1,11 @@
 const express = require('express')
 const createError = require('http-errors')
 const router = express.Router()
-const {db,pgp} = require('../db')
+const {db} = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
 const {asyncRouter, hasOwn} = utils
 const getSettings = require('../settings')
-const development = process.env.NODE_ENV === 'development'
 const SEARCH_CATEGORIES = {
     players: 'players',
     tribes: 'tribes',
@@ -790,7 +789,7 @@ router.post('/stats/:marketId/:worldNumber/search/', asyncRouter(async function 
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
 
-    return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
+    return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`)
 }))
 
 router.get('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
@@ -803,7 +802,7 @@ router.get('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (
         throw createError(404, 'This world does not exist')
     }
 
-    return res.redirect(302, `/stats/${marketId}/${worldNumber}`);
+    return res.redirect(302, `/stats/${marketId}/${worldNumber}`)
 }))
 
 const routerSearch = async function (req, res, next) {
