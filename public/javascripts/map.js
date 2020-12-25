@@ -241,11 +241,19 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         let dragging = false
         let dragStartX = 0
         let dragStartY = 0
+        let mousemoveEnabled = true
 
         $overlay.addEventListener('mousedown', (event) => {
             draggable = true
             dragStartX = positionX + event.pageX
             dragStartY = positionY + event.pageY
+        })
+
+        $overlay.addEventListener('touchstart', (event) => {
+            mousemoveEnabled = false
+            draggable = true
+            dragStartX = positionX + event.touches[0].pageX
+            dragStartY = positionY + event.touches[0].pageY
         })
 
         $overlay.addEventListener('mouseup', () => {
@@ -270,7 +278,33 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             renderViewport()
         })
 
+        $overlay.addEventListener('touchend', () => {
+            draggable = false
+
+            if (!dragging) {
+                this.trigger('click', [activeVillage])
+
+                if (activeVillage && activeVillage.character_id) {
+                    clearOverlay()
+                    const color = arrayRandom(TW2Map.colorPalette.flat())
+                    this.addHighlight(TW2Map.highlightTypes.PLAYERS, activeVillage.character_id, color)
+                }
+            }
+
+            dragging = false
+            dragStartX = 0
+            dragStartY = 0
+            renderEnabled = false
+            $overlay.style.cursor = 'default'
+
+            renderViewport()
+        })
+
         $overlay.addEventListener('mousemove', (event) => {
+            if (!mousemoveEnabled) {
+                return
+            }
+
             if (draggable) {
                 if (!dragging) {
                     clearOverlay()
@@ -294,7 +328,35 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
             }
         })
 
+        $overlay.addEventListener('touchmove', (event) => {
+            if (draggable) {
+                if (!dragging) {
+                    clearOverlay()
+                    renderEnabled = true
+                    $overlay.style.cursor = 'move'
+                }
+
+                dragging = true
+
+                positionX = boundNumber(dragStartX - event.touches[0].pageX, 0, zoomSettings.mapWidth)
+                positionY = boundNumber(dragStartY - event.touches[0].pageY, 0, zoomSettings.mapHeight)
+
+                updateCenter()
+
+                if (tooltip) {
+                    tooltip.hide()
+                }
+
+                renderVisibleDemarcations()
+                renderVisibleContinents()
+            }
+        })
+
         $overlay.addEventListener('mousemove', (event) => {
+            if (!mousemoveEnabled) {
+                return
+            }
+
             if (draggable) {
                 return
             }
@@ -317,6 +379,10 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
         })
 
         $overlay.addEventListener('mouseleave', (event) => {
+            if (!mousemoveEnabled) {
+                return
+            }
+
             draggable = false
             dragStartX = 0
             dragStartY = 0

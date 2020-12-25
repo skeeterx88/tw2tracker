@@ -117,6 +117,7 @@ button.red:focus {
 }
 
 #map {
+    touch-action: none;
     flex: 1 1 auto;
     user-select: none;
     background-color: #436213;
