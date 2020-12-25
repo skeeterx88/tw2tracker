@@ -766,7 +766,7 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     res.render('stats/player-tribe-changes', {
-        title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Player ${player.name} - Tribe Changes - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         world,
