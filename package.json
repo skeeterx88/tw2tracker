@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "autoreload": "TZ=UTC nodemon app.js",
-    "start": "TZ=UTC node app.js",
+    "autoreload": "nodemon app.js",
+    "start": "node app.js",
     "install-unit": "node install-unit.js",
     "eslint": "eslint *.js routes/*.js"
   },
