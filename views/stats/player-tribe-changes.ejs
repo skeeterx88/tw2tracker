@@ -27,24 +27,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% for (let change of tribeChanges) { %>
+                            <% if (tribeChanges.length) { -%>
+                                <% for (let change of tribeChanges) { %>
+                                    <tr>
+                                        <td><%= changeIndex++ %></td>
+                                        <% if (change.old_tribe) { -%>
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
+                                        <% } else { -%>
+                                            <td>None</td>
+                                        <% } -%>
+
+                                        <% if (change.new_tribe) { -%>
+                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
+                                        <% } else { -%>
+                                            <td>None</td>
+                                        <% } -%>
+
+                                        <td><%= formatDate(change.date, 'hours-only') %></td>
+                                    </tr>
+                                <% } %>
+                            <% } else { -%>
                                 <tr>
-                                    <td><%= changeIndex++ %></td>
-                                    <% if (change.old_tribe) { -%>
-                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
-                                    <% } else { -%>
-                                        <td>None</td>
-                                    <% } -%>
-
-                                    <% if (change.new_tribe) { -%>
-                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
-                                    <% } else { -%>
-                                        <td>None</td>
-                                    <% } -%>
-
-                                    <td><%= formatDate(change.date, 'hours-only') %></td>
+                                    <td colspan="4">No tribe changes yet</td>
                                 </tr>
-                            <% } %>
+                            <% } -%>
                         </tbody>
                     </table>
                 </div>
