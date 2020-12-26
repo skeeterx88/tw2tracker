@@ -30,7 +30,7 @@
                             <% if (tribeChanges.length) { -%>
                                 <% for (let change of tribeChanges) { %>
                                     <tr>
-                                        <td><%= changeIndex++ %></td>
+                                        <td><%= changeIndex-- %></td>
                                         <% if (change.old_tribe) { -%>
                                             <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
                                         <% } else { -%>

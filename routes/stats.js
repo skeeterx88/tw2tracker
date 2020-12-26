@@ -851,7 +851,7 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', 
         world,
         player,
         tribeChanges,
-        changeIndex: 1,
+        changeIndex: tribeChanges.length,
         tribeTags,
         navigation: [
             `<a href="/">Stats</a>`,
