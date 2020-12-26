@@ -207,6 +207,8 @@ const ejsHelpers = {
 
             if (flag === 'hours-only') {
                 time.push(dateObject.getHours().toString().padStart(2, 0) + 'h')
+            } else if (flag === 'day-only') {
+                return date.join('/')
             } else {
                 time.push(dateObject.getHours().toString().padStart(2, 0))
                 time.push(dateObject.getMinutes().toString().padStart(2, 0))

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../head.ejs') %>
+    <body>
+        <header></header>
+        <%- include('../menu.ejs') %>
+
+        <main class="content-border">
+            <%- include('../navigation.ejs') %>
+
+            <div class="content">
+                <div class="left">
+                    <h2>Milestones</h2>
+                    <table class="content-border">
+                        <colgroup>
+                            <col width="*">
+                            <col width="100px">
+                            <col width="100px">
+                            <col width="150px">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Points</th>
+                                <th>Milestone</th>
+                                <th>Unlocked on</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (let achievement of achievementUnique) { %>
+                                <tr>
+                                    <td><%= achievementTitles[achievement.type] %></td>
+                                    <td><%= formatNumbers(achievement.points) %></td>
+                                    <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
+                                    <td><%= formatDate(achievement.time_last_level) %></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="right">
+                    <h2>Daily/Weekly</h2>
+                    <table class="content-border">
+                        <colgroup>
+                            <col width="*">
+                            <col width="150px">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Unlocked on</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (let achievement of achievements) { %>
+                                <tr>
+                                    <td><%= achievementTitles[achievement.type] %></td>
+                                    <td><%= formatDate(achievement.time_last_level, 'day-only') %></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../footer.ejs') %>
+
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
+    </body>
+</html>

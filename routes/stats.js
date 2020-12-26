@@ -4,6 +4,7 @@ const router = express.Router()
 const {db} = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
+const achievementTitles = require('../achievement-titles.json')
 const {asyncRouter, hasOwn} = utils
 const getSettings = require('../settings')
 const SEARCH_CATEGORIES = {
@@ -228,16 +229,9 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
     const achievementTypes = new Map(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribe.id})
 
-    let achievementPoints = achievements.reduce(function (sum, next) {
-        const {type, level} = next
-        const data = achievementTypes.get(type)
-
-        if (level && data.points) {
-            const typePoints = data.points.slice(0, level).reduce((sum, next) => sum + next)
-            return sum + typePoints
-        } else {
-            return sum
-        }
+    let achievementPoints = achievements.reduce(function (sum, {type, level}) {
+        const {milestone, points} = achievementTypes.get(type)
+        return milestone ? sum + points[level - 1] : sum
     }, 0)
 
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count
@@ -563,6 +557,76 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/member-changes', async
     })
 }))
 
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const tribeId = parseInt(req.params.tribeId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    let tribe
+
+    try {
+        tribe = await db.one(sql.getTribe, {worldId, tribeId})
+    } catch (error) {
+        throw createError(404, 'This tribe does not exist')
+    }
+
+    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
+
+    const achievementRepeatable = []
+    const achievementUnique = []
+
+    for (let achievement of achievements) {
+        const {repeatable, milestone, points} = achievementTypes[achievement.type]
+
+        if (repeatable) {
+            achievementRepeatable.push(achievement)
+        } else if (milestone) {
+            achievement.points = points[achievement.level - 1]
+            achievementUnique.push(achievement)
+        }
+    }
+
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+
+    res.render('stats/tribe-achievements', {
+        title: `Tribe ${tribe.tag} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        tribe,
+        achievements,
+        achievementUnique,
+        achievementRepeatable,
+        achievementTitles,
+        achievementTypes,
+        navigation: [
+            `<a href="/">Stats</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            'Achievements'
+        ],
+        exportValues: {
+            marketId,
+            worldNumber
+        },
+        ...utils.ejsHelpers
+    })
+}))
+
 router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
@@ -603,18 +667,16 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
     const achievementTypes = new Map(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
 
-    let achievementPoints = achievements.reduce(function (sum, next) {
-        const {type, level} = next
-        const data = achievementTypes.get(type)
-
-        if (level && data.points) {
-            const typePoints = data.category === 'milestone'
-                ? data.points[level - 1]
-                : data.points.slice(0, level).reduce((sum, next) => sum + next, 0)
-            return sum + typePoints
-        } else {
+    let achievementPoints = achievements.reduce(function (sum, {type, level}) {
+        const {milestone, points} = achievementTypes.get(type)
+        
+        if (!points) {
             return sum
         }
+
+        return milestone
+            ? sum + points[level - 1]
+            : sum + points.slice(0, level).reduce((sum, next) => sum + next, 0)
     }, 0)
 
     const tribeChangesCount = (await db.one(sql.getPlayerTribeChangesCount, {worldId, id: playerId})).count
@@ -866,6 +928,82 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', 
             player,
             mapHighlights: [player],
             mapHighlightsType: 'players'
+        },
+        ...utils.ejsHelpers
+    })
+}))
+
+router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const playerId = parseInt(req.params.character_id, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    let player
+
+    try {
+        player = await db.one(sql.getPlayer, {worldId, playerId})
+    } catch (error) {
+        throw createError(404, 'This player does not exist')
+    }
+
+    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
+
+    const achievementRepeatable = []
+    const achievementUnique = []
+
+    for (let achievement of achievements) {
+        const typeData = achievementTypes[achievement.type]
+
+        if (typeData.repeatable) {
+            achievementRepeatable.push(achievement)
+        } else if (typeData.points) {
+            if (typeData.milestone) {
+                achievement.points = typeData.points[achievement.level - 1]
+            } else {
+                achievement.points = typeData.points.slice(0, achievement.level).reduce((sum, next) => sum + next, 0)
+            }
+
+            achievementUnique.push(achievement)
+        }
+    }
+
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+
+    res.render('stats/player-achievements', {
+        title: `Player ${player.name} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        player,
+        achievements,
+        achievementUnique,
+        achievementRepeatable,
+        achievementTitles,
+        achievementTypes,
+        navigation: [
+            `<a href="/">Stats</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
+            'Achievements'
+        ],
+        exportValues: {
+            marketId,
+            worldNumber,
+            player
         },
         ...utils.ejsHelpers
     })
