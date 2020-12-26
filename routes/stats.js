@@ -531,7 +531,9 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         const data = achievementTypes.get(type)
 
         if (level && data.points) {
-            const typePoints = data.points.slice(0, level).reduce((sum, next) => sum + next)
+            const typePoints = data.category === 'milestone'
+                ? data.points[level - 1]
+                : data.points.slice(0, level).reduce((sum, next) => sum + next, 0)
             return sum + typePoints
         } else {
             return sum
