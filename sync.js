@@ -745,7 +745,7 @@ const commitDataDatabase = async function (data, worldId) {
 
         for (let type of ['tribes', 'players']) {
             for (let [id, subject] of data[type]) {
-                this.none(sqlSubjectMap[type].data, {worldId, id, ...subject})
+                this.none(sqlSubjectMap[type].updateData, {worldId, id, ...subject})
 
                 const [best_rank, best_points, best_villages] = records[type].get(id) || []
 
