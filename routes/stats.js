@@ -27,7 +27,7 @@ const tribeMemberChangeTypes = {
 
 const homeRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
-    const worlds = await db.any(sql.getOpenWorlds)
+    const worlds = await db.any(sql.getWorlds)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
 
     const marketStats = marketsIds.map(function (id) {
@@ -62,8 +62,8 @@ router.get('/stats/:marketId', asyncRouter(async function (req, res, next) {
 
     const settings = await getSettings()
     const marketId = req.params.marketId
-    const allWorlds = await db.any(sql.getSyncedWorlds)
-    const marketWorlds = allWorlds.filter((world) => world.market === marketId)
+    const syncedWorlds = await db.any(sql.getSyncedWorlds)
+    const marketWorlds = syncedWorlds.filter((world) => world.market === marketId)
     const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num)
 
     if (!marketWorlds.length) {
