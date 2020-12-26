@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../head.ejs') %>
+    <body>
+        <header></header>
+        <%- include('../menu.ejs') %>
+
+        <main class="content-border">
+            <%- include('../navigation.ejs') %>
+
+            <div class="content">
+                <div class="single">
+                    <h2>Tribe member changes</h2>
+                    <table class="content-border">
+                        <colgroup>
+                            <col width="10px">
+                            <col width="100px">
+                            <col width="*">
+                            <col width="200px">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Action</th>
+                                <th>Player</th>
+                                <th>Date/Hour</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (memberChanges.length) { -%>
+                                <% for (let change of memberChanges) { %>
+                                    <tr>
+                                        <td><%= changeIndex-- %></td>
+
+                                        <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
+                                            <td>Left</td>
+                                        <% } else { -%>
+                                            <td>Join</td>
+                                        <% } -%>
+
+                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
+                                        <td><%= formatDate(change.date, 'hours-only') %></td>
+                                    </tr>
+                                <% } %>
+                            <% } else { -%>
+                                <tr>
+                                    <td colspan="4">No member changes yet</td>
+                                </tr>
+                            <% } -%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../footer.ejs') %>
+
+        <script type="text/javascript">
+            const {
+                marketId,
+                worldNumber
+            } = <%- JSON.stringify(exportValues) %>
+        </script>
+        <script type="text/javascript" src="/javascripts/stats.js"></script>
+    </body>
+</html>

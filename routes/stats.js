@@ -20,6 +20,10 @@ const conquestTypes = {
     LOSS: 'loss',
     SELF: 'self'
 }
+const tribeMemberChangeTypes = {
+    LEFT: 'left',
+    JOIN: 'join'
+}
 
 const homeRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
@@ -236,6 +240,8 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
         }
     }, 0)
 
+    const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count
+
     res.render('stats/tribe', {
         title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
@@ -245,6 +251,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
         conquestCount,
         conquestTypes,
         achievementPoints,
+        memberChangesCount,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -486,6 +493,76 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages', tribeVillagesRouter)
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', tribeVillagesRouter)
 
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/member-changes', asyncRouter(async function (req, res, next) {
+    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+        return next()
+    }
+
+    const settings = await getSettings()
+    const marketId = req.params.marketId
+    const worldNumber = parseInt(req.params.worldNumber, 10)
+    const tribeId = parseInt(req.params.tribeId, 10)
+
+    const worldId = marketId + worldNumber
+    const worldExists = await utils.schemaExists(worldId)
+
+    if (!worldExists) {
+        throw createError(404, 'This world does not exist')
+    }
+
+    let tribe
+
+    try {
+        tribe = await db.one(sql.getTribe, {worldId, tribeId})
+    } catch (error) {
+        throw createError(404, 'This tribe does not exist')
+    }
+
+    const playersName = {}
+    const memberChangesRaw = await db.any(sql.getTribeMemberChanges, {worldId, id: tribeId})
+    const memberChanges = []
+
+    for (let change of memberChangesRaw) {
+        if (!hasOwn.call(playersName, change.character_id)) {
+            playersName[change.character_id] = (await db.one(sql.getPlayer, {worldId, playerId: change.character_id})).name
+        }
+
+        memberChanges.push({
+            player: {
+                id: change.character_id,
+                name: playersName[change.character_id]
+            },
+            type: change.old_tribe === tribeId ? tribeMemberChangeTypes.LEFT : tribeMemberChangeTypes.JOIN,
+            date: change.date
+        })
+    }
+
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+
+    res.render('stats/tribe-member-changes', {
+        title: `Tribe ${tribe.tag} - Member Changes - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        marketId,
+        worldNumber,
+        world,
+        tribe,
+        changeIndex: memberChanges.length,
+        memberChanges,
+        tribeMemberChangeTypes,
+        navigation: [
+            `<a href="/">Stats</a>`,
+            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `Member Changes`
+        ],
+        exportValues: {
+            marketId,
+            worldNumber
+        },
+        ...utils.ejsHelpers
+    })
+}))
+
 router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
@@ -540,7 +617,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         }
     }, 0)
 
-    const tribeChanges = await db.one(sql.getPlayerTribeChangesCount, {worldId, id: playerId})
+    const tribeChangesCount = (await db.one(sql.getPlayerTribeChangesCount, {worldId, id: playerId})).count
 
     res.render('stats/player', {
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -551,7 +628,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         conquestCount,
         conquestTypes,
         achievementPoints,
-        tribeChangesCount: tribeChanges.count,
+        tribeChangesCount,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
