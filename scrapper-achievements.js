@@ -5,11 +5,24 @@ module.exports = async function () {
     const socketService = injector.get('socketService')
     const routeProvider = injector.get('routeProvider')
     const RANKING_QUERY_COUNT = 25
+
+    const achievementsMap = {
+        players: {
+            router: routeProvider.ACHIEVEMENT_GET_CHAR_ACHIEVEMENTS,
+            key: 'character_id'
+        },
+        tribes: {
+            router: routeProvider.ACHIEVEMENT_GET_TRIBE_ACHIEVEMENTS,
+            key: 'tribe_id'
+        }
+    }
     
     const playerIds = new Set()
     const tribeIds = new Set()
-    const playersAchievements = new Map()
-    const tribesAchievements = new Map()
+    const achievementsData = {
+        players: new Map(),
+        tribes: new Map()
+    }
 
     const sleep = function (ms) {
         return new Promise(function (resolve) {
@@ -99,32 +112,37 @@ module.exports = async function () {
         }
     }
 
+    const loadAchievements = function (type, id) {
+        return new Promise(function (resolve) {
+            if (!id) {
+                return resolve()
+            }
+
+            const {
+                router,
+                key
+            } = achievementsMap[type]
+
+            socketService.emit(router, {
+                [key]: id
+            }, function ({achievements}) {
+                achievementsData[type].set(id, achievements.filter(achievement => achievement.level))
+                resolve()
+            })
+        })
+    }
+
     const loadTribesAchievements = async function () {
         const tribeIdsArray = Array.from(tribeIds.values())
 
         for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
             await Promise.all([
-                loadTribeAchievements(tribeIdsArray[i]),
-                loadTribeAchievements(tribeIdsArray[i + 1]),
-                loadTribeAchievements(tribeIdsArray[i + 2]),
-                loadTribeAchievements(tribeIdsArray[i + 3])
+                loadAchievements('tribes', tribeIdsArray[i]),
+                loadAchievements('tribes', tribeIdsArray[i + 1]),
+                loadAchievements('tribes', tribeIdsArray[i + 2]),
+                loadAchievements('tribes', tribeIdsArray[i + 3])
             ])
         }
-    }
-
-    const loadTribeAchievements = function (tribe_id) {
-        return new Promise(function (resolve) {
-            if (!tribe_id) {
-                return resolve()
-            }
-
-            socketService.emit(routeProvider.ACHIEVEMENT_GET_TRIBE_ACHIEVEMENTS, {
-                tribe_id
-            }, function ({achievements}) {
-                tribesAchievements.set(tribe_id, achievements)
-                resolve()
-            })
-        })
     }
 
     const loadPlayersAchievements = async function () {
@@ -132,27 +150,12 @@ module.exports = async function () {
 
         for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
             await Promise.all([
-                loadPlayerAchievements(playerIdsArray[i]),
-                loadPlayerAchievements(playerIdsArray[i + 1]),
-                loadPlayerAchievements(playerIdsArray[i + 2]),
-                loadPlayerAchievements(playerIdsArray[i + 3])
+                loadAchievements('players', playerIdsArray[i]),
+                loadAchievements('players', playerIdsArray[i + 1]),
+                loadAchievements('players', playerIdsArray[i + 2]),
+                loadAchievements('players', playerIdsArray[i + 3])
             ])
         }
-    }
-
-    const loadPlayerAchievements = function (character_id) {
-        return new Promise(function (resolve) {
-            if (!character_id) {
-                return resolve()
-            }
-
-            socketService.emit(routeProvider.ACHIEVEMENT_GET_CHAR_ACHIEVEMENTS, {
-                character_id
-            }, function ({achievements}) {
-                playersAchievements.set(character_id, achievements)
-                resolve()
-            })
-        })
     }
 
     const time = async function (name, handler) {
@@ -180,7 +183,7 @@ module.exports = async function () {
     })
 
     return {
-        playersAchievements: Array.from(playersAchievements),
-        tribesAchievements: Array.from(tribesAchievements)
+        players: Array.from(achievementsData.players),
+        tribes: Array.from(achievementsData.tribes)
     }
 }
