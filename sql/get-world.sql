@@ -1,4 +1,4 @@
 SELECT *
-FROM main.worlds
+FROM public.worlds
 WHERE market = $1
 AND num = $2

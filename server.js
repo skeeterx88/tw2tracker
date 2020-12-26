@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(session({
     store: new (require('connect-pg-simple')(session))({
         pgPromise: db,
-        schemaName: 'main',
+        schemaName: 'public',
         tableName: 'session'
     }),
     secret: 'neko loli pantsu',

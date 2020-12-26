@@ -1,1 +1,1 @@
-SELECT * FROM main.settings
+SELECT * FROM public.settings

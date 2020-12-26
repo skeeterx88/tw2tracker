@@ -1,4 +1,4 @@
-INSERT INTO main.worlds (
+INSERT INTO public.worlds (
     market, num, world_id, name, open
 ) VALUES (
     ${marketId},
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.conquests (
 CREATE TABLE IF NOT EXISTS ${worldId:name}.player_achievements (
     id SERIAL PRIMARY KEY,
     character_id INT,
-    type VARCHAR (50) REFERENCES main.achievement_types(name),
+    type VARCHAR (50) REFERENCES public.achievement_types(name),
     category achievement_categories,
     level SMALLINT NOT NULL,
     period VARCHAR (20),
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.player_achievements (
 CREATE TABLE IF NOT EXISTS ${worldId:name}.tribe_achievements (
     id SERIAL PRIMARY KEY,
     tribe_id INT,
-    type VARCHAR (50) REFERENCES main.achievement_types(name),
+    type VARCHAR (50) REFERENCES public.achievement_types(name),
     category achievement_categories,
     level SMALLINT NOT NULL,
     period VARCHAR (20),

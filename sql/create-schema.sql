@@ -1,7 +1,6 @@
-CREATE SCHEMA main;
 SET TIMEZONE='UTC';
 
-CREATE TABLE main.settings (
+CREATE TABLE public.settings (
     site_name VARCHAR (255) NOT NULL,
     admin_password VARCHAR (255) NOT NULL,
     scrappe_all_interval VARCHAR (50) NOT NULL,
@@ -16,7 +15,7 @@ CREATE TABLE main.settings (
 -- '10 */12 * * *' == At minute 10 past every 12th hour
 -- '0 */12 * * *' == At minute 0 past every 12th hour
 -- 129600 = 60 days
-INSERT INTO main.settings (
+INSERT INTO public.settings (
     site_name,
     admin_password,
     scrappe_all_interval,
@@ -36,29 +35,30 @@ INSERT INTO main.settings (
     20
 );
 
-CREATE TABLE main.state (
+CREATE TABLE public.state (
+    initialized BOOLEAN DEFAULT FALSE,
     last_scrappe_all_time TIMESTAMP DEFAULT NULL,
     last_register_worlds_time TIMESTAMP DEFAULT NULL,
     last_fetch_markets_time TIMESTAMP DEFAULT NULL
 );
 
-INSERT INTO main.state VALUES (NULL, NULL, NULL);
+INSERT INTO public.state VALUES (FALSE, NULL, NULL, NULL);
 
-CREATE TABLE main.markets (
+CREATE TABLE public.markets (
     id VARCHAR (10) PRIMARY KEY,
     account_name VARCHAR (255) DEFAULT 'tribalwarstracker',
     account_password VARCHAR (255) DEFAULT '7FONlraMpdnvrNIVE8aOgSGISVW00A'
 );
 
-CREATE TYPE map_sync_status AS ENUM ('success', 'fail');
+CREATE TYPE public.map_sync_status AS ENUM ('success', 'fail');
 
-CREATE TABLE main.worlds (
-    market VARCHAR (10) REFERENCES main.markets(id),
+CREATE TABLE public.worlds (
+    market VARCHAR (10) REFERENCES public.markets(id),
     num SMALLINT,
     world_id VARCHAR (5),
     name VARCHAR (255) NOT NULL,
     last_sync TIMESTAMP,
-    last_sync_status map_sync_status,
+    last_sync_status public.map_sync_status,
     open BOOLEAN NOT NULL DEFAULT TRUE,
     config JSONB,
     player_count INT DEFAULT 0,
@@ -66,15 +66,15 @@ CREATE TABLE main.worlds (
     tribe_count INT DEFAULT 0
 );
 
-CREATE TYPE map_share_type AS ENUM ('static', 'dynamic');
+CREATE TYPE public.map_share_type AS ENUM ('static', 'dynamic');
 
-CREATE TABLE main.maps_share (
+CREATE TABLE public.maps_share (
     id SERIAL PRIMARY KEY,
     share_id VARCHAR (20) UNIQUE NOT NULL,
-    world_market VARCHAR (10) REFERENCES main.markets(id),
+    world_market VARCHAR (10) REFERENCES public.markets(id),
     world_number SMALLINT,
     highlights TEXT NOT NULL,
-    type map_share_type,
+    type public.map_share_type,
     center_x SMALLINT DEFAULT 500,
     center_y SMALLINT DEFAULT 500,
     settings TEXT NOT NULL,
@@ -82,16 +82,16 @@ CREATE TABLE main.maps_share (
     last_access TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
-CREATE TABLE main.session (
+CREATE TABLE public.session (
     sid VARCHAR NOT NULL COLLATE "default",
     sess JSON NOT NULL,
     expire TIMESTAMP (6) NOT NULL
 ) WITH (OIDS=FALSE);
 
-ALTER TABLE main.session ADD CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE;
-CREATE INDEX IDX_session_expire ON main.session (expire);
+ALTER TABLE public.session ADD CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX IDX_session_expire ON public.session (expire);
 
-CREATE TYPE achievement_categories AS ENUM (
+CREATE TYPE public.achievement_categories AS ENUM (
     'battle',
     'friends',
     'milestone',
@@ -103,10 +103,10 @@ CREATE TYPE achievement_categories AS ENUM (
     'tribe'
 );
 
-CREATE TABLE main.achievement_types (
+CREATE TABLE public.achievement_types (
     id SERIAL PRIMARY KEY,
     name VARCHAR (50) UNIQUE NOT NULL,
-    category achievement_categories,
+    category public.achievement_categories,
     levels SMALLINT NOT NULL,
     repeatable BOOLEAN NOT NULL,
     limits BIGINT[],
@@ -114,7 +114,7 @@ CREATE TABLE main.achievement_types (
     milestone BOOLEAN NOT NULL
 );
 
-INSERT INTO main.achievement_types (name, category, levels, repeatable, limits, points, milestone) VALUES
+INSERT INTO public.achievement_types (name, category, levels, repeatable, limits, points, milestone) VALUES
     ('loot', 'battle', 5, false, '{500, 10000, 100000, 1000000, 100000000}', '{10, 25, 40, 60, 80}', false),
     ('overkill', 'battle', 1, false, '{10000}', '{50}', false),
     ('loot_daily', 'repeatable', 1, true, null, null, false),

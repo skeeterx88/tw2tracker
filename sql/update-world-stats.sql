@@ -1,4 +1,4 @@
-UPDATE main.worlds
+UPDATE public.worlds
 SET village_count = ${villages},
     player_count = ${players},
     tribe_count = ${tribes}

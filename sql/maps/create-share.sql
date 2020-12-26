@@ -1,4 +1,4 @@
-INSERT INTO main.maps_share (
+INSERT INTO public.maps_share (
     share_id,
     world_market,
     world_number,

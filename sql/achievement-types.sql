@@ -1,2 +1,2 @@
 SELECT *
-FROM main.achievement_types
+FROM public.achievement_types

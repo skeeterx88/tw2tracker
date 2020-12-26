@@ -1,4 +1,4 @@
-UPDATE main.markets
+UPDATE public.markets
 SET
     account_name = $2,
     account_password = $3,

@@ -1,1 +1,1 @@
-SELECT * FROM main.worlds WHERE open ORDER BY market ASC, num ASC
+SELECT * FROM public.worlds WHERE open ORDER BY market ASC, num ASC

@@ -1,10 +1,11 @@
 (async function () {
-    const utils = require('./utils')
     const development = process.env.NODE_ENV === 'development'
+    const {db} = require('./db')
+    const sql = require('./sql')
 
-    if (!await utils.schemaExists('main')) {
-        const {db} = require('./db')
-        const sql = require('./sql')
+    const schemaInitialized = (await db.one(sql.helpers.schemaInitialized)).exists
+
+    if (!schemaInitialized) {
         await db.query(sql.createSchema)
     }
 

@@ -1,3 +1,3 @@
 SELECT *
-FROM main.markets
+FROM public.markets
 WHERE id = $1

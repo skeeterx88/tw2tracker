@@ -1,3 +1,3 @@
 SELECT share_id, type, last_access
-FROM main.maps_share
+FROM public.maps_share
 WHERE type = 'static'

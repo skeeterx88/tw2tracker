@@ -1,1 +1,1 @@
-SELECT * FROM main.state
+SELECT * FROM public.state
