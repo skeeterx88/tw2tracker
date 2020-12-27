@@ -933,15 +933,34 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', 
     })
 }))
 
-router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:category?', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
+
+    const achievementCategoryTitles = {
+        overall: 'Overall',
+        battle: 'Battle',
+        points: 'Points',
+        tribe: 'Tribe',
+        repeatable: 'Daily / Weekly',
+        special: 'Special',
+        friends: 'Friends',
+        milestone: 'Milestone',
+        ruler: 'Ruler'
+    }
+    const achievementCategories = ['battle', 'points', 'tribe', 'repeatable', 'special', 'friends', 'milestone', 'ruler']
+    const achievementCategoriesUnique = ['battle', 'points', 'tribe', 'special', 'friends', 'milestone', 'ruler']
 
     const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const playerId = parseInt(req.params.character_id, 10)
+    const selectedCategory = req.params.category
+
+    if (selectedCategory && !achievementCategories.includes(selectedCategory)) {
+        throw createError(404, 'This achievement category does not exist')
+    }
 
     const worldId = marketId + worldNumber
     const worldExists = await utils.schemaExists(worldId)
@@ -960,27 +979,47 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements', a
 
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
+    const achievementByCategory = {}
+    const achievementsWithPoints = []
 
-    const achievementRepeatable = []
-    const achievementUnique = []
-
-    for (let achievement of achievements) {
-        const typeData = achievementTypes[achievement.type]
-
-        if (typeData.repeatable) {
-            achievementRepeatable.push(achievement)
-        } else if (typeData.points) {
-            if (typeData.milestone) {
-                achievement.points = typeData.points[achievement.level - 1]
-            } else {
-                achievement.points = typeData.points.slice(0, achievement.level).reduce((sum, next) => sum + next, 0)
-            }
-
-            achievementUnique.push(achievement)
-        }
+    for (let category of achievementCategories) {
+        achievementByCategory[category] = []
     }
 
+    for (let achievement of achievements) {
+        if (achievement.category !== 'repeatable') {
+            const typeData = achievementTypes[achievement.type]
+
+            achievement.points = typeData.milestone
+                ? typeData.points[achievement.level - 1]
+                : typeData.points.slice(0, achievement.level).reduce((sum, next) => sum + next, 0)
+        }
+
+        achievementsWithPoints.push(achievement)
+        achievementByCategory[achievement.category].push(achievement)
+    }
+
+    const achievementsNonRepeatable = achievementsWithPoints.filter(function (achievement) {
+        return achievement.category !== 'repeatable'
+    })
+
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
+
+    let categoryTemplate
+    let navigationTitle
+    let overviewData
+
+    if (!selectedCategory) {
+        categoryTemplate = 'overview'
+        navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
+        overviewData = getAchievementsOverview(achievementCategoriesUnique, achievementTypes, achievementByCategory)
+    } else if (selectedCategory === 'repeatable') {
+        categoryTemplate = 'repeatable'
+        navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
+    } else {
+        categoryTemplate = 'generic'
+        navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
+    }
 
     res.render('stats/player-achievements', {
         title: `Player ${player.name} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -988,11 +1027,17 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements', a
         worldNumber,
         world,
         player,
+        selectedCategory,
+        categoryTemplate,
+        overviewData,
         achievements,
-        achievementUnique,
-        achievementRepeatable,
+        achievementByCategory,
+        achievementsWithPoints,
+        achievementsNonRepeatable,
+        achievementCategoryTitles,
         achievementTitles,
         achievementTypes,
+        navigationTitle,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -1241,5 +1286,48 @@ const routerRanking = async function (req, res, next) {
 
 router.get('/stats/:marketId/:worldNumber/ranking/:category?/', asyncRouter(routerRanking))
 router.get('/stats/:marketId/:worldNumber/ranking/:category?/page/:page', asyncRouter(routerRanking))
+
+function getAchievementsOverview (achievementCategoriesUnique, achievementTypes, achievementByCategory) {
+    const overviewData = []
+    const categoriesMaxPoints = {}
+
+    for (let category of achievementCategoriesUnique) {
+        categoriesMaxPoints[category] = 0
+    }
+
+    for (let achievement of Object.values(achievementTypes)) {
+        if (!achievement.repeatable) {
+            categoriesMaxPoints[achievement.category] += achievement.milestone
+                ? achievement.points[achievement.points.length - 1]
+                : achievement.points.reduce((sum, next) => sum + next, 0)
+        }
+    }
+
+    const achievementsMaxPoints = Object.values(categoriesMaxPoints).reduce((sum, next) => sum + next, 0)
+
+    overviewData.push(...achievementCategoriesUnique.map(function (category) {
+        const max = categoriesMaxPoints[category]
+        const current = achievementByCategory[category].reduce((sum, next) => sum + next.points, 0)
+        const percent = Math.floor(current / max * 100)
+
+        return [category, {
+            max,
+            current,
+            percent
+        }]
+    }))
+
+    const overallCurrent = overviewData.reduce((sum, [, next]) => sum + next.current, 0)
+    const overallMax = achievementsMaxPoints
+    const overallPercent = Math.floor(overallCurrent / overallMax * 100)
+
+    overviewData.unshift(['overall', {
+        max: overallMax,
+        current: overallCurrent,
+        percent: overallPercent
+    }])
+
+    return overviewData
+}
 
 module.exports = router

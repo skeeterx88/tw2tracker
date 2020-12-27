@@ -1,0 +1,33 @@
+<div class="left">
+    <h2>Overview</h2>
+
+    <table class="content-border">
+        <colgroup>
+            <col width="100px">
+            <col width="*">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Progress</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for (let [category, data] of overviewData) { %>
+                <tr>
+                    <td>
+                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>"><%= achievementCategoryTitles[category] %></a>
+                    </td>
+                    <td>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar" style="width:<%= data.percent %>%"></div>
+                            <div class="progress-text">
+                                <span><%= formatNumbers(data.current) %>/<%= formatNumbers(data.max) %> (<%= data.percent %>%)</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>

@@ -8,60 +8,20 @@
         <main class="content-border">
             <%- include('../navigation.ejs') %>
 
-            <div class="content">
-                <div class="left">
-                    <h2>Milestones</h2>
-                    <table class="content-border">
-                        <colgroup>
-                            <col width="*">
-                            <col width="100px">
-                            <col width="100px">
-                            <col width="150px">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Points</th>
-                                <th>Milestone</th>
-                                <th>Unlocked on</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (let achievement of achievementUnique) { %>
-                                <tr>
-                                    <td><%= achievementTitles[achievement.type] %></td>
-                                    <td><%= formatNumbers(achievement.points) %></td>
-                                    <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
-                                    <td><%= formatDate(achievement.time_last_level) %></td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
+            <ul class="achievements-menu">
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements">
+                    <li <% __append(!selectedCategory ? ' class="selected"' : '') %>>Overview</li>
+                </a>
 
-                <div class="right">
-                    <h2>Daily/Weekly</h2>
-                    <table class="content-border">
-                        <colgroup>
-                            <col width="*">
-                            <col width="150px">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Unlocked on</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (let achievement of achievementRepeatable) { %>
-                                <tr>
-                                    <td><%= achievementTitles[achievement.type] %></td>
-                                    <td><%= formatDate(achievement.time_last_level, 'day-only') %></td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
+                <% for (let category of Object.keys(achievementByCategory)) { -%>
+                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>">
+                        <li <% __append(category === selectedCategory ? 'class="selected"' : '') %>><%= achievementCategoryTitles[category] %></li>
+                    </a>
+                <% } -%>
+            </ul>
+
+            <div class="content">
+                <%- include(`achievements/${categoryTemplate}.ejs`) %>
             </div>
         </main>
 

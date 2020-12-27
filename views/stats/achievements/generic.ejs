@@ -1,0 +1,36 @@
+<div class="left">
+    <h2><%= navigationTitle %></h2>
+
+    <table class="content-border">
+        <colgroup>
+            <col width="*">
+            <col width="60px">
+            <col width="70px">
+            <col width="150px">
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Points</th>
+                <th>Milestone</th>
+                <th>Unlocked on</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (achievementByCategory[selectedCategory].length) { -%>
+                <% for (let achievement of achievementByCategory[selectedCategory]) { %>
+                    <tr>
+                        <td><%= achievementTitles[achievement.type] %></td>
+                        <td><%= formatNumbers(achievement.points) %></td>
+                        <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
+                        <td><%= formatDate(achievement.time_last_level) %></td>
+                    </tr>
+                <% } %>
+            <% } else { -%>
+                <tr>
+                    <td colspan="4">No achievements on this category yet.</td>
+                </tr>
+            <% } -%>
+        </tbody>
+    </table>
+</div>
