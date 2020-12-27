@@ -14,9 +14,11 @@
         </thead>
         <tbody>
             <% for (let [category, data] of overviewData) { %>
+                <% let categorySubpage = category === 'overall' ? '' : category %>
+
                 <tr>
                     <td>
-                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>"><%= achievementCategoryTitles[category] %></a>
+                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= achievementCategoryTitles[category] %></a>
                     </td>
                     <td>
                         <div class="progress-bar-wrapper">
