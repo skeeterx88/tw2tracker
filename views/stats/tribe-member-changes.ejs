@@ -9,37 +9,33 @@
             <%- include('../navigation.ejs') %>
 
             <div class="content">
-                <div class="single">
+                <div class="left">
                     <h2>Tribe member changes</h2>
                     <table class="content-border">
                         <colgroup>
-                            <col width="10px">
-                            <col width="100px">
-                            <col width="*">
                             <col width="200px">
+                            <col width="*">
+                            <col width="100px">
                         </colgroup>
                         <thead>
                             <tr>
-                                <th></th>
-                                <th>Action</th>
-                                <th>Player</th>
                                 <th>Date/Hour</th>
+                                <th>Player</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% if (memberChanges.length) { -%>
                                 <% for (let change of memberChanges) { %>
                                     <tr>
-                                        <td><%= changeIndex-- %></td>
+                                        <td><%= formatDate(change.date, 'hours-only') %></td>
+                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
                                         <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
                                             <td>Left</td>
                                         <% } else { -%>
                                             <td>Join</td>
                                         <% } -%>
-
-                                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
-                                        <td><%= formatDate(change.date, 'hours-only') %></td>
                                     </tr>
                                 <% } %>
                             <% } else { -%>

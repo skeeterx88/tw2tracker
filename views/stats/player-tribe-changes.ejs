@@ -9,28 +9,27 @@
             <%- include('../navigation.ejs') %>
 
             <div class="content">
-                <div class="single">
+                <div class="left">
                     <h2>Player tribe changes</h2>
                     <table class="content-border">
                         <colgroup>
-                            <col width="10px">
-                            <col width="*">
+                            <col width="200px">
                             <col width="*">
                             <col width="*">
                         </colgroup>
                         <thead>
                             <tr>
-                                <th></th>
+                                <th>Date/Hour</th>
                                 <th>Old tribe</th>
                                 <th>New tribe</th>
-                                <th>Date/Hour</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% if (tribeChanges.length) { -%>
                                 <% for (let change of tribeChanges) { %>
                                     <tr>
-                                        <td><%= changeIndex-- %></td>
+                                        <td><%= formatDate(change.date, 'hours-only') %></td>
+
                                         <% if (change.old_tribe) { -%>
                                             <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
                                         <% } else { -%>
@@ -42,8 +41,6 @@
                                         <% } else { -%>
                                             <td>None</td>
                                         <% } -%>
-
-                                        <td><%= formatDate(change.date, 'hours-only') %></td>
                                     </tr>
                                 <% } %>
                             <% } else { -%>
