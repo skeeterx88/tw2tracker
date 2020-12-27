@@ -94,6 +94,48 @@
                             <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/history">View player history</a>
                         </div>
                     </section>
+
+                    <section id="player-latest-achievements">
+                        <h2>Latest achievements</h2>
+
+                        <div class="content-border">
+                            <table>
+                                <colgroup>
+                                    <col width="*">
+                                    <col width="130px">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Date/Hour</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (latestAchievements.length) { -%>
+                                        <% for (let achievement of latestAchievements) { -%>
+                                            <tr>
+                                                <% if (achievement.category === 'repeatable') { -%>
+                                                    <td><%= achievementTitles[achievement.type] %></td>
+                                                    <td><%= formatDate(achievement.time_last_level, 'day-only') %></td>
+                                                <% } else { -%>
+                                                    <td><%= achievementTitles[achievement.type] %></td>
+                                                    <td><%= formatDate(achievement.time_last_level, 'hours-only') %></td>
+                                                <% } -%>
+                                            </tr>
+                                        <% } -%>
+                                    <% } else { -%>
+                                        <tr>
+                                            <td colspan="2">No recent achievements.</td>
+                                        </tr>
+                                    <% } -%>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="actions">
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements">View player's achievements</a>
+                        </div>
+                    </section>
                 </div>
 
                 <div class="right">

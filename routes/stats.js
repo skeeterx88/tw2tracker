@@ -226,11 +226,12 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    const achievementTypes = new Map(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribe.id})
+    const latestAchievements = achievements.slice(0, 5)
 
     let achievementPoints = achievements.reduce(function (sum, {type, level}) {
-        const {milestone, points} = achievementTypes.get(type)
+        const {milestone, points} = achievementTypes[type]
         return milestone ? sum + points[level - 1] : sum
     }, 0)
 
@@ -245,6 +246,8 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
         conquestCount,
         conquestTypes,
         achievementPoints,
+        achievementTitles,
+        latestAchievements,
         memberChangesCount,
         navigation: [
             `<a href="/">Stats</a>`,
@@ -647,11 +650,12 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         tribe = await db.one(sql.getTribe, {worldId, tribeId: player.tribe_id})
     }
 
-    const achievementTypes = new Map(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
+    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
+    const latestAchievements = achievements.slice(0, 5)
 
     let achievementPoints = achievements.reduce(function (sum, {type, level}) {
-        const {milestone, points} = achievementTypes.get(type)
+        const {milestone, points} = achievementTypes[type]
         
         if (!points) {
             return sum
@@ -673,6 +677,9 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         conquestCount,
         conquestTypes,
         achievementPoints,
+        achievementTitles,
+        latestAchievements,
+        achievementTypes,
         tribeChangesCount,
         navigation: [
             `<a href="/">Stats</a>`,
