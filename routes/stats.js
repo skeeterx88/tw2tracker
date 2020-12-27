@@ -582,22 +582,8 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements', asyncRo
         throw createError(404, 'This tribe does not exist')
     }
 
-    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
-
-    const achievementRepeatable = []
-    const achievementUnique = []
-
-    for (let achievement of achievements) {
-        const {repeatable, milestone, points} = achievementTypes[achievement.type]
-
-        if (repeatable) {
-            achievementRepeatable.push(achievement)
-        } else if (milestone) {
-            achievement.points = points[achievement.level - 1]
-            achievementUnique.push(achievement)
-        }
-    }
+    const achievementRepeatable = achievements.filter(achievement => !!achievement.period)
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
@@ -607,11 +593,8 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements', asyncRo
         worldNumber,
         world,
         tribe,
-        achievements,
-        achievementUnique,
         achievementRepeatable,
         achievementTitles,
-        achievementTypes,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
