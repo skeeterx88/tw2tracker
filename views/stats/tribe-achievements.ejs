@@ -25,20 +25,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (subCategory === 'detailed') { -%>
-                                    <% for (let [type, achievementDates] of Object.entries(repeatableAchievementsDetailed)) { %>
-                                        <tr>
-                                            <td><%= achievementTitles[type] %> (<%= achievementDates.length %>x)</td>
-                                            <td><%= achievementDates.join(', ') %></td>
-                                        </tr>
-                                    <% } %>
+                                <% if (achievementsRepeatable.length) { -%>
+                                    <% if (subCategory === 'detailed') { -%>
+                                        <% for (let [type, achievementDates] of Object.entries(achievementsRepeatableDetailed)) { %>
+                                            <tr>
+                                                <td><%= achievementTitles[type] %> (<%= achievementDates.length %>x)</td>
+                                                <td><%= achievementDates.join(', ') %></td>
+                                            </tr>
+                                        <% } %>
+                                    <% } else { -%>
+                                        <% for (let [type, count] of Object.entries(achievementsRepeatableCount)) { %>
+                                            <tr>
+                                                <td><%= achievementTitles[type] %> (<%= count %>x)</td>
+                                                <td><%= achievementsRepeatableLastEarned[type] || 'Never' %></td>
+                                            </tr>
+                                        <% } %>
+                                    <% } -%>
                                 <% } else { -%>
-                                    <% for (let [type, count] of Object.entries(repeatableAchievementsCount)) { %>
-                                        <tr>
-                                            <td><%= achievementTitles[type] %> (<%= count %>x)</td>
-                                            <td><%= repeatableAchievementsLastEarned[type] || 'Never' %></td>
-                                        </tr>
-                                    <% } %>
+                                    <tr>
+                                        <td colspan="2">No achievements on this category yet.</td>
+                                    </tr>
                                 <% } -%>
                             </tbody>
                         </table>

@@ -74,7 +74,7 @@
                                     </tr>
                                     <tr>
                                         <th>Daily/Weekly Achievement:</th>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= repeatableAchievementsCount %>x</a></td>
+                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= achievementsRepeatableCount %>x</a></td>
                                     </tr>
                                     <tr>
                                         <th>Best Rank:</th>
@@ -117,8 +117,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% if (latestAchievements.length) { -%>
-                                        <% for (let achievement of latestAchievements) { -%>
+                                    <% if (achievementsLatest.length) { -%>
+                                        <% for (let achievement of achievementsLatest) { -%>
                                             <tr>
                                                 <% if (achievement.category === 'repeatable') { -%>
                                                     <td><%= achievementTitles[achievement.type] %></td>

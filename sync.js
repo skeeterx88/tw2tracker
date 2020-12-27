@@ -104,7 +104,8 @@ Sync.init = async function () {
             // await commitAchievementsDatabase(achievements, worldId)
 
             // await Sync.allWorlds()
-            // await Sync.world('br', 52)
+            // await Sync.world('br', 54)
+            // await Sync.worldAchievements('br', 54)
             // await Sync.registerWorlds()
 
             // await Sync.worldAchievements('br', 52)

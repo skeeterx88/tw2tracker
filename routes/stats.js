@@ -226,11 +226,10 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribe.id})
-    const latestAchievements = achievements.slice(0, 5)
+    const achievementsLatest = achievements.slice(0, 5)
 
-    let repeatableAchievementsCount = achievements.reduce(function (sum, {period, type, level}) {
+    let achievementsRepeatableCount = achievements.reduce(function (sum, {period, type, level}) {
         return period ? sum + 1 : sum
     }, 0)
 
@@ -244,9 +243,9 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
         tribe,
         conquestCount,
         conquestTypes,
-        repeatableAchievementsCount,
+        achievementsRepeatableCount,
         achievementTitles,
-        latestAchievements,
+        achievementsLatest,
         memberChangesCount,
         navigation: [
             `<a href="/">Stats</a>`,
@@ -590,26 +589,26 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements/:sub_cate
     }
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
-    const repeatableAchievements = {}
-    const repeatableAchievementsCount = {}
-    const repeatableAchievementsLastEarned = {}
-    const repeatableAchievementsDetailed = {}
+    const achievementsRepeatable = {}
+    const achievementsRepeatableCount = {}
+    const achievementsRepeatableLastEarned = {}
+    const achievementsRepeatableDetailed = {}
 
     for (let {period, type, time_last_level} of achievements) {
         if (period) {
-            if (!repeatableAchievementsLastEarned[type]) {
-                repeatableAchievementsLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
+            if (!achievementsRepeatableLastEarned[type]) {
+                achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
             }
 
-            repeatableAchievements[type] = repeatableAchievements[type] || []
-            repeatableAchievements[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+            achievementsRepeatable[type] = achievementsRepeatable[type] || []
+            achievementsRepeatable[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
 
-            repeatableAchievementsCount[type] = repeatableAchievementsCount[type] ?? 0
-            repeatableAchievementsCount[type]++
+            achievementsRepeatableCount[type] = achievementsRepeatableCount[type] ?? 0
+            achievementsRepeatableCount[type]++
 
             if (subCategory === 'detailed') {
-                repeatableAchievementsDetailed[type] = repeatableAchievementsDetailed[type] || []
-                repeatableAchievementsDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+                achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || []
+                achievementsRepeatableDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
             }
         }
     }
@@ -622,10 +621,10 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements/:sub_cate
         worldNumber,
         world,
         tribe,
-        repeatableAchievements,
-        repeatableAchievementsCount,
-        repeatableAchievementsLastEarned,
-        repeatableAchievementsDetailed,
+        achievementsRepeatable,
+        achievementsRepeatableCount,
+        achievementsRepeatableLastEarned,
+        achievementsRepeatableDetailed,
         subCategory,
         achievementTitles,
         navigation: [
@@ -682,7 +681,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
 
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
-    const latestAchievements = achievements.slice(0, 5)
+    const achievementsLatest = achievements.slice(0, 5)
 
     let achievementPoints = achievements.reduce(function (sum, {type, level}) {
         const {milestone, points} = achievementTypes[type]
@@ -708,7 +707,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         conquestTypes,
         achievementPoints,
         achievementTitles,
-        latestAchievements,
+        achievementsLatest,
         achievementTypes,
         tribeChangesCount,
         navigation: [
@@ -1041,9 +1040,9 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
     let categoryTemplate
     let navigationTitle
     let overviewData
-    const repeatableAchievementsCount = {}
-    const repeatableAchievementsLastEarned = {}
-    const repeatableAchievementsDetailed = {}
+    const achievementsRepeatableCount = {}
+    const achievementsRepeatableLastEarned = {}
+    const achievementsRepeatableDetailed = {}
 
     if (!selectedCategory) {
         categoryTemplate = 'overview'
@@ -1053,18 +1052,18 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
         categoryTemplate = 'repeatable'
         navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
 
-        for (let {period, type, time_last_level} of achievementsRepeatable) {
-            if (!repeatableAchievementsLastEarned[type]) {
-                repeatableAchievementsLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
+        for (let {type, time_last_level} of achievementsRepeatable) {
+            if (!achievementsRepeatableLastEarned[type]) {
+                achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
             }
 
             if (subCategory === 'detailed') {
-                repeatableAchievementsDetailed[type] = repeatableAchievementsDetailed[type] || []
-                repeatableAchievementsDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+                achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || []
+                achievementsRepeatableDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
             }
 
-            repeatableAchievementsCount[type] = repeatableAchievementsCount[type] ?? 0
-            repeatableAchievementsCount[type]++
+            achievementsRepeatableCount[type] = achievementsRepeatableCount[type] ?? 0
+            achievementsRepeatableCount[type]++
         }
     } else {
         categoryTemplate = 'generic'
@@ -1085,9 +1084,10 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
         achievementByCategory,
         achievementsWithPoints,
         achievementsNonRepeatable,
-        repeatableAchievementsLastEarned,
-        repeatableAchievementsCount,
-        repeatableAchievementsDetailed,
+        achievementsRepeatable,
+        achievementsRepeatableLastEarned,
+        achievementsRepeatableCount,
+        achievementsRepeatableDetailed,
         achievementCategoryTitles,
         achievementTitles,
         achievementTypes,
