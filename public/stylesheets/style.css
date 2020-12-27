@@ -658,7 +658,8 @@ span[class^="flag-"] {
     }
 
     body {
-        width: 95vw;
+        width: 96vw;
+        padding: 1px 0px;
     }
 
     header {
@@ -680,6 +681,7 @@ span[class^="flag-"] {
     .content > div.left-really-big,
     .content > div.right-really-small {
         width: 100%;
+        margin: 0px;
     }
 
     menu {
