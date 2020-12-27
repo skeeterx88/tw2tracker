@@ -22,7 +22,7 @@
         </tr>
     </thead>
     <tbody>
-        <% for (let player of players) { %>
+        <% for (let player of ranking) { %>
             <tr data-id="<%= player.id %>" data-highlight-type="players">
                 <td><%= player.rank %></td>
                 <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>

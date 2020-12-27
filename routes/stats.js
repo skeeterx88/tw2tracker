@@ -7,15 +7,9 @@ const utils = require('../utils')
 const achievementTitles = require('../achievement-titles.json')
 const {asyncRouter, hasOwn} = utils
 const getSettings = require('../settings')
-const SEARCH_CATEGORIES = {
-    players: 'players',
-    tribes: 'tribes',
-    villages: 'villages'
-}
-const RANKING_CATEGORIES = {
-    players: 'players',
-    tribes: 'tribes'
-}
+
+const searchCategories = ['players', 'tribes', 'villages']
+const rankingCategories = ['players', 'tribes']
 const conquestTypes = {
     GAIN: 'gain',
     LOSS: 'loss',
@@ -1168,7 +1162,7 @@ router.post('/stats/:marketId/:worldNumber/search/', asyncRouter(async function 
     const rawQuery = encodeURIComponent(req.body.query)
     const category = (req.body.category || '').toLowerCase()
 
-    if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
+    if (!searchCategories.includes(category)) {
         throw createError(404, 'This search category does not exist')
     }
 
@@ -1198,7 +1192,7 @@ const routerSearch = async function (req, res, next) {
 
     const category = req.params.category
 
-    if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
+    if (!searchCategories.includes(category)) {
         return next()
     }
 
@@ -1263,6 +1257,17 @@ const routerSearch = async function (req, res, next) {
 router.get('/stats/:marketId/:worldNumber/search/:category/:query', asyncRouter(routerSearch))
 router.get('/stats/:marketId/:worldNumber/search/:category/:query/page/:page', asyncRouter(routerSearch))
 
+const rankingRouterSqlMap = {
+    players: {
+        ranking: sql.getWorldRankingPlayers,
+        count: sql.getWorldPlayerCount
+    },
+    tribes: {
+        ranking: sql.getWorldRankingTribes,
+        count: sql.getWorldTribeCount
+    }
+}
+
 const routerRanking = async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
@@ -1270,7 +1275,7 @@ const routerRanking = async function (req, res, next) {
 
     const category = req.params.category
 
-    if (!hasOwn.call(RANKING_CATEGORIES, category)) {
+    if (!rankingCategories.includes(category)) {
         throw createError(404, 'This ranking category does not exist')
     }
 
@@ -1293,25 +1298,9 @@ const routerRanking = async function (req, res, next) {
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const limit = settings.ranking_items_per_page
 
-    let players
-    let tribes
-    let total
-
-    switch (category) {
-        case RANKING_CATEGORIES.players: {
-            players = await db.any(sql.getWorldRankingPlayers, {worldId, offset, limit})
-            total = await db.one(sql.getWorldPlayerCount, {worldId})
-            total = parseInt(total.count, 10)
-            break
-        }
-        case RANKING_CATEGORIES.tribes: {
-            tribes = await db.any(sql.getWorldRankingTribes, {worldId, offset, limit})
-            total = await db.one(sql.getWorldTribeCount, {worldId})
-            total = parseInt(total.count, 10)
-            break
-        }
-    }
-
+    const ranking = await db.any(rankingRouterSqlMap[category].ranking, {worldId, offset, limit})
+    const {count} = await db.one(rankingRouterSqlMap[category].count, {worldId})
+    const total = parseInt(count, 10)
     const capitalizedCategory = utils.capitalize(category)
 
     res.render('stats/ranking', {
@@ -1320,8 +1309,7 @@ const routerRanking = async function (req, res, next) {
         worldNumber,
         worldName: world.name,
         world,
-        tribes,
-        players,
+        ranking,
         category,
         pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
