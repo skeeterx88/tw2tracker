@@ -230,9 +230,8 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribe.id})
     const latestAchievements = achievements.slice(0, 5)
 
-    let achievementPoints = achievements.reduce(function (sum, {type, level}) {
-        const {milestone, points} = achievementTypes[type]
-        return milestone ? sum + points[level - 1] : sum
+    let repeatableAchievementsCount = achievements.reduce(function (sum, {period, type, level}) {
+        return period ? sum + 1 : sum
     }, 0)
 
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count
@@ -245,7 +244,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', asyncRouter(async fu
         tribe,
         conquestCount,
         conquestTypes,
-        achievementPoints,
+        repeatableAchievementsCount,
         achievementTitles,
         latestAchievements,
         memberChangesCount,
@@ -560,7 +559,7 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/member-changes', async
     })
 }))
 
-router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements/:sub_category?', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -569,6 +568,11 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements', asyncRo
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const tribeId = parseInt(req.params.tribeId, 10)
+    const subCategory = req.params.sub_category
+
+    if (subCategory && subCategory !== 'detailed') {
+        throw createError(404, 'This achievement sub-category does not exist')
+    }
 
     const worldId = marketId + worldNumber
     const worldExists = await utils.schemaExists(worldId)
@@ -586,7 +590,29 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements', asyncRo
     }
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
-    const achievementRepeatable = achievements.filter(achievement => !!achievement.period)
+    const repeatableAchievements = {}
+    const repeatableAchievementsCount = {}
+    const repeatableAchievementsLastEarned = {}
+    const repeatableAchievementsDetailed = {}
+
+    for (let {period, type, time_last_level} of achievements) {
+        if (period) {
+            if (!repeatableAchievementsLastEarned[type]) {
+                repeatableAchievementsLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
+            }
+
+            repeatableAchievements[type] = repeatableAchievements[type] || []
+            repeatableAchievements[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+
+            repeatableAchievementsCount[type] = repeatableAchievementsCount[type] ?? 0
+            repeatableAchievementsCount[type]++
+
+            if (subCategory === 'detailed') {
+                repeatableAchievementsDetailed[type] = repeatableAchievementsDetailed[type] || []
+                repeatableAchievementsDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+            }
+        }
+    }
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
@@ -596,7 +622,11 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements', asyncRo
         worldNumber,
         world,
         tribe,
-        achievementRepeatable,
+        repeatableAchievements,
+        repeatableAchievementsCount,
+        repeatableAchievementsLastEarned,
+        repeatableAchievementsDetailed,
+        subCategory,
         achievementTitles,
         navigation: [
             `<a href="/">Stats</a>`,
@@ -923,7 +953,7 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', 
     })
 }))
 
-router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:category?', asyncRouter(async function (req, res, next) {
+router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:category?/:sub_category?', asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -947,9 +977,18 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const playerId = parseInt(req.params.character_id, 10)
     const selectedCategory = req.params.category
+    const subCategory = req.params.sub_category
 
     if (selectedCategory && !achievementCategories.includes(selectedCategory)) {
         throw createError(404, 'This achievement category does not exist')
+    }
+
+    if (selectedCategory === 'repeatable') {
+        if (!(subCategory === 'detailed' || !subCategory)) {
+            throw createError(404, 'This achievement sub-category does not exist')
+        }
+    } else if (subCategory) {
+        throw createError(404, 'This achievement sub-category does not exist')
     }
 
     const worldId = marketId + worldNumber
@@ -993,11 +1032,18 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
         return achievement.category !== 'repeatable'
     })
 
+    const achievementsRepeatable = achievementsWithPoints.filter(function (achievement) {
+        return achievement.category === 'repeatable'
+    })
+
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let categoryTemplate
     let navigationTitle
     let overviewData
+    const repeatableAchievementsCount = {}
+    const repeatableAchievementsLastEarned = {}
+    const repeatableAchievementsDetailed = {}
 
     if (!selectedCategory) {
         categoryTemplate = 'overview'
@@ -1006,6 +1052,20 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
     } else if (selectedCategory === 'repeatable') {
         categoryTemplate = 'repeatable'
         navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
+
+        for (let {period, type, time_last_level} of achievementsRepeatable) {
+            if (!repeatableAchievementsLastEarned[type]) {
+                repeatableAchievementsLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
+            }
+
+            if (subCategory === 'detailed') {
+                repeatableAchievementsDetailed[type] = repeatableAchievementsDetailed[type] || []
+                repeatableAchievementsDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+            }
+
+            repeatableAchievementsCount[type] = repeatableAchievementsCount[type] ?? 0
+            repeatableAchievementsCount[type]++
+        }
     } else {
         categoryTemplate = 'generic'
         navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
@@ -1018,12 +1078,16 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
         world,
         player,
         selectedCategory,
+        subCategory,
         categoryTemplate,
         overviewData,
         achievements,
         achievementByCategory,
         achievementsWithPoints,
         achievementsNonRepeatable,
+        repeatableAchievementsLastEarned,
+        repeatableAchievementsCount,
+        repeatableAchievementsDetailed,
         achievementCategoryTitles,
         achievementTitles,
         achievementTypes,

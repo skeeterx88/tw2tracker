@@ -1,0 +1,43 @@
+<section id="player-achievements-repeatable">
+    <div class="<% __append(subCategory === 'detailed' ? 'single' : 'left') %>">
+        <h2><%= navigationTitle %><% __append(subCategory === 'detailed' ? ' (Detailed)' : '') %></h2>
+
+        <table class="content-border">
+            <colgroup>
+                <col width="200px">
+                <col width="*">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th><% __append(subCategory === 'detailed' ? 'Earned on' : 'Last earned on') %></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (subCategory === 'detailed') { -%>
+                    <% for (let [type, achievementDates] of Object.entries(repeatableAchievementsDetailed)) { %>
+                        <tr>
+                            <td><%= achievementTitles[type] %> (<%= achievementDates.length %>x)</td>
+                            <td><%= achievementDates.join(', ') %></td>
+                        </tr>
+                    <% } %>
+                <% } else { -%>
+                    <% for (let [type, count] of Object.entries(repeatableAchievementsCount)) { %>
+                        <tr>
+                            <td><%= achievementTitles[type] %> (<%= count %>x)</td>
+                            <td><%= repeatableAchievementsLastEarned[type] || 'Never' %></td>
+                        </tr>
+                    <% } %>
+                <% } -%>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <% if (subCategory === 'detailed') { -%>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable">Simplified daily/weekly achievement's view</a>
+        <% } else { -%>
+            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable/detailed">Detailed daily/weekly achievement's view</a>
+        <% } -%>
+    </div>
+</section>

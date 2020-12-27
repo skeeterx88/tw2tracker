@@ -9,29 +9,48 @@
             <%- include('../navigation.ejs') %>
 
             <div class="content">
-                <div class="left">
-                    <h2>Daily / Weekly Achievements</h2>
+                <div class="<% __append(subCategory === 'detailed' ? 'single' : 'left') %>">
+                    <section class="tribe-achievements">
+                        <h2>Daily / Weekly Achievements<th><% __append(subCategory === 'detailed' ? ' (Detailed)' : '') %></th></h2>
 
-                    <table class="content-border">
-                        <colgroup>
-                            <col width="*">
-                            <col width="150px">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Unlocked on</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (let achievement of achievementRepeatable) { %>
+                        <table class="content-border">
+                            <colgroup>
+                                <col width="200px">
+                                <col width="*">
+                            </colgroup>
+                            <thead>
                                 <tr>
-                                    <td><%= achievementTitles[achievement.type] %></td>
-                                    <td><%= formatDate(achievement.time_last_level, 'day-only') %></td>
+                                    <th>Name</th>
+                                    <th><% __append(subCategory === 'detailed' ? 'Earned on' : 'Last earned on') %></th>
                                 </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <% if (subCategory === 'detailed') { -%>
+                                    <% for (let [type, achievementDates] of Object.entries(repeatableAchievementsDetailed)) { %>
+                                        <tr>
+                                            <td><%= achievementTitles[type] %> (<%= achievementDates.length %>x)</td>
+                                            <td><%= achievementDates.join(', ') %></td>
+                                        </tr>
+                                    <% } %>
+                                <% } else { -%>
+                                    <% for (let [type, count] of Object.entries(repeatableAchievementsCount)) { %>
+                                        <tr>
+                                            <td><%= achievementTitles[type] %> (<%= count %>x)</td>
+                                            <td><%= repeatableAchievementsLastEarned[type] || 'Never' %></td>
+                                        </tr>
+                                    <% } %>
+                                <% } -%>
+                            </tbody>
+                        </table>
+
+                        <div class="actions">
+                            <% if (subCategory === 'detailed') { -%>
+                                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements">Simplified daily/weekly achievement's view</a>
+                            <% } else { -%>
+                                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements/detailed">Detailed daily/weekly achievement's view</a>
+                            <% } -%>
+                        </div>
+                    </section>
                 </div>
             </div>
         </main>
