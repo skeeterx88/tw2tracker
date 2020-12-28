@@ -751,6 +751,18 @@
         })
     }
 
+    const setupPanelToggle = () => {
+        const $panelToggle = document.querySelector('#panel-toggle')
+        const $sidePanel = document.querySelector('#side-panel')
+        const $map = document.querySelector('#map')
+
+        $panelToggle.addEventListener('click', function (event) {
+            $sidePanel.classList.toggle('hidden')
+            $map.classList.toggle('full')
+            $panelToggle.classList.toggle('hide')
+        })
+    }
+
     // const setupAbout = () => {
     //     const $contact = document.querySelector('#contact')
     //     const $about = document.querySelector('#about')
@@ -787,6 +799,7 @@
     setupWorldList()
     setupSettings()
     setupMapShare()
+    setupPanelToggle()
     // setupAbout()
 
     map.init()
