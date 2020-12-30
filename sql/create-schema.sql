@@ -63,7 +63,8 @@ CREATE TABLE public.worlds (
     config JSONB,
     player_count INT DEFAULT 0,
     village_count INT DEFAULT 0,
-    tribe_count INT DEFAULT 0
+    tribe_count INT DEFAULT 0,
+    time_offset INT
 );
 
 CREATE TYPE public.map_share_type AS ENUM ('static', 'dynamic');

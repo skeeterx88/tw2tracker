@@ -104,7 +104,7 @@ Sync.init = async function () {
             // await commitAchievementsDatabase(achievements, worldId)
 
             // await Sync.allWorlds()
-            // await Sync.world('br', 54)
+            await Sync.world('br', 54)
             // await Sync.worldAchievements('br', 54)
             // await Sync.registerWorlds()
 
@@ -473,30 +473,22 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
                 const worldConfig = await page.evaluate(function () {
                     const modelDataService = injector.get('modelDataService')
-                    const configs = modelDataService.getWorldConfig().data
+                    const worldConfig = modelDataService.getWorldConfig().data
+                    const filteredConfig = {}
 
-                    return {
-                        speed: configs.speed,
-                        victory_points: configs.victory_points,
-                        barbarian_point_limit: configs.barbarian_point_limit,
-                        barbarian_spawn_rate: configs.barbarian_spawn_rate,
-                        barbarize_inactive_percent: configs.barbarize_inactive_percent,
-                        bathhouse: configs.bathhouse,
-                        chapel_bonus: configs.chapel_bonus,
-                        church: configs.church,
-                        farm_rule: configs.farm_rule,
-                        instant_recruit: configs.instant_recruit,
-                        language_selection: configs.language_selection,
-                        loyalty_after_conquer: configs.loyalty_after_conquer,
-                        mass_buildings: configs.mass_buildings,
-                        mass_recruiting: configs.mass_recruiting,
-                        noob_protection_days: configs.noob_protection_days,
-                        relocate_units: configs.relocate_units,
-                        resource_deposits: configs.resource_deposits,
-                        second_village: configs.second_village,
-                        tribe_member_limit: configs.tribe_member_limit,
-                        tribe_skills: configs.tribe_skills
+                    const selecteConfig = [
+                        'speed', 'victory_points', 'barbarian_point_limit', 'barbarian_spawn_rate',
+                        'barbarize_inactive_percent', 'bathhouse', 'chapel_bonus', 'church',
+                        'farm_rule', 'instant_recruit', 'language_selection', 'loyalty_after_conquer',
+                        'mass_buildings', 'mass_recruiting', 'noob_protection_days', 'relocate_units',
+                        'resource_deposits', 'second_village', 'tribe_member_limit', 'tribe_skills'
+                    ]
+
+                    for (let key of selecteConfig) {
+                        filteredConfig[key] = worldConfig[key]
                     }
+
+                    return filteredConfig
                 })
 
                 await db.none(sql.updateWorldConfig, {
@@ -505,6 +497,23 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
                 })
             } catch (error) {
                 log(log.GENERAL, colors.red(`Error trying to fetch world config: ${error.message}`))
+            }
+        }
+
+        if (!world.time_offset) {
+            try {
+                log(log.GENERAL, 'Scrapper: Fetching world time offset')
+
+                const timeOffset = await page.evaluate(function () {
+                    return require('helper/time').getGameTimeOffset()
+                })
+
+                await db.none(sql.updateWorldTimeOffset, {
+                    worldId,
+                    timeOffset
+                })
+            } catch (error) {
+                log(log.GENERAL, colors.red(`Error trying to fetch world time offset: ${error.message}`))
             }
         }
 
