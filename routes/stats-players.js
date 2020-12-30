@@ -22,7 +22,7 @@ const conquestTypes =  {
     SELF: 'self'
 }
 
-router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
+const playerProfileRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -93,9 +93,9 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         },
         ...utils.ejsHelpers
     })
-}))
+})
 
-router.get('/stats/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(async function (req, res, next) {
+const playerVillagesRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -138,7 +138,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/villages', asyncRout
         },
         ...utils.ejsHelpers
     })
-}))
+})
 
 const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
@@ -234,10 +234,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', playerConquestsRouter)
-router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?/page/:page', playerConquestsRouter)
-
-router.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', asyncRouter(async function (req, res, next) {
+const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -292,9 +289,9 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', asyn
         },
         ...utils.ejsHelpers
     })
-}))
+})
 
-router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:category?/:sub_category?', asyncRouter(async function (req, res, next) {
+const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -314,7 +311,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:catego
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const selectedCategory = req.params.category
-    const subCategory = req.params.sub_category
+    const subCategory = req.params.subCategory
 
     const achievementCategories = ['battle', 'points', 'tribe', 'repeatable', 'special', 'friends', 'milestone', 'ruler']
     const achievementCategoriesUnique = ['battle', 'points', 'tribe', 'special', 'friends', 'milestone', 'ruler']
@@ -374,7 +371,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:catego
 
     let categoryTemplate
     let navigationTitle
-    let overviewData
+    const overviewData = []
     const achievementsRepeatableCount = {}
     const achievementsRepeatableLastEarned = {}
     const achievementsRepeatableDetailed = {}
@@ -382,7 +379,44 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:catego
     if (!selectedCategory) {
         categoryTemplate = 'overview'
         navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
-        overviewData = getAchievementsOverview(achievementCategoriesUnique, achievementTypes, achievementByCategory)
+        
+        const categoriesMaxPoints = {}
+
+        for (let category of achievementCategoriesUnique) {
+            categoriesMaxPoints[category] = 0
+        }
+
+        for (let achievement of Object.values(achievementTypes)) {
+            if (!achievement.repeatable) {
+                categoriesMaxPoints[achievement.category] += achievement.milestone
+                    ? achievement.points[achievement.points.length - 1]
+                    : achievement.points.reduce((sum, next) => sum + next, 0)
+            }
+        }
+
+        const achievementsMaxPoints = Object.values(categoriesMaxPoints).reduce((sum, next) => sum + next, 0)
+
+        overviewData.push(...achievementCategoriesUnique.map(function (category) {
+            const max = categoriesMaxPoints[category]
+            const current = achievementByCategory[category].reduce((sum, next) => sum + next.points, 0)
+            const percent = Math.floor(current / max * 100)
+
+            return [category, {
+                max,
+                current,
+                percent
+            }]
+        }))
+
+        const overallCurrent = overviewData.reduce((sum, [, next]) => sum + next.current, 0)
+        const overallMax = achievementsMaxPoints
+        const overallPercent = Math.floor(overallCurrent / overallMax * 100)
+
+        overviewData.unshift(['overall', {
+            max: overallMax,
+            current: overallCurrent,
+            percent: overallPercent
+        }])
     } else if (selectedCategory === 'repeatable') {
         categoryTemplate = 'repeatable'
         navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
@@ -440,49 +474,13 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:catego
         },
         ...utils.ejsHelpers
     })
-}))
+})
 
-function getAchievementsOverview (achievementCategoriesUnique, achievementTypes, achievementByCategory) {
-    const overviewData = []
-    const categoriesMaxPoints = {}
-
-    for (let category of achievementCategoriesUnique) {
-        categoriesMaxPoints[category] = 0
-    }
-
-    for (let achievement of Object.values(achievementTypes)) {
-        if (!achievement.repeatable) {
-            categoriesMaxPoints[achievement.category] += achievement.milestone
-                ? achievement.points[achievement.points.length - 1]
-                : achievement.points.reduce((sum, next) => sum + next, 0)
-        }
-    }
-
-    const achievementsMaxPoints = Object.values(categoriesMaxPoints).reduce((sum, next) => sum + next, 0)
-
-    overviewData.push(...achievementCategoriesUnique.map(function (category) {
-        const max = categoriesMaxPoints[category]
-        const current = achievementByCategory[category].reduce((sum, next) => sum + next.points, 0)
-        const percent = Math.floor(current / max * 100)
-
-        return [category, {
-            max,
-            current,
-            percent
-        }]
-    }))
-
-    const overallCurrent = overviewData.reduce((sum, [, next]) => sum + next.current, 0)
-    const overallMax = achievementsMaxPoints
-    const overallPercent = Math.floor(overallCurrent / overallMax * 100)
-
-    overviewData.unshift(['overall', {
-        max: overallMax,
-        current: overallCurrent,
-        percent: overallPercent
-    }])
-
-    return overviewData
-}
+router.get('/stats/:marketId/:worldNumber/players/:playerId', playerProfileRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/villages', playerVillagesRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', playerConquestsRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?/page/:page', playerConquestsRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', playerTribeChangesRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:category?/:subCategory?', playerAchievementsRouter)
 
 module.exports = router

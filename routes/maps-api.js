@@ -19,7 +19,7 @@ const mapShareTypes = {
     DYNAMIC: 'dynamic'
 }
 
-const getWorldInfo = asyncRouter(async function (req, res) {
+const getWorldInfoRouter = asyncRouter(async function (req, res) {
     const {
         marketId,
         worldId,
@@ -60,21 +60,19 @@ const getWorldInfo = asyncRouter(async function (req, res) {
     res.end(data)
 })
 
-router.get('/api/:marketId/:worldNumber/info/:mapShareId?', getWorldInfo)
-
-router.get('/api/get-open-worlds', asyncRouter(async function (req, res) {
+const getOpenWorldsRouter = asyncRouter(async function (req, res) {
     const allWorlds = await db.any(sql.getOpenWorlds)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allWorlds))
-}))
+})
 
-router.get('/api/get-markets', asyncRouter(async function (req, res) {
+const getMarketsRouters = asyncRouter(async function (req, res) {
     const allMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allMarkets))
-}))
+})
 
-router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', asyncRouter(async function (req, res) {
+const getContinentRouter = asyncRouter(async function (req, res) {
     const {
         marketId,
         worldId,
@@ -130,9 +128,9 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
 
     res.setHeader('ETag', etag)
     res.end(data)
-}))
+})
 
-router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req, res) {
+const getStructRouter = asyncRouter(async function (req, res) {
     const {
         worldId
     } = await paramWorldParse(req)
@@ -161,9 +159,9 @@ router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req
     res.setHeader('Vary', 'ETag')
     res.setHeader('ETag', etag)
     res.end(struct)
-}))
+})
 
-router.post('/api/create-share', asyncRouter(async function (req, res) {
+const crateShareRouter = asyncRouter(async function (req, res) {
     const {
         marketId,
         worldNumber,
@@ -223,9 +221,9 @@ router.post('/api/create-share', asyncRouter(async function (req, res) {
     }
 
     res.end(`/maps/${marketId}/${worldNumber}/share/${shareId}`)
-}))
+})
 
-router.post('/api/get-share/', asyncRouter(async function (req, res) {
+const getShareRouter = asyncRouter(async function (req, res) {
     let {
         mapShareId,
         marketId,
@@ -251,6 +249,14 @@ router.post('/api/get-share/', asyncRouter(async function (req, res) {
         res.status(404)
         res.end('Map share does not exist')
     }
-}))
+})
+
+router.get('/api/:marketId/:worldNumber/info/:mapShareId?', getWorldInfoRouter)
+router.get('/api/get-open-worlds', getOpenWorldsRouter)
+router.get('/api/get-markets', getMarketsRouters)
+router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', getContinentRouter)
+router.get('/api/:marketId/:worldNumber/struct', getStructRouter)
+router.post('/api/create-share', crateShareRouter)
+router.post('/api/get-share/', getShareRouter)
 
 module.exports = router

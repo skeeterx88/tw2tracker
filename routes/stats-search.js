@@ -14,7 +14,7 @@ const {
 
 const searchCategories = ['players', 'tribes', 'villages']
 
-router.post('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
+const searchPostRedirectRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -32,16 +32,16 @@ router.post('/stats/:marketId/:worldNumber/search/', asyncRouter(async function 
     }
 
     return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`)
-}))
+})
 
-router.get('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
+const searchGetRedirectRouter = asyncRouter(async function (req, res, next) {
     const {
         marketId,
         worldNumber
     } = await paramWorldParse(req)
 
     return res.redirect(302, `/stats/${marketId}/${worldNumber}`)
-}))
+})
 
 const categorySearchRouter = asyncRouter(async function (req, res, next) {
     const category = req.params.category
@@ -108,6 +108,8 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
+router.post('/stats/:marketId/:worldNumber/search/', searchPostRedirectRouter)
+router.get('/stats/:marketId/:worldNumber/search/', searchGetRedirectRouter)
 router.get('/stats/:marketId/:worldNumber/search/:category/:query', categorySearchRouter)
 router.get('/stats/:marketId/:worldNumber/search/:category/:query/page/:page', categorySearchRouter)
 

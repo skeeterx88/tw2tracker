@@ -12,7 +12,7 @@ const {
     paramVillageParse
 } = require('../router-helpers.js')
 
-router.get('/stats/:marketId/:worldNumber/villages/:villageId', asyncRouter(async function (req, res, next) {
+const villageRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -54,6 +54,8 @@ router.get('/stats/:marketId/:worldNumber/villages/:villageId', asyncRouter(asyn
         },
         ...utils.ejsHelpers
     })
-}))
+})
+
+router.get('/stats/:marketId/:worldNumber/villages/:villageId', villageRouter)
 
 module.exports = router
