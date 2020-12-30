@@ -7,6 +7,12 @@ const getSettings = require('../settings')
 const {db} = require('../db')
 const sql = require('../sql')
 
+const {
+    paramWorld,
+    paramWorldParse,
+    paramMarket
+} = require('../router-helpers.js')
+
 const rankingsRouter = require('./stats-rankings.js')
 const searchRouter = require('./stats-search.js')
 const villagesRouter = require('./stats-villages.js')
@@ -42,7 +48,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
 })
 
 const worldsRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2) {
+    if (!paramMarket(req)) {
         return next()
     }
 
@@ -50,19 +56,21 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
     const marketId = req.params.marketId
     const syncedWorlds = await db.any(sql.getSyncedWorlds)
     const marketWorlds = syncedWorlds.filter((world) => world.market === marketId)
-    const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num)
 
     if (!marketWorlds.length) {
         throw createError(404, 'This server does not exist or does not have any available world')
     }
 
+    const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num)
+    const worlds = [
+        ['Open Worlds', sortedWorlds.filter(world => world.open)],
+        ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
+    ]
+
     res.render('stats/worlds', {
         title: `${marketId.toUpperCase()} - ${settings.site_name}`,
         marketId,
-        worlds: [
-            ['Open Worlds', sortedWorlds.filter(world => world.open)],
-            ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
-        ],
+        worlds,
         navigation: [
             `<a href="/stats">Stats</a>`,
             `Server <a href="/stats/${marketId}">${marketId.toUpperCase()}</a>`,
@@ -76,20 +84,17 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
 })
 
 const worldRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
 
     const [
         world,

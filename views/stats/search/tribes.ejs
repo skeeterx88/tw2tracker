@@ -21,8 +21,8 @@
         <% for (let tribe of results) { %>
             <tr>
                 <td><%= formatNumbers(tribe.rank) %></td>
-                <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>/"><%= tribe.name %></a></td>
-                <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>/"><%= tribe.tag %></a></td>
+                <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/"><%= tribe.name %></a></td>
+                <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/"><%= tribe.tag %></a></td>
                 <td><%= formatNumbers(tribe.points) %></td>
                 <td><%= formatNumbers(tribe.villages) %></td>
                 <td><%= formatNumbers(tribe.members) %></td>

@@ -14,5 +14,5 @@ LEFT OUTER JOIN ${worldId:name}.players
 ON (${worldId:name}.villages.character_id = players.id)
 LEFT OUTER JOIN ${worldId:name}.tribes
 ON (${worldId:name}.players.tribe_id = tribes.id)
-WHERE villages.id = ${village_id}
+WHERE villages.id = ${villageId}
 ORDER BY villages.points DESC

@@ -31,13 +31,13 @@
                                         <td><%= formatDate(change.date, 'hours-only') %></td>
 
                                         <% if (change.old_tribe) { -%>
-                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
                                         <% } else { -%>
                                             <td>None</td>
                                         <% } -%>
 
                                         <% if (change.new_tribe) { -%>
-                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
                                         <% } else { -%>
                                             <td>None</td>
                                         <% } -%>

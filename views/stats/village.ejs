@@ -35,7 +35,7 @@
                                     <tr>
                                         <th>Owner:</th>
                                         <% if (village.character_id) { -%>
-                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= village.character_id %>"><%= village.player_name %></a></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.character_id %>"><%= village.player_name %></a></td>
                                         <% } else { -%>
                                             <td>Abandoned</td>
                                         <% } -%>
@@ -43,7 +43,7 @@
                                     <tr>
                                         <th>Owner's tribe:</th>
                                         <% if (village.character_id && village.tribe_id) { -%>
-                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= village.tribe_id %>"><%= village.tribe_tag %></a></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= village.tribe_id %>"><%= village.tribe_tag %></a></td>
                                         <% } else { -%>
                                             <td>-</td>
                                         <% } -%>

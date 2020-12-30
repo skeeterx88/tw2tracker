@@ -17,5 +17,5 @@ SELECT
 FROM ${worldId:name}.conquests
 LEFT OUTER JOIN ${worldId:name}.villages
 ON (${worldId:name}.villages.id = conquests.village_id)
-WHERE village_id = ${village_id}
+WHERE village_id = ${villageId}
 ORDER BY date ASC

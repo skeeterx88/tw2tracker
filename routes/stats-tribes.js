@@ -8,6 +8,12 @@ const {asyncRouter, hasOwn} = utils
 const getSettings = require('../settings')
 const achievementTitles = require('../achievement-titles.json')
 
+const {
+    paramWorld,
+    paramWorldParse,
+    paramTribeParse
+} = require('../router-helpers.js')
+
 const conquestTypes =  {
     GAIN: 'gain',
     LOSS: 'loss',
@@ -20,42 +26,31 @@ const tribeMemberChangeTypes = {
 }
 
 const tribeRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        tribeId,
+        tribe
+    } = await paramTribeParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const tribeId = parseInt(req.params.tribeId, 10)
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let tribe
-
-    try {
-        tribe = await db.one(sql.getTribe, {worldId, tribeId})
-    } catch (error) {
-        throw createError(404, 'This tribe does not exist')
-    }
-
-    let conquestCount = await db.one(sql.getTribeConquestsCount, {worldId, tribeId})
+    const conquestCount = await db.one(sql.getTribeConquestsCount, {worldId, tribeId})
     conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
     conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
-
-    const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribe.id})
+    const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
     const achievementsLatest = achievements.slice(0, 5)
-
-    let achievementsRepeatableCount = achievements.reduce(function (sum, {period, type, level}) {
-        return period ? sum + 1 : sum
-    }, 0)
+    const achievementsRepeatableCount = achievements.reduce((sum, {period}) => period ? sum + 1 : sum, 0)
 
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count
 
@@ -74,8 +69,8 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`
         ],
         exportValues: {
             marketId,
@@ -89,42 +84,36 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
 })
 
 const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        tribeId,
+        tribe
+    } = await paramTribeParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const tribeId = parseInt(req.params.tribeId, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let tribe
-
-    try {
-        tribe = await db.one(sql.getTribe, {worldId, tribeId})
-    } catch (error) {
-        throw createError(404, 'This tribe does not exist')
-    }
-
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let conquests
     let total
     let navigationTitle = ['Conquests']
 
+    // TODO: create helper to create pagination
     const page = req.params.page && !isNaN(req.params.page)
         ? Math.max(1, parseInt(req.params.page, 10))
         : 1
     const offset = settings.ranking_items_per_page * (page - 1)
     const limit = settings.ranking_items_per_page
 
+    // TODO: use sql mapping
     switch (req.params.type) {
         case undefined: {
             conquests = await db.any(sql.getTribeConquests, {worldId, tribeId, offset, limit})
@@ -177,8 +166,8 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             navigationTitle
         ],
         exportValues: {
@@ -193,45 +182,36 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
 })
 
 const tribeMembersRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        tribeId,
+        tribe
+    } = await paramTribeParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const tribeId = parseInt(req.params.tribeId, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let tribe
-
-    try {
-        tribe = await db.one(sql.getTribe, {worldId, tribeId})
-    } catch (error) {
-        throw createError(404, 'This tribe does not exist')
-    }
-
-    const members = await db.any(sql.getTribeMembers, {worldId, tribeId})
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
+    const members = await db.any(sql.getTribeMembers, {worldId, tribeId})
 
     res.render('stats/tribe-members', {
         title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        world,
         tribe,
         members,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             `Members`
         ],
         exportValues: {
@@ -246,53 +226,43 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
 })
 
 const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        tribeId,
+        tribe
+    } = await paramTribeParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const tribeId = parseInt(req.params.tribeId, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
     const limit = settings.ranking_items_per_page
     const offset = limit * (page - 1)
-
-    let tribe
-
-    try {
-        tribe = await db.one(sql.getTribe, {worldId, tribeId})
-    } catch (error) {
-        throw createError(404, 'This tribe does not exist')
-    }
-
     const allVillages = await db.any(sql.getTribeVillages, {worldId, tribeId})
     const villages = allVillages.slice(offset, offset + limit)
     const total = allVillages.length
-
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     res.render('stats/tribe-villages', {
         title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        world,
         tribe,
         villages,
         pagination: utils.createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             `Villages`
         ],
         exportValues: {
@@ -307,29 +277,23 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
 })
 
 const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        tribeId,
+        tribe
+    } = await paramTribeParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const tribeId = parseInt(req.params.tribeId, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let tribe
-
-    try {
-        tribe = await db.one(sql.getTribe, {worldId, tribeId})
-    } catch (error) {
-        throw createError(404, 'This tribe does not exist')
-    }
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const playersName = {}
     const memberChangesRaw = await db.any(sql.getTribeMemberChanges, {worldId, id: tribeId})
@@ -350,22 +314,18 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         })
     }
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
-
     res.render('stats/tribe-member-changes', {
         title: `Tribe ${tribe.tag} - Member Changes - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        world,
         tribe,
-        changeIndex: memberChanges.length,
         memberChanges,
         tribeMemberChangeTypes,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             `Member Changes`
         ],
         exportValues: {
@@ -377,33 +337,28 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
 })
 
 const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        tribeId,
+        tribe
+    } = await paramTribeParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const tribeId = parseInt(req.params.tribeId, 10)
-    const subCategory = req.params.sub_category
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+
+    const subCategory = req.params.subCategory
 
     if (subCategory && subCategory !== 'detailed') {
         throw createError(404, 'This achievement sub-category does not exist')
-    }
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let tribe
-
-    try {
-        tribe = await db.one(sql.getTribe, {worldId, tribeId})
-    } catch (error) {
-        throw createError(404, 'This tribe does not exist')
     }
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
@@ -431,13 +386,10 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         }
     }
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
-
     res.render('stats/tribe-achievements', {
         title: `Tribe ${tribe.tag} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        world,
         tribe,
         achievementsRepeatable,
         achievementsRepeatableCount,
@@ -448,8 +400,8 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Tribe <a href="/stats/${marketId}/${world.num}/tribes/${tribe.id}">${tribe.tag}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             'Achievements'
         ],
         exportValues: {
@@ -467,6 +419,6 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/members', tribeMembers
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages', tribeVillagesRouter)
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', tribeVillagesRouter)
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/member-changes', tribeMembersChangeRouter)
-router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements/:sub_category?', tribeAchievementsRouter)
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements/:subCategory?', tribeAchievementsRouter)
 
 module.exports = router

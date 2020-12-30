@@ -3,35 +3,33 @@ const path = require('path')
 const express = require('express')
 const createError = require('http-errors')
 const router = express.Router()
+const {db} = require('../db')
+const sql = require('../sql')
 const utils = require('../utils')
 const {asyncRouter} = utils
 const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
 const EMPTY_CONTINENT = 'empty_continent'
 
-const {db} = require('../db')
-const sql = require('../sql')
+const {
+    paramWorldParse
+} = require('../router-helpers.js')
 
 const mapShareTypes = {
     STATIC: 'static',
     DYNAMIC: 'dynamic'
 }
 
-router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async function (req, res) {
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const mapShareId = req.params.mapShareId
-    const worldId = marketId + worldNumber
-
-    const worldExists = await utils.schemaExists(marketId + worldNumber)
-
-    if (!worldExists) {
-        throw createError(404, 'World does not exist')
-    }
+const getWorldInfo = asyncRouter(async function (req, res) {
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
 
     let dataPath
 
-    if (mapShareId) {
-        const mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
+    if (req.params.mapShareId) {
+        const mapShare = await db.one(sql.maps.getShareInfo, [req.params.mapShareId, marketId, worldNumber])
         const dateId = utils.getHourlyDir(mapShare.creation_date)
         dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'info')
     } else {
@@ -60,7 +58,9 @@ router.get('/api/:marketId/:worldNumber/info/:mapShareId?', asyncRouter(async fu
     res.setHeader('Vary', 'ETag')
     res.setHeader('ETag', etag)
     res.end(data)
-}))
+})
+
+router.get('/api/:marketId/:worldNumber/info/:mapShareId?', getWorldInfo)
 
 router.get('/api/get-open-worlds', asyncRouter(async function (req, res) {
     const allWorlds = await db.any(sql.getOpenWorlds)
@@ -75,17 +75,13 @@ router.get('/api/get-markets', asyncRouter(async function (req, res) {
 }))
 
 router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', asyncRouter(async function (req, res) {
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const worldId = marketId + worldNumber
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
     const continentId = req.params.continentId
-    const mapShareId = req.params.mapShareId
-
-    const worldExists = await utils.schemaExists(marketId + worldNumber)
-
-    if (!worldExists) {
-        throw createError(404, 'World does not exist')
-    }
 
     if (continentId < 0 || continentId > 99 || isNaN(continentId)) {
         throw createError(400, 'Invalid continent')
@@ -93,8 +89,8 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
 
     let dataPath
 
-    if (mapShareId) {
-        const mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
+    if (req.params.mapShareId) {
+        const mapShare = await db.one(sql.maps.getShareInfo, [req.params.mapShareId, marketId, worldNumber])
         const dateId = utils.getHourlyDir(mapShare.creation_date)
         dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, continentId)
     } else {
@@ -137,15 +133,9 @@ router.get('/api/:marketId/:worldNumber/continent/:continentId/:mapShareId?', as
 }))
 
 router.get('/api/:marketId/:worldNumber/struct', asyncRouter(async function (req, res) {
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const worldId = marketId + worldNumber
-    
-    const worldExists = await utils.schemaExists(marketId + worldNumber)
-
-    if (!worldExists) {
-        throw createError(404, 'World does not exist')
-    }
+    const {
+        worldId
+    } = await paramWorldParse(req)
 
     const structPath = path.join('.', 'data', worldId, 'struct')
 

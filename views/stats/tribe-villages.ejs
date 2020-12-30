@@ -32,10 +32,10 @@
                                 <tbody>
                                     <% for (let village of villages) { %>
                                         <tr data-id="<%= village.village_id %>" data-highlight-type="villages">
-                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.village_id %>/"><%= village.village_name %></a></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>/"><%= village.village_name %></a></td>
                                             <td><%= village.village_x %>|<%= village.village_y %></td>
                                             <td><%= formatNumbers(village.village_points) %></td>
-                                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
+                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
                                         </tr>
                                     <% } %>
                                 </tbody>
@@ -53,7 +53,7 @@
                         <div id="map" class="content-border"></div>
 
                         <div class="actions">
-                            <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>">View complete world map</a>
                         </div>
                     </section>
                 </div>

@@ -8,6 +8,14 @@ const {asyncRouter, hasOwn} = utils
 const getSettings = require('../settings')
 const achievementTitles = require('../achievement-titles.json')
 
+const {
+    paramWorld,
+    paramWorldParse,
+    paramPlayerParse,
+    getTribe,
+    getPlayerVillages
+} = require('../router-helpers.js')
+
 const conquestTypes =  {
     GAIN: 'gain',
     LOSS: 'loss',
@@ -15,41 +23,28 @@ const conquestTypes =  {
 }
 
 router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        playerId,
+        player
+    } = await paramPlayerParse(req, worldId)
+
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const playerId = parseInt(req.params.playerId, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let player
-
-    try {
-        player = await db.one(sql.getPlayer, {worldId, playerId})
-    } catch (error) {
-        throw createError(404, 'This player does not exist')
-    }
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let conquestCount = await db.one(sql.getPlayerConquestCount, {worldId, playerId})
     conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
     conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
-
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
-
-    let tribe = false
-
-    if (player.tribe_id) {
-        tribe = await db.one(sql.getTribe, {worldId, tribeId: player.tribe_id})
-    }
 
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
@@ -57,7 +52,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
 
     let achievementPoints = achievements.reduce(function (sum, {type, level}) {
         const {milestone, points} = achievementTypes[type]
-        
+
         if (!points) {
             return sum
         }
@@ -68,6 +63,7 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
     }, 0)
 
     const tribeChangesCount = (await db.one(sql.getPlayerTribeChangesCount, {worldId, id: playerId})).count
+    const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false
 
     res.render('stats/player', {
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -85,8 +81,8 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`
         ],
         exportValues: {
             marketId,
@@ -99,34 +95,25 @@ router.get('/stats/:marketId/:worldNumber/players/:playerId', asyncRouter(async 
     })
 }))
 
-router.get('/stats/:marketId/:worldNumber/players/:character_id/villages', asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+router.get('/stats/:marketId/:worldNumber/players/:playerId/villages', asyncRouter(async function (req, res, next) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        playerId,
+        player
+    } = await paramPlayerParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const playerId = parseInt(req.params.character_id, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let player
-    let villages
-
-    try {
-        player = await db.one(sql.getPlayer, {worldId, playerId})
-        villages = await db.any(sql.getPlayerVillages, {worldId, playerId})
-    } catch (error) {
-        throw createError(404, 'This player does not exist')
-    }
-
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
+    const villages = await getPlayerVillages(worldId, playerId)
 
     res.render('stats/player-villages', {
         title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -138,8 +125,8 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/villages', async
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
             'Villages'
         ],
         exportValues: {
@@ -154,30 +141,22 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/villages', async
 }))
 
 const playerConquestsRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        playerId,
+        player
+    } = await paramPlayerParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const playerId = parseInt(req.params.playerId, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let player
-
-    try {
-        player = await db.one(sql.getPlayer, {worldId, playerId})
-    } catch (error) {
-        throw createError(404, 'This player does not exist')
-    }
-
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let conquests
@@ -190,6 +169,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     const offset = settings.ranking_items_per_page * (page - 1)
     const limit = settings.ranking_items_per_page
 
+    // TODO: use sql mapping
     switch (req.params.type) {
         case undefined: {
             conquests = await db.any(sql.getPlayerConquests, {worldId, playerId, offset, limit})
@@ -239,8 +219,8 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
             navigationTitle
         ],
         exportValues: {
@@ -257,30 +237,24 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
 router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', playerConquestsRouter)
 router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?/page/:page', playerConquestsRouter)
 
-router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+router.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', asyncRouter(async function (req, res, next) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        playerId,
+        player
+    } = await paramPlayerParse(req, worldId)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const playerId = parseInt(req.params.character_id, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
-
-    let player
-
-    try {
-        player = await db.one(sql.getPlayer, {worldId, playerId})
-    } catch (error) {
-        throw createError(404, 'This player does not exist')
-    }
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const tribeChanges = await db.any(sql.getPlayerTribeChanges, {worldId, id: playerId})
     const tribeTags = {}
@@ -295,16 +269,12 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', 
         }
     }
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
-
     res.render('stats/player-tribe-changes', {
         title: `Player ${player.name} - Tribe Changes - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        world,
         player,
         tribeChanges,
-        changeIndex: tribeChanges.length,
         tribeTags,
         navigation: [
             `<a href="/">Stats</a>`,
@@ -324,31 +294,30 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/tribe-changes', 
     })
 }))
 
-router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:category?/:sub_category?', asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:category?/:sub_category?', asyncRouter(async function (req, res, next) {
+    if (!paramWorld(req)) {
         return next()
     }
 
-    const achievementCategoryTitles = {
-        overall: 'Overall',
-        battle: 'Battle',
-        points: 'Points',
-        tribe: 'Tribe',
-        repeatable: 'Daily / Weekly',
-        special: 'Special',
-        friends: 'Friends',
-        milestone: 'Milestone',
-        ruler: 'Ruler'
-    }
-    const achievementCategories = ['battle', 'points', 'tribe', 'repeatable', 'special', 'friends', 'milestone', 'ruler']
-    const achievementCategoriesUnique = ['battle', 'points', 'tribe', 'special', 'friends', 'milestone', 'ruler']
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const {
+        playerId,
+        player
+    } = await paramPlayerParse(req, worldId)
 
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const playerId = parseInt(req.params.character_id, 10)
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+
     const selectedCategory = req.params.category
     const subCategory = req.params.sub_category
+
+    const achievementCategories = ['battle', 'points', 'tribe', 'repeatable', 'special', 'friends', 'milestone', 'ruler']
+    const achievementCategoriesUnique = ['battle', 'points', 'tribe', 'special', 'friends', 'milestone', 'ruler']
 
     if (selectedCategory && !achievementCategories.includes(selectedCategory)) {
         throw createError(404, 'This achievement category does not exist')
@@ -362,21 +331,17 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
         throw createError(404, 'This achievement sub-category does not exist')
     }
 
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
+    const achievementCategoryTitles = {
+        overall: 'Overall',
+        battle: 'Battle',
+        points: 'Points',
+        tribe: 'Tribe',
+        repeatable: 'Daily / Weekly',
+        special: 'Special',
+        friends: 'Friends',
+        milestone: 'Milestone',
+        ruler: 'Ruler'
     }
-
-    let player
-
-    try {
-        player = await db.one(sql.getPlayer, {worldId, playerId})
-    } catch (error) {
-        throw createError(404, 'This player does not exist')
-    }
-
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
     const achievementByCategory = {}
@@ -406,8 +371,6 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
     const achievementsRepeatable = achievementsWithPoints.filter(function (achievement) {
         return achievement.category === 'repeatable'
     })
-
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     let categoryTemplate
     let navigationTitle
@@ -446,7 +409,6 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
         title: `Player ${player.name} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        world,
         player,
         selectedCategory,
         subCategory,
@@ -467,8 +429,8 @@ router.get('/stats/:marketId/:worldNumber/players/:character_id/achievements/:ca
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
+            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
             'Achievements'
         ],
         exportValues: {

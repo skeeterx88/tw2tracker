@@ -13,7 +13,7 @@
                     <section id="search" class="content-border">
                         <% if (!resultsCount) { %>
                             <h3>No results</h3>
-                            <a href="/stats/<%= marketId %>/<%= world.num %>/">Go back</a>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/">Go back</a>
                         <% } else { %>
                             <%- include('search/' + category + '.ejs') %>
                             <%- include('../pagination.ejs') %>

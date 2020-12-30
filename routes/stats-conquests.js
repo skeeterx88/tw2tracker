@@ -1,5 +1,4 @@
 const express = require('express')
-const createError = require('http-errors')
 const router = express.Router()
 const {db} = require('../db')
 const sql = require('../sql')
@@ -7,21 +6,24 @@ const utils = require('../utils')
 const {asyncRouter} = utils
 const getSettings = require('../settings')
 
+const {
+    paramWorld,
+    paramWorldParse
+} = require('../router-helpers.js')
+
 const conquestsRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
     const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page)
         ? Math.max(1, parseInt(req.params.page, 10))
@@ -29,7 +31,6 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
     const offset = settings.ranking_items_per_page * (page - 1)
     const limit = settings.ranking_items_per_page
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const conquests = await db.any(sql.getWorldConquests, {worldId, offset, limit})
     const total = parseInt((await db.one(sql.getWorldConquestsCount, {worldId})).count, 10)
 

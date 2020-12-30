@@ -7,12 +7,22 @@ const utils = require('../utils')
 const {asyncRouter} = utils
 const getSettings = require('../settings')
 
+const {
+    paramWorld,
+    paramWorldParse
+} = require('../router-helpers.js')
+
 const searchCategories = ['players', 'tribes', 'villages']
 
 router.post('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next()
     }
+
+    const {
+        marketId,
+        worldNumber
+    } = await paramWorldParse(req)
 
     const rawQuery = encodeURIComponent(req.body.query)
     const category = (req.body.category || '').toLowerCase()
@@ -21,52 +31,42 @@ router.post('/stats/:marketId/:worldNumber/search/', asyncRouter(async function 
         throw createError(404, 'This search category does not exist')
     }
 
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-
     return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`)
 }))
 
 router.get('/stats/:marketId/:worldNumber/search/', asyncRouter(async function (req, res, next) {
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
-    }
+    const {
+        marketId,
+        worldNumber
+    } = await paramWorldParse(req)
 
     return res.redirect(302, `/stats/${marketId}/${worldNumber}`)
 }))
 
 const categorySearchRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
-        return next()
-    }
-
     const category = req.params.category
 
     if (!searchCategories.includes(category)) {
         return next()
     }
 
-    const settings = await getSettings()
-    const marketId = req.params.marketId
-    const worldNumber = parseInt(req.params.worldNumber, 10)
-
-    const worldId = marketId + worldNumber
-    const worldExists = await utils.schemaExists(worldId)
-
-    if (!worldExists) {
-        throw createError(404, 'This world does not exist')
+    if (!paramWorld(req)) {
+        return next()
     }
+
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req)
+
+    const settings = await getSettings()
+    const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
     const limit = settings.ranking_items_per_page
     const offset = limit * (page - 1)
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const rawQuery = decodeURIComponent(req.params.query)
 
     if (!rawQuery) {
@@ -90,7 +90,6 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
-        world,
         category,
         results,
         resultsCount: results.length,
@@ -98,7 +97,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
+            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
             `Search "${rawQuery}"`
         ],
         exportValues: {
