@@ -9,7 +9,8 @@ const getSettings = require('../settings')
 
 const {
     paramWorld,
-    paramWorldParse
+    paramWorldParse,
+    createPagination
 } = require('../router-helpers.js')
 
 const searchCategories = ['players', 'tribes', 'villages']
@@ -93,7 +94,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         category,
         results,
         resultsCount: results.length,
-        pagination: utils.createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,

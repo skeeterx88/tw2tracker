@@ -93,6 +93,39 @@ async function paramVillageParse (req, worldId) {
     }
 }
 
+function createPagination (current, total, limit, path) {
+    if (typeof current !== 'number') {
+        throw new Error('Pagination: Current is not a number.')
+    }
+
+    if (typeof total !== 'number') {
+        throw new Error('Pagination: Total is not a number.')
+    }
+
+    if (typeof limit !== 'number') {
+        throw new Error('Pagination: Limit is not a number.')
+    }
+
+    const last = Math.max(1, parseInt(Math.ceil(total / limit), 10))
+    const start = Math.max(1, current - 3)
+    const end = Math.min(last, current + 3)
+
+    path = path.replace(/\/page\/\d+|\/$/, '')
+
+    return {
+        current,
+        last,
+        start,
+        end,
+        path,
+        showAllPages: last <= 7,
+        showGotoLast: end < last,
+        showGotoFirst: start > 1,
+        showGotoNext: current < last,
+        showGotoPrev: current > 1 && last > 1
+    }
+}
+
 module.exports = {
     getPlayer,
     getPlayerVillages,
@@ -102,5 +135,6 @@ module.exports = {
     paramWorldParse,
     paramTribeParse,
     paramPlayerParse,
-    paramVillageParse
+    paramVillageParse,
+    createPagination
 }

@@ -13,14 +13,18 @@ const {
     paramWorldParse,
     paramPlayerParse,
     getTribe,
-    getPlayerVillages
+    getPlayerVillages,
+    createPagination
 } = require('../router-helpers.js')
 
 const conquestTypes =  {
     GAIN: 'gain',
     LOSS: 'loss',
-    SELF: 'self'
+    SELF: 'self',
+    ALL: 'all'
 }
+
+const conquestCategories = ['gain', 'loss', 'all']
 
 const playerProfileRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
@@ -159,41 +163,35 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    let conquests
-    let total
-    let navigationTitle = ['Conquests']
-
-    const page = req.params.page && !isNaN(req.params.page)
-        ? Math.max(1, parseInt(req.params.page, 10))
-        : 1
+    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
     const offset = settings.ranking_items_per_page * (page - 1)
     const limit = settings.ranking_items_per_page
 
-    // TODO: use sql mapping
-    switch (req.params.type) {
-        case undefined: {
-            conquests = await db.any(sql.getPlayerConquests, {worldId, playerId, offset, limit})
-            total = (await db.one(sql.getPlayerConquestsCount, {worldId, playerId})).count
-            break
-        }
-        case conquestTypes.GAIN: {
-            conquests = await db.any(sql.getPlayerConquestsGain, {worldId, playerId, offset, limit})
-            total = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count
-            navigationTitle.push('Gains')
-            break
-        }
-        case conquestTypes.LOSS: {
-            conquests = await db.any(sql.getPlayerConquestsLoss, {worldId, playerId, offset, limit})
-            total = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count
-            navigationTitle.push('Losses')
-            break
-        }
-        default: {
-            throw createError(404, 'This conquests sub page does not exist')
+    const conquestsTypeMap = {
+        all: {
+            sqlConquests: sql.getPlayerConquests,
+            sqlCount: sql.getPlayerConquestsCount,
+            navigationTitle: 'Conquests'
+        },
+        gain: {
+            sqlConquests: sql.getPlayerConquestsGain,
+            sqlCount: sql.getPlayerConquestsGainCount,
+            navigationTitle: 'Conquest Gains'
+        },
+        loss: {
+            sqlConquests: sql.getPlayerConquestsLoss,
+            sqlCount: sql.getPlayerConquestsLossCount,
+            navigationTitle: 'Conquest Losses'
         }
     }
 
-    conquests = conquests.map(function (conquest) {
+    const type = req.params.type ?? 'all'
+
+    if (!conquestCategories.includes(type)) {
+        throw createError(404, 'This conquests sub page does not exist')
+    }
+
+    const conquests = await db.map(conquestsTypeMap[type].sqlConquests, {worldId, playerId, offset, limit}, function (conquest) {
         if (conquest.new_owner === conquest.old_owner) {
             conquest.type = conquestTypes.SELF
         } else if (conquest.new_owner === playerId) {
@@ -205,7 +203,8 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         return conquest
     })
 
-    navigationTitle = navigationTitle.join(' ')
+    const total = (await db.one(conquestsTypeMap[type].sqlCount, {worldId, playerId})).count
+    const navigationTitle = conquestsTypeMap[type].navigationTitle
 
     res.render('stats/player-conquests', {
         title: `Player ${player.name} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -215,7 +214,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         conquests,
         conquestTypes,
         navigationTitle,
-        pagination: utils.createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,

@@ -9,7 +9,8 @@ const getSettings = require('../settings')
 
 const {
     paramWorld,
-    paramWorldParse
+    paramWorldParse,
+    createPagination
 } = require('../router-helpers.js')
 
 const rankingCategories = ['players', 'tribes']
@@ -64,7 +65,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         world,
         ranking,
         category,
-        pagination: utils.createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,

@@ -11,7 +11,8 @@ const achievementTitles = require('../achievement-titles.json')
 const {
     paramWorld,
     paramWorldParse,
-    paramTribeParse
+    paramTribeParse,
+    createPagination
 } = require('../router-helpers.js')
 
 const conquestTypes =  {
@@ -162,7 +163,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         conquests,
         conquestTypes,
         navigationTitle,
-        pagination: utils.createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
@@ -257,7 +258,7 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         tribe,
         villages,
-        pagination: utils.createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,

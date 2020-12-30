@@ -8,7 +8,8 @@ const getSettings = require('../settings')
 
 const {
     paramWorld,
-    paramWorldParse
+    paramWorldParse,
+    createPagination
 } = require('../router-helpers.js')
 
 const conquestsRouter = asyncRouter(async function (req, res, next) {
@@ -40,7 +41,7 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         world,
         conquests,
-        pagination: utils.createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, req.path),
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
