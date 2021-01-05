@@ -40,11 +40,9 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
     let $grid
     let $gridContext
 
-    const { x, y, width, height } = $container.getBoundingClientRect()
+    const { width, height } = $container.getBoundingClientRect()
     let viewportWidth = width ? width : window.innerWidth
     let viewportHeight = height ? height : window.innerHeight
-    let viewportOffsetX = x
-    let viewportOffsetY = y
 
     let middleViewportOffsetX = Math.floor(viewportWidth / 2)
     let middleViewportOffsetY = Math.floor(viewportHeight / 2)
@@ -245,8 +243,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
         $overlay.addEventListener('mousedown', (event) => {
             draggable = true
-            dragStartX = positionX + event.pageX
-            dragStartY = positionY + event.pageY
+            dragStartX = positionX + event.offsetX
+            dragStartY = positionY + event.offsetY
         })
 
         $overlay.addEventListener('touchstart', (event) => {
@@ -314,8 +312,8 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
 
                 dragging = true
 
-                positionX = boundNumber(dragStartX - event.pageX, 0, zoomSettings.mapWidth)
-                positionY = boundNumber(dragStartY - event.pageY, 0, zoomSettings.mapHeight)
+                positionX = boundNumber(dragStartX - event.offsetX, 0, zoomSettings.mapWidth)
+                positionY = boundNumber(dragStartY - event.offsetY, 0, zoomSettings.mapHeight)
 
                 updateCenter()
 
@@ -361,9 +359,13 @@ const TW2Map = function (containerSelector, loader, tooltip, settings) {
                 return
             }
 
-            mouseCoordY = Math.floor((positionY - viewportOffsetY - middleViewportOffsetY + event.pageY) / zoomSettings.tileSize)
+            const {width, height} = $container.getBoundingClientRect()
+            middleViewportOffsetX = Math.floor(width / 2)
+            middleViewportOffsetY = Math.floor(height / 2)
+
+            mouseCoordY = Math.floor((positionY - middleViewportOffsetY + event.offsetY) / zoomSettings.tileSize)
             let off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
-            mouseCoordX = Math.floor((positionX - viewportOffsetX - middleViewportOffsetX + event.pageX - off) / zoomSettings.tileSize)
+            mouseCoordX = Math.floor((positionX - middleViewportOffsetX + event.offsetX - off) / zoomSettings.tileSize)
 
             const villagesX = loader.villages[mouseCoordX]
 
@@ -1351,8 +1353,8 @@ const TW2Tooltip = function (selector) {
     let $provinceName = $tooltip.querySelector('.province-name')
 
     const mouseMoveHandler = (event) => {
-        let x = event.pageX
-        let y = event.pageY
+        let x = event.offsetX
+        let y = event.offsetY
 
         if (x + 400 > window.innerWidth) {
             x -= 370
