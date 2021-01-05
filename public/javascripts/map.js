@@ -1353,8 +1353,8 @@ const TW2Tooltip = function (selector) {
     let $provinceName = $tooltip.querySelector('.province-name')
 
     const mouseMoveHandler = (event) => {
-        let x = event.offsetX
-        let y = event.offsetY
+        let x = event.pageX
+        let y = event.pageY
 
         if (x + 400 > window.innerWidth) {
             x -= 370

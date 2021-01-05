@@ -1,11 +1,10 @@
 html {
-    width: 100%;
-    height: 100%;
     overflow: hidden;
 }
 
-body {
+body#map-page {
     width: 100%;
+    max-width: initial;
     height: 100%;
     margin: 0;
     padding: 0;
@@ -26,9 +25,29 @@ a {
     font-weight: bold;
 }
 
-header a {
+#map-page header {
+    background: initial;
+    height: initial;
+    width: initial;
+    filter: initial;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#map-page header a {
     color: #ffeccc;
-    
+}
+
+#map-page footer {
+    margin: initial;
+    padding: initial;
+    background: initial;
+    text-align: initial;
+}
+
+#map-page td,
+#map-page th {
+    text-align: initial;
 }
 
 a:hover {
@@ -328,77 +347,6 @@ button.red:focus {
     display: none;
 }
 
-
-
-
-
-#tooltip {
-    opacity: 0;
-    visibility: hidden;
-    position: absolute;
-    transition: opacity .2s;
-    width: 360px;
-    z-index: 5;
-    padding: 3px;
-    top: 0px;
-    left: 0px;
-    margin-top: 3px;
-    background: url(/images/tooltip-background.png) #d0ac86;
-}
-
-#tooltip table {
-    width: 100%;
-    border-spacing: 1px;
-    border-collapse: separate;
-    box-shadow: 0 0 0 2px #7c360066;
-    background: url(/images/noise-4.png) #d1ad86;
-}
-
-#tooltip td {
-    border: 1px solid #7c36004d;
-    box-shadow: none;
-    background: url(/images/noise-4.png) #c39c72;
-    padding: 1px;
-}
-
-#tooltip td > div {
-    padding-left: 30px;
-    position: relative;
-}
-
-#tooltip .title {
-    display: block;
-    color: #00000095;
-}
-
-#tooltip.left {
-    left: -380px;
-}
-
-#tooltip.top {
-    top: -120px;
-}
-
-#tooltip span,
-#tooltip div {
-    white-space: nowrap;
-}
-
-#tooltip .village-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(100% - 54px);
-    display: inline-block;
-    vertical-align: top;
-}
-
-#tooltip .tribe-villages,
-#tooltip .player-villages {
-    font-size: 10px;
-    color: #00000095;
-}
-
-
 .mini-icon {
     width: 12px;
     height: 12px;
@@ -418,68 +366,6 @@ button.red:focus {
 .mini-icon.points {
     background-image: url(/images/points-icon.png);
 }
-
-
-
-.icon {
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    margin: 2px;
-    display: inline-block;
-    border: 1px solid #2b2121;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    background: linear-gradient(#02030373, #02030300),
-                url(/images/background-icon-black.png);
-}
-
-.icon:before {
-    content: ' ';
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    z-index: 1;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.icon.village:before {
-    background-image: url(/images/village-icon.png);
-}
-
-.icon.player:before {
-    background-image: url(/images/player-icon.png);
-}
-
-.icon.tribe:before {
-    background-image: url(/images/tribe-icon.png);
-}
-
-.icon.tribe-points-x:before {
-    background-image: url(/images/tribe-points-icon.png);
-}
-
-.icon.points:before {
-    background-image: url(/images/points-icon.png);
-}
-
-.icon.province:before {
-    background-image: url(/images/province-icon.png);
-}
-
-
-
-
-
-.box-border {
-    box-shadow: inset 0 0 0 1px #45505c, 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000;
-    border: 1px solid #5e351b;
-    border-radius: 1px;
-}
-
-
 
 #color-picker {
     visibility: hidden;
@@ -546,11 +432,6 @@ div.text-container {
     display: inline-block;
     clear: both;
     float: left;
-}
-
-header {
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
 
 #world-name {
@@ -638,8 +519,6 @@ header {
     background: #865333;
 }
 
-
-
 #change-settings {
     margin-left: 2px;
     width: 70px;
@@ -690,8 +569,6 @@ header {
     box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #d8bfb0;
 }
 
-
-
 .autoComplete_highlighted {
     font-weight: bold;
 }
@@ -731,13 +608,6 @@ header {
     color: #824300;
     background-color: #f4dec666;
 }
-
-
-
-
-
-
-
 
 #notif {
     position: absolute;
@@ -816,9 +686,6 @@ header {
     cursor: pointer;
 }
 
-
-
-
 #site-info {
     font-size: 9px;
     text-align: center;
@@ -832,11 +699,6 @@ header {
 #site-info a {
     cursor: pointer;
 }
-
-
-
-
-
 
 .loading {
     margin: auto;
@@ -871,56 +733,6 @@ header {
         transform: scale(1.0);
     }
 }
-
-span[class^="flag-"] {
-    height: 12px;
-    background-image: url(/images/flags.png);
-    background-repeat: no-repeat;
-    display: inline-block;
-    padding-left: 20px;
-    line-height: 12px;
-    text-align: left;
-}
-
-.flag-de {background-position: 0 -448px}
-.flag-en {background-position: 0 -64px}
-.flag-fr {background-position: 0 -704px}
-.flag-es {background-position: 0 -736px}
-.flag-it {background-position: 0 -640px}
-.flag-gr {background-position: 0 -96px}
-.flag-nl {background-position: 0 -32px}
-.flag-ro {background-position: 0 -320px}
-.flag-se {background-position: 0 -384px}
-.flag-cz {background-position: 0 -128px}
-.flag-pl {background-position: 0 -544px}
-.flag-hu {background-position: 0 -480px}
-.flag-sk {background-position: 0 -160px}
-.flag-dk {background-position: 0 -576px}
-.flag-no {background-position: 0 -512px}
-.flag-pt {background-position: 0 -192px}
-.flag-jp {background-position: 0 -1056px}
-.flag-ru {background-position: 0 -256px}
-.flag-br {background-position: 0 -352px}
-.flag-tr {background-position: 0 -672px}
-.flag-ch {background-position: 0 -416px}
-.flag-kr {background-position: 0 -224px}
-.flag-ae {background-position: 0 -800px}
-.flag-bg {background-position: 0 0}
-.flag-th {background-position: 0 -1088px}
-.flag-ba {background-position: 0 -608px}
-.flag-fi {background-position: 0 -768px}
-.flag-hr {background-position: 0 -992px}
-.flag-il {background-position: 0 -928px}
-.flag-lt {background-position: 0 -896px}
-.flag-si {background-position: 0 -864px}
-.flag-us {background-position: 0 -1120px}
-.flag-id {background-position: 0 -960px}
-.flag-uk {background-position: 0 -832px}
-.flag-ts {background-position: 0 -1024px}
-.flag-zz,
-.flag-xx {background-position: 0 -1152px}
-.flag-ar {background-position: 0 -1217px}
-.flag-mx {background-position: 0 -1184px}
 
 @media (max-width: 800px) {
     html {

@@ -1,6 +1,7 @@
 (async () => {
     let map
     let loader
+    let tooltip
 
     const colors = ["#ffee00", "#0000ff", "#ff0000"]
 
@@ -48,10 +49,11 @@
         }
 
         loader = new TW2DataLoader(marketId, worldNumber)
-        map = new TW2Map('#map', loader, null, {
+        tooltip = new TW2Tooltip('#map-tooltip')
+        map = new TW2Map('#map', loader, tooltip, {
             allowZoom: false,
             zoomLevel: 1,
-            inlineHighlight: false,
+            inlineHighlight: true,
             quickHighlightColor: '#000000'
         })
 

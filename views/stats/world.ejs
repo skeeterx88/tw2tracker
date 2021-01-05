@@ -239,7 +239,9 @@
                     <section class="world-map">
                         <h2>World map</h2>
 
-                        <div id="map" class="content-border"></div>
+                        <div id="map-container" class="content-border">
+                            <div id="map"></div>
+                        </div>
 
                         <div class="actions">
                             <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
@@ -249,6 +251,7 @@
             </div>
         </main>
 
+        <%- include('../maps/tooltip.ejs') %>
         <%- include('../footer.ejs') %>
 
         <script type="text/javascript">
