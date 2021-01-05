@@ -529,7 +529,7 @@ ul.achievements-menu {
 }
 
 ul.achievements-menu li {
-    margin: 2px 5px;
+    margin: 5px 5px;
     padding: 3px;
     display: inline-block;
     background: url(/images/noise.png), linear-gradient(#875515, #d0ad79);
