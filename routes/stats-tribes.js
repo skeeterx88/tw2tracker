@@ -358,7 +358,8 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
     const achievementsRepeatable = {}
-    const achievementsRepeatableCount = {}
+    const achievementsRepeatableCategoryCount = {}
+    let achievementsRepeatableGeralCount = 0
     const achievementsRepeatableLastEarned = {}
     const achievementsRepeatableDetailed = {}
 
@@ -371,8 +372,9 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
             achievementsRepeatable[type] = achievementsRepeatable[type] || []
             achievementsRepeatable[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
 
-            achievementsRepeatableCount[type] = achievementsRepeatableCount[type] ?? 0
-            achievementsRepeatableCount[type]++
+            achievementsRepeatableCategoryCount[type] = achievementsRepeatableCategoryCount[type] ?? 0
+            achievementsRepeatableCategoryCount[type]++
+            achievementsRepeatableGeralCount++
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || []
@@ -387,7 +389,8 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         tribe,
         achievementsRepeatable,
-        achievementsRepeatableCount,
+        achievementsRepeatableCategoryCount,
+        achievementsRepeatableGeralCount,
         achievementsRepeatableLastEarned,
         achievementsRepeatableDetailed,
         subCategory,

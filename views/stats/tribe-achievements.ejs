@@ -25,7 +25,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (achievementsRepeatable.length) { -%>
+                                <% if (achievementsRepeatableGeralCount) { -%>
                                     <% if (subCategory === 'detailed') { -%>
                                         <% for (let [type, achievementDates] of Object.entries(achievementsRepeatableDetailed)) { %>
                                             <tr>
@@ -34,7 +34,7 @@
                                             </tr>
                                         <% } %>
                                     <% } else { -%>
-                                        <% for (let [type, count] of Object.entries(achievementsRepeatableCount)) { %>
+                                        <% for (let [type, count] of Object.entries(achievementsRepeatableCategoryCount)) { %>
                                             <tr>
                                                 <td><%= achievementTitles[type] %> (<%= count %>x)</td>
                                                 <td><%= achievementsRepeatableLastEarned[type] || 'Never' %></td>
