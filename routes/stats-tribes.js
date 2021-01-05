@@ -21,6 +21,8 @@ const conquestTypes =  {
     SELF: 'self'
 }
 
+const conquestCategories = ['gain', 'loss', 'all']
+
 const tribeMemberChangeTypes = {
     LEFT: 'left',
     JOIN: 'join'
@@ -45,9 +47,8 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    const conquestCount = await db.one(sql.getTribeConquestsCount, {worldId, tribeId})
-    conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
-    conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
+    const conquestGainCount = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count
+    const conquestLossCount = (await db.one(sql.getTribeConquestsLossCount, {worldId, tribeId})).count
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
     const achievementsLatest = achievements.slice(0, 5)
@@ -61,7 +62,8 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         world,
         tribe,
-        conquestCount,
+        conquestGainCount,
+        conquestLossCount,
         conquestTypes,
         achievementsRepeatableCount,
         achievementTitles,
@@ -103,43 +105,35 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    let conquests
-    let total
-    let navigationTitle = ['Conquests']
-
-    // TODO: create helper to create pagination
-    const page = req.params.page && !isNaN(req.params.page)
-        ? Math.max(1, parseInt(req.params.page, 10))
-        : 1
+    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
     const offset = settings.ranking_items_per_page * (page - 1)
     const limit = settings.ranking_items_per_page
 
-    // TODO: use sql mapping
-    switch (req.params.type) {
-        case undefined: {
-            conquests = await db.any(sql.getTribeConquests, {worldId, tribeId, offset, limit})
-            total = await db.one(sql.getTribeConquestsCount, {worldId, tribeId})
-            total = total[conquestTypes.GAIN] + total[conquestTypes.LOSS]
-            break
-        }
-        case conquestTypes.GAIN: {
-            conquests = await db.any(sql.getTribeConquestsGain, {worldId, tribeId, offset, limit})
-            total = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count
-            navigationTitle.push('Gains')
-            break
-        }
-        case conquestTypes.LOSS: {
-            conquests = await db.any(sql.getTribeConquestsLoss, {worldId, tribeId, offset, limit})
-            total = (await db.one(sql.getTribeConquestsLossCount, {worldId, tribeId})).count
-            navigationTitle.push('Losses')
-            break
-        }
-        default: {
-            throw createError(404, 'This conquests sub page does not exist')
+    const conquestsTypeMap = {
+        all: {
+            sqlConquests: sql.getTribeConquests,
+            sqlCount: sql.getTribeConquestsCount,
+            navigationTitle: 'Conquests'
+        },
+        gain: {
+            sqlConquests: sql.getTribeConquestsGain,
+            sqlCount: sql.getTribeConquestsGainCount,
+            navigationTitle: 'Conquest Gains'
+        },
+        loss: {
+            sqlConquests: sql.getTribeConquestsLoss,
+            sqlCount: sql.getTribeConquestsLossCount,
+            navigationTitle: 'Conquest Losses'
         }
     }
 
-    conquests = conquests.map(function (conquest) {
+    const type = req.params.type ?? 'all'
+
+    if (!conquestCategories.includes(type)) {
+        throw createError(404, 'This conquests sub page does not exist')
+    }
+
+    const conquests = await db.map(conquestsTypeMap[type].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
         if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
             conquest.type = conquestTypes.SELF
         } else if (conquest.new_owner_tribe_id === tribeId) {
@@ -148,11 +142,11 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
             conquest.type = conquestTypes.LOSS
         }
 
-
         return conquest
     })
 
-    navigationTitle = navigationTitle.join(' ')
+    const total = (await db.one(conquestsTypeMap[type].sqlCount, {worldId, tribeId})).count
+    const navigationTitle = conquestsTypeMap[type].navigationTitle
 
     res.render('stats/tribe-conquests', {
         title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,

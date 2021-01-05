@@ -65,9 +65,9 @@
                                     <tr>
                                         <th>Village Conquers:</th>
                                         <td>
-                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestCount[conquestTypes.GAIN] + conquestCount[conquestTypes.LOSS]) %></a>
-                                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/<%= conquestTypes.GAIN %>"><%= formatNumbers(conquestCount[conquestTypes.GAIN]) %></a>
-                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/<%= conquestTypes.LOSS %>"><%= formatNumbers(conquestCount[conquestTypes.LOSS]) %></a>)
+                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestsGainCount + conquestsLossCount) %></a>
+                                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain"><%= formatNumbers(conquestsGainCount) %></a>
+                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss"><%= formatNumbers(conquestsLossCount) %></a>)
                                         </td>
                                     </tr>
                                     <tr>

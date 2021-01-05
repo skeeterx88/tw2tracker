@@ -20,8 +20,7 @@ const {
 const conquestTypes =  {
     GAIN: 'gain',
     LOSS: 'loss',
-    SELF: 'self',
-    ALL: 'all'
+    SELF: 'self'
 }
 
 const conquestCategories = ['gain', 'loss', 'all']
@@ -46,9 +45,8 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    let conquestCount = await db.one(sql.getPlayerConquestCount, {worldId, playerId})
-    conquestCount[conquestTypes.GAIN] = parseInt(conquestCount[conquestTypes.GAIN], 10)
-    conquestCount[conquestTypes.LOSS] = parseInt(conquestCount[conquestTypes.LOSS], 10)
+    let conquestsGainCount = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count
+    let conquestsLossCount = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count
 
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
@@ -75,7 +73,8 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         player,
         tribe,
-        conquestCount,
+        conquestsGainCount,
+        conquestsLossCount,
         conquestTypes,
         achievementPoints,
         achievementTitles,
