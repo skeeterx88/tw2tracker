@@ -126,10 +126,6 @@ button.red:focus {
     float: left;
 }
 
-#side-panel.hidden {
-    margin-left: -150px;
-}
-
 #map {
     touch-action: none;
     width: 100%;
@@ -139,14 +135,10 @@ button.red:focus {
     background-color: #436213;
 }
 
-#map.full {
-    margin-left: 0px;
-}
-
 #panel-toggle {
     visibility: hidden;
     width: 22px;
-    height: 70px;
+    height: 50px;
     position: absolute;
     margin: auto;
     right: -28px;
@@ -159,28 +151,25 @@ button.red:focus {
     box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e, 5px 0px 6px #00000080;
 }
 
-#panel-toggle:after {
-    content: '>';
+#panel-toggle:after,
+#panel-toggle.hide:after {
     bottom: 0px;
     width: 100%;
+    margin-top: 10px;
     text-align: center;
     display: inline-block;
-    line-height: 70px;
     font-size: 25px;
     font-weight: bold;
     color: #a59a8a;
+    cursor: pointer;
+}
+
+#panel-toggle:after {
+    content: '>';
 }
 
 #panel-toggle.hide:after {
     content: '<';
-    bottom: 0px;
-    width: 100%;
-    text-align: center;
-    display: inline-block;
-    line-height: 70px;
-    font-size: 25px;
-    font-weight: bold;
-    color: #a59a8a;
 }
 
 #quick-jump {
@@ -540,8 +529,6 @@ div.text-container {
 }
 
 #map-info {
-    width: calc(100% - 10px);
-    height: 20PX;
     position: absolute;
     bottom: 5px;
     margin-left: 5px;
@@ -554,16 +541,10 @@ div.text-container {
     display: none;
 }
 
-#last-sync {
-    float: right;
-}
-
-#share-date {
-    float: right;
-    margin-right: 5px;
-}
-
-#display-position {
+#map-info > div {
+    margin: 4px 0px;
+    display: inline-block;
+    clear: both;
     float: left;
 }
 
@@ -949,4 +930,12 @@ span[class^="flag-"] {
     #panel-toggle {
         visibility: visible;
     }
+
+    #side-panel.hidden {
+        margin-left: -150px;
+    }
+
+    #map.full {
+    margin-left: 0px;
+}
 }

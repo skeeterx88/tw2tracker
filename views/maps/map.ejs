@@ -2,7 +2,7 @@
 <html lang="en">
     <%- include('head.ejs') %>
     <body>
-        <div id="side-panel">
+        <div id="side-panel" class="hidden">
             <header>
                 <a href="/stats/<%= marketId %>/<%= world.num %>">
                     <h1 id="world-name"><%= world.name %></h1>
@@ -54,10 +54,14 @@
                 </div>
             </footer>
 
-            <div id="panel-toggle" class="hide"></div>
+            <div id="panel-toggle"></div>
         </div>
-        <div id="map">
+        <div id="map" class="full">
             <div id="map-info">
+                <div id="display-position" class="text-container">
+                    <span id="display-position-x">500</span>|<span id="display-position-y">500</span>
+                </div>
+
                 <div id="last-sync" class="text-container hidden">
                     <span>Last update:</span>
                     <span id="last-sync-date"></span>
@@ -66,10 +70,6 @@
                 <div id="share-date" class="text-container hidden">
                     <span>Share date:</span>
                     <span id="share-date-date"></span>
-                </div>
-
-                <div id="display-position" class="text-container">
-                    <span id="display-position-x">500</span>|<span id="display-position-y">500</span>
                 </div>
             </div>
         </div>
