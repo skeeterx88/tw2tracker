@@ -558,63 +558,77 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 }
 
 Sync.allWorldsAchievements = async function (flag) {
-    log(log.ACHIEVEMENTS)
-    log(log.ACHIEVEMENTS, 'Sync.allWorldsAchievements()')
-    log.increase(log.ACHIEVEMENTS)
+    // log(log.ACHIEVEMENTS)
+    // log(log.ACHIEVEMENTS, 'Sync.allWorldsAchievements()')
+    // log.increase(log.ACHIEVEMENTS)
 
     Events.trigger(enums.SCRAPPE_ACHIEVEMENT_ALL_WORLD_START)
 
+    const simultaneousSyncs = 3
     const failedToSync = []
-    const perf = utils.perf(utils.perf.MINUTES)
+    // const perf = utils.perf(utils.perf.MINUTES)
 
-    let worlds
+    let queuedWorlds
 
     if (development) {
-        worlds = [
+        queuedWorlds = [
             {market: 'zz', num: 8},
             {market: 'br', num: 52}
         ]
     } else {
-        worlds = await db.any(sql.getOpenWorlds)
+        queuedWorlds = await db.any(sql.getOpenWorlds)
     }
 
-    for (let world of worlds) {
-        try {
-            await Sync.worldAchievements(world.market, world.num, flag)
-        } catch (error) {
-            failedToSync.push({
-                marketId: world.market,
-                worldNumber: world.num,
-                message: error.message
-            })
+    let runningSyncs = 0
+
+    async function asynchronousSync () {
+        while (queuedWorlds.length) {
+            const world = queuedWorlds.shift()
+
+            if (runningSyncs < simultaneousSyncs) {
+                runningSyncs++
+
+                Sync.worldAchievements(world.market, world.num, flag).catch(function (error) {
+                    failedToSync.push({
+                        marketId: world.market,
+                        worldNumber: world.num,
+                        message: error.message
+                    })
+                })
+            } else {
+                await Events.on(enums.SCRAPPE_ACHIEVEMENT_WORLD_END)
+                runningSyncs--
+            }
         }
     }
 
-    const time = perf.end()
+    await asynchronousSync()
+
+    // const time = perf.end()
 
     Events.trigger(enums.SCRAPPE_ACHIEVEMENT_ALL_WORLD_END)
 
     if (failedToSync.length) {
-        const allFail = failedToSync.length === worlds.length
+        const allFail = failedToSync.length === queuedWorlds.length
 
-        log(log.ACHIEVEMENTS)
-        log(log.ACHIEVEMENTS, `${allFail ? 'All' : 'Some'} worlds achievements failed to sync:`)
-        log.increase(log.ACHIEVEMENTS)
+        // log(log.ACHIEVEMENTS)
+        // log(log.ACHIEVEMENTS, `${allFail ? 'All' : 'Some'} worlds achievements failed to sync:`)
+        // log.increase(log.ACHIEVEMENTS)
 
-        for (let fail of failedToSync) {
-            log(log.ACHIEVEMENTS, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
-        }
+        // for (let fail of failedToSync) {
+        //     log(log.ACHIEVEMENTS, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
+        // }
 
-        log.decrease(log.ACHIEVEMENTS)
-        log(log.ACHIEVEMENTS)
-        log(log.ACHIEVEMENTS, `Finished in ${time}`)
-        log.decrease(log.ACHIEVEMENTS)
+        // log.decrease(log.ACHIEVEMENTS)
+        // log(log.ACHIEVEMENTS)
+        // log(log.ACHIEVEMENTS, `Finished in ${time}`)
+        // log.decrease(log.ACHIEVEMENTS)
 
         return allFail ? enums.SYNC_ACHIEVEMENTS_ERROR_ALL : enums.SYNC_ACHIEVEMENTS_ERROR_SOME
     } else {
-        log(log.ACHIEVEMENTS)
-        log(log.ACHIEVEMENTS, `Finished in ${time}`)
-        log.decrease(log.ACHIEVEMENTS)
+        // log(log.ACHIEVEMENTS)
+        // log(log.ACHIEVEMENTS, `Finished in ${time}`)
+        // log.decrease(log.ACHIEVEMENTS)
 
         return enums.SYNC_ACHIEVEMENTS_SUCCESS_ALL
     }
@@ -625,9 +639,9 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 
     Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_START)
 
-    log(log.ACHIEVEMENTS)
+    // log(log.ACHIEVEMENTS)
     log(log.ACHIEVEMENTS, `Sync.worldAchievements() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
-    log.increase(log.ACHIEVEMENTS)
+    // log.increase(log.ACHIEVEMENTS)
 
     let page
 
@@ -646,7 +660,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
         await page.evaluate(readyState)
 
         const achievements = await utils.timeout(async function () {
-            return await page.evaluate(ScrapperAchievements)
+            return await page.evaluate(ScrapperAchievements, marketId, worldNumber)
         }, 1000000, 'ScrapperAchievements evaluation timeout')
 
         // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
@@ -657,14 +671,14 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 
         const time = perf.end()
 
-        log(log.ACHIEVEMENTS, `Finished in ${time}`)
+        log(log.ACHIEVEMENTS, `Sync.worldAchievements() ${colors.green(worldId)} finished in ${time}`)
         log.decrease(log.ACHIEVEMENTS)
 
         await page.close()
 
         Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_END)
     } catch (error) {
-        log(log.ACHIEVEMENTS, colors.red(`Failed to synchronize achievements ${worldId}: ${error.stack}`))
+        log(log.ACHIEVEMENTS, colors.red(`Sync.worldAchievements() ${colors.green(worldId)} failed: ${error.message}`))
         log.decrease(log.ACHIEVEMENTS)
 
         if (page) {
@@ -896,7 +910,7 @@ async function commitAchievementsDatabase (data, worldId) {
 
     const time = perf.end()
 
-    log(log.ACHIEVEMENTS, `Writed achievements data to database in ${time}`)
+    // log(log.ACHIEVEMENTS, `Writed achievements data to database in ${time}`)
 }
 
 async function commitDataFilesystem (worldId) {

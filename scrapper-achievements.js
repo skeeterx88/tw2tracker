@@ -163,7 +163,7 @@ module.exports = async function () {
         await handler()
         const end = Date.now()
         const seconds = Math.round(((end - start) / 1000) * 10) / 10
-        console.log('Scrapper:', name, 'in', seconds + 's')
+        // console.log('Scrapper:', name, 'in', seconds + 's')
     }
 
     await time('loaded tribes', async function () {
