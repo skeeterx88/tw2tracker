@@ -67,7 +67,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
             `Server <a href="/maps/${marketId}/">${marketId.toUpperCase()}</a>`,
             'World List'
         ],
-        exportValues: {
+        backendValues: {
             marketId
         },
         ...utils.ejsHelpers
@@ -101,7 +101,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         title: `Map ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         world,
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             worldName: world.name,
@@ -146,7 +146,7 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
         title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${settings.site_name}`,
         marketId,
         world,
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             worldName: world.name,

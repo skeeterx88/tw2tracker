@@ -75,7 +75,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
             `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
             `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             tribe,
@@ -165,7 +165,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
             `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             navigationTitle
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             tribe,
@@ -209,7 +209,7 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
             `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             `Members`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             tribe,
@@ -260,7 +260,7 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
             `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             `Villages`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             tribe,
@@ -323,7 +323,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
             `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             `Member Changes`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber
         },
@@ -402,7 +402,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
             `Tribe <a href="/stats/${marketId}/${worldNumber}/tribes/${tribeId}">${tribe.tag}</a>`,
             'Achievements'
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber
         },

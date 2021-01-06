@@ -72,7 +72,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             `Ranking / ${capitalizedCategory}`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber
         },

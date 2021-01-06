@@ -48,7 +48,7 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
             'Conquests'
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber
         },

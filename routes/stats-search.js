@@ -101,7 +101,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
             `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
             `Search "${rawQuery}"`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber
         },

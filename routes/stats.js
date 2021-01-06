@@ -76,7 +76,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
             `Server <a href="/stats/${marketId}">${marketId.toUpperCase()}</a>`,
             `World List`
         ],
-        exportValues: {
+        backendValues: {
             marketId
         },
         ...utils.ejsHelpers
@@ -121,7 +121,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
             `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>${!world.open ? ' (Closed)' : ''}`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             players,

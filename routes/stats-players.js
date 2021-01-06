@@ -87,7 +87,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
             `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
             `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             player,
@@ -132,7 +132,7 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
             `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
             'Villages'
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             player,
@@ -221,7 +221,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
             `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
             navigationTitle
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             player,
@@ -278,7 +278,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
             `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
             'Tribe Changes'
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             player,
@@ -465,7 +465,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
             `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
             'Achievements'
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             player

@@ -45,7 +45,7 @@ const villageRouter = asyncRouter(async function (req, res, next) {
             `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
             `Village <a href="/stats/${marketId}/${worldNumber}/villages/${village.id}">${village.name}</a>`
         ],
-        exportValues: {
+        backendValues: {
             marketId,
             worldNumber,
             village,
