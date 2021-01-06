@@ -1,5 +1,6 @@
 SELECT
     tribe_achievements.id,
+    tribe_achievements.tribe_id,
     tribe_achievements.type,
     tribe_achievements.category,
     tribe_achievements.level,
