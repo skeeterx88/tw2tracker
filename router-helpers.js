@@ -126,6 +126,17 @@ function createPagination (current, total, limit, path) {
     }
 }
 
+function groupAchievements (achievements) {
+    const group = {}
+
+    for (let achievement of achievements) {
+        group[achievement.type] = group[achievement.type] || []
+        group[achievement.type].push(achievement)
+    }
+
+    return Object.entries(group)
+}
+
 module.exports = {
     getPlayer,
     getPlayerVillages,
@@ -136,5 +147,6 @@ module.exports = {
     paramTribeParse,
     paramPlayerParse,
     paramVillageParse,
-    createPagination
+    createPagination,
+    groupAchievements
 }

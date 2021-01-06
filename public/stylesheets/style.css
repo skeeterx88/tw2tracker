@@ -571,6 +571,15 @@ ul.achievements-menu a.selected {
     text-shadow: 1px 1px 1px #00000020;
 }
 
+a.achievement-subject:after {
+    content: ',';
+    color: #50311d;
+}
+
+a.achievement-subject:last-child:after {
+    content: initial;
+}
+
 .progress-bar-wrapper {
     width: 300px;
     height: 100%;

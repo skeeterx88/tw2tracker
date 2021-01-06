@@ -143,7 +143,7 @@
                     </section>
 
                     <section id="last-conquests">
-                        <h2>World's Last Conquests</h2>
+                        <h2>World's last conquests</h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
@@ -210,6 +210,134 @@
 
                         <div class="actions">
                             <a href="/stats/<%= marketId %>/<%= world.num %>/conquests/">View all world's conquests</a>
+                        </div>
+                    </section>
+
+                    <section id="last-players-achievements">
+                        <h2>Daily player's achievements</h2>
+
+                        <div class="content-border">
+                            <table class="vertical">
+                                <colgroup>
+                                    <col width="25%">
+                                    <col width="*">
+                                </colgroup>
+
+                                <tbody>
+                                    <% if (achievements.counts.players.daily) { -%>
+                                        <% for (let [type, players] of achievements.groups.players.daily) { -%>
+                                            <tr>
+                                                <th><%= achievementTitles[type] %>:</th>
+                                                <td>
+                                                    <% for (let player of players) { -%>
+                                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
+                                                    <% } -%>
+                                                </td>
+                                            </tr>
+                                        <% } -%>
+                                    <% } else { -%>
+                                        <tr>
+                                            <td colspan="2">No daily achievements today.</td>
+                                        </tr>
+                                    <% } -%>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="last-tribes-achievements">
+                        <h2>Weekly player's achievements</h2>
+
+                        <div class="content-border">
+                            <table class="vertical">
+                                <colgroup>
+                                    <col width="25%">
+                                    <col width="*">
+                                </colgroup>
+
+                                <tbody>
+                                    <% if (achievements.counts.players.weekly) { -%>
+                                        <% for (let [type, players] of achievements.groups.players.weekly) { -%>
+                                            <tr>
+                                                <th><%= achievementTitles[type] %>:</th>
+                                                <td>
+                                                    <% for (let player of players) { -%>
+                                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
+                                                    <% } -%>
+                                                </td>
+                                            </tr>
+                                        <% } -%>
+                                    <% } else { -%>
+                                        <tr>
+                                            <td colspan="2">No weekly achievements.</td>
+                                        </tr>
+                                    <% } -%>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="last-players-achievements">
+                        <h2>Daily tribe's achievements</h2>
+
+                        <div class="content-border">
+                            <table class="vertical">
+                                <colgroup>
+                                    <col width="25%">
+                                    <col width="*">
+                                </colgroup>
+
+                                <tbody>
+                                    <% if (achievements.counts.tribes.daily) { -%>
+                                        <% for (let [type, tribes] of achievements.groups.tribes.daily) { -%>
+                                            <tr>
+                                                <th><%= achievementTitles[type] %>:</th>
+                                                <td>
+                                                    <% for (let tribe of tribes) { -%>
+                                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
+                                                    <% } -%>
+                                                </td>
+                                            </tr>
+                                        <% } -%>
+                                    <% } else { -%>
+                                        <tr>
+                                            <td colspan="2">No daily achievements today.</td>
+                                        </tr>
+                                    <% } -%>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="last-tribes-achievements">
+                        <h2>Weekly tribe's achievements</h2>
+
+                        <div class="content-border">
+                            <table class="vertical">
+                                <colgroup>
+                                    <col width="25%">
+                                    <col width="*">
+                                </colgroup>
+
+                                <tbody>
+                                    <% if (achievements.counts.tribes.weekly) { -%>
+                                        <% for (let [type, tribes] of achievements.groups.tribes.weekly) { -%>
+                                            <tr>
+                                                <th><%= achievementTitles[type] %>:</th>
+                                                <td>
+                                                    <% for (let tribe of tribes) { -%>
+                                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
+                                                    <% } -%>
+                                                </td>
+                                            </tr>
+                                        <% } -%>
+                                    <% } else { -%>
+                                        <tr>
+                                            <td colspan="2">No weekly achievements.</td>
+                                        </tr>
+                                    <% } -%>
+                                </tbody>
+                            </table>
                         </div>
                     </section>
 

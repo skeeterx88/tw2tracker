@@ -6,11 +6,13 @@ const {asyncRouter} = utils
 const getSettings = require('../settings')
 const {db} = require('../db')
 const sql = require('../sql')
+const achievementTitles = require('../achievement-titles.json')
 
 const {
     paramWorld,
     paramWorldParse,
-    paramMarket
+    paramMarket,
+    groupAchievements
 } = require('../router-helpers.js')
 
 const rankingsRouter = require('./stats-rankings.js')
@@ -100,13 +102,44 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         world,
         players,
         tribes,
-        lastConquests
+        lastConquests,
+        lastDailyPlayerAchievements,
+        lastWeeklyPlayerAchievements,
+        lastDailyTribeAchievements,
+        lastWeeklyTribeAchievements
     ] = await Promise.all([
         db.one(sql.getWorld, [marketId, worldNumber]),
         db.any(sql.getWorldTopPlayers, {worldId}),
         db.any(sql.getWorldTopTribes, {worldId}),
-        db.any(sql.getWorldLastConquests, {worldId})
+        db.any(sql.getWorldLastConquests, {worldId}),
+        db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-%-%'}),
+        db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-W%'}),
+        db.any(sql.getWorldLastTribeRepeatableAchievements, {worldId, period: '%-%-%'}),
+        db.any(sql.getWorldLastTribeRepeatableAchievements, {worldId, period: '%-W%'})
     ])
+
+    const achievements = {
+        counts: {
+            players: {
+                daily: lastDailyPlayerAchievements.length,
+                weekly: lastWeeklyPlayerAchievements.length
+            },
+            tribes: {
+                daily: lastDailyTribeAchievements.length,
+                weekly: lastWeeklyTribeAchievements.length
+            }
+        },
+        groups: {
+            players: {
+                daily: groupAchievements(lastDailyPlayerAchievements),
+                weekly: groupAchievements(lastWeeklyPlayerAchievements)
+            },
+            tribes: {
+                daily: groupAchievements(lastDailyTribeAchievements),
+                weekly: groupAchievements(lastWeeklyTribeAchievements)
+            }
+        }
+    }
 
     res.render('stats/world', {
         title: `${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -116,6 +149,8 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         tribes,
         world,
         lastConquests,
+        achievements,
+        achievementTitles,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
