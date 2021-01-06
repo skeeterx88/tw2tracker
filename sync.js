@@ -736,8 +736,17 @@ async function commitDataDatabase (data, worldId) {
 
     await db.tx(async function () {
         const playersNew = new Map(data.players)
+        const playersNewIds = Array.from(playersNew.keys())
         const playersOld = new Map(await this.map(sql.worldPlayers, {worldId}, player => [player.id, player]))
+        const playersOldIds = Array.from(playersOld.keys())
+        const missingPlayersIds = playersOldIds.filter(tribeId => !playersNewIds.includes(tribeId))
+
         const tribesNew = new Map(data.tribes)
+        const tribesNewIds = Array.from(tribesNew.keys())
+        const tribesOld = new Map(await this.map(sql.worldTribes, {worldId}, tribe => [tribe.id, tribe]))
+        const tribesOldIds = Array.from(tribesOld.keys())
+        const missingTribesIds = tribesOldIds.filter(tribeId => !tribesNewIds.includes(tribeId))
+
         const villagesNew = new Map(data.villages)
         const villagesNewIds = Array.from(villagesNew.keys())
         const villagesOld = new Map(await this.map(sql.worldVillages, {worldId}, village => [village.id, village]))
@@ -762,6 +771,14 @@ async function commitDataDatabase (data, worldId) {
                 updateRecordPoints: sql.updateTribeRecordPoints,
                 updateRecordVillages: sql.updateTribeRecordVillages
             }
+        }
+
+        for (let id of missingPlayersIds) {
+            await this.none(sql.archivePlayer, {worldId, id})
+        }
+
+        for (let id of missingTribesIds) {
+            await this.none(sql.archiveTribe, {worldId, id})
         }
 
         for (let type of ['tribes', 'players']) {

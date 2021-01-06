@@ -8,4 +8,5 @@ SELECT
     rank,
     villages
 FROM ${worldId:name}.tribes
+WHERE archived = false
 ORDER BY rank ASC LIMIT 10
