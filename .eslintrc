@@ -30,4 +30,6 @@ rules:
 globals:
   injector: true
   $rootScope: true
+  require: true
+  define: true
   

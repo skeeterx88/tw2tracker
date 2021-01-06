@@ -1,4 +1,27 @@
-;(async () => {
+require([
+    'AutoComplete',
+    'TW2Map',
+    'TW2DataLoader',
+    'TW2Tooltip',
+    'utils',
+    'backendValues'
+], function (
+    AutoComplete,
+    TW2Map,
+    TW2DataLoader,
+    TW2Tooltip,
+    {
+        arrayRandom,
+        normalizeString,
+        formatSince
+    },
+    {
+        marketId,
+        worldNumber,
+        mapShare,
+        lastSync
+    }
+) {
     let colorPicker
     let notif
     const KEEP_COLORPICKER_OPEN = 'keep_colorpicker_open'
@@ -116,7 +139,7 @@
                 },
                 highlight: true,
                 onSelection: (feedback) => {
-                    const { search, id, highlightType } = feedback.selection.value
+                    const {id, highlightType} = feedback.selection.value
                     const color = arrayRandom(TW2Map.colorPalette.flat())
 
                     map.addHighlight(highlightType, id, color)
@@ -152,7 +175,6 @@
         map.on('add highlight', (highlightType, id, displayName, color) => {
             const $item = document.createElement('li')
             const $name = document.createElement('div')
-            const $nameSpan = document.createElement('span')
             const $color = document.createElement('div')
             const $villages = document.createElement('div')
             const $icon = document.createElement('span')
@@ -300,7 +322,6 @@
             activeColorPicker = (event) => {
                 if (event.target.classList.contains('color')) {
                     const color = event.target.dataset.color
-                    const confirmUpdate = callback(color)
 
                     clearActiveColor()
                     updateActiveColor(color)
@@ -420,8 +441,9 @@
             }
 
             $settings.classList.toggle('hidden')
+            visible = !visible
 
-            if (visible = !visible) {
+            if (visible) {
                 const { x, y } = getElemPosition($changeSettings)
                 $settings.style.left = `${x}px`
                 $settings.style.top = `${y}px`
@@ -674,7 +696,7 @@
                 $button.appendChild($flag)
 
                 $button.addEventListener('mouseenter', function () {
-                    $selectedmarket = $allWorlds.querySelector('.market.selected')
+                    const $selectedmarket = $allWorlds.querySelector('.market.selected')
 
                     if ($selectedmarket) {
                         $selectedmarket.classList.remove('selected')
@@ -740,8 +762,9 @@
             }
 
             $allWorlds.classList.toggle('hidden')
+            visible = !visible
 
-            if (visible = !visible) {
+            if (visible) {
                 const { x, y } = getElemPosition($currentWorld)
                 $allWorlds.style.left = `${x}px`
                 $allWorlds.style.top = `${y}px`

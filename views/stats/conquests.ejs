@@ -100,14 +100,10 @@
         <%- include('../maps/tooltip.ejs') %>
         <%- include('../footer.ejs') %>
 
-        <script type="text/javascript">
-            const {
-                marketId,
-                worldNumber
-            } = <%- JSON.stringify(exportValues) %>
-        </script>
-        <script type="text/javascript" src="/javascripts/map.js"></script>
+        <script type="text/javascript" src="/javascripts/require.js"></script>
+        <script type="text/javascript">define('backendValues', () => (<%- JSON.stringify(exportValues) %>))</script>
         <script type="text/javascript" src="/javascripts/utils.js"></script>
+        <script type="text/javascript" src="/javascripts/map.js"></script>
         <script type="text/javascript" src="/javascripts/stats.js"></script>
     </body>
 </html>

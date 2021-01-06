@@ -1,9 +1,31 @@
-(async () => {
+require([
+    'TW2Map',
+    'TW2Tooltip',
+    'TW2DataLoader',
+    'utils',
+    'backendValues'
+], function (
+    TW2Map,
+    TW2Tooltip,
+    TW2DataLoader,
+    {
+        averageCoords,
+        hasOwn
+    },
+    {
+        mapHighlights,
+        mapHighlightsType,
+        marketId,
+        worldNumber,
+        player,
+        tribe
+    }
+) {
     let map
     let loader
     let tooltip
 
-    const colors = ["#ffee00", "#0000ff", "#ff0000"]
+    const colors = ['#ffee00', '#0000ff', '#ff0000']
 
     const averagePositionFor = (type, id) => {
         let averageX
@@ -128,7 +150,7 @@
             $searchInput.focus()
         }
 
-        for ($searchCategory of $searchCategories) {
+        for (let $searchCategory of $searchCategories) {
             $searchCategory.addEventListener('click', function () {
                 selectCategory(this.dataset.searchCategory)
                 return false
@@ -170,4 +192,4 @@
     } else if (typeof tribe !== 'undefined') {
         setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
     }
-})();
+})
