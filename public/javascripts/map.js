@@ -1352,8 +1352,6 @@ define('TW2Tooltip', [], function () {
 
         const mouseDistance = 30
 
-        let visible = false
-
         $tooltip.style.visibility = 'hidden'
         $tooltip.style.opacity = 0
 

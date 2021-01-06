@@ -7,7 +7,7 @@
     "start": "node app.js",
     "debug": "node --inspect-brk app.js",
     "install-unit": "node install-unit.js",
-    "eslint": "eslint *.js routes/*.js"
+    "eslint": "eslint *.js routes/*.js public/javascripts/*.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
