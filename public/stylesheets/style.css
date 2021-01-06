@@ -670,7 +670,7 @@ ul.achievements-menu a.selected {
     color: #00000095;
 }
 
-.icon {
+#map-tooltip .icon {
     width: 24px;
     height: 24px;
     line-height: 24px;
@@ -684,7 +684,7 @@ ul.achievements-menu a.selected {
                 url(/images/background-icon-black.png);
 }
 
-.icon:before {
+#map-tooltip .icon:before {
     content: ' ';
     display: inline-block;
     width: 24px;
@@ -694,27 +694,27 @@ ul.achievements-menu a.selected {
     background-position: center;
 }
 
-.icon.village:before {
+#map-tooltip .icon.village:before {
     background-image: url(/images/village-icon.png);
 }
 
-.icon.player:before {
+#map-tooltip .icon.player:before {
     background-image: url(/images/player-icon.png);
 }
 
-.icon.tribe:before {
+#map-tooltip .icon.tribe:before {
     background-image: url(/images/tribe-icon.png);
 }
 
-.icon.tribe-points-x:before {
+#map-tooltip .icon.tribe-points-x:before {
     background-image: url(/images/tribe-points-icon.png);
 }
 
-.icon.points:before {
+#map-tooltip .icon.points:before {
     background-image: url(/images/points-icon.png);
 }
 
-.icon.province:before {
+#map-tooltip .icon.province:before {
     background-image: url(/images/province-icon.png);
 }
 
