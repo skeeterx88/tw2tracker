@@ -827,4 +827,4 @@ require([
     // setupAbout()
 
     map.init()
-})()
+})
