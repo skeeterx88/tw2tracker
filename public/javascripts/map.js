@@ -251,6 +251,32 @@ define('TW2Map', [
             let dragStartX = 0
             let dragStartY = 0
             let mousemoveEnabled = true
+            let touchstartEvent = false
+
+            const setActiveVillageByPosition = (event) => {
+                const {width, height} = $container.getBoundingClientRect()
+                middleViewportOffsetX = Math.floor(width / 2)
+                middleViewportOffsetY = Math.floor(height / 2)
+
+                const offsetX = touchstartEvent ? touchstartEvent.touches[0].pageX : event.offsetX
+                const offsetY = touchstartEvent ? touchstartEvent.touches[0].pageY : event.offsetY
+
+                mouseCoordY = Math.floor((positionY - middleViewportOffsetY + offsetY) / zoomSettings.tileSize)
+                let off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
+                mouseCoordX = Math.floor((positionX - middleViewportOffsetX + offsetX - off) / zoomSettings.tileSize)
+
+                const villagesX = loader.villages[mouseCoordX]
+
+                if (villagesX) {
+                    const village = villagesX[mouseCoordY]
+
+                    if (village) {
+                        return setActiveVillage(village)
+                    }
+                }
+
+                return unsetActiveVillage()
+            }
 
             $overlay.addEventListener('mousedown', (event) => {
                 draggable = true
@@ -259,6 +285,7 @@ define('TW2Map', [
             })
 
             $overlay.addEventListener('touchstart', (event) => {
+                touchstartEvent = event
                 mousemoveEnabled = false
                 draggable = true
                 dragStartX = positionX + event.touches[0].pageX
@@ -287,10 +314,11 @@ define('TW2Map', [
                 renderViewport()
             })
 
-            $overlay.addEventListener('touchend', () => {
+            $overlay.addEventListener('touchend', (event) => {
                 draggable = false
 
                 if (!dragging) {
+                    setActiveVillageByPosition(event)
                     this.trigger('click', [activeVillage])
 
                     if (activeVillage && activeVillage.character_id) {
@@ -370,25 +398,7 @@ define('TW2Map', [
                     return
                 }
 
-                const {width, height} = $container.getBoundingClientRect()
-                middleViewportOffsetX = Math.floor(width / 2)
-                middleViewportOffsetY = Math.floor(height / 2)
-
-                mouseCoordY = Math.floor((positionY - middleViewportOffsetY + event.offsetY) / zoomSettings.tileSize)
-                let off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
-                mouseCoordX = Math.floor((positionX - middleViewportOffsetX + event.offsetX - off) / zoomSettings.tileSize)
-
-                const villagesX = loader.villages[mouseCoordX]
-
-                if (villagesX) {
-                    const village = villagesX[mouseCoordY]
-
-                    if (village) {
-                        return setActiveVillage(village)
-                    }
-                }
-
-                return unsetActiveVillage()
+                setActiveVillageByPosition(event)
             })
 
             $overlay.addEventListener('mouseleave', (event) => {
