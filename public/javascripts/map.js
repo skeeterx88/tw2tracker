@@ -263,7 +263,7 @@ define('TW2Map', [
                 draggable = true
                 dragStartX = positionX + event.touches[0].pageX
                 dragStartY = positionY + event.touches[0].pageY
-            })
+            }, {passive: true})
 
             $overlay.addEventListener('mouseup', () => {
                 draggable = false
@@ -359,7 +359,7 @@ define('TW2Map', [
                     renderVisibleDemarcations()
                     renderVisibleContinents()
                 }
-            })
+            }, {passive: true})
 
             $overlay.addEventListener('mousemove', (event) => {
                 if (!mousemoveEnabled) {
