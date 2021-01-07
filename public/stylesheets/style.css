@@ -522,12 +522,12 @@ span.conquest-self {
     background: #e1d400 radial-gradient(circle at 70% 60%, #ffef00, #e1d400);
 }
 
-ul.achievements-menu {
+ul.sub-menu {
     margin: 20px 0px 10px;
     padding: 0;
 }
 
-ul.achievements-menu li {
+ul.sub-menu li {
     margin: 5px 5px;
     padding: 3px;
     display: inline-block;
@@ -542,7 +542,7 @@ ul.achievements-menu li {
                 1px 1px 2px 3px #00000070;
 }
 
-ul.achievements-menu li.selected {
+ul.sub-menu li.selected {
     background: url(/images/noise.webp), linear-gradient(#875515, #CB994D);
     box-shadow: 0px 0px 0px 1px #442810,
                 0px 0px 0px 2px #ec955b,
@@ -552,7 +552,7 @@ ul.achievements-menu li.selected {
                 1px 1px 2px 3px #00000070;
 }
 
-ul.achievements-menu li:hover {
+ul.sub-menu li:hover {
     box-shadow: 0px 0px 0px 1px #442810,
                 0px 0px 0px 2px #ec955b,
                 0px 0px 0px 3px #201612,
@@ -561,12 +561,12 @@ ul.achievements-menu li:hover {
                 1px 1px 2px 3px #00000070;
 }
 
-ul.achievements-menu a {
+ul.sub-menu a {
     text-decoration: none;
     color: #191410;
 }
 
-ul.achievements-menu a.selected {
+ul.sub-menu a.selected {
     color: #1d1611;
     text-shadow: 1px 1px 1px #00000020;
 }

@@ -127,13 +127,13 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         }
     }
 
-    const type = req.params.type ?? 'all'
+    const category = req.params.category ?? 'all'
 
-    if (!conquestCategories.includes(type)) {
+    if (!conquestCategories.includes(category)) {
         throw createError(404, 'This conquests sub page does not exist')
     }
 
-    const conquests = await db.map(conquestsTypeMap[type].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
+    const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
         if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
             conquest.type = conquestTypes.SELF
         } else if (conquest.new_owner_tribe_id === tribeId) {
@@ -145,8 +145,8 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         return conquest
     })
 
-    const total = (await db.one(conquestsTypeMap[type].sqlCount, {worldId, tribeId})).count
-    const navigationTitle = conquestsTypeMap[type].navigationTitle
+    const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, tribeId})).count
+    const navigationTitle = conquestsTypeMap[category].navigationTitle
 
     res.render('stats/tribe-conquests', {
         title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
@@ -156,6 +156,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         tribe,
         conquests,
         conquestTypes,
+        category,
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),
         navigation: [
@@ -412,8 +413,8 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
 })
 
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', tribeRouter)
-router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?', tribeConquestsRouter)
-router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:type?/page/:page', tribeConquestsRouter)
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:category?', tribeConquestsRouter)
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:category?/page/:page', tribeConquestsRouter)
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/members', tribeMembersRouter)
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages', tribeVillagesRouter)
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', tribeVillagesRouter)

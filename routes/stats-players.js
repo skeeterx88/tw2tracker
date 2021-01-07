@@ -185,13 +185,13 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         }
     }
 
-    const type = req.params.type ?? 'all'
+    const category = req.params.category ?? 'all'
 
-    if (!conquestCategories.includes(type)) {
+    if (!conquestCategories.includes(category)) {
         throw createError(404, 'This conquests sub page does not exist')
     }
 
-    const conquests = await db.map(conquestsTypeMap[type].sqlConquests, {worldId, playerId, offset, limit}, function (conquest) {
+    const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, playerId, offset, limit}, function (conquest) {
         if (conquest.new_owner === conquest.old_owner) {
             conquest.type = conquestTypes.SELF
         } else if (conquest.new_owner === playerId) {
@@ -203,16 +203,18 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         return conquest
     })
 
-    const total = (await db.one(conquestsTypeMap[type].sqlCount, {worldId, playerId})).count
-    const navigationTitle = conquestsTypeMap[type].navigationTitle
+    const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, playerId})).count
+    const navigationTitle = conquestsTypeMap[category].navigationTitle
 
     res.render('stats/player-conquests', {
         title: `Player ${player.name} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
         world,
+        player,
         conquests,
         conquestTypes,
+        category,
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),
         navigation: [
@@ -479,8 +481,8 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
 
 router.get('/stats/:marketId/:worldNumber/players/:playerId', playerProfileRouter)
 router.get('/stats/:marketId/:worldNumber/players/:playerId/villages', playerVillagesRouter)
-router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?', playerConquestsRouter)
-router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:type?/page/:page', playerConquestsRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category?', playerConquestsRouter)
+router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category?/page/:page', playerConquestsRouter)
 router.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', playerTribeChangesRouter)
 router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:category?/:subCategory?', playerAchievementsRouter)
 
