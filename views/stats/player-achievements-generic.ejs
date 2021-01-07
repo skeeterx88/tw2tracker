@@ -23,7 +23,7 @@
                         <td><%= achievementTitles[achievement.type] %></td>
                         <td><%= formatNumbers(achievement.points) %></td>
                         <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
-                        <td><%= formatDate(achievement.time_last_level) %></td>
+                        <td><%= formatDate(achievement.time_last_level, world.time_offset) %></td>
                     </tr>
                 <% } %>
             <% } else { -%>

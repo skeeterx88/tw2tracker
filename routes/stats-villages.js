@@ -37,6 +37,7 @@ const villageRouter = asyncRouter(async function (req, res, next) {
         title: `Village ${village.name} (${village.x}|${village.y}) - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
+        world,
         village,
         conquests,
         navigation: [

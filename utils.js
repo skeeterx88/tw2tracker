@@ -195,8 +195,14 @@ const ejsHelpers = {
             ? value.toLocaleString('pt-BR')
             : value
     },
-    formatDate: function (dateObject, flag = false) {
+    formatDate: function (dateObject, timeOffset, flag = false) {
         if (dateObject instanceof Date) {
+            if (typeof timeOffset === 'number') {
+                dateObject = new Date(dateObject.getTime() + timeOffset)
+            } else if (typeof timeOffset === 'string') {
+                flag = timeOffset
+            }
+
             const date = [
                 dateObject.getFullYear(),
                 (dateObject.getMonth() + 1).toString().padStart(2, 0),

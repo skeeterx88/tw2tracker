@@ -28,7 +28,7 @@
                             <% if (memberChanges.length) { -%>
                                 <% for (let change of memberChanges) { %>
                                     <tr>
-                                        <td><%= formatDate(change.date, 'hours-only') %></td>
+                                        <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
                                         <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>

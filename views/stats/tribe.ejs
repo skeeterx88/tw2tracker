@@ -78,15 +78,15 @@
                                     </tr>
                                     <tr>
                                         <th>Best Rank:</th>
-                                        <td><%= formatNumbers(tribe.best_rank) %> <small class="right"><%= formatDate(tribe.best_rank_date, 'hours-only') %></small></td>
+                                        <td><%= formatNumbers(tribe.best_rank) %> <small class="right"><%= formatDate(tribe.best_rank_date, world.time_offset, 'hours-only') %></small></td>
                                     </tr>
                                     <tr>
                                         <th>Most Points:</th>
-                                        <td><%= formatNumbers(tribe.best_points) %> <small class="right"><%= formatDate(tribe.best_points_date, 'hours-only') %></small></td>
+                                        <td><%= formatNumbers(tribe.best_points) %> <small class="right"><%= formatDate(tribe.best_points_date, world.time_offset, 'hours-only') %></small></td>
                                     </tr>
                                     <tr>
                                         <th>Most Villages:</th>
-                                        <td><%= formatNumbers(tribe.best_villages) %> <small class="right"><%= formatDate(tribe.best_villages_date, 'hours-only') %></small></td>
+                                        <td><%= formatNumbers(tribe.best_villages) %> <small class="right"><%= formatDate(tribe.best_villages_date, world.time_offset, 'hours-only') %></small></td>
                                     </tr>
                                     <tr>
                                         <th>First seen:</th>
@@ -122,10 +122,10 @@
                                             <tr>
                                                 <% if (achievement.category === 'repeatable') { -%>
                                                     <td><%= achievementTitles[achievement.type] %></td>
-                                                    <td><%= formatDate(achievement.time_last_level, 'day-only') %></td>
+                                                    <td><%= formatDate(achievement.time_last_level, world.time_offset, 'day-only') %></td>
                                                 <% } else { -%>
                                                     <td><%= achievementTitles[achievement.type] %></td>
-                                                    <td><%= formatDate(achievement.time_last_level, 'hours-only') %></td>
+                                                    <td><%= formatDate(achievement.time_last_level, world.time_offset, 'hours-only') %></td>
                                                 <% } -%>
                                             </tr>
                                         <% } -%>

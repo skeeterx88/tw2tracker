@@ -71,6 +71,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
+        world,
         player,
         tribe,
         conquestsGainCount,
@@ -268,6 +269,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         title: `Player ${player.name} - Tribe Changes - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
+        world,
         player,
         tribeChanges,
         tribeTags,
@@ -421,12 +423,12 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
 
         for (let {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
-                achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
+                achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only')
             }
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || []
-                achievementsRepeatableDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+                achievementsRepeatableDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only'))
             }
 
             achievementsRepeatableCount[type] = achievementsRepeatableCount[type] ?? 0
@@ -441,6 +443,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         title: `Player ${player.name} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
         marketId,
         worldNumber,
+        world,
         player,
         selectedCategory,
         subCategory,

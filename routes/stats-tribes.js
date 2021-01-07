@@ -314,6 +314,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         marketId,
         worldNumber,
         tribe,
+        world,
         memberChanges,
         tribeMemberChangeTypes,
         navigation: [
@@ -366,11 +367,11 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
     for (let {period, type, time_last_level} of achievements) {
         if (period) {
             if (!achievementsRepeatableLastEarned[type]) {
-                achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, 'day-only')
+                achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only')
             }
 
             achievementsRepeatable[type] = achievementsRepeatable[type] || []
-            achievementsRepeatable[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+            achievementsRepeatable[type].push(utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only'))
 
             achievementsRepeatableCategoryCount[type] = achievementsRepeatableCategoryCount[type] ?? 0
             achievementsRepeatableCategoryCount[type]++
@@ -378,7 +379,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || []
-                achievementsRepeatableDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, 'day-only'))
+                achievementsRepeatableDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only'))
             }
         }
     }
