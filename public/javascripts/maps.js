@@ -323,6 +323,7 @@ require([
                 if (event.target.classList.contains('color')) {
                     const color = event.target.dataset.color
 
+                    callback(color)
                     clearActiveColor()
                     updateActiveColor(color)
 
