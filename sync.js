@@ -1129,11 +1129,8 @@ function mapAchievements (achievements) {
     const repeatable = {}
 
     for (let achievement of achievements) {
-        if (achievement.category === 'repeatable') {
-            if (!hasOwn.call(repeatable, achievement.type)) {
-                repeatable[achievement.type] = []
-            }
-
+        if (achievement.period) {
+            repeatable[achievement.type] = repeatable[achievement.type] || []
             repeatable[achievement.type].push(achievement)
         } else {
             unique[achievement.type] = achievement
