@@ -1,6 +1,7 @@
 const createError = require('http-errors')
 const express = require('express')
 const session = require('express-session')
+const compression = require('compression')
 const debug = require('debug')('tw2tracker:server')
 const http = require('http')
 const path = require('path')
@@ -29,6 +30,10 @@ if (process.env.NODE_ENV === 'production') {
     })
 }
 
+app.use(compression({
+    level: 9
+}))
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
@@ -36,6 +41,7 @@ app.set('view engine', 'ejs')
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
+
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(session({
