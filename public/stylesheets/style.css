@@ -3,7 +3,7 @@ html {
     height: 100%;
     font-size: 14px;
     font-family: 'Trebuchet MS', 'Lucida Grande', Helvetica, Arial, sans-serif;
-    background: url(/images/background-scene.webp) top no-repeat, url(/images/noise-2.png), #88785F;
+    background: url(/images/background-scene.webp) top no-repeat, url(/images/noise.webp), #88785F;
     margin: 0px;
     color: #50311d;
 }
@@ -92,7 +92,7 @@ menu a:hover {
 menu li {
     width: 90px;
     display: inline-block;
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 0%, #3f5361 70%, #4c6271 70%);
+    background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 0%, #3f5361 70%, #4c6271 70%);
     padding: 4px 4px 8px 4px;
     margin: 0 4px;
     text-align: center;
@@ -109,7 +109,7 @@ menu li {
 }
 
 menu li:hover {
-    background: url(/images/noise.png), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 20%, #3f5361 70%, #4c6271 70%);
+    background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 20%, #3f5361 70%, #4c6271 70%);
 }
 
 menu li.donate {
@@ -120,7 +120,7 @@ main, footer {
     position: relative;
     margin: 0 auto;
     padding: 10px;
-    background: url(/images/noise.png),
+    background: url(/images/noise.webp),
                 url(/images/content-border-left.webp) left repeat-y,
                 url(/images/content-border-right.webp) right repeat-y,
                 url(/images/content-border-top.webp) top repeat-x,
@@ -238,7 +238,7 @@ td, th {
     border-width: 1px;
     border-style: solid;
     border-color: #794929;
-    background: url(/images/noise.png), linear-gradient(#8d5b39, #583f2d);
+    background: url(/images/noise.webp), linear-gradient(#8d5b39, #583f2d);
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #00000050,
@@ -246,7 +246,7 @@ td, th {
 }
 
 .content-menu li:hover {
-    background: url(/images/noise.png), linear-gradient(#af7046, #583f2d);
+    background: url(/images/noise.webp), linear-gradient(#af7046, #583f2d);
 }
 
 .content-menu li.selected {
@@ -261,7 +261,7 @@ td, th {
 div.modal {
     width: 630px;
     margin: 0 auto;
-    background: url(/images/noise.png) #6f4327;
+    background: url(/images/noise.webp) #6f4327;
     color: #e0bfbf;
     padding: 3px;
     text-shadow: 1px 1px 0px #00000090;
@@ -310,7 +310,7 @@ menu .icon-heart {
     border-radius: 1px;
     border: 1px solid #8d5b39;
     padding: 1px 5px;
-    background: url(/images/noise.png) #a07246;
+    background: url(/images/noise.webp) #a07246;
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000,
@@ -337,7 +337,7 @@ menu .icon-heart {
     border-width: 1px;
     border-style: solid;
     border-color: #794929;
-    background: url(/images/noise.png), linear-gradient(#8d5b39, #583f2d);
+    background: url(/images/noise.webp), linear-gradient(#8d5b39, #583f2d);
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000,
@@ -346,7 +346,7 @@ menu .icon-heart {
 
 #search form input[type="submit"]:hover,
 #search form input[type="submit"]:focus {
-    background: url(/images/noise.png), linear-gradient(#af7046, #583f2d);
+    background: url(/images/noise.webp), linear-gradient(#af7046, #583f2d);
 }
 
 div.world-title {
@@ -373,7 +373,7 @@ div.world-title {
     font-size: 0.8em;
     border-color: #b18e76;
     border-radius: 1px;
-    background: url(/images/noise.png) #f9eed166;
+    background: url(/images/noise.webp) #f9eed166;
     box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e, 2px 2px 2px #000;
     padding: 5px 0px;
     cursor: pointer;
@@ -386,7 +386,7 @@ div.world-title {
 #worlds .world:hover,
 #markets .market:hover {
     border-color: #dc9750;
-    background: url(/images/noise.png) #ffe49d40;
+    background: url(/images/noise.webp) #ffe49d40;
 }
 
 #worlds .world a,
@@ -484,7 +484,7 @@ div.world-title {
     position: relative;
     border-radius: 1px;
     border: 1px solid #8d5b39;
-    background-image: url(/images/noise.png);
+    background-image: url(/images/noise.webp);
     box-shadow: 0 0 0 1px #47240e,
                 inset 0 0 0 1px #47240e,
                 1px 1px 2px #000;
@@ -531,7 +531,7 @@ ul.achievements-menu li {
     margin: 5px 5px;
     padding: 3px;
     display: inline-block;
-    background: url(/images/noise.png), linear-gradient(#875515, #d0ad79);
+    background: url(/images/noise.webp), linear-gradient(#875515, #d0ad79);
     text-align: center;
     font-weight: bold;
     box-shadow: 0px 0px 0px 1px #442810,
@@ -543,7 +543,7 @@ ul.achievements-menu li {
 }
 
 ul.achievements-menu li.selected {
-    background: url(/images/noise.png), linear-gradient(#875515, #CB994D);
+    background: url(/images/noise.webp), linear-gradient(#875515, #CB994D);
     box-shadow: 0px 0px 0px 1px #442810,
                 0px 0px 0px 2px #ec955b,
                 0px 0px 0px 3px #201612,
@@ -584,7 +584,7 @@ a.achievement-subject:last-child:after {
     width: 300px;
     height: 100%;
     position: relative;
-    background: url(/images/noise.png), linear-gradient(#343D15, #3F4A19);
+    background: url(/images/noise.webp), linear-gradient(#343D15, #3F4A19);
     border-radius: 2px;
     border: 1px solid #0b0b0b;
     display: inline-block;
@@ -598,7 +598,7 @@ a.achievement-subject:last-child:after {
     position: absolute;
     top: 0;
     left: 0;
-    background: url(/images/noise.png), linear-gradient(#54661B, #5C701E);
+    background: url(/images/noise.webp), linear-gradient(#54661B, #5C701E);
 }
 
 .progress-text {
@@ -623,7 +623,7 @@ a.achievement-subject:last-child:after {
     top: 0px;
     left: 0px;
     margin-top: 3px;
-    background: url(/images/tooltip-background.png) #d0ac86;
+    background: url(/images/noise.webp) #d0ac86;
 }
 
 #map-tooltip table {
@@ -631,14 +631,14 @@ a.achievement-subject:last-child:after {
     border-spacing: 1px;
     border-collapse: separate;
     box-shadow: 0 0 0 2px #7c360066;
-    background: url(/images/noise-4.png) #d1ad86;
+    background: url(/images/noise.webp) #d1ad86;
 }
 
 #map-tooltip td {
     text-align: left;
     border: 1px solid #7c36004d;
     box-shadow: none;
-    background: url(/images/noise-4.png) #c39c72;
+    background: url(/images/noise.webp) #c39c72;
     padding: 1px;
 }
 
@@ -690,7 +690,7 @@ a.achievement-subject:last-child:after {
     left: 0px;
     top: 0px;
     background: linear-gradient(#02030373, #02030300),
-                url(/images/background-icon-black.png);
+                url(/images/background-icon-black.webp);
 }
 
 #map-tooltip .icon:before {
@@ -704,27 +704,27 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip .icon.village:before {
-    background-image: url(/images/village-icon.png);
+    background-image: url(/images/village-icon.webp);
 }
 
 #map-tooltip .icon.player:before {
-    background-image: url(/images/player-icon.png);
+    background-image: url(/images/player-icon.webp);
 }
 
 #map-tooltip .icon.tribe:before {
-    background-image: url(/images/tribe-icon.png);
+    background-image: url(/images/tribe-icon.webp);
 }
 
 #map-tooltip .icon.tribe-points-x:before {
-    background-image: url(/images/tribe-points-icon.png);
+    background-image: url(/images/tribe-points-icon.webp);
 }
 
 #map-tooltip .icon.points:before {
-    background-image: url(/images/points-icon.png);
+    background-image: url(/images/points-icon.webp);
 }
 
 #map-tooltip .icon.province:before {
-    background-image: url(/images/province-icon.png);
+    background-image: url(/images/province-icon.webp);
 }
 
 .box-border {
