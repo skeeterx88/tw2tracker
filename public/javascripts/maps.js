@@ -784,6 +784,7 @@ require([
             $sidePanel.classList.toggle('hidden')
             $map.classList.toggle('full')
             $panelToggle.classList.toggle('hide')
+            map.recalcSize()
         })
     }
 

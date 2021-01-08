@@ -51,9 +51,10 @@ define('TW2Map', [
         let $grid
         let $gridContext
 
-        const { width, height } = $container.getBoundingClientRect()
-        let viewportWidth = width ? width : window.innerWidth
-        let viewportHeight = height ? height : window.innerHeight
+        let {
+            width: viewportWidth,
+            height: viewportHeight
+        } = $container.getBoundingClientRect()
 
         let middleViewportOffsetX = Math.floor(viewportWidth / 2)
         let middleViewportOffsetY = Math.floor(viewportHeight / 2)
@@ -739,7 +740,7 @@ define('TW2Map', [
         }
 
         const clearOverlay = function () {
-            $overlayContext.clearRect(0, 0, viewportWidth, viewportHeight)
+            $overlayContext.clearRect(0, 0, $overlay.width, $overlay.height)
         }
 
         const continuousRender = () => {
@@ -871,9 +872,10 @@ define('TW2Map', [
         }
 
         this.recalcSize = () => {
-            const { width, height } = $container.getBoundingClientRect()
-            viewportWidth = width ? width : window.innerWidth
-            viewportHeight = height ? height : window.innerHeight
+            const {
+                width: viewportWidth,
+                height: viewportHeight
+            } = $container.getBoundingClientRect()
 
             middleViewportOffsetX = Math.floor(viewportWidth / 2)
             middleViewportOffsetY = Math.floor(viewportHeight / 2)

@@ -2,74 +2,76 @@
 <html lang="en">
     <%- include('head.ejs') %>
     <body id="map-page">
-        <div id="side-panel" class="hidden">
-            <header>
-                <a href="/stats/<%= marketId %>/<%= world.num %>">
-                    <h1 id="world-name"><%= world.name %></h1>
-                </a>
-                <button id="current-world">
-                    <span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span>
-                </button>
-                <button id="change-settings">Settings</button>
-            </header>
-
-            <div id="quick-jump">
-                <div id="quick-jump-coords" class="input">
-                    <label>x:<input type="text" id="quick-jump-x" placeholder="500"></label>
-                    <label>y:<input type="text" id="quick-jump-y" placeholder="500"></label>
-                </div>
-                <button id="quick-jump-go" class="red">Go</button>
-            </div>
-
-            <div id="highlights">
-                <label>
-                    <h2 id="highlights-title">Highlights</h2>
-                    <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="Search...">
-                </label>
-                <ul id="highlight-items"></ul>
-            </div>
-
-            <footer>
-                <div id="map-share-wrapper">
-                    <button id="map-share">
-                        <span>Generate dynamic map</span>
-                        <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+        <div id="map-wrapper">
+            <div id="side-panel" class="hidden">
+                <header>
+                    <a href="/stats/<%= marketId %>/<%= world.num %>">
+                        <h1 id="world-name"><%= world.name %></h1>
+                    </a>
+                    <button id="current-world">
+                        <span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span>
                     </button>
-                    <button id="map-save">
-                        <span>Generate static map</span>
-                        <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
-                    </button>
+                    <button id="change-settings">Settings</button>
+                </header>
+
+                <div id="quick-jump">
+                    <div id="quick-jump-coords" class="input">
+                        <label>x:<input type="text" id="quick-jump-x" placeholder="500"></label>
+                        <label>y:<input type="text" id="quick-jump-y" placeholder="500"></label>
+                    </div>
+                    <button id="quick-jump-go" class="red">Go</button>
                 </div>
 
-                <div id="site-info">
-                    <p>
-                        &copy; 2020-2021 <a href="https://www.tw2-tracker.com">Tw2-Tracker</a>
-                        <br/>
-                        Created by <a href="mailto:zakhiel@tw2-tracker.com">Zakhiel</a>
-                        <br/>
-                        Developed by <a href="mailto:relaxeaza@tw2-tracker.com">Relaxeaza</a>
-                    </p>
-
-                    <p>Some graphic resources by<br/><a href="https://www.innogames.com/">InnoGames GmbH</a></p>
-                </div>
-            </footer>
-
-            <div id="panel-toggle"></div>
-        </div>
-        <div id="map" class="full">
-            <div id="map-info">
-                <div id="display-position" class="text-container">
-                    <span id="display-position-x">500</span>|<span id="display-position-y">500</span>
+                <div id="highlights">
+                    <label>
+                        <h2 id="highlights-title">Highlights</h2>
+                        <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="Search...">
+                    </label>
+                    <ul id="highlight-items"></ul>
                 </div>
 
-                <div id="last-sync" class="text-container hidden">
-                    <span>Last update:</span>
-                    <span id="last-sync-date"></span>
-                </div>
+                <footer>
+                    <div id="map-share-wrapper">
+                        <button id="map-share">
+                            <span>Generate dynamic map</span>
+                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                        </button>
+                        <button id="map-save">
+                            <span>Generate static map</span>
+                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                        </button>
+                    </div>
 
-                <div id="share-date" class="text-container hidden">
-                    <span>Share date:</span>
-                    <span id="share-date-date"></span>
+                    <div id="site-info">
+                        <p>
+                            &copy; 2020-2021 <a href="https://www.tw2-tracker.com">Tw2-Tracker</a>
+                            <br/>
+                            Created by <a href="mailto:zakhiel@tw2-tracker.com">Zakhiel</a>
+                            <br/>
+                            Developed by <a href="mailto:relaxeaza@tw2-tracker.com">Relaxeaza</a>
+                        </p>
+
+                        <p>Some graphic resources by<br/><a href="https://www.innogames.com/">InnoGames GmbH</a></p>
+                    </div>
+                </footer>
+
+                <div id="panel-toggle"></div>
+            </div>
+            <div id="map" class="full">
+                <div id="map-info">
+                    <div id="display-position" class="text-container">
+                        <span id="display-position-x">500</span>|<span id="display-position-y">500</span>
+                    </div>
+
+                    <div id="last-sync" class="text-container hidden">
+                        <span>Last update:</span>
+                        <span id="last-sync-date"></span>
+                    </div>
+
+                    <div id="share-date" class="text-container hidden">
+                        <span>Share date:</span>
+                        <span id="share-date-date"></span>
+                    </div>
                 </div>
             </div>
         </div>
