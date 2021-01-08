@@ -748,6 +748,17 @@ div.text-container {
     }
 
     #map.full {
-    margin-left: 0px;
-}
+        margin-left: 0px;
+    }
+
+    #color-picker {
+        transform: initial !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 366px;
+        height: 132px;
+    }
 }
