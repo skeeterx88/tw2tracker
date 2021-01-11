@@ -47,6 +47,13 @@
                                                             </div>
                                                         <% } -%>
                                                     </div>
+
+                                                    <% if (world.open_date || world.close_date) { -%>
+                                                        <div class="world-dates">
+                                                            <% if (world.open_date) __append('Opened: ', formatDate(world.open_date, 'day-only')) -%>
+                                                            <% if (world.close_date) __append('- Closed: ', formatDate(world.close_date, 'day-only')) -%>
+                                                        </div>
+                                                    <% } -%>
                                                 </div>
                                             </a>
                                         <% } -%>

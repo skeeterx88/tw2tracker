@@ -64,7 +64,9 @@ CREATE TABLE public.worlds (
     player_count INT DEFAULT 0,
     village_count INT DEFAULT 0,
     tribe_count INT DEFAULT 0,
-    time_offset INT
+    time_offset INT,
+    close_date TIMESTAMP NULL,
+    open_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TYPE public.map_share_type AS ENUM ('static', 'dynamic');

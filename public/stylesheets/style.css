@@ -450,6 +450,11 @@ div.world-title {
     padding: 0px;
 }
 
+.world-dates {
+    margin-top: 5px;
+    padding-left: 7px;
+}
+
 #worlds .flag {
     height: 14px;
     line-height: 6px;

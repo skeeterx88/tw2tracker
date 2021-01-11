@@ -1,5 +1,9 @@
 INSERT INTO public.worlds (
-    market, num, world_id, name, open
+    market,
+    num,
+    world_id,
+    name,
+    open
 ) VALUES (
     ${marketId},
     ${worldNumber},
