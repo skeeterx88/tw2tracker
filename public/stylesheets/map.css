@@ -238,6 +238,9 @@ button.red:focus {
 
 
 
+#highlights {
+    height: calc(100% - 170px);
+}
 
 #highlight-id {
     margin-left: 4px;
@@ -255,12 +258,15 @@ button.red:focus {
 }
 
 #highlight-items {
-    width: calc(100% - 13px);
+    width: calc(100% - 11px);
     margin-top: 5px;
     margin-left: 2px;
     text-shadow: 1px 1px 0px #000;
-    display: flex;
-    flex-direction: column;
+    height: calc(100% - 50px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #806753 transparent;
 }
 
 #highlight-items .item {
@@ -281,7 +287,7 @@ button.red:focus {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    width: 102px;
+    width: 96px;
     cursor: pointer;
 }
 
@@ -292,6 +298,7 @@ button.red:focus {
 #highlight-items .item .color {
     padding: 1px;
     margin-top: 5px;
+    margin-right: 3px;
     float: right;
     width: 11px;
     height: 10px;
@@ -319,15 +326,25 @@ button.red:focus {
 
 #highlight-items .item .icon-players {
     background: url(/images/player.png) left center no-repeat;
-    padding-left: 19px;
+    padding-left: 17px;
 }
 
 #highlight-items .item .icon-tribes {
     background: url(/images/tribe.png) left center no-repeat;
-    padding-left: 19px;
+    padding-left: 17px;
 }
 
+#highlight-items::-webkit-scrollbar {
+    width: 6px;
+}
 
+#highlight-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#highlight-items::-webkit-scrollbar-thumb {
+  background-color: #806753;
+}
 
 #side-panel footer {
     position: absolute;
