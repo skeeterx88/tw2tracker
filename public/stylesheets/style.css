@@ -615,6 +615,20 @@ a.achievement-subject:last-child:after {
     line-height: 20px;
 }
 
+.error {
+    padding: 10px;
+    border: 2px solid #e73333;
+    background: #ff00002b;
+    border-radius: 3px;
+}
+
+.warning {
+    padding: 10px;
+    border: 2px solid #ffd000;
+    background: #fff3002b;
+    border-radius: 3px;
+}
+
 #map-tooltip {
     font: 11px Arial, Helvetica, sans-serif;
     text-align: left;
