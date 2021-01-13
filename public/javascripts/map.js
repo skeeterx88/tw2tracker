@@ -166,7 +166,8 @@ define('TW2Map', [
 
             setupZoom()
 
-            this.moveTo(currentCenterX, currentCenterY)
+            positionX = currentCenterX * zoomSettings.tileSize
+            positionY = currentCenterY * zoomSettings.tileSize
 
             if (flag === TW2Map.INITIAL_SETUP) {
                 resetZoomContinents()
