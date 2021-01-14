@@ -20,6 +20,8 @@ const auths = {}
 let browser = null
 let syncInProgress = false
 let syncAllInProgress = false
+let syncAllAchievementsInProgress = false
+let syncAchievementsInProgress = false
 
 const achievementCommitTypes = {
     ADD: 'add',
@@ -34,31 +36,30 @@ const devAccounts = [
 const Sync = {}
 
 Sync.init = async function () {
-    Events.on(enums.SCRAPPE_WORLD_START, function () {
-        syncInProgress = true
-    })
-
-    Events.on(enums.SCRAPPE_WORLD_END, function () {
-        syncInProgress = false
-    })
-
-    Events.on(enums.SCRAPPE_WORLD_START, function () {
-        syncAllInProgress = true
-    })
-
-    Events.on(enums.SCRAPPE_WORLD_END, function () {
-        syncAllInProgress = false
-    })
+    Events.on(enums.SCRAPPE_WORLD_START, () => syncInProgress = true)
+    Events.on(enums.SCRAPPE_WORLD_END, () => syncInProgress = false)
+    Events.on(enums.SCRAPPE_ALL_WORLD_START, () => syncAllInProgress = true)
+    Events.on(enums.SCRAPPE_ALL_WORLD_END, () => syncAllInProgress = false)
+    Events.on(enums.SCRAPPE_ACHIEVEMENT_WORLD_START, () => syncAchievementsInProgress = true)
+    Events.on(enums.SCRAPPE_ACHIEVEMENT_WORLD_END, () => syncAchievementsInProgress = false)
+    Events.on(enums.SCRAPPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAllAchievementsInProgress = true)
+    Events.on(enums.SCRAPPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAllAchievementsInProgress = false)
 
     await fs.promises.mkdir('logs', {recursive: true})
 
     log(log.GENERAL, 'Sync.init()')
 
     process.on('SIGTERM', async function () {
-        log(log.GENERAL, colors.red('Stopping tw2-tracker! Waiting pendent tasks...'))
+        log(log.GENERAL, colors.red('Stopping tw2-tracker'))
 
         if (syncInProgress) {
+            log(log.GENERAL, colors.red('Waiting pendent sync to end...'))
             await Events.on(enums.SCRAPPE_WORLD_END)
+        }
+
+        if (syncAchievementsInProgress) {
+            log(log.GENERAL, colors.red('Waiting pendent achievement sync to end...'))
+            await Events.on(enums.SCRAPPE_ACHIEVEMENT_WORLD_END)
         }
 
         if (browser) {
@@ -109,7 +110,7 @@ Sync.init = async function () {
             // await Sync.registerWorlds()
 
             // await Sync.worldAchievements('br', 52)
-            // await Sync.allWorldsAchievements()
+            await Sync.allWorldsAchievements()
         } else {
             await Sync.daemon()
         }
@@ -532,6 +533,11 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
 Sync.allWorldsAchievements = async function (flag) {
     log(log.GENERAL, 'Sync.allWorldsAchievements()')
+
+    if (syncAllAchievementsInProgress) {
+        log(log.GENERAL, colors.red('\nA Scrappe All Achievement Worlds is already in progress\n'))
+        return false
+    }
 
     Events.trigger(enums.SCRAPPE_ACHIEVEMENT_ALL_WORLD_START)
 
