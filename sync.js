@@ -433,68 +433,16 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
         await page.evaluate(readyState)
 
-        try {
-            await fs.promises.access(path.join('.', 'data', worldId, 'struct'))
-        } catch (e) {
-            log(log.GENERAL, `Scrapper: Fetching ${worldId} map structure`)
-
-            const structPath = await page.evaluate(function () {
-                const cdn = require('cdn')
-                const conf = require('conf/conf')
-                return cdn.getPath(conf.getMapPath())
-            })
-
-            await downloadMapStruct(`https://${urlId}.tribalwars2.com/${structPath}`, worldId)
+        if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
+            await fetchWorldMapStructure(page, worldId, urlId)
         }
 
         if (!world.config) {
-            try {
-                log(log.GENERAL, `Scrapper: Fetching ${worldId} config`)
-
-                const worldConfig = await page.evaluate(function () {
-                    const modelDataService = injector.get('modelDataService')
-                    const worldConfig = modelDataService.getWorldConfig().data
-                    const filteredConfig = {}
-
-                    const selecteConfig = [
-                        'speed', 'victory_points', 'barbarian_point_limit', 'barbarian_spawn_rate',
-                        'barbarize_inactive_percent', 'bathhouse', 'chapel_bonus', 'church',
-                        'farm_rule', 'instant_recruit', 'language_selection', 'loyalty_after_conquer',
-                        'mass_buildings', 'mass_recruiting', 'noob_protection_days', 'relocate_units',
-                        'resource_deposits', 'second_village', 'tribe_member_limit', 'tribe_skills'
-                    ]
-
-                    for (let key of selecteConfig) {
-                        filteredConfig[key] = worldConfig[key]
-                    }
-
-                    return filteredConfig
-                })
-
-                await db.none(sql.updateWorldConfig, {
-                    worldId,
-                    worldConfig
-                })
-            } catch (error) {
-                log(log.GENERAL, colors.red(`Error trying to fetch ${worldId} config: ${error.message}`))
-            }
+            await fetchWorldConfig(page, worldId)
         }
 
-        if (!world.time_offset) {
-            try {
-                log(log.GENERAL, `Scrapper: Fetching ${worldId} time offset`)
-
-                const timeOffset = await page.evaluate(function () {
-                    return require('helper/time').getGameTimeOffset()
-                })
-
-                await db.none(sql.updateWorldTimeOffset, {
-                    worldId,
-                    timeOffset
-                })
-            } catch (error) {
-                log(log.GENERAL, colors.red(`Error trying to fetch ${worldId} time offset: ${error.message}`))
-            }
+        if (world.time_offset === null) {
+            await fetchWorldTimeOffset(page, worldId)
         }
 
         const data = await utils.timeout(async function () {
@@ -678,8 +626,6 @@ Sync.cleanExpiredShares = async function () {
 }
 
 async function commitDataDatabase (data, worldId) {
-    const perf = utils.perf()
-
     await db.tx(async function () {
         const playersNew = new Map(data.players)
         const playersNewIds = Array.from(playersNew.keys())
@@ -1068,12 +1014,70 @@ function mapAchievements (achievements) {
     return {unique, repeatable}
 }
 
-async function downloadMapStruct (url, worldId) {
-    const buffer = await utils.getBuffer(url)
+async function fetchWorldMapStructure (page, worldId, urlId) {
+    log(log.GENERAL, `Scrapper: Fetching ${worldId} map structure`)
+
+    const structPath = await page.evaluate(function () {
+        const cdn = require('cdn')
+        const conf = require('conf/conf')
+        return cdn.getPath(conf.getMapPath())
+    })
+
+    const buffer = await utils.getBuffer(`https://${urlId}.tribalwars2.com/${structPath}`)
     const gzipped = zlib.gzipSync(buffer)
 
     await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true})
     await fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped)
+}
+
+async function fetchWorldConfig (page, worldId) {
+    try {
+        log(log.GENERAL, `Scrapper: Fetching ${worldId} config`)
+
+        const worldConfig = await page.evaluate(function () {
+            const modelDataService = injector.get('modelDataService')
+            const worldConfig = modelDataService.getWorldConfig().data
+            const filteredConfig = {}
+
+            const selecteConfig = [
+                'speed', 'victory_points', 'barbarian_point_limit', 'barbarian_spawn_rate',
+                'barbarize_inactive_percent', 'bathhouse', 'chapel_bonus', 'church',
+                'farm_rule', 'instant_recruit', 'language_selection', 'loyalty_after_conquer',
+                'mass_buildings', 'mass_recruiting', 'noob_protection_days', 'relocate_units',
+                'resource_deposits', 'second_village', 'tribe_member_limit', 'tribe_skills'
+            ]
+
+            for (let key of selecteConfig) {
+                filteredConfig[key] = worldConfig[key]
+            }
+
+            return filteredConfig
+        })
+
+        await db.none(sql.updateWorldConfig, {
+            worldId,
+            worldConfig
+        })
+    } catch (error) {
+        log(log.GENERAL, colors.red(`Error trying to fetch ${worldId} config: ${error.message}`))
+    }
+}
+
+async function fetchWorldTimeOffset (page, worldId) {
+    try {
+        log(log.GENERAL, `Scrapper: Fetching ${worldId} time offset`)
+
+        const timeOffset = await page.evaluate(function () {
+            return require('helper/time').getGameTimeOffset()
+        })
+
+        await db.none(sql.updateWorldTimeOffset, {
+            worldId,
+            timeOffset
+        })
+    } catch (error) {
+        log(log.GENERAL, colors.red(`Error trying to fetch ${worldId} time offset: ${error.message}`))
+    }
 }
 
 module.exports = Sync
