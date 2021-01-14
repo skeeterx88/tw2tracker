@@ -371,9 +371,9 @@ Sync.allWorlds = async function (flag) {
 
     async function asynchronousSync () {
         while (queuedWorlds.length) {
-            const world = queuedWorlds.shift()
-
             if (runningSyncs < simultaneousSyncs) {
+                const world = queuedWorlds.shift()
+
                 runningSyncs++
 
                 Sync.world(world.market, world.num, flag).catch(function (error) {
@@ -561,9 +561,9 @@ Sync.allWorldsAchievements = async function (flag) {
 
     async function asynchronousSync () {
         while (queuedWorlds.length) {
-            const world = queuedWorlds.shift()
-
             if (runningSyncs < simultaneousSyncs) {
+                const world = queuedWorlds.shift()
+
                 runningSyncs++
 
                 Sync.worldAchievements(world.market, world.num, flag).catch(function (error) {
