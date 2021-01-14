@@ -158,29 +158,10 @@ module.exports = async function () {
         }
     }
 
-    const time = async function (name, handler) {
-        const start = Date.now()
-        await handler()
-        const end = Date.now()
-        const seconds = Math.round(((end - start) / 1000) * 10) / 10
-        // console.log('Scrapper:', name, 'in', seconds + 's')
-    }
-
-    await time('loaded tribes', async function () {
-        await processTribes()
-    })
-
-    await time('loaded players', async function () {
-        await processPlayers()
-    })
-
-    await time('loaded tribe achievements', async function () {
-        await loadTribesAchievements()
-    })
-
-    await time('loaded player achievements', async function () {
-        await loadPlayersAchievements()
-    })
+    await processTribes()
+    await processPlayers()
+    await loadTribesAchievements()
+    await loadPlayersAchievements()
 
     return {
         players: Array.from(achievementsData.players),

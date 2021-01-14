@@ -299,30 +299,15 @@ module.exports = async function () {
         }
     }
 
-    const time = async function (name, handler) {
-        const start = Date.now()
-        await handler()
-        const end = Date.now()
-        const seconds = Math.round(((end - start) / 1000) * 10) / 10
-        console.log('Scrapper:', name, 'in', seconds + 's')
+    const boundaries = await getBoundaries()
+    const missingBlocks = filterBlocks(boundaries)
+
+    for (let [x, y] of missingBlocks) {
+        await loadContinent(x, y)
     }
 
-    await time('loaded villages', async function () {
-        const boundaries = await getBoundaries()
-        const missingBlocks = filterBlocks(boundaries)
-
-        for (let [x, y] of missingBlocks) {
-            await loadContinent(x, y)
-        }
-    })
-
-    await time('loaded tribes', async function () {
-        await processTribes()
-    })
-
-    await time('loaded players', async function () {
-        await processPlayers()
-    })
+    await processTribes()
+    await processPlayers()
 
     processVillagesByPlayer()
     processPlayersByTribe()
