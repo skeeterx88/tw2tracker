@@ -342,9 +342,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
 }
 
 Sync.allWorlds = async function (flag) {
-    log(log.GENERAL)
     log(log.GENERAL, 'Sync.allWorlds()')
-    log.increase(log.GENERAL)
 
     if (syncAllInProgress) {
         log(log.GENERAL, colors.red('\nA Scrappe All Worlds is already in progress\n'))
@@ -353,60 +351,53 @@ Sync.allWorlds = async function (flag) {
 
     Events.trigger(enums.SCRAPPE_ALL_WORLD_START)
 
+    const simultaneousSyncs = 3
     const failedToSync = []
-    const perf = utils.perf(utils.perf.MINUTES)
 
-    let worlds
+    let queuedWorlds
 
     if (development) {
-        worlds = [
+        queuedWorlds = [
             {market: 'zz', num: 8},
             {market: 'br', num: 52}
         ]
     } else {
-        worlds = await db.any(sql.getOpenWorlds)
+        queuedWorlds = await db.any(sql.getOpenWorlds)
     }
 
     await db.query(sql.state.update.lastScrappeAll)
 
-    for (let world of worlds) {
-        try {
-            await Sync.world(world.market, world.num, flag)
-        } catch (error) {
-            failedToSync.push({
-                marketId: world.market,
-                worldNumber: world.num,
-                message: error.message
-            })
+    let runningSyncs = 0
+
+    async function asynchronousSync () {
+        while (queuedWorlds.length) {
+            const world = queuedWorlds.shift()
+
+            if (runningSyncs < simultaneousSyncs) {
+                runningSyncs++
+
+                Sync.world(world.market, world.num, flag).catch(function (error) {
+                    failedToSync.push({
+                        marketId: world.market,
+                        worldNumber: world.num,
+                        message: error.message
+                    })
+                })
+            } else {
+                await Events.on(enums.SCRAPPE_WORLD_END)
+                runningSyncs--
+            }
         }
     }
 
-    const time = perf.end()
+    await asynchronousSync()
 
     Events.trigger(enums.SCRAPPE_ALL_WORLD_END)
 
     if (failedToSync.length) {
-        const allFail = failedToSync.length === worlds.length
-
-        log(log.GENERAL)
-        log(log.GENERAL, `${allFail ? 'All' : 'Some'} worlds failed to sync:`)
-        log.increase(log.GENERAL)
-
-        for (let fail of failedToSync) {
-            log(log.GENERAL, (fail.marketId + fail.worldNumber).padEnd(7), colors.red(fail.message))
-        }
-
-        log.decrease(log.GENERAL)
-        log(log.GENERAL)
-        log(log.GENERAL, `Finished in ${time}`)
-        log.decrease(log.GENERAL)
-
+        const allFail = failedToSync.length === queuedWorlds.length
         return allFail ? enums.SYNC_ERROR_ALL : enums.SYNC_ERROR_SOME
     } else {
-        log(log.GENERAL)
-        log(log.GENERAL, `Finished in ${time}`)
-        log.decrease(log.GENERAL)
-
         return enums.SYNC_SUCCESS_ALL
     }
 }
@@ -416,9 +407,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
     Events.trigger(enums.SCRAPPE_WORLD_START)
 
-    log(log.GENERAL)
     log(log.GENERAL, `Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
-    log.increase(log.GENERAL)
 
     let page
 
@@ -437,8 +426,6 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         page = await createPuppeteerPage(log.GENERAL)
 
-        const perf = utils.perf()
-
         const account = await Sync.auth(marketId, credentials)
         const worldCharacter = account.characters.find(({world_id}) => world_id === worldId)
 
@@ -456,7 +443,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         try {
             await fs.promises.access(path.join('.', 'data', worldId, 'struct'))
         } catch (e) {
-            log(log.GENERAL, 'Scrapper: Fetching map structure')
+            log(log.GENERAL, `Scrapper: Fetching ${worldId} map structure`)
 
             const structPath = await page.evaluate(function () {
                 const cdn = require('cdn')
@@ -469,7 +456,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         if (!world.config) {
             try {
-                log(log.GENERAL, 'Scrapper: Fetching world config')
+                log(log.GENERAL, `Scrapper: Fetching ${worldId} config`)
 
                 const worldConfig = await page.evaluate(function () {
                     const modelDataService = injector.get('modelDataService')
@@ -496,13 +483,13 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
                     worldConfig
                 })
             } catch (error) {
-                log(log.GENERAL, colors.red(`Error trying to fetch world config: ${error.message}`))
+                log(log.GENERAL, colors.red(`Error trying to fetch ${worldId} config: ${error.message}`))
             }
         }
 
         if (!world.time_offset) {
             try {
-                log(log.GENERAL, 'Scrapper: Fetching world time offset')
+                log(log.GENERAL, `Scrapper: Fetching ${worldId} time offset`)
 
                 const timeOffset = await page.evaluate(function () {
                     return require('helper/time').getGameTimeOffset()
@@ -513,7 +500,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
                     timeOffset
                 })
             } catch (error) {
-                log(log.GENERAL, colors.red(`Error trying to fetch world time offset: ${error.message}`))
+                log(log.GENERAL, colors.red(`Error trying to fetch ${worldId} time offset: ${error.message}`))
             }
         }
 
@@ -530,17 +517,11 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
         await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
 
-        const time = perf.end()
-
-        log(log.GENERAL, `Finished in ${time}`)
-        log.decrease(log.GENERAL)
-
         await page.close()
 
         Events.trigger(enums.SCRAPPE_WORLD_END)
     } catch (error) {
-        log(log.GENERAL, colors.red(`Failed to synchronize ${worldId}: ${error.stack}`))
-        log.decrease(log.GENERAL)
+        log(log.GENERAL, colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
 
         if (page) {
             await page.close()
