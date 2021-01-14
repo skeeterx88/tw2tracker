@@ -119,9 +119,7 @@ Sync.init = async function () {
 }
 
 Sync.daemon = async function () {
-    log(log.GENERAL)
     log(log.GENERAL, 'Sync.daemon()')
-    log.increase(log.GENERAL)
 
     const {
         scrappe_all_interval,
@@ -159,9 +157,7 @@ Sync.daemon = async function () {
 }
 
 Sync.registerWorlds = async function () {
-    log(log.GENERAL)
     log(log.GENERAL, 'Sync.registerWorlds()')
-    log.increase(log.GENERAL)
 
     await db.query(sql.state.update.registerWorlds)
     const markets = development ? devAccounts : await db.any(sql.markets.withAccount)
@@ -224,7 +220,6 @@ Sync.registerWorlds = async function () {
 
 Sync.registerCharacter = async function (marketId, worldNumber) {
     log(log.GENERAL, `Sync.registerCharacter() ${marketId}${worldNumber}`)
-    log.increase(log.GENERAL)
 
     const page = await createPuppeteerPage(log.GENERAL)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
@@ -244,9 +239,6 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
     await page.waitFor(2000)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
     await page.waitFor(2000)
-
-    log(log.GENERAL, 'Character created')
-    log.decrease(log.GENERAL)
 }
 
 Sync.auth = async function (marketId, {account_name, account_password}, auth_attempt = 1) {
@@ -597,7 +589,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 
     Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_START)
 
-    log(log.GENERAL, `Sync.worldAchievements() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    log(log.GENERAL, `Sync.worldAchievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
 
     let page
 
@@ -835,15 +827,9 @@ async function commitDataDatabase (data, worldId) {
         players: data.players.length,
         tribes: data.tribes.length
     })
-
-    const time = perf.end()
-
-    log(log.GENERAL, `Writed data to database in ${time}`)
 }
 
 async function commitAchievementsDatabase (data, worldId) {
-    const perf = utils.perf()
-
     const sqlSubjectMap = {
         players: {
             [achievementCommitTypes.ADD]: sql.addPlayerAchievement,
@@ -875,8 +861,6 @@ async function commitAchievementsDatabase (data, worldId) {
 }
 
 async function commitDataFilesystem (worldId) {
-    const perf = utils.perf()
-
     try {
         const players = await db.any(sql.getWorldData, {worldId, table: 'players'})
         const villages = await db.any(sql.getWorldData, {worldId, table: 'villages'})
@@ -949,14 +933,8 @@ async function commitDataFilesystem (worldId) {
         const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
         await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
     } catch (error) {
-        log.increase(log.GENERAL)
-        log(log.GENERAL, colors.red(`Failed to write to filesystem: ${error.message}`))
-        log.decrease(log.GENERAL)
+        log(log.GENERAL, colors.red(`Failed to write ${worldId} data to filesystem: ${error.message}`))
     }
-
-    const time = perf.end()
-
-    log(log.GENERAL, `Writed data to filesystem in ${time}`)
 
     return false
 }
