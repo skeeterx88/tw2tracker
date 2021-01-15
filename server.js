@@ -3,7 +3,7 @@ const express = require('express')
 const session = require('express-session')
 const compression = require('compression')
 const debug = require('debug')('tw2tracker:server')
-const http = require('http')
+const http2 = require('http2')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
@@ -113,7 +113,7 @@ app.set('port', port)
 module.exports = function () {
     // console.log('Server: Initializing...')
 
-    const server = http.createServer(app)
+    const server = http2.createServer(app)
 
     server.on('error', function (error) {
         if (error.syscall !== 'listen') {
