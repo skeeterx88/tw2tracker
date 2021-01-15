@@ -7,7 +7,7 @@ const http = require('http')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy
+const passportLocal = require('passport-local')
 const {db} = require('./db.js')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const config = require('./config.js')
@@ -57,7 +57,7 @@ app.use(session({
     cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }
 }))
 
-passport.use(new LocalStrategy(async function (username, password, callback) {
+passport.use(new passportLocal.Strategy(async function (username, password, callback) {
     if (!config || !config.admin_password) {
         return callback(null, false)
     }
