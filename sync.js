@@ -110,7 +110,7 @@ Sync.init = async function () {
             // await Sync.registerWorlds()
 
             // await Sync.worldAchievements('br', 52)
-            await Sync.allWorldsAchievements()
+            // await Sync.allWorldsAchievements()
         } else {
             await Sync.daemon()
         }
@@ -122,30 +122,23 @@ Sync.init = async function () {
 Sync.daemon = async function () {
     log(log.GENERAL, 'Sync.daemon()')
 
-    const {
-        scrappe_all_interval,
-        scrappe_achievements_all_interval,
-        register_worlds_interval,
-        clean_shares_check_interval
-    } = await db.one(sql.settings.intervals)
-
-    const scrapeWorldsJob = schedule.scheduleJob(scrappe_all_interval, async function () {
+    const scrapeWorldsJob = schedule.scheduleJob(config.scrappe_all_interval, async function () {
         await Sync.allWorlds()
         log(log.GENERAL, 'Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const scrapeAchievementsWorldsJob = schedule.scheduleJob(scrappe_achievements_all_interval, async function () {
+    const scrapeAchievementsWorldsJob = schedule.scheduleJob(config.scrappe_achievements_all_interval, async function () {
         await Sync.allWorldsAchievements()
         log(log.GENERAL, 'Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const registerWorldsJob = schedule.scheduleJob(register_worlds_interval, async function () {
+    const registerWorldsJob = schedule.scheduleJob(config.register_worlds_interval, async function () {
         await Sync.markets()
         await Sync.registerWorlds()
         log(log.GENERAL, 'Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const cleanSharesJob = schedule.scheduleJob(clean_shares_check_interval, async function () {
+    const cleanSharesJob = schedule.scheduleJob(config.clean_shares_check_interval, async function () {
         await Sync.cleanExpiredShares()
         log(log.GENERAL, 'Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
     })
