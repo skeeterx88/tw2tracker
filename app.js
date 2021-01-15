@@ -1,7 +1,7 @@
 (async function () {
     const development = process.env.NODE_ENV === 'development'
-    const {db} = require('./db')
-    const sql = require('./sql')
+    const {db} = require('./db.js')
+    const sql = require('./sql.js')
 
     const schemaInitialized = (await db.one(sql.helpers.schemaInitialized)).exists
 
@@ -9,8 +9,8 @@
         await db.query(sql.createSchema)
     }
 
-    const server = require('./server')
-    const Sync = require('./sync')
+    const server = require('./server.js')
+    const Sync = require('./sync.js')
 
     if (development) {
         server()

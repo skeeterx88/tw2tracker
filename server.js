@@ -8,16 +8,16 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
-const {db} = require('./db')
+const {db} = require('./db.js')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const config = require('./config.js')
 
 
-const statsRouter = require('./routes/stats')
-const adminRouter = require('./routes/admin')
-const loginRouter = require('./routes/login')
-const logoutRouter = require('./routes/logout')
-const mapsRouter = require('./routes/maps')
+const statsRouter = require('./routes/stats.js')
+const adminRouter = require('./routes/admin.js')
+const loginRouter = require('./routes/login.js')
+const logoutRouter = require('./routes/logout.js')
+const mapsRouter = require('./routes/maps.js')
 
 const app = express()
 

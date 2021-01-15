@@ -3,11 +3,11 @@ const path = require('path')
 const express = require('express')
 const createError = require('http-errors')
 const router = express.Router()
-const utils = require('../utils')
+const utils = require('../utils.js')
 const {asyncRouter} = utils
 const config = require('../config.js')
-const {db} = require('../db')
-const sql = require('../sql')
+const {db} = require('../db.js')
+const sql = require('../sql.js')
 
 const mapsAPIRouter = require('./maps-api.js')
 

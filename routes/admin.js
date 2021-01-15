@@ -2,10 +2,10 @@ const express = require('express')
 const router = express.Router()
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 
-const {db} = require('../db')
-const sql = require('../sql')
-const utils = require('../utils')
-const Sync = require('../sync')
+const {db} = require('../db.js')
+const sql = require('../sql.js')
+const utils = require('../utils.js')
+const Sync = require('../sync.js')
 const config = require('../config.js')
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'

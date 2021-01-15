@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const {db} = require('../db')
-const sql = require('../sql')
-const utils = require('../utils')
+const {db} = require('../db.js')
+const sql = require('../sql.js')
+const utils = require('../utils.js')
 const {asyncRouter} = utils
 const config = require('../config.js')
 

@@ -1,9 +1,9 @@
 const express = require('express')
 const createError = require('http-errors')
 const router = express.Router()
-const {db} = require('../db')
-const sql = require('../sql')
-const utils = require('../utils')
+const {db} = require('../db.js')
+const sql = require('../sql.js')
+const utils = require('../utils.js')
 const {asyncRouter, hasOwn} = utils
 const config = require('../config.js')
 const achievementTitles = require('../achievement-titles.json')
