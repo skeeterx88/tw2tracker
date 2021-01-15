@@ -1,14 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const passport = require('passport')
-
-const getSettings = require('../settings')
+const config = require('../config.js')
 
 router.get('/', async function (req, res, next) {
-    const settings = await getSettings()
-
     res.render('login', {
-        title: `Admin login - ${settings.site_name}`
+        title: `Admin login - ${config.site_name}`
     })
 })
 

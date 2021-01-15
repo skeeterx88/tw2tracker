@@ -3,7 +3,7 @@ const createError = require('http-errors')
 const router = express.Router()
 const utils = require('../utils')
 const {asyncRouter} = utils
-const getSettings = require('../settings')
+const config = require('../config.js')
 const {db} = require('../db')
 const sql = require('../sql')
 const achievementTitles = require('../achievement-titles.json')
@@ -23,7 +23,6 @@ const tribesRouter = require('./stats-tribes.js')
 const conquestsRouter = require('./stats-conquests.js')
 
 const marketsRouter = asyncRouter(async function (req, res, next) {
-    const settings = await getSettings()
     const worlds = await db.any(sql.getWorlds)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
 
@@ -39,7 +38,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
     })
 
     res.render('stats/servers', {
-        title: settings.site_name,
+        title: config.site_name,
         marketStats,
         navigation: [
             `<a href="/stats">Stats</a>`,
@@ -54,7 +53,6 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
         return next()
     }
 
-    const settings = await getSettings()
     const marketId = req.params.marketId
     const syncedWorlds = await db.any(sql.getSyncedWorlds)
     const marketWorlds = syncedWorlds.filter((world) => world.market === marketId)
@@ -70,7 +68,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
     ]
 
     res.render('stats/worlds', {
-        title: `${marketId.toUpperCase()} - ${settings.site_name}`,
+        title: `${marketId.toUpperCase()} - ${config.site_name}`,
         marketId,
         worlds,
         navigation: [
@@ -95,8 +93,6 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         worldId,
         worldNumber
     } = await paramWorldParse(req)
-
-    const settings = await getSettings()
 
     const [
         world,
@@ -142,7 +138,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
     }
 
     res.render('stats/world', {
-        title: `${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         players,

@@ -5,7 +5,7 @@ const {db} = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
 const {asyncRouter, hasOwn} = utils
-const getSettings = require('../settings')
+const config = require('../config.js')
 const achievementTitles = require('../achievement-titles.json')
 
 const {
@@ -44,7 +44,6 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const conquestGainCount = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count
@@ -57,7 +56,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count
 
     res.render('stats/tribe', {
-        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         world,
@@ -102,12 +101,11 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
-    const offset = settings.ranking_items_per_page * (page - 1)
-    const limit = settings.ranking_items_per_page
+    const limit = parseInt(config.ranking_items_per_page, 10)
+    const offset = limit * (page - 1)
 
     const conquestsTypeMap = {
         all: {
@@ -149,7 +147,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
     const navigationTitle = conquestsTypeMap[category].navigationTitle
 
     res.render('stats/tribe-conquests', {
-        title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         world,
@@ -193,12 +191,11 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
     const members = await db.any(sql.getTribeMembers, {worldId, tribeId})
 
     res.render('stats/tribe-members', {
-        title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         tribe,
@@ -237,18 +234,17 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
-    const limit = settings.ranking_items_per_page
+    const limit = parseInt(config.ranking_items_per_page, 10)
     const offset = limit * (page - 1)
     const allVillages = await db.any(sql.getTribeVillages, {worldId, tribeId})
     const villages = allVillages.slice(offset, offset + limit)
     const total = allVillages.length
 
     res.render('stats/tribe-villages', {
-        title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         tribe,
@@ -288,7 +284,6 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const playersName = {}
@@ -311,7 +306,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
     }
 
     res.render('stats/tribe-member-changes', {
-        title: `Tribe ${tribe.tag} - Member Changes - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - Member Changes - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         tribe,
@@ -349,7 +344,6 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const subCategory = req.params.subCategory
@@ -386,7 +380,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
     }
 
     res.render('stats/tribe-achievements', {
-        title: `Tribe ${tribe.tag} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Tribe ${tribe.tag} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         tribe,

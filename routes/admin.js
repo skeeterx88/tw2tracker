@@ -6,20 +6,19 @@ const {db} = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
 const Sync = require('../sync')
-const getSettings = require('../settings')
+const config = require('../config.js')
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
 router.get('/', ensureLoggedIn, async function (req, res) {
     const worlds = await db.any(sql.getWorlds)
     const markets = await db.any(sql.markets.all)
-    const settings = await getSettings()
 
     res.render('admin', {
-        title: `Admin Panel - ${settings.site_name}`,
+        title: `Admin Panel - ${config.site_name}`,
         worlds: worlds,
         markets: markets,
-        settings: settings,
+        config: config,
         ...utils.ejsHelpers
     })
 })
@@ -138,10 +137,9 @@ router.post('/add-market', ensureLoggedIn, async function (req, res) {
 router.get('/edit-market/:marketId', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const market = await db.one(sql.markets.one, [marketId])
-    const settings = await getSettings()
 
     res.render('admin-edit-market', {
-        title: `Edit market ${marketId} - Admin Panel - ${settings.site_name}`,
+        title: `Edit market ${marketId} - Admin Panel - ${config.site_name}`,
         market: market
     })
 })

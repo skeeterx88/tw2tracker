@@ -5,14 +5,13 @@ const createError = require('http-errors')
 const router = express.Router()
 const utils = require('../utils')
 const {asyncRouter} = utils
-const getSettings = require('../settings')
+const config = require('../config.js')
 const {db} = require('../db')
 const sql = require('../sql')
 
 const mapsAPIRouter = require('./maps-api.js')
 
 const marketsRouter = asyncRouter(async function (req, res, next) {
-    const settings = await getSettings()
     const worlds = await db.any(sql.getWorlds)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
 
@@ -28,7 +27,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
     })
 
     res.render('maps/servers', {
-        title: `Maps - Server List - ${settings.site_name}`,
+        title: `Maps - Server List - ${config.site_name}`,
         marketStats,
         navigation: [
             `<a href="/maps">Maps</a>`,
@@ -43,7 +42,6 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
         return next()
     }
 
-    const settings = await getSettings()
     const marketId = req.params.marketId
     const syncedWorlds = await db.any(sql.getSyncedWorlds)
     const marketWorlds = syncedWorlds.filter((world) => world.market === marketId)
@@ -59,7 +57,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
     ]
 
     res.render('maps/worlds', {
-        title: `Maps ${marketId.toUpperCase()} - World List - ${settings.site_name}`,
+        title: `Maps ${marketId.toUpperCase()} - World List - ${config.site_name}`,
         marketId,
         worlds,
         navigation: [
@@ -79,7 +77,6 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         return next()
     }
 
-    const settings = await getSettings()
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
@@ -98,7 +95,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
     const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
 
     res.render('maps/map', {
-        title: `Map ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Map ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         world,
         backendValues: {
@@ -115,7 +112,6 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
         return next()
     }
 
-    const settings = await getSettings()
     const mapShareId = req.params.mapShareId
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
@@ -143,7 +139,7 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
     db.query(sql.maps.updateShareAccess, [mapShareId])
 
     res.render('maps/map', {
-        title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${settings.site_name}`,
+        title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${config.site_name}`,
         marketId,
         world,
         backendValues: {

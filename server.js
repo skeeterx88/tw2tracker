@@ -10,7 +10,8 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const {db} = require('./db')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
-const getSettings = require('./settings')
+const config = require('./config.js')
+
 
 const statsRouter = require('./routes/stats')
 const adminRouter = require('./routes/admin')
@@ -57,13 +58,11 @@ app.use(session({
 }))
 
 passport.use(new LocalStrategy(async function (username, password, callback) {
-    const settings = getSettings()
-
-    if (!settings || !settings.admin_password) {
+    if (!config || !config.admin_password) {
         return callback(null, false)
     }
 
-    if (settings.admin_password !== password) {
+    if (config.admin_password !== password) {
         return callback(null, false)
     }
 

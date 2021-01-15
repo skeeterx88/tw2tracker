@@ -5,7 +5,7 @@ const {log, hasOwn} = utils
 const Scrapper = require('./scrapper.js')
 const ScrapperAchievements = require('./scrapper-achievements.js')
 const readyState = require('./ready-state.js')
-const getSettings = require('./settings')
+const config = require('./config.js')
 const Events = require('./events.js')
 const fs = require('fs')
 const schedule = require('node-schedule')
@@ -410,9 +410,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
             const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60
-            const settings = await getSettings()
-
-            if (minutesSinceLastSync < settings.scrapper_interval_minutes) {
+            if (minutesSinceLastSync < config.scrapper_interval_minutes) {
                 throw new Error(`${worldId} already sincronized`)
             }
         }

@@ -5,7 +5,7 @@ const {db} = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
 const {asyncRouter} = utils
-const getSettings = require('../settings')
+const config = require('../config.js')
 
 const {
     paramWorld,
@@ -37,7 +37,6 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const category = req.params.category
@@ -49,8 +48,8 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     const page = req.params.page && !isNaN(req.params.page)
         ? Math.max(1, parseInt(req.params.page, 10))
         : 1
-    const offset = settings.ranking_items_per_page * (page - 1)
-    const limit = settings.ranking_items_per_page
+    const limit = parseInt(config.ranking_items_per_page, 10)
+    const offset = limit * (page - 1)
 
     const ranking = await db.any(rankingRouterSqlMap[category].ranking, {worldId, offset, limit})
     const {count} = await db.one(rankingRouterSqlMap[category].count, {worldId})
@@ -58,7 +57,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     const capitalizedCategory = utils.capitalize(category)
 
     res.render('stats/ranking', {
-        title: `${capitalizedCategory} Ranking - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `${capitalizedCategory} Ranking - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         worldName: world.name,

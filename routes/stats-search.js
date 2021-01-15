@@ -5,7 +5,7 @@ const {db} = require('../db')
 const sql = require('../sql')
 const utils = require('../utils')
 const {asyncRouter} = utils
-const getSettings = require('../settings')
+const config = require('../config.js')
 
 const {
     paramWorld,
@@ -61,11 +61,10 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req)
 
-    const settings = await getSettings()
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
-    const limit = settings.ranking_items_per_page
+    const limit = parseInt(config.ranking_items_per_page, 10)
     const offset = limit * (page - 1)
 
     const rawQuery = decodeURIComponent(req.params.query)
@@ -88,7 +87,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
     const total = allResults.length
 
     return res.render('stats/search', {
-        title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${settings.site_name}`,
+        title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
         category,
