@@ -605,9 +605,8 @@ Sync.markets = async function () {
 Sync.cleanExpiredShares = async function () {
     const now = Date.now()
     const shares = await db.any(sql.maps.getShareLastAccess)
-    let {static_share_expire_time} = await db.one(sql.settings.intervals)
 
-    static_share_expire_time = static_share_expire_time * 60 * 1000
+    const static_share_expire_time = config.static_share_expire_time * 60 * 1000
 
     for (let {share_id, last_access} of shares) {
         if (now - last_access.getTime() < static_share_expire_time) {
