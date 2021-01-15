@@ -1,20 +1,32 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel='stylesheet' href='/stylesheets/login.css' />
-  </head>
-  <body>
-    <h1>Admin login</h1>
-    <form action="/login" method="POST">
-        <input type="password" name="password" placeholder="password">
-        <input type="submit" value="Login">
-        <input type="hidden" name="username" value="admin">
-    </form>
+<html lang="en">
+    <%- include('./head.ejs') %>
+    <body>
+        <header></header>
+        <%- include('./menu.ejs') %>
 
-    <script defer type="text/javascript">
-      document.querySelector('input[name=password]').focus()
-    </script>
-  </body>
+        <main class="content-border">
+            <%- include('./navigation.ejs') %>
+
+            <div class="content">
+                <div class="single">
+                    <section id="worlds">
+                        <h1>Admin login</h1>
+
+                        <form action="/login" method="POST">
+                            <input type="password" name="password" placeholder="password">
+                            <input type="submit" value="Login">
+                            <input type="hidden" name="username" value="admin">
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <%- include('./footer.ejs') %>
+
+        <script defer type="text/javascript">
+            document.querySelector('input[name=password]').focus()
+        </script>
+    </body>
 </html>

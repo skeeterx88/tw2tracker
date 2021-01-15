@@ -1,107 +1,45 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel='stylesheet' href='/stylesheets/admin.css' />
-  </head>
-  <body class="admin-panel">
-    <h1><%= title %></h1>
+<html lang="en">
+    <%- include('./head.ejs') %>
+    <body id="admin">
+        <header></header>
+        <%- include('./menu.ejs') %>
 
-    <!-- <ul>
-        <li><span class="flag-de"></span></li>
-        <li><span class="flag-en"></span></li>
-        <li><span class="flag-br"></span></li>
-        <li><span class="flag-pl"></span></li>
-        <li><span class="flag-nl"></span></li>
-        <li><span class="flag-fr"></span></li>
-        <li><span class="flag-ru"></span></li>
-        <li><span class="flag-zz"></span></li>
-        <li><span class="flag-us"></span></li>
-        <li><span class="flag-es"></span></li>
-        <li><span class="flag-it"></span></li>
-        <li><span class="flag-gr"></span></li>
-        <li><span class="flag-tr"></span></li>
-        <li><span class="flag-cz"></span></li>
-        <li><span class="flag-pt"></span></li>
-        <li><span class="flag-sk"></span></li>
-        <li><span class="flag-ro"></span></li>
-        <li><span class="flag-hu"></span></li>
-    </ul> -->
+        <main class="content-border">
+            <%- include('./navigation.ejs') %>
 
-    <h2>Settings</h2>
+            <div class="content">
+                <div class="left">
+                    <section>
+                        <h1>Worlds</h1>
 
-    <section>
-        <form action="/admin/change-settings" method="POST" class="settings">
-            <label>
-                <span>Site Name</span>
-                <input type="text" name="site-name" value="<%= settings.site_name %>" minlength="1" required>
-            </label>
-            <label>
-                <span>Admin Password</span>
-                <input type="text" name="admin-password" value="" minlength="3" required>
-            </label>
-            <label>
-                <span>Scrapper - Allow barbarians</span>
-                <input type="checkbox" name="scrapper-allow-barbarians" checked="<%= settings.scrapper_allow_barbarians %>">
-            </label>
-            <label>
-                <span>Scrapper - Sync interval</span>
-                <input type="number" name="scrapper-interval-minutes" value="<%= settings.scrapper_interval_minutes %>" required> minutes
-            </label>
+                        <% for (let world of worlds) { %>
+                            <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
 
-            <div class="footer">
-                <input type="submit" value="Save">
+                            <div class="world">
+                                <div class="short-info">
+                                    <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %></span> -
+                                    <span class="last-sync">Last sync: <%= formatDate(world_last_sync) %></span>
+                                    <% if (!world.open) { __append(' (Closed)') } -%>
+                                </div>
+                                <ul class="actions">
+                                    <% if (world.open) { -%>
+                                        <li><a href="/admin/scrapper/<%= world.market %>/<%= world.num %>">Sync now</a></li>
+                                    <% } -%>
+                                </ul>
+                            </div>
+                        <% } %>
+                    </section>
+                </div>
+
+                <div class="right">
+                    <section>
+                        <h1>Logging</h1>
+                    </section>
+                </div>
             </div>
-        </form>
-    </section>
+        </main>
 
-    <h2>Markets</h2>
-
-    <section class="markets">
-        <% markets.forEach(function (market) { %>
-        <% const market_enabled = market.enabled ? 'Yes' : 'No' %>
-
-        <div class="market">
-            <span class="flag-<%= market.id %>"></span>
-            <span><%= market.id %></span>
-
-            <div class="long-info">
-                <span>account_name: <%= market.account_name %></span>
-                <span>account_password: <%= market.account_password %></span>
-            </div>
-
-            <ul class="actions">
-                <li><a href="/admin/edit-market/<%= market.id %>">Edit</a></li>
-                <li><a href="/admin/test-account/<%= market.id %>">Test account</a></li>
-            </ul>
-        </div>
-        <% }) %>
-    </section>
-
-    <h2>Worlds</h2>
-
-    <section class="worlds">
-        <% worlds.forEach(function (world) { %>
-        <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
-
-        <div class="world">
-            <span class="flag-<%= world.market %>"></span>
-            <span><%= world.market %><%= world.num %> (<%= world.name %></span>)
-            <div class="short-info">
-                <span class="last-sync">Last sync: <strong><%= formatNumbers(world_last_sync) %></strong></span>
-            </div>
-            <ul class="actions">
-                <li><a href="/admin/scrapper/<%= world.market %>/<%= world.num %>">Sync now</a></li>
-                <li><a href="/maps/<%= world.market %>/<%= world.num %>">Open map</a></li>
-            </ul>
-        </div>
-        <% }) %>
-    </section>
-
-    <p><a href="/logout">Logout</a></p>
-
-    <script defer type="text/javascript" src="/javascripts/utils.js"></script>
-    <script defer type="text/javascript" src="/javascripts/admin.js"></script>
-  </body>
+        <%- include('./footer.ejs') %>
+    </body>
 </html>

@@ -147,7 +147,6 @@ Sync.daemon = async function () {
     log(log.GENERAL, 'Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     log(log.GENERAL, 'Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     log(log.GENERAL, 'Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
-    log.decrease(log.GENERAL)
 }
 
 Sync.registerWorlds = async function () {
@@ -208,8 +207,6 @@ Sync.registerWorlds = async function () {
             log(log.GENERAL, colors.red(`Failed to register worlds on market ${marketId}: ${error.message}`))
         }
     }
-
-    log.decrease(log.GENERAL)
 }
 
 Sync.registerCharacter = async function (marketId, worldNumber) {

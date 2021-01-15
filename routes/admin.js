@@ -16,9 +16,8 @@ router.get('/', ensureLoggedIn, async function (req, res) {
 
     res.render('admin', {
         title: `Admin Panel - ${config.site_name}`,
-        worlds: worlds,
-        markets: markets,
-        config: config,
+        worlds,
+        markets,
         ...utils.ejsHelpers
     })
 })

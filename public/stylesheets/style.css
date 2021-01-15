@@ -306,6 +306,10 @@ menu .icon-heart {
 
 #search form input[type="text"] {
     width: 75%;
+}
+
+form input[type="text"],
+form input[type="password"] {
     height: 22px;
     border-radius: 1px;
     border: 1px solid #8d5b39;
@@ -317,16 +321,18 @@ menu .icon-heart {
                 inset 1px 1px 3px #00000095;
 }
 
-#search form input[type="text"]:focus {
+form input[type="text"]:focus,
+form input[type="password"]:focus {
     border: 1px solid #b17a55;
 }
 
-#search form input[type="text"]::placeholder {
+form input[type="text"]::placeholder,
+form input[type="password"]::placeholder {
     color: #333;
     text-shadow: none;
 }
 
-#search form input[type="submit"] {
+form input[type="submit"] {
     height: 26px;
     padding: 0px 5px;
     outline: none;
@@ -344,8 +350,8 @@ menu .icon-heart {
                 inset -1px -1px 2px #000;
 }
 
-#search form input[type="submit"]:hover,
-#search form input[type="submit"]:focus {
+form input[type="submit"]:hover,
+form input[type="submit"]:focus {
     background: url(/images/noise.webp), linear-gradient(#af7046, #583f2d);
 }
 
@@ -750,6 +756,47 @@ a.achievement-subject:last-child:after {
     box-shadow: inset 0 0 0 1px #45505c, 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000;
     border: 1px solid #5e351b;
     border-radius: 1px;
+}
+
+#admin .world {
+    margin-bottom: 10px;
+}
+
+#admin .world ul {
+    margin: 5px 10px;
+    padding: 0px;
+}
+
+#admin .world ul li {
+    display: inline;
+    border: 1px solid #77351a;
+    border-radius: 2px;
+    padding: 1px 3px;
+}
+
+#admin #logging {
+    background: #000;
+    width: 98%;
+    height: 500px;
+    padding: 3px;
+    outline: none;
+    color: green;
+    overflow: auto;
+    font-size: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #806753 transparent;
+}
+
+#admin #logging::-webkit-scrollbar {
+    width: 6px;
+}
+
+#admin #logging::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#admin #logging::-webkit-scrollbar-thumb {
+  background-color: #9e5f2e;
 }
 
 span[class^="flag-"] {

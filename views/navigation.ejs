@@ -1,3 +1,6 @@
-<h1>
-    <%- navigation.join(' / ') %>
-</h1>
+<% if (typeof navigation !== 'undefined') { -%>
+    <h1>
+        <%- navigation.join(' / ') %>
+    </h1>
+<% } -%>
+
