@@ -437,10 +437,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             return await page.evaluate(Scrapper)
         }, 120000, 'Scrappe evaluation timeout')
 
-        // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
-        // await fs.promises.writeFile(path.join('.', 'data', `${worldId}.freeze.json`), JSON.stringify(data))
-        // return
-
+        await commitRawDataFilesystem(data, worldId)
         await commitDataDatabase(data, worldId)
         await commitDataFilesystem(worldId)
         await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
@@ -876,6 +873,12 @@ async function commitDataFilesystem (worldId) {
     }
 
     return false
+}
+
+async function commitRawDataFilesystem (data, worldId) {
+    const location = path.join('.', 'data', 'raw')
+    await fs.promises.mkdir(location, {recursive: true})
+    await fs.promises.writeFile(path.join(location, `${worldId}.json`), JSON.stringify(data))
 }
 
 async function initPuppeteerBrowser () {
