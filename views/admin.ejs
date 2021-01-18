@@ -16,20 +16,19 @@
                         <% for (let world of openWorlds) { %>
                             <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
 
-                            <div class="world world-container" id="<%= world.world_id %>">
+                            <div class="world world-container" id="<%= world.world_id %>" data-market-id="<%= world.market %>" data-world-number="<%= world.num %>">
                                 <div class="short-info">
                                     <p class="world-id">
                                         <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
                                     </p>
-                                    <p>
-                                        Last sync: <%= formatDate(world_last_sync) %>
-                                    </p>
+                                    <p>Last sync date: <span class="last-sync-date"><%= formatDate(world_last_sync) %></span></p>
+                                    <p>Last sync status: <span class="last-sync-status"><%= world.last_sync_status %></span></p>
                                 </div>
                                 <div class="actions">
                                     <ul>
                                         <% if (world.open) { -%>
                                             <li>
-                                                <a href="/admin/scrapper/<%= world.market %>/<%= world.num %>"><button class="relax-button">Sync now</button></a>
+                                                <a class="sync-now" href="/admin/scrapper/<%= world.market %>/<%= world.num %>"><button class="relax-button small">Sync now</button></a>
                                             </li>
                                         <% } -%>
                                     </ul>
@@ -49,6 +48,7 @@
 
         <%- include('./footer.ejs') %>
 
+        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
         <script type="text/javascript" src="/javascripts/admin.js"></script>
     </body>
 </html>

@@ -14,19 +14,34 @@ const Events = require('../events.js')
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
-const socketServer = new WebSocket.Server({
-    port: 8080
-})
+const syncStates = {
+    START: 'start',
+    FINISH: 'finish',
+    UPDATE: 'update'
+}
+
+const socketServer = new WebSocket.Server({port: 7777})
 
 socketServer.on('connection', function connection(ws) {
-    function sendCurrentStatus() {
-        ws.send(JSON.stringify(syncStatus.getCurrent()))
+    function send(data) {
+        ws.send(JSON.stringify(data))
     }
 
-    Events.on(enums.SCRAPPE_WORLD_START, () => sendCurrentStatus())
-    Events.on(enums.SCRAPPE_WORLD_END, () => sendCurrentStatus())
+    Events.on(enums.SCRAPPE_WORLD_START, function (worldId) {
+        send([syncStates.START, {
+            worldId
+        }])
+    })
 
-    sendCurrentStatus()
+    Events.on(enums.SCRAPPE_WORLD_END, function (worldId, status, date) {
+        send([syncStates.FINISH, {
+            worldId,
+            status,
+            date
+        }])
+    })
+
+    send([syncStates.UPDATE, syncStatus.getCurrent()])
 })
 
 router.get('/', ensureLoggedIn, async function (req, res) {

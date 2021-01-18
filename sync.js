@@ -442,10 +442,13 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
         await commitDataFilesystem(worldId)
         await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
         await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
+        
+        const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
+        const syncDate = utils.ejsHelpers.formatDate(last_sync)
 
         await page.close()
 
-        Events.trigger(enums.SCRAPPE_WORLD_END, [worldId])
+        Events.trigger(enums.SCRAPPE_WORLD_END, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
         log(log.GENERAL, colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
 
@@ -457,7 +460,12 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             return await Sync.world(marketId, worldNumber, flag, ++attempt)
         } else {
             await db.query(sql.updateWorldSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
-            Events.trigger(enums.SCRAPPE_WORLD_END, [worldId])
+            await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
+
+            const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
+            const syncDate = utils.ejsHelpers.formatDate(last_sync)
+
+            Events.trigger(enums.SCRAPPE_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
 
             throw new Error(error.message)
         }

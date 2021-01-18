@@ -134,10 +134,6 @@ footer {
     text-align: center;
 }
 
-section .actions {
-    margin: 12px 0px;
-}
-
 small {
     padding: 2px 0px;
     font-size: 0.8em;
@@ -292,24 +288,11 @@ menu .icon-heart {
     text-align: center;
 }
 
-#search form {
-    width: 100%;
-}
-
-#search form > div {
-    display: block;
-}
-
-#search form .submit-buttons {
-    margin-top: 5px;
-}
-
-#search form input[type="text"] {
+#search .relax-input {
     width: 75%;
 }
 
-form input[type="text"],
-form input[type="password"] {
+.relax-input {
     height: 22px;
     border-radius: 1px;
     border: 1px solid #8d5b39;
@@ -321,18 +304,15 @@ form input[type="password"] {
                 inset 1px 1px 3px #00000095;
 }
 
-form input[type="text"]:focus,
-form input[type="password"]:focus {
+.relax-input:focus {
     border: 1px solid #b17a55;
 }
 
-form input[type="text"]::placeholder,
-form input[type="password"]::placeholder {
+.relax-input::placeholder {
     color: #333;
     text-shadow: none;
 }
 
-form input[type="submit"],
 .relax-button {
     height: 26px;
     padding: 0px 5px;
@@ -349,6 +329,10 @@ form input[type="submit"],
                 inset 0 0 0 1px #47240e,
                 2px 2px 2px #000,
                 inset -1px -1px 2px #000;
+}
+
+.relax-button.small {
+    height: 20px;
 }
 
 form input[type="submit"]:hover,
@@ -764,10 +748,8 @@ a.achievement-subject:last-child:after {
 }
 
 #admin .world {
-    margin-bottom: 10px;
-    padding: 5px;
-    width: 200px;
-    /*display: block;*/
+    padding: 3px 5px;
+    width: 95%;
 }
 
 #admin .world .world-id {
@@ -796,29 +778,22 @@ a.achievement-subject:last-child:after {
     border-color: #88bb7b;
 }
 
-#admin #logging {
-    background: #000;
-    width: 98%;
-    height: 500px;
-    padding: 3px;
-    outline: none;
+#admin .in-progress .relax-button {
+    cursor: wait;
+}
+
+#admin .last-sync-date,
+#admin .last-sync-status {
+    font-weight: bold;
+}
+
+#admin .sync-in-progress {
+    font-weight: bold;
     color: green;
-    overflow: auto;
-    font-size: 10px;
-    scrollbar-width: thin;
-    scrollbar-color: #806753 transparent;
 }
 
-#admin #logging::-webkit-scrollbar {
-    width: 6px;
-}
-
-#admin #logging::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-#admin #logging::-webkit-scrollbar-thumb {
-  background-color: #9e5f2e;
+.hidden {
+    display: none;
 }
 
 span[class^="flag-"] {
