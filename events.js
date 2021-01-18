@@ -49,9 +49,13 @@ const remove = function (id, handler) {
     return events.get(id).delete(handler)
 }
 
-const trigger = function (id) {
+const trigger = function (id, args = []) {
     if (typeof id !== 'string') {
         throw new Error('Invalid trigger event ID: Not a String.')
+    }
+
+    if (!Array.isArray(args)) {
+        throw new Error('Invalid trigger args: Not an Array.')
     }
 
     if (!events.has(id)) {
@@ -59,7 +63,7 @@ const trigger = function (id) {
     }
 
     for (let handler of events.get(id)) {
-        handler()
+        handler.apply(this, args)
     }
 
     return true
