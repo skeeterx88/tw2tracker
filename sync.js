@@ -1,6 +1,6 @@
-const {db} = require('./db')
-const sql = require('./sql')
-const utils = require('./utils')
+const {db} = require('./db.js')
+const sql = require('./sql.js')
+const utils = require('./utils.js')
 const {log, hasOwn} = utils
 const Scrapper = require('./scrapper.js')
 const ScrapperAchievements = require('./scrapper-achievements.js')
@@ -388,7 +388,7 @@ Sync.allWorlds = async function (flag) {
 Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
-    Events.trigger(enums.SCRAPPE_WORLD_START)
+    Events.trigger(enums.SCRAPPE_WORLD_START, [worldId])
 
     log(log.GENERAL, `Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
 
@@ -445,7 +445,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await page.close()
 
-        Events.trigger(enums.SCRAPPE_WORLD_END)
+        Events.trigger(enums.SCRAPPE_WORLD_END, [worldId])
     } catch (error) {
         log(log.GENERAL, colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
 
@@ -457,7 +457,7 @@ Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
             return await Sync.world(marketId, worldNumber, flag, ++attempt)
         } else {
             await db.query(sql.updateWorldSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
-            Events.trigger(enums.SCRAPPE_WORLD_END)
+            Events.trigger(enums.SCRAPPE_WORLD_END, [worldId])
 
             throw new Error(error.message)
         }
@@ -526,7 +526,7 @@ Sync.allWorldsAchievements = async function (flag) {
 Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
-    Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_START)
+    Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_START, [marketId])
 
     log(log.GENERAL, `Sync.worldAchievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
 
@@ -556,7 +556,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
 
         await page.close()
 
-        Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_END)
+        Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_END, [marketId])
     } catch (error) {
         log(log.GENERAL, colors.red(`Sync.worldAchievements() ${colors.green(worldId)} failed: ${error.message}`))
 
@@ -567,7 +567,7 @@ Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 
         if (attempt < 3) {
             return await Sync.worldAchievements(marketId, worldNumber, flag, ++attempt)
         } else {
-            Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_END)
+            Events.trigger(enums.SCRAPPE_ACHIEVEMENT_WORLD_END, [marketId])
             throw new Error(error.message)
         }
     }

@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const WebSocket = require('ws')
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 
 const {db} = require('../db.js')
@@ -7,8 +8,26 @@ const sql = require('../sql.js')
 const utils = require('../utils.js')
 const Sync = require('../sync.js')
 const config = require('../config.js')
+const syncStatus = require('../sync-status.js')
+const enums = require('../enums.js')
+const Events = require('../events.js')
 
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
+
+const socketServer = new WebSocket.Server({
+    port: 8080
+})
+
+socketServer.on('connection', function connection(ws) {
+    function sendCurrentStatus() {
+        ws.send(JSON.stringify(syncStatus.getCurrent()))
+    }
+
+    Events.on(enums.SCRAPPE_WORLD_START, () => sendCurrentStatus())
+    Events.on(enums.SCRAPPE_WORLD_END, () => sendCurrentStatus())
+
+    sendCurrentStatus()
+})
 
 router.get('/', ensureLoggedIn, async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds)
@@ -22,6 +41,13 @@ router.get('/', ensureLoggedIn, async function (req, res) {
         markets,
         ...utils.ejsHelpers
     })
+})
+
+router.get('/scrapper/status', ensureLoggedIn, async function (req, res) {
+    const response = syncStatus.getCurrent()
+
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(response))
 })
 
 router.get('/scrapper/all/:flag?', ensureLoggedIn, async function (req, res) {

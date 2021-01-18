@@ -10,13 +10,13 @@
 
             <div class="content">
                 <div class="left">
-                    <section>
+                    <section id="worlds-sync">
                         <h1>Open Worlds</h1>
 
                         <% for (let world of openWorlds) { %>
                             <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
 
-                            <div class="world world-container">
+                            <div class="world world-container" id="<%= world.world_id %>">
                                 <div class="short-info">
                                     <p class="world-id">
                                         <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
@@ -48,5 +48,7 @@
         </main>
 
         <%- include('./footer.ejs') %>
+
+        <script type="text/javascript" src="/javascripts/admin.js"></script>
     </body>
 </html>

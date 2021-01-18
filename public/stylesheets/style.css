@@ -791,6 +791,11 @@ a.achievement-subject:last-child:after {
      
 }
 
+#admin .in-progress {
+    box-shadow: 0 0 0 1px green, inset 0 0 0 1px green, 2px 2px 2px #000;
+    border-color: #88bb7b;
+}
+
 #admin #logging {
     background: #000;
     width: 98%;

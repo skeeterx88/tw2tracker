@@ -1,16 +1,21 @@
-const addMarket = async function (market, accountName, accountId, accountToken, enabled = true) {
-    return await ajaxPost('/admin/add-market', {
-        market: market,
-        accountName: accountName,
-        accountId: accountId,
-        accountToken: accountToken,
-        enabled: enabled
-    })
-}
+function updateSyncStatus (worlds) {
+    const $syncings = document.querySelectorAll('#worlds-sync .in-progress')
 
-const debug = {
-    addMarket: async function () {
-        const result = await addMarket('en', '-Relaxeaza-', '848900934', '0f1673d8f39aa4c15687f5c5afea0ba57d1e6ce6', true)
-        console.log(result)
+    for (let $syncing of $syncings) {
+        if (!worlds.includes($syncing.id)) {
+            $syncing.classList.remove('in-progress')
+        }
+    }
+
+    for (let worldId of worlds) {
+        const $world = document.querySelector('#' + worldId)
+        $world.classList.add('in-progress')
     }
 }
+
+const socket = new WebSocket('ws://localhost:8080')
+
+socket.addEventListener('message', function (event) {
+    const worlds = JSON.parse(event.data)
+    updateSyncStatus(worlds)
+})
