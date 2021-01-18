@@ -11,22 +11,29 @@
             <div class="content">
                 <div class="left">
                     <section>
-                        <h1>Worlds</h1>
+                        <h1>Open Worlds</h1>
 
-                        <% for (let world of worlds) { %>
+                        <% for (let world of openWorlds) { %>
                             <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
 
-                            <div class="world">
+                            <div class="world world-container">
                                 <div class="short-info">
-                                    <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %></span> -
-                                    <span class="last-sync">Last sync: <%= formatDate(world_last_sync) %></span>
-                                    <% if (!world.open) { __append(' (Closed)') } -%>
+                                    <p class="world-id">
+                                        <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
+                                    </p>
+                                    <p>
+                                        Last sync: <%= formatDate(world_last_sync) %>
+                                    </p>
                                 </div>
-                                <ul class="actions">
-                                    <% if (world.open) { -%>
-                                        <li><a href="/admin/scrapper/<%= world.market %>/<%= world.num %>">Sync now</a></li>
-                                    <% } -%>
-                                </ul>
+                                <div class="actions">
+                                    <ul>
+                                        <% if (world.open) { -%>
+                                            <li>
+                                                <a href="/admin/scrapper/<%= world.market %>/<%= world.num %>"><button class="relax-button">Sync now</button></a>
+                                            </li>
+                                        <% } -%>
+                                    </ul>
+                                </div>
                             </div>
                         <% } %>
                     </section>

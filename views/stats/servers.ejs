@@ -13,7 +13,7 @@
                     <section id="markets">
                         <% for (let market of marketStats) { -%>
                             <a href="/stats/<%= market.id %>">
-                                <div class="market">
+                                <div class="market market-container">
                                     <div class="market-title">
                                         <span class="flag-<%= market.id %>"></span>
                                         <%= market.id.toUpperCase() %>

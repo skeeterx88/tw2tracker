@@ -11,12 +11,14 @@ const config = require('../config.js')
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
 
 router.get('/', ensureLoggedIn, async function (req, res) {
-    const worlds = await db.any(sql.getWorlds)
+    const openWorlds = await db.any(sql.getOpenWorlds)
+    const closedWorlds = await db.any(sql.getClosedWorlds)
     const markets = await db.any(sql.markets.all)
 
     res.render('admin', {
         title: `Admin Panel - ${config.site_name}`,
-        worlds,
+        openWorlds,
+        closedWorlds,
         markets,
         ...utils.ejsHelpers
     })
