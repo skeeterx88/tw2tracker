@@ -28,11 +28,6 @@ const achievementCommitTypes = {
     UPDATE: 'update'
 }
 
-const devAccounts = [
-    {id: 'zz', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'},
-    {id: 'br', account_name: 'tribalwarstracker', account_password: '7FONlraMpdnvrNIVE8aOgSGISVW00A'}
-]
-
 const Sync = {}
 
 Sync.init = async function () {
@@ -153,7 +148,7 @@ Sync.registerWorlds = async function () {
     log(log.GENERAL, 'Sync.registerWorlds()')
 
     await db.query(sql.state.update.registerWorlds)
-    const markets = development ? devAccounts : await db.any(sql.markets.withAccount)
+    const markets = await db.any(sql.markets.withAccount)
 
     for (let market of markets) {
         const marketId = market.id
@@ -337,16 +332,7 @@ Sync.allWorlds = async function (flag) {
     const simultaneousSyncs = 3
     const failedToSync = []
 
-    let queuedWorlds
-
-    if (development) {
-        queuedWorlds = [
-            {market: 'zz', num: 8},
-            {market: 'br', num: 52}
-        ]
-    } else {
-        queuedWorlds = await db.any(sql.getOpenWorlds)
-    }
+    let queuedWorlds = await db.any(sql.getOpenWorlds)
 
     await db.query(sql.state.update.lastScrappeAll)
 
@@ -485,16 +471,7 @@ Sync.allWorldsAchievements = async function (flag) {
     const simultaneousSyncs = 3
     const failedToSync = []
 
-    let queuedWorlds
-
-    if (development) {
-        queuedWorlds = [
-            {market: 'zz', num: 8},
-            {market: 'br', num: 52}
-        ]
-    } else {
-        queuedWorlds = await db.any(sql.getOpenWorlds)
-    }
+    let queuedWorlds = await db.any(sql.getOpenWorlds)
 
     let runningSyncs = 0
 
