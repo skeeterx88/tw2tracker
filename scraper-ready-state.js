@@ -1,3 +1,6 @@
+/**
+ * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
+ */
 module.exports = function () {
     return new Promise(function (resolve, reject) {
         let injectorTimeout
