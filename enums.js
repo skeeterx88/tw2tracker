@@ -7,13 +7,13 @@ module.exports = {
     SYNC_ACHIEVEMENTS_SUCCESS_ALL: 'sync_achievements_success_all',
     SYNC_ACHIEVEMENTS_ERROR_ALL: 'sync_achievements_error_all',
     SYNC_ACHIEVEMENTS_ERROR_SOME: 'sync_achievements_error_some',
-    SCRAPPE_WORLD_START: 'scrappe_world_start',
-    SCRAPPE_WORLD_END: 'scrappe_world_end',
-    SCRAPPE_ALL_WORLD_START: 'scrappe_all_world_start',
-    SCRAPPE_ALL_WORLD_END: 'scrappe_all_world_end',
+    SCRAPE_WORLD_START: 'scrape_world_start',
+    SCRAPE_WORLD_END: 'scrape_world_end',
+    SCRAPE_ALL_WORLD_START: 'scrape_all_world_start',
+    SCRAPE_ALL_WORLD_END: 'scrape_all_world_end',
     IGNORE_LAST_SYNC: 'ignore_last_sync',
-    SCRAPPE_ACHIEVEMENT_WORLD_START: 'scrappe_achievement_world_start',
-    SCRAPPE_ACHIEVEMENT_WORLD_END: 'scrappe_achievement_world_end',
-    SCRAPPE_ACHIEVEMENT_ALL_WORLD_START: 'scrappe_achievement_all_world_start',
-    SCRAPPE_ACHIEVEMENT_ALL_WORLD_END: 'scrappe_achievement_all_world_end'
+    SCRAPE_ACHIEVEMENT_WORLD_START: 'scrape_achievement_world_start',
+    SCRAPE_ACHIEVEMENT_WORLD_END: 'scrape_achievement_world_end',
+    SCRAPE_ACHIEVEMENT_ALL_WORLD_START: 'scrape_achievement_all_world_start',
+    SCRAPE_ACHIEVEMENT_ALL_WORLD_END: 'scrape_achievement_all_world_end'
 }

@@ -67,7 +67,7 @@ require([
             $sync.addEventListener('click', function (event) {
                 event.preventDefault()
 
-                fetch(`/admin/scrapper/${marketId}/${worldNumber}`)
+                fetch(`/admin/scraper/${marketId}/${worldNumber}`)
             })
         }
     }

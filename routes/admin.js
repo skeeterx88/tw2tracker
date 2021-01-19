@@ -24,14 +24,14 @@ router.get('/', ensureLoggedIn, async function (req, res) {
     })
 })
 
-router.get('/scrapper/status', ensureLoggedIn, async function (req, res) {
+router.get('/scraper/status', ensureLoggedIn, async function (req, res) {
     const response = syncStatus.getCurrent()
 
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(response))
 })
 
-router.get('/scrapper/all', ensureLoggedIn, async function (req, res) {
+router.get('/scraper/all', ensureLoggedIn, async function (req, res) {
     process.send({
         action: 'syncAllWorlds'
     })
@@ -39,7 +39,7 @@ router.get('/scrapper/all', ensureLoggedIn, async function (req, res) {
     res.end()
 })
 
-router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (req, res) {
+router.get('/scraper/:marketId/:worldNumber', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
@@ -56,7 +56,7 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     res.end()
 })
 
-router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async function (req, res) {
+router.get('/scraper/:marketId/:worldNumber/force', ensureLoggedIn, async function (req, res) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
@@ -143,8 +143,8 @@ router.post('/change-settings', ensureLoggedIn, async function (req, res) {
 
     const siteName = req.body['site-name']
     const adminPassword = req.body['admin-password']
-    const scrapperAllowBarbarians = req.body['scrapper-allow-barbarians']
-    const scrapperIntervalMinutes = req.body['scrapper-interval-minutes']
+    const scraperAllowBarbarians = req.body['scraper-allow-barbarians']
+    const scraperIntervalMinutes = req.body['scraper-interval-minutes']
 
     if (siteName.length < 1) {
         response.success = false
@@ -156,8 +156,8 @@ router.post('/change-settings', ensureLoggedIn, async function (req, res) {
         await db.query(sql.settings.update, [
             siteName,
             adminPassword,
-            scrapperAllowBarbarians,
-            scrapperIntervalMinutes
+            scraperAllowBarbarians,
+            scraperIntervalMinutes
         ])
 
         response.success = true

@@ -5,7 +5,7 @@ let syncing = new Set()
 let fullSync = false
 let partialSync = false
 
-Events.on(enums.SCRAPPE_WORLD_START, function (worldId) {
+Events.on(enums.SCRAPE_WORLD_START, function (worldId) {
     syncing.add(worldId)
 
     if (!fullSync) {
@@ -13,7 +13,7 @@ Events.on(enums.SCRAPPE_WORLD_START, function (worldId) {
     }
 })
 
-Events.on(enums.SCRAPPE_WORLD_END, function (worldId) {
+Events.on(enums.SCRAPE_WORLD_END, function (worldId) {
     syncing.delete(worldId)
 
     if (!fullSync) {
@@ -21,11 +21,11 @@ Events.on(enums.SCRAPPE_WORLD_END, function (worldId) {
     }
 })
 
-Events.on(enums.SCRAPPE_ACHIEVEMENT_WORLD_START, function (worldId) {
+Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, function (worldId) {
     fullSync = true
 })
 
-Events.on(enums.SCRAPPE_ACHIEVEMENT_WORLD_END, function (worldId) {
+Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, function (worldId) {
     fullSync = false
 })
 

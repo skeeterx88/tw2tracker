@@ -18,13 +18,13 @@ module.exports = function () {
             ws.send(JSON.stringify(data))
         }
 
-        Events.on(enums.SCRAPPE_WORLD_START, function (worldId) {
+        Events.on(enums.SCRAPE_WORLD_START, function (worldId) {
             send([syncStates.START, {
                 worldId
             }])
         })
 
-        Events.on(enums.SCRAPPE_WORLD_END, function (worldId, status, date) {
+        Events.on(enums.SCRAPE_WORLD_END, function (worldId, status, date) {
             send([syncStates.FINISH, {
                 worldId,
                 status,

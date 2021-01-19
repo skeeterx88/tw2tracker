@@ -2,7 +2,7 @@ SET TIMEZONE='UTC';
 
 CREATE TABLE public.state (
     initialized BOOLEAN DEFAULT FALSE,
-    last_scrappe_all_time TIMESTAMP DEFAULT NULL,
+    last_scrape_all_time TIMESTAMP DEFAULT NULL,
     last_register_worlds_time TIMESTAMP DEFAULT NULL,
     last_fetch_markets_time TIMESTAMP DEFAULT NULL
 );
