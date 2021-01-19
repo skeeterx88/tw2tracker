@@ -186,7 +186,6 @@ module.exports = {
     perf,
     sha1sum,
     asyncRouter,
-    log,
     timeout,
     hasOwn,
     ejsHelpers,
