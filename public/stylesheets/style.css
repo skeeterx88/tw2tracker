@@ -792,10 +792,6 @@ a.achievement-subject:last-child:after {
     color: green;
 }
 
-.hidden {
-    display: none;
-}
-
 span[class^="flag-"] {
     height: 12px;
     background-image: url(/images/flags.png);
