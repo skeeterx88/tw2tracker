@@ -12,7 +12,6 @@ const {db} = require('./db.js')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const config = require('./config.js')
 
-
 const statsRouter = require('./routes/stats.js')
 const adminRouter = require('./routes/admin.js')
 const loginRouter = require('./routes/login.js')

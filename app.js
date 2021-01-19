@@ -11,36 +11,31 @@
 
     const server = require('./server.js')
     const Sync = require('./sync.js')
+    const syncServer = require('./sync-server.js')
+    const cluster = require('cluster')
+    const cpus = require('os').cpus()
 
-    if (development) {
-        server()
+    if (cluster.isMaster) {
         Sync.init()
-    } else {
-        const cluster = require('cluster')
-        const cpus = require('os').cpus()
+        syncServer()
 
-        if (cluster.isMaster) {
-            for (let i = 0; i < cpus.length; i++) {
-                cluster.fork()
-            }
-        } else {
-            if (cpus.length === 1) {
-                server()
-                Sync.init()
+        for (let i = 0; i < cpus.length; i++) {
+            const worker = cluster.fork()
 
-                cluster.on('exit', () => {
-                    server()
-                    Sync.init()
-                })
-            } else {
-                if (cluster.worker.id === cpus.length) {
-                    Sync.init()
-                    cluster.on('exit', Sync.init)
-                } else {
-                    server()
-                    cluster.on('exit', server)
+            worker.on('message', function (data) {
+                switch (data.action) {
+                    case 'syncWorld': {
+                        Sync.world(data.marketId, data.worldNumber)
+                        break
+                    }
+                    case 'syncAllWorlds': {
+                        Sync.allWorlds()
+                        break
+                    }
                 }
-            }
+            })
         }
+    } else {
+        server()
     }
 })()

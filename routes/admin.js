@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const WebSocket = require('ws')
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 
 const {db} = require('../db.js')
@@ -9,40 +8,7 @@ const utils = require('../utils.js')
 const Sync = require('../sync.js')
 const config = require('../config.js')
 const syncStatus = require('../sync-status.js')
-const enums = require('../enums.js')
-const Events = require('../events.js')
-
 const IGNORE_LAST_SYNC = 'ignore_last_sync'
-
-const syncStates = {
-    START: 'start',
-    FINISH: 'finish',
-    UPDATE: 'update'
-}
-
-const socketServer = new WebSocket.Server({port: 7777})
-
-socketServer.on('connection', function connection(ws) {
-    function send(data) {
-        ws.send(JSON.stringify(data))
-    }
-
-    Events.on(enums.SCRAPPE_WORLD_START, function (worldId) {
-        send([syncStates.START, {
-            worldId
-        }])
-    })
-
-    Events.on(enums.SCRAPPE_WORLD_END, function (worldId, status, date) {
-        send([syncStates.FINISH, {
-            worldId,
-            status,
-            date
-        }])
-    })
-
-    send([syncStates.UPDATE, syncStatus.getCurrent()])
-})
 
 router.get('/', ensureLoggedIn, async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds)
@@ -65,21 +31,12 @@ router.get('/scrapper/status', ensureLoggedIn, async function (req, res) {
     res.end(JSON.stringify(response))
 })
 
-router.get('/scrapper/all/:flag?', ensureLoggedIn, async function (req, res) {
-    const response = {}
-    const flag = req.params.flag === 'force' ? IGNORE_LAST_SYNC : false
+router.get('/scrapper/all', ensureLoggedIn, async function (req, res) {
+    process.send({
+        action: 'syncAllWorlds'
+    })
 
-    try {
-        await Sync.allWorlds(flag)
-        response.message = 'worlds synchronized successfully'
-        response.success = true
-    } catch (error) {
-        response.message = error.message
-        response.success = false
-    }
-
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(response))
+    res.end()
 })
 
 router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (req, res) {
@@ -88,27 +45,15 @@ router.get('/scrapper/:marketId/:worldNumber', ensureLoggedIn, async function (r
     const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
     const worlds = await db.map(sql.getWorlds, [], world => world.num)
 
-    const response = {}
-
-    if (!enabledMarkets.includes(marketId)) {
-        response.success = false
-        response.message = `market ${marketId} is invalid`
-    } else if (!worlds.includes(worldNumber)) {
-        response.success = false
-        response.message = `world ${worldNumber} is invalid`
-    } else {
-        try {
-            await Sync.world(marketId, worldNumber)
-            response.message = `${marketId}${worldNumber} synchronized successfully`
-            response.success = true
-        } catch (error) {
-            response.message = error.message
-            response.success = false
-        }
+    if (enabledMarkets.includes(marketId) && worlds.includes(worldNumber)) {
+        process.send({
+            action: 'syncWorld',
+            marketId,
+            worldNumber
+        })
     }
 
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(response))
+    res.end()
 })
 
 router.get('/scrapper/:marketId/:worldNumber/force', ensureLoggedIn, async function (req, res) {
