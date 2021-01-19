@@ -1,6 +1,7 @@
-const createError = require('http-errors')
 const express = require('express')
 const session = require('express-session')
+const connectPgSimple = require('connect-pg-simple')
+const createError = require('http-errors')
 const compression = require('compression')
 const debug = require('debug')('tw2tracker:server')
 const http = require('http')
@@ -8,16 +9,11 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const passportLocal = require('passport-local')
+
 const db = require('./db.js')
-const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const config = require('./config.js')
 
-const statsRouter = require('./routes/stats.js')
-const adminRouter = require('./routes/admin.js')
-const loginRouter = require('./routes/login.js')
-const logoutRouter = require('./routes/logout.js')
-const mapsRouter = require('./routes/maps.js')
-
+const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const app = express()
 
 if (process.env.NODE_ENV === 'production') {
@@ -30,22 +26,16 @@ if (process.env.NODE_ENV === 'production') {
     })
 }
 
-app.use(compression({
-    level: 9
-}))
-
-// view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 
+app.use(compression({level: 9}))
 app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
-
 app.use(express.static(path.join(__dirname, 'public')))
-
 app.use(session({
-    store: new (require('connect-pg-simple')(session))({
+    store: new (connectPgSimple(session))({
         pgPromise: db,
         schemaName: 'public',
         tableName: 'session'
@@ -68,22 +58,22 @@ passport.use(new passportLocal.Strategy(async function (username, password, call
     callback(null, username)
 }))
 
-passport.serializeUser(function(username, callback) {
+passport.serializeUser(function (username, callback) {
     callback(null, username)
 })
 
-passport.deserializeUser(function(username, callback) {
+passport.deserializeUser(function (username, callback) {
     callback(null, username)
 })
 
 app.use(passport.initialize())
 app.use(passport.session())
 
-// if (development) {
-//     app.use(function (req, res, next) {
-//         setTimeout(next, 1000)
-//     })
-// }
+const statsRouter = require('./routes/stats.js')
+const adminRouter = require('./routes/admin.js')
+const loginRouter = require('./routes/login.js')
+const logoutRouter = require('./routes/logout.js')
+const mapsRouter = require('./routes/maps.js')
 
 app.use('/', statsRouter)
 app.use('/admin', adminRouter)
@@ -110,8 +100,6 @@ app.use(function (err, req, res, next) {
 app.set('port', port)
 
 module.exports = function () {
-    // console.log('Server: Initializing...')
-
     const server = http.createServer(app)
 
     server.on('error', function (error) {
