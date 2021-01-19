@@ -111,63 +111,6 @@ const asyncRouter = function (handler) {
     }
 }
 
-const log = function () {
-    const args = Array.from(arguments)
-    const empty = ' ·'
-    const message = []
-    const id = args[0]
-
-    if (!id || !hasOwn(log, id)) {
-        return false
-    }
-
-    switch (args.length) {
-        case 1: {
-            message.push(empty.repeat(log[id].level))
-            break
-        }
-        default: {
-            message.push(empty.repeat(log[id].level))
-            message.push(...args.slice(1))
-            break
-        }
-    }
-
-    const file = path.join('.', 'logs', id + '.log')
-    const date = new Date().toISOString().replace('T', ' ').substr(0, 19)
-
-    fs.appendFile(file, [date, ...message, '\n'].join(' '), async function (error) {
-        if (error && error.code === 'ENOENT') {
-            await fs.promises.writeFile(file, '')
-            log(...args)
-        }
-    })
-
-    if (id === log.GENERAL) {
-        console.log(...message)
-    }
-}
-
-
-
-log.GENERAL = 'general'
-log.ACHIEVEMENTS = 'achievements'
-
-log.INCREASE = 'log_increase'
-log.DECREASE = 'log_decrease'
-log.ZERO = 'log_zero'
-
-log[log.GENERAL] = {level: 0}
-log[log.ACHIEVEMENTS] = {level: 0}
-
-log.increase = function (id) {
-    log[id].level++
-}
-
-log.decrease = function (id) {
-    log[id].level = Math.max(0, log[id].level - 1)
-}
-
 const timeout = function (handler, time, errorMessage) {
     return new Promise(async function (resolve, reject) {
         const id = setTimeout(function () {
