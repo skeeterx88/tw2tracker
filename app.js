@@ -1,6 +1,5 @@
 (async function () {
-    const development = process.env.NODE_ENV === 'development'
-    const {db} = require('./db.js')
+    const db = require('./db.js')
     const sql = require('./sql.js')
 
     const schemaInitialized = (await db.one(sql.helpers.schemaInitialized)).exists

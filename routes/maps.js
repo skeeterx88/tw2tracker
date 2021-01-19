@@ -6,7 +6,7 @@ const router = express.Router()
 const utils = require('../utils.js')
 const {asyncRouter} = utils
 const config = require('../config.js')
-const {db} = require('../db.js')
+const db = require('../db.js')
 const sql = require('../sql.js')
 
 const mapsAPIRouter = require('./maps-api.js')

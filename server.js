@@ -8,7 +8,7 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const passportLocal = require('passport-local')
-const {db} = require('./db.js')
+const db = require('./db.js')
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const config = require('./config.js')
 

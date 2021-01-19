@@ -4,7 +4,7 @@ const router = express.Router()
 const utils = require('../utils')
 const {asyncRouter} = utils
 const config = require('../config.js')
-const {db} = require('../db.js')
+const db = require('../db.js')
 const sql = require('../sql.js')
 const achievementTitles = require('../achievement-titles.json')
 

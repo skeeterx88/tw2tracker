@@ -1,4 +1,3 @@
-const {db} = require('./db.js')
 const sql = require('./sql.js')
 const utils = require('./utils.js')
 const {log, hasOwn} = utils
@@ -14,6 +13,7 @@ const path = require('path')
 const colors = require('colors/safe')
 const development = process.env.NODE_ENV === 'development'
 const puppeteer = require('puppeteer-core')
+const db = require('./db.js')
 const enums = require('./enums.js')
 const auths = {}
 

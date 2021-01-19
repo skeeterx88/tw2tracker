@@ -1,6 +1,6 @@
 const createError = require('http-errors')
 const {schemaExists} = require('./utils.js')
-const {db} = require('./db.js')
+const db = require('./db.js')
 const sql = require('./sql.js')
 
 async function getPlayer (worldId, playerId) {
