@@ -2,7 +2,6 @@ const express = require('express')
 const createError = require('http-errors')
 const router = express.Router()
 const utils = require('../utils')
-const {asyncRouter} = utils
 const config = require('../config.js')
 const db = require('../db.js')
 const sql = require('../sql.js')
@@ -22,7 +21,7 @@ const playersRouter = require('./stats-players.js')
 const tribesRouter = require('./stats-tribes.js')
 const conquestsRouter = require('./stats-conquests.js')
 
-const marketsRouter = asyncRouter(async function (req, res, next) {
+const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     const worlds = await db.any(sql.getWorlds)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
 
@@ -48,7 +47,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const worldsRouter = asyncRouter(async function (req, res, next) {
+const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramMarket(req)) {
         return next()
     }
@@ -83,7 +82,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const worldRouter = asyncRouter(async function (req, res, next) {
+const worldRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }

@@ -8,10 +8,7 @@ require([
     TW2Map,
     TW2Tooltip,
     TW2DataLoader,
-    {
-        averageCoords,
-        hasOwn
-    },
+    utils,
     {
         mapHighlights,
         mapHighlightsType,
@@ -33,11 +30,11 @@ require([
 
         switch (type) {
             case TW2Map.highlightTypes.TRIBES: {
-                [averageX, averageY] = averageCoords(loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat())
+                [averageX, averageY] = utils.averageCoords(loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat())
                 break
             }
             case TW2Map.highlightTypes.PLAYERS: {
-                [averageX, averageY] = averageCoords(loader.playerVillages[id])
+                [averageX, averageY] = utils.averageCoords(loader.playerVillages[id])
                 break
             }
             case TW2Map.highlightTypes.VILLAGES: {
@@ -133,7 +130,7 @@ require([
         const $hiddenInput = document.querySelector('#search-category')
 
         const selectCategory = (category) => {
-            if (!hasOwn(SEARCH_CATEGORIES, category)) {
+            if (!utils.hasOwn(SEARCH_CATEGORIES, category)) {
                 return false
             }
 

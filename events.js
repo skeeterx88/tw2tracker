@@ -1,7 +1,7 @@
-const {noop} = require('./utils.js')
+const utils = require('./utils.js')
 const events = new Map()
 
-const on = function (id, handler = noop) {
+const on = function (id, handler = utils.noop) {
     if (typeof id !== 'string') {
         throw new Error('Invalid on event ID: Not a String.')
     }
@@ -10,7 +10,7 @@ const on = function (id, handler = noop) {
         throw new Error('Invalid on event handler: Not a Function/undefined.')
     }
 
-    if (handler === noop) {
+    if (handler === utils.noop) {
         return new Promise(function (resolve) {
             const tmp = function () {
                 remove(id, tmp)

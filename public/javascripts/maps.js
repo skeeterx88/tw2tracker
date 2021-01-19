@@ -10,11 +10,7 @@ require([
     TW2Map,
     TW2DataLoader,
     TW2Tooltip,
-    {
-        arrayRandom,
-        normalizeString,
-        formatSince
-    },
+    utils,
     {
         marketId,
         worldNumber,
@@ -140,7 +136,7 @@ require([
                 highlight: true,
                 onSelection: (feedback) => {
                     const {id, highlightType} = feedback.selection.value
-                    const color = arrayRandom(TW2Map.colorPalette.flat())
+                    const color = utils.arrayRandom(TW2Map.colorPalette.flat())
 
                     map.addHighlight(highlightType, id, color)
                     $highlightId.value = ''
@@ -179,7 +175,7 @@ require([
             const $villages = document.createElement('div')
             const $icon = document.createElement('span')
 
-            $item.classList.add(`highlight-${normalizeString(id)}`)
+            $item.classList.add(`highlight-${utils.normalizeString(id)}`)
             $item.classList.add('item')
             $item.classList.add(highlightType)
             $item.dataset.highlightType = highlightType
@@ -230,7 +226,7 @@ require([
         })
 
         map.on('update highlight', (highlightType, id, displayName, color) => {
-            const $item = $highlightItems.querySelector(`.highlight-${normalizeString(id)}`)
+            const $item = $highlightItems.querySelector(`.highlight-${utils.normalizeString(id)}`)
 
             if (!$item) {
                 return false
@@ -243,7 +239,7 @@ require([
         })
 
         map.on('remove highlight', (highlightType, id) => {
-            const $item = $highlightItems.querySelector(`.highlight-${normalizeString(id)}`)
+            const $item = $highlightItems.querySelector(`.highlight-${utils.normalizeString(id)}`)
 
             if ($item) {
                 $item.remove()
@@ -364,7 +360,7 @@ require([
             return
         }
 
-        $lastSyncDate.innerHTML = formatSince(lastSync)
+        $lastSyncDate.innerHTML = utils.formatSince(lastSync)
         $lastSync.classList.remove('hidden')
     }
 
@@ -376,7 +372,7 @@ require([
         const $shareDate = document.querySelector('#share-date')
         const $shareDateDate = document.querySelector('#share-date-date')
 
-        $shareDateDate.innerHTML = formatSince(mapShare.creation_date)
+        $shareDateDate.innerHTML = utils.formatSince(mapShare.creation_date)
         $shareDate.classList.remove('hidden')
     }
 

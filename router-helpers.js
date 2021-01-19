@@ -1,5 +1,5 @@
 const createError = require('http-errors')
-const {schemaExists} = require('./utils.js')
+const utils = require('./utils.js')
 const db = require('./db.js')
 const sql = require('./sql.js')
 
@@ -50,7 +50,7 @@ async function paramWorldParse (req) {
     const marketId = req.params.marketId
     const worldNumber = parseInt(req.params.worldNumber, 10)
     const worldId = marketId + worldNumber
-    const worldSchema = await schemaExists(worldId)
+    const worldSchema = await utils.schemaExists(worldId)
 
     if (!worldSchema) {
         throw createError(404, 'This world does not exist')

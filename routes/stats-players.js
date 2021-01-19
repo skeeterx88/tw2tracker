@@ -4,7 +4,6 @@ const router = express.Router()
 const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
-const {asyncRouter, hasOwn} = utils
 const config = require('../config.js')
 const achievementTitles = require('../achievement-titles.json')
 
@@ -25,7 +24,7 @@ const conquestTypes =  {
 
 const conquestCategories = ['gain', 'loss', 'all']
 
-const playerProfileRouter = asyncRouter(async function (req, res, next) {
+const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -98,7 +97,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const playerVillagesRouter = asyncRouter(async function (req, res, next) {
+const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -142,7 +141,7 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const playerConquestsRouter = asyncRouter(async function (req, res, next) {
+const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -232,7 +231,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
+const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -254,11 +253,11 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
     const tribeTags = {}
 
     for (let change of tribeChanges) {
-        if (change.old_tribe && !hasOwn(tribeTags, change.old_tribe)) {
+        if (change.old_tribe && !utils.hasOwn(tribeTags, change.old_tribe)) {
             tribeTags[change.old_tribe] = (await db.one(sql.getTribe, {worldId, tribeId: change.old_tribe})).tag
         }
 
-        if (change.new_tribe && !hasOwn(tribeTags, change.new_tribe)) {
+        if (change.new_tribe && !utils.hasOwn(tribeTags, change.new_tribe)) {
             tribeTags[change.new_tribe] = (await db.one(sql.getTribe, {worldId, tribeId: change.new_tribe})).tag
         }
     }
@@ -289,7 +288,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
+const playerAchievementsRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
