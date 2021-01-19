@@ -1,20 +1,23 @@
-const sql = require('./sql.js')
-const config = require('./config.js')
-const Events = require('./events.js')
 const fs = require('fs')
-const schedule = require('node-schedule')
 const zlib = require('zlib')
 const path = require('path')
+const schedule = require('node-schedule')
 const colors = require('colors/safe')
-const development = process.env.NODE_ENV === 'development'
 const puppeteer = require('puppeteer-core')
+
 const db = require('./db.js')
+const sql = require('./sql.js')
 const utils = require('./utils.js')
+const config = require('./config.js')
+const Events = require('./events.js')
 const enums = require('./enums.js')
+
 const scraperData = require('./scraper-data.js')
 const scraperAchievements = require('./scraper-achievements.js')
 const scraperReadyState = require('./scraper-ready-state.js')
+
 const auths = {}
+const Sync = {}
 
 let browser = null
 let syncInProgress = false
@@ -26,8 +29,6 @@ const achievementCommitTypes = {
     ADD: 'add',
     UPDATE: 'update'
 }
-
-const Sync = {}
 
 Sync.init = async function () {
     Events.on(enums.SCRAPE_WORLD_START, () => syncInProgress = true)
@@ -82,32 +83,7 @@ Sync.init = async function () {
     }
 
     try {
-        if (development) {
-            // const worldNumber = 8
-            // const marketId = 'zz'
-            // const worldId = marketId + worldNumber
-            // const data = JSON.parse(await fs.promises.readFile(path.join('.', 'data', `${worldId}.freeze.json`)))
-            // await commitDataDatabase(data, worldId)
-            // await commitDataFilesystem(worldId)
-            // await db.query(sql.updateWorldSyncStatus, [SYNC_SUCCESS, marketId, worldNumber])
-            // await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
-
-            // const worldNumber = 52
-            // const marketId = 'br'
-            // const worldId = marketId + worldNumber
-            // const achievements = JSON.parse(await fs.promises.readFile(path.join('.', 'data', `${worldId}-achievements.freeze.json`)))
-            // await commitAchievementsDatabase(achievements, worldId)
-
-            // await Sync.allWorlds()
-            // await Sync.world('br', 54)
-            // await Sync.worldAchievements('br', 54)
-            // await Sync.registerWorlds()
-
-            // await Sync.worldAchievements('br', 52)
-            // await Sync.allWorldsAchievements()
-        } else {
-            await Sync.daemon()
-        }
+        await Sync.daemon()
     } catch (error) {
         console.log(colors.red(error))
     }
