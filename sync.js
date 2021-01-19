@@ -1,6 +1,4 @@
 const sql = require('./sql.js')
-const utils = require('./utils.js')
-const {log, hasOwn} = utils
 const config = require('./config.js')
 const Events = require('./events.js')
 const fs = require('fs')
@@ -11,6 +9,7 @@ const colors = require('colors/safe')
 const development = process.env.NODE_ENV === 'development'
 const puppeteer = require('puppeteer-core')
 const db = require('./db.js')
+const utils = require('./utils.js')
 const enums = require('./enums.js')
 const scraperData = require('./scraper-data.js')
 const scraperAchievements = require('./scraper-achievements.js')
@@ -228,7 +227,7 @@ Sync.registerCharacter = async function (marketId, worldNumber) {
 }
 
 Sync.auth = async function (marketId, {account_name, account_password}, auth_attempt = 1) {
-    if (hasOwn.call(auths, marketId)) {
+    if (utils.hasOwn(auths, marketId)) {
         return await auths[marketId]
     }
 
@@ -821,11 +820,11 @@ async function commitDataFilesystem (worldId) {
 
             const k = parseInt(ky + kx, 10)
 
-            if (!hasOwn.call(continents, k)) {
+            if (!utils.hasOwn(continents, k)) {
                 continents[k] = {}
             }
 
-            if (!hasOwn.call(continents[k], x)) {
+            if (!utils.hasOwn(continents[k], x)) {
                 continents[k][x] = {}
             }
 

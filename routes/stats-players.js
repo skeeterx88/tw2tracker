@@ -254,11 +254,11 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
     const tribeTags = {}
 
     for (let change of tribeChanges) {
-        if (change.old_tribe && !hasOwn.call(tribeTags, change.old_tribe)) {
+        if (change.old_tribe && !hasOwn(tribeTags, change.old_tribe)) {
             tribeTags[change.old_tribe] = (await db.one(sql.getTribe, {worldId, tribeId: change.old_tribe})).tag
         }
 
-        if (change.new_tribe && !hasOwn.call(tribeTags, change.new_tribe)) {
+        if (change.new_tribe && !hasOwn(tribeTags, change.new_tribe)) {
             tribeTags[change.new_tribe] = (await db.one(sql.getTribe, {worldId, tribeId: change.new_tribe})).tag
         }
     }

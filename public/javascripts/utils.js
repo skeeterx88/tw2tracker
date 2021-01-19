@@ -1,5 +1,7 @@
 define('utils', function () {
-    const hasOwn = Object.prototype.hasOwnProperty
+    const hasOwn = function (obj, property) {
+        return Object.prototype.hasOwnProperty.call(obj, property)
+    }
 
     const ajaxPost = async function (url = '', data = {}) {
         const response = await fetch(url, {

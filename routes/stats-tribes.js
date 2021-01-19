@@ -4,7 +4,7 @@ const router = express.Router()
 const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
-const {asyncRouter, hasOwn} = utils
+const {asyncRouter} = utils
 const config = require('../config.js')
 const achievementTitles = require('../achievement-titles.json')
 
@@ -291,7 +291,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
     const memberChanges = []
 
     for (let change of memberChangesRaw) {
-        if (!hasOwn.call(playersName, change.character_id)) {
+        if (!utils.hasOwn(playersName, change.character_id)) {
             playersName[change.character_id] = (await db.one(sql.getPlayer, {worldId, playerId: change.character_id})).name
         }
 

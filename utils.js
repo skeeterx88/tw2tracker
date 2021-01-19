@@ -117,7 +117,7 @@ const log = function () {
     const message = []
     const id = args[0]
 
-    if (!id || !hasOwn.call(log, id)) {
+    if (!id || !hasOwn(log, id)) {
         return false
     }
 
@@ -181,7 +181,9 @@ const timeout = function (handler, time, errorMessage) {
     })
 }
 
-const hasOwn = Object.prototype.hasOwnProperty
+const hasOwn = function (obj, property) {
+    return Object.prototype.hasOwnProperty.call(obj, property)
+}
 
 const capitalize = function (value) {
     return typeof value === 'string'

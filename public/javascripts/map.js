@@ -193,7 +193,7 @@ define('TW2Map', [
             zoomSettings.mapWidth = 1000 * zoomSettings.tileSize
             zoomSettings.mapHeight = 1000 * zoomSettings.tileSize
 
-            if (!hasOwn.call($zoomElements, settings.zoomLevel)) {
+            if (!hasOwn($zoomElements, settings.zoomLevel)) {
                 $cache = document.createElement('canvas')
                 $cacheContext = $cache.getContext('2d')
 
@@ -522,7 +522,7 @@ define('TW2Map', [
             }
 
             const visibleContinents = getVisibleContinents()
-            const nonRenderedContinents = visibleContinents.filter((k) => !hasOwn.call(renderedZoomGrid[settings.zoomLevel], k))
+            const nonRenderedContinents = visibleContinents.filter((k) => !hasOwn(renderedZoomGrid[settings.zoomLevel], k))
 
             for (let k of nonRenderedContinents) {
                 k = String(k)
@@ -766,16 +766,16 @@ define('TW2Map', [
 
             switch (highlightType) {
                 case TW2Map.highlightTypes.PLAYERS: {
-                    if (hasOwn.call(loader.playersByName, lowerId)) {
+                    if (hasOwn(loader.playersByName, lowerId)) {
                         return loader.playersByName[lowerId]
                     } else {
                         throw new Error(`Highlights: Player ${id} not found`)
                     }
                 }
                 case TW2Map.highlightTypes.TRIBES: {
-                    if (hasOwn.call(loader.tribesByTag, lowerId)) {
+                    if (hasOwn(loader.tribesByTag, lowerId)) {
                         return loader.tribesByTag[lowerId]
-                    } else if (hasOwn.call(loader.tribesByName, lowerId)) {
+                    } else if (hasOwn(loader.tribesByName, lowerId)) {
                         return loader.tribesByName[lowerId]
                     } else {
                         throw new Error(`Highlights: Tribe ${id} not found`)
@@ -944,7 +944,7 @@ define('TW2Map', [
             let realId
             let displayName
 
-            if (typeof id === 'number' && hasOwn.call(loader[highlightType], id)) {
+            if (typeof id === 'number' && hasOwn(loader[highlightType], id)) {
                 realId = id
             } else if (typeof id === 'string') {
                 try {
@@ -975,7 +975,7 @@ define('TW2Map', [
                 }
             }
 
-            if (hasOwn.call(highlights[highlightType], realId)) {
+            if (hasOwn(highlights[highlightType], realId)) {
                 this.trigger('update highlight', [highlightType, id, displayName, color])
             } else {
                 this.trigger('add highlight', [highlightType, id, displayName, color])
@@ -1000,7 +1000,7 @@ define('TW2Map', [
         this.removeHighlight = (highlightType, id) => {
             let realId
 
-            if (typeof id === 'number' && hasOwn.call(loader[highlightType], id)) {
+            if (typeof id === 'number' && hasOwn(loader[highlightType], id)) {
                 realId = id
             } else if (typeof id === 'string') {
                 try {
@@ -1040,7 +1040,7 @@ define('TW2Map', [
 
             switch (type) {
                 case TW2Map.highlightTypes.PLAYERS: {
-                    if (!hasOwn.call(loader.players, id)) {
+                    if (!hasOwn(loader.players, id)) {
                         return false
                     }
 
@@ -1048,7 +1048,7 @@ define('TW2Map', [
                     break
                 }
                 case TW2Map.highlightTypes.TRIBES: {
-                    if (!hasOwn.call(loader.tribes, id)) {
+                    if (!hasOwn(loader.tribes, id)) {
                         return false
                     }
 
@@ -1056,7 +1056,7 @@ define('TW2Map', [
                     break
                 }
                 case TW2Map.highlightTypes.VILLAGES: {
-                    if (!hasOwn.call(loader.villagesById, id)) {
+                    if (!hasOwn(loader.villagesById, id)) {
                         return false
                     }
 
@@ -1149,7 +1149,7 @@ define('TW2Map', [
         }
 
         this.trigger = (event, args) => {
-            if (hasOwn.call(events, event)) {
+            if (hasOwn(events, event)) {
                 for (let handler of events[event]) {
                     handler.apply(this, args)
                 }
@@ -1161,13 +1161,13 @@ define('TW2Map', [
         }
 
         this.changeSetting = (id, value, flag) => {
-            if (!hasOwn.call(settings, id)) {
+            if (!hasOwn(settings, id)) {
                 throw new Error(`Setting '${id}' does not exist`)
             }
 
             settings[id] = value
 
-            if (hasOwn.call(settingTriggers, id)) {
+            if (hasOwn(settingTriggers, id)) {
                 settingTriggers[id](flag)
             }
 
@@ -1320,7 +1320,7 @@ define('TW2DataLoader', [
                 throw new Error('Invalid continent value')
             }
 
-            if (hasOwn.call(continentPromises, continent)) {
+            if (hasOwn(continentPromises, continent)) {
                 return continentPromises[continent]
             }
 

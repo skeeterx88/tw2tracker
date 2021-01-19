@@ -133,7 +133,7 @@ require([
         const $hiddenInput = document.querySelector('#search-category')
 
         const selectCategory = (category) => {
-            if (!hasOwn.call(SEARCH_CATEGORIES, category)) {
+            if (!hasOwn(SEARCH_CATEGORIES, category)) {
                 return false
             }
 
