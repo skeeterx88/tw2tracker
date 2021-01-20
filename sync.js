@@ -70,15 +70,15 @@ Sync.init = async function () {
 
     const state = await db.one(sql.state.all)
 
-    if (!state.last_fetch_markets_time) {
+    if (!state.last_sync_markets) {
         await Sync.markets()
     }
 
-    if (!state.last_register_worlds_time) {
+    if (!state.last_sync_worlds) {
         await Sync.worlds()
     }
 
-    if (!state.last_scrape_all_time) {
+    if (!state.last_sync_data_all) {
         await Sync.dataAll()
     }
 
