@@ -24,11 +24,11 @@
             worker.on('message', function (data) {
                 switch (data.action) {
                     case 'syncWorld': {
-                        Sync.world(data.marketId, data.worldNumber)
+                        Sync.data(data.marketId, data.worldNumber)
                         break
                     }
                     case 'syncAllWorlds': {
-                        Sync.allWorlds()
+                        Sync.dataAll()
                         break
                     }
                 }

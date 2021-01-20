@@ -20,10 +20,10 @@ const auths = {}
 const Sync = {}
 
 let browser = null
-let syncInProgress = false
-let syncAllInProgress = false
-let syncAllAchievementsInProgress = false
-let syncAchievementsInProgress = false
+let syncDataActiveWorlds = new Set()
+let syncDataAllRunning = false
+let syncAchievementsActiveWorlds = new Set()
+let syncAchievementsRunning = false
 
 const achievementCommitTypes = {
     ADD: 'add',
@@ -31,26 +31,29 @@ const achievementCommitTypes = {
 }
 
 Sync.init = async function () {
-    Events.on(enums.SCRAPE_WORLD_START, () => syncInProgress = true)
-    Events.on(enums.SCRAPE_WORLD_END, () => syncInProgress = false)
-    Events.on(enums.SCRAPE_ALL_WORLD_START, () => syncAllInProgress = true)
-    Events.on(enums.SCRAPE_ALL_WORLD_END, () => syncAllInProgress = false)
-    Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, () => syncAchievementsInProgress = true)
-    Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, () => syncAchievementsInProgress = false)
-    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAllAchievementsInProgress = true)
-    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAllAchievementsInProgress = false)
     console.log('Sync.init()')
+
+    Events.on(enums.SCRAPE_WORLD_START, (worldId) => syncDataActiveWorlds.add(worldId))
+    Events.on(enums.SCRAPE_WORLD_END, (worldId) => syncDataActiveWorlds.delete(worldId))
+    Events.on(enums.SCRAPE_ALL_WORLD_START, () => syncDataAllRunning = true)
+    Events.on(enums.SCRAPE_ALL_WORLD_END, () => syncDataAllRunning = false)
+    Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, (worldId) => syncAchievementsActiveWorlds.add(worldId))
+    Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId) => syncAchievementsActiveWorlds.delete(worldId))
+    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAchievementsRunning = true)
+    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAchievementsRunning = false)
 
     process.on('SIGTERM', async function () {
         console.log(colors.red('Stopping tw2-tracker'))
 
-        if (syncInProgress) {
+        if (syncDataActiveWorlds.size) {
             console.log(colors.red('Waiting pendent sync to end...'))
+            // TODO: handle multiple data syncs running simultaneously
             await Events.on(enums.SCRAPE_WORLD_END)
         }
 
-        if (syncAchievementsInProgress) {
+        if (syncAchievementsRunning) {
             console.log(colors.red('Waiting pendent achievement sync to end...'))
+            // TODO: handle multiple achievement syncs running simultaneously
             await Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END)
         }
 
@@ -72,11 +75,11 @@ Sync.init = async function () {
     }
 
     if (!state.last_register_worlds_time) {
-        await Sync.registerWorlds()
+        await Sync.worlds()
     }
 
     if (!state.last_scrape_all_time) {
-        await Sync.allWorlds()
+        await Sync.dataAll()
     }
 
     try {
@@ -90,34 +93,288 @@ Sync.daemon = async function () {
     console.log('Sync.daemon()')
 
     const scrapeWorldsJob = schedule.scheduleJob(config.scrape_all_interval, async function () {
-        await Sync.allWorlds()
-        console.log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+        await Sync.dataAll()
+        console.log('Next data sync', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const scrapeAchievementsWorldsJob = schedule.scheduleJob(config.scrape_achievements_all_interval, async function () {
-        await Sync.allWorldsAchievements()
-        console.log('Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
+        await Sync.achievementsAll()
+        console.log('Next achievements sync', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const registerWorldsJob = schedule.scheduleJob(config.register_worlds_interval, async function () {
         await Sync.markets()
-        await Sync.registerWorlds()
-        console.log('Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
+        await Sync.worlds()
+        console.log('Next markets/worlds sync', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     })
 
     const cleanSharesJob = schedule.scheduleJob(config.clean_shares_check_interval, async function () {
-        await Sync.cleanExpiredShares()
-        console.log('Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
+        const now = Date.now()
+        const shares = await db.any(sql.maps.getShareLastAccess)
+
+        const static_share_expire_time = config.static_share_expire_time * 60 * 1000
+
+        for (let { share_id, last_access } of shares) {
+            if (now - last_access.getTime() < static_share_expire_time) {
+                await db.query(sql.maps.deleteStaticShare, [share_id])
+            }
+        }
+
+        console.log('Next map shares vacuum', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
     })
 
-    console.log('Next Sync.allWorlds', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
-    console.log('Next Sync.allWorldsAchievements', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
-    console.log('Next Sync.registerWorldsJob', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
-    console.log('Next Sync.cleanExpiredShares', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
+    console.log('Next data sync', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+    console.log('Next achievements sync', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
+    console.log('Next markets/worlds sync', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
+    console.log('Next map shares vacuum', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
 }
 
-Sync.registerWorlds = async function () {
-    console.log('Sync.registerWorlds()')
+Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
+    const worldId = marketId + worldNumber
+
+    if (syncDataActiveWorlds.has(worldId)) {
+        console.log(`Sync.data() ${colors.green(marketId + worldNumber)} already in progress`)
+        return
+    }
+
+    Events.trigger(enums.SCRAPE_WORLD_START, [worldId])
+
+    console.log(`Sync.data() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+
+    let page
+
+    try {
+        const world = await getWorld(marketId, worldNumber)
+        const credentials = await db.one(sql.markets.oneWithAccount, [marketId])
+
+        if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
+            const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60
+            if (minutesSinceLastSync < config.scraper_interval_minutes) {
+                throw new Error(`${worldId} already sincronized`)
+            }
+        }
+
+        page = await createPuppeteerPage()
+
+        const account = await Sync.auth(marketId, credentials)
+        const worldCharacter = account.characters.find(({ world_id }) => world_id === worldId)
+
+        if (!worldCharacter) {
+            await Sync.character(marketId, worldNumber)
+        } else if (!worldCharacter.allow_login) {
+            await db.query(sql.closeWorld, [marketId, worldNumber])
+            throw new Error('world is not open')
+        }
+
+        const urlId = marketId === 'zz' ? 'beta' : marketId
+        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, { waitFor: ['domcontentloaded', 'networkidle2'] })
+        await page.evaluate(scraperReadyState)
+
+        if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
+            await fetchWorldMapStructure(page, worldId, urlId)
+        }
+
+        if (!world.config) {
+            await fetchWorldConfig(page, worldId)
+        }
+
+        if (world.time_offset === null) {
+            await fetchWorldTimeOffset(page, worldId)
+        }
+
+        const data = await utils.timeout(async function () {
+            return await page.evaluate(scraperData)
+        }, 120000, 'Scrape evaluation timeout')
+
+        await commitRawDataFilesystem(data, worldId)
+        await commitDataDatabase(data, worldId)
+        await commitDataFilesystem(worldId)
+        await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
+        await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
+
+        const { last_sync } = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
+        const syncDate = utils.ejsHelpers.formatDate(last_sync)
+
+        await page.close()
+
+        Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_SUCCESS, syncDate])
+    } catch (error) {
+        console.log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
+
+        if (page) {
+            await page.close()
+        }
+
+        if (attempt < 3) {
+            return await Sync.data(marketId, worldNumber, flag, ++attempt)
+        } else {
+            await db.query(sql.updateWorldSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
+            await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
+
+            const { last_sync } = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
+            const syncDate = utils.ejsHelpers.formatDate(last_sync)
+
+            Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
+
+            throw new Error(error.message)
+        }
+    }
+}
+
+Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
+    const worldId = marketId + worldNumber
+
+    Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_START, [marketId])
+
+    console.log(`Sync.achievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+
+    let page
+
+    try {
+        await getWorld(marketId, worldNumber)
+
+        const credentials = await db.one(sql.markets.oneWithAccount, [marketId])
+
+        page = await createPuppeteerPage()
+
+        const account = await Sync.auth(marketId, credentials)
+        const urlId = marketId === 'zz' ? 'beta' : marketId
+        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, { waitFor: ['domcontentloaded', 'networkidle2'] })
+        await page.evaluate(scraperReadyState)
+
+        const achievements = await utils.timeout(async function () {
+            return await page.evaluate(scraperAchievements, marketId, worldNumber)
+        }, 1000000, 'scraperAchievements evaluation timeout')
+
+        // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
+        // await fs.promises.writeFile(path.join('.', 'data', `${worldId}-achievements.freeze.json`), JSON.stringify(achievements))
+        // return
+
+        await commitAchievementsDatabase(achievements, worldId)
+
+        await page.close()
+
+        Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [marketId])
+    } catch (error) {
+        console.log(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
+
+        if (page) {
+            await page.close()
+        }
+
+        if (attempt < 3) {
+            return await Sync.achievements(marketId, worldNumber, flag, ++attempt)
+        } else {
+            Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [marketId])
+            throw new Error(error.message)
+        }
+    }
+}
+
+Sync.dataAll = async function (flag) {
+    console.log('Sync.allWorlds()')
+
+    if (syncDataAllRunning) {
+        console.log(colors.red('\nA Scrape All Worlds is already in progress\n'))
+        return false
+    }
+
+    Events.trigger(enums.SCRAPE_ALL_WORLD_START)
+
+    const simultaneousSyncs = 3
+    const failedToSync = []
+
+    let queuedWorlds = await db.any(sql.getOpenWorlds)
+
+    await db.query(sql.state.update.lastScrapeAll)
+
+    let runningSyncs = 0
+
+    async function asynchronousSync() {
+        while (queuedWorlds.length) {
+            if (runningSyncs < simultaneousSyncs) {
+                const world = queuedWorlds.shift()
+
+                runningSyncs++
+
+                Sync.data(world.market, world.num, flag).catch(function (error) {
+                    failedToSync.push({
+                        marketId: world.market,
+                        worldNumber: world.num,
+                        message: error.message
+                    })
+                })
+            } else {
+                await Events.on(enums.SCRAPE_WORLD_END)
+                runningSyncs--
+            }
+        }
+    }
+
+    await asynchronousSync()
+
+    Events.trigger(enums.SCRAPE_ALL_WORLD_END)
+
+    if (failedToSync.length) {
+        const allFail = failedToSync.length === queuedWorlds.length
+        return allFail ? enums.SYNC_ERROR_ALL : enums.SYNC_ERROR_SOME
+    } else {
+        return enums.SYNC_SUCCESS_ALL
+    }
+}
+
+Sync.achievementsAll = async function (flag) {
+    console.log('Sync.allWorldsAchievements()')
+
+    if (syncAchievementsActiveWorlds.size) {
+        console.log(colors.red('A Scrape All Achievement Worlds is already in progress'))
+        return false
+    }
+
+    Events.trigger(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START)
+
+    const simultaneousSyncs = 3
+    const failedToSync = []
+
+    let queuedWorlds = await db.any(sql.getOpenWorlds)
+
+    let runningSyncs = 0
+
+    async function asynchronousSync() {
+        while (queuedWorlds.length) {
+            if (runningSyncs < simultaneousSyncs) {
+                const world = queuedWorlds.shift()
+
+                runningSyncs++
+
+                Sync.achievements(world.market, world.num, flag).catch(function (error) {
+                    failedToSync.push({
+                        marketId: world.market,
+                        worldNumber: world.num,
+                        message: error.message
+                    })
+                })
+            } else {
+                await Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END)
+                runningSyncs--
+            }
+        }
+    }
+
+    await asynchronousSync()
+
+    Events.trigger(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END)
+
+    if (failedToSync.length) {
+        const allFail = failedToSync.length === queuedWorlds.length
+        return allFail ? enums.SYNC_ACHIEVEMENTS_ERROR_ALL : enums.SYNC_ACHIEVEMENTS_ERROR_SOME
+    } else {
+        return enums.SYNC_ACHIEVEMENTS_SUCCESS_ALL
+    }
+}
+
+Sync.worlds = async function () {
+    console.log('Sync.worlds()')
 
     await db.query(sql.state.update.registerWorlds)
     const markets = await db.any(sql.markets.withAccount)
@@ -155,7 +412,7 @@ Sync.registerWorlds = async function () {
                 const worldId = marketId + worldNumber
 
                 if (!registered) {
-                    await Sync.registerCharacter(marketId, worldNumber)
+                    await Sync.character(marketId, worldNumber)
                 }
 
                 if (!await utils.worldEntryExists(worldId)) {
@@ -176,7 +433,30 @@ Sync.registerWorlds = async function () {
     }
 }
 
-Sync.registerCharacter = async function (marketId, worldNumber) {
+Sync.markets = async function () {
+    console.log('Sync.markets()')
+
+    await db.query(sql.state.update.lastFetchMarkets)
+
+    const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
+    const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
+    const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
+
+    const marketList = $markets.map(function ($market) {
+        const market = $market.attributes.href.split('//')[1].split('.')[0]
+        return market === 'beta' ? 'zz' : market
+    })
+
+    const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId))
+
+    for (let missingMarket of missingMarkets) {
+        await db.query(sql.markets.add, missingMarket)
+    }
+
+    return missingMarkets
+}
+
+Sync.character = async function (marketId, worldNumber) {
     console.log(`Sync.registerCharacter() ${marketId}${worldNumber}`)
 
     const page = await createPuppeteerPage()
@@ -287,281 +567,6 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
             }, auth_attempt)
         } else {
             throw new Error(error.message)
-        }
-    }
-}
-
-Sync.allWorlds = async function (flag) {
-    console.log('Sync.allWorlds()')
-
-    if (syncAllInProgress) {
-        console.log(colors.red('\nA Scrape All Worlds is already in progress\n'))
-        return false
-    }
-
-    Events.trigger(enums.SCRAPE_ALL_WORLD_START)
-
-    const simultaneousSyncs = 3
-    const failedToSync = []
-
-    let queuedWorlds = await db.any(sql.getOpenWorlds)
-
-    await db.query(sql.state.update.lastScrapeAll)
-
-    let runningSyncs = 0
-
-    async function asynchronousSync () {
-        while (queuedWorlds.length) {
-            if (runningSyncs < simultaneousSyncs) {
-                const world = queuedWorlds.shift()
-
-                runningSyncs++
-
-                Sync.world(world.market, world.num, flag).catch(function (error) {
-                    failedToSync.push({
-                        marketId: world.market,
-                        worldNumber: world.num,
-                        message: error.message
-                    })
-                })
-            } else {
-                await Events.on(enums.SCRAPE_WORLD_END)
-                runningSyncs--
-            }
-        }
-    }
-
-    await asynchronousSync()
-
-    Events.trigger(enums.SCRAPE_ALL_WORLD_END)
-
-    if (failedToSync.length) {
-        const allFail = failedToSync.length === queuedWorlds.length
-        return allFail ? enums.SYNC_ERROR_ALL : enums.SYNC_ERROR_SOME
-    } else {
-        return enums.SYNC_SUCCESS_ALL
-    }
-}
-
-Sync.world = async function (marketId, worldNumber, flag, attempt = 1) {
-    const worldId = marketId + worldNumber
-
-    Events.trigger(enums.SCRAPE_WORLD_START, [worldId])
-
-    console.log(`Sync.world() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
-
-    let page
-
-    try {
-        const world = await getWorld(marketId, worldNumber)
-        const credentials = await db.one(sql.markets.oneWithAccount, [marketId])
-
-        if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
-            const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60
-            if (minutesSinceLastSync < config.scraper_interval_minutes) {
-                throw new Error(`${worldId} already sincronized`)
-            }
-        }
-
-        page = await createPuppeteerPage()
-
-        const account = await Sync.auth(marketId, credentials)
-        const worldCharacter = account.characters.find(({world_id}) => world_id === worldId)
-
-        if (!worldCharacter) {
-            await Sync.registerCharacter(marketId, worldNumber)
-        } else if (!worldCharacter.allow_login) {
-            await db.query(sql.closeWorld, [marketId, worldNumber])
-            throw new Error('world is not open')
-        }
-
-        const urlId = marketId === 'zz' ? 'beta' : marketId
-        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
-        await page.evaluate(scraperReadyState)
-
-        if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
-            await fetchWorldMapStructure(page, worldId, urlId)
-        }
-
-        if (!world.config) {
-            await fetchWorldConfig(page, worldId)
-        }
-
-        if (world.time_offset === null) {
-            await fetchWorldTimeOffset(page, worldId)
-        }
-
-        const data = await utils.timeout(async function () {
-            return await page.evaluate(scraperData)
-        }, 120000, 'Scrape evaluation timeout')
-
-        await commitRawDataFilesystem(data, worldId)
-        await commitDataDatabase(data, worldId)
-        await commitDataFilesystem(worldId)
-        await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
-        await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
-        
-        const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
-        const syncDate = utils.ejsHelpers.formatDate(last_sync)
-
-        await page.close()
-
-        Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_SUCCESS, syncDate])
-    } catch (error) {
-        console.log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
-
-        if (page) {
-            await page.close()
-        }
-
-        if (attempt < 3) {
-            return await Sync.world(marketId, worldNumber, flag, ++attempt)
-        } else {
-            await db.query(sql.updateWorldSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
-            await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
-
-            const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
-            const syncDate = utils.ejsHelpers.formatDate(last_sync)
-
-            Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
-
-            throw new Error(error.message)
-        }
-    }
-}
-
-Sync.allWorldsAchievements = async function (flag) {
-    console.log('Sync.allWorldsAchievements()')
-
-    if (syncAllAchievementsInProgress) {
-        console.log(colors.red('\nA Scrape All Achievement Worlds is already in progress\n'))
-        return false
-    }
-
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START)
-
-    const simultaneousSyncs = 3
-    const failedToSync = []
-
-    let queuedWorlds = await db.any(sql.getOpenWorlds)
-
-    let runningSyncs = 0
-
-    async function asynchronousSync () {
-        while (queuedWorlds.length) {
-            if (runningSyncs < simultaneousSyncs) {
-                const world = queuedWorlds.shift()
-
-                runningSyncs++
-
-                Sync.worldAchievements(world.market, world.num, flag).catch(function (error) {
-                    failedToSync.push({
-                        marketId: world.market,
-                        worldNumber: world.num,
-                        message: error.message
-                    })
-                })
-            } else {
-                await Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END)
-                runningSyncs--
-            }
-        }
-    }
-
-    await asynchronousSync()
-
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END)
-
-    if (failedToSync.length) {
-        const allFail = failedToSync.length === queuedWorlds.length
-        return allFail ? enums.SYNC_ACHIEVEMENTS_ERROR_ALL : enums.SYNC_ACHIEVEMENTS_ERROR_SOME
-    } else {
-        return enums.SYNC_ACHIEVEMENTS_SUCCESS_ALL
-    }
-}
-
-Sync.worldAchievements = async function (marketId, worldNumber, flag, attempt = 1) {
-    const worldId = marketId + worldNumber
-
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_START, [marketId])
-
-    console.log(`Sync.worldAchievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
-
-    let page
-
-    try {
-        await getWorld(marketId, worldNumber)
-
-        const credentials = await db.one(sql.markets.oneWithAccount, [marketId])
-
-        page = await createPuppeteerPage()
-
-        const account = await Sync.auth(marketId, credentials)
-        const urlId = marketId === 'zz' ? 'beta' : marketId
-        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
-        await page.evaluate(scraperReadyState)
-
-        const achievements = await utils.timeout(async function () {
-            return await page.evaluate(scraperAchievements, marketId, worldNumber)
-        }, 1000000, 'scraperAchievements evaluation timeout')
-
-        // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
-        // await fs.promises.writeFile(path.join('.', 'data', `${worldId}-achievements.freeze.json`), JSON.stringify(achievements))
-        // return
-
-        await commitAchievementsDatabase(achievements, worldId)
-
-        await page.close()
-
-        Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [marketId])
-    } catch (error) {
-        console.log(colors.red(`Sync.worldAchievements() ${colors.green(worldId)} failed: ${error.message}`))
-
-        if (page) {
-            await page.close()
-        }
-
-        if (attempt < 3) {
-            return await Sync.worldAchievements(marketId, worldNumber, flag, ++attempt)
-        } else {
-            Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [marketId])
-            throw new Error(error.message)
-        }
-    }
-}
-
-Sync.markets = async function () {
-    console.log('Sync.markets()')
-
-    await db.query(sql.state.update.lastFetchMarkets)
-
-    const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
-    const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
-    const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a')
-    
-    const marketList = $markets.map(function ($market) {
-        const market = $market.attributes.href.split('//')[1].split('.')[0]
-        return market === 'beta' ? 'zz' : market
-    })
-
-    const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId))
-
-    for (let missingMarket of missingMarkets) {
-        await db.query(sql.markets.add, missingMarket)
-    }
-
-    return missingMarkets
-}
-
-Sync.cleanExpiredShares = async function () {
-    const now = Date.now()
-    const shares = await db.any(sql.maps.getShareLastAccess)
-
-    const static_share_expire_time = config.static_share_expire_time * 60 * 1000
-
-    for (let {share_id, last_access} of shares) {
-        if (now - last_access.getTime() < static_share_expire_time) {
-            await db.query(sql.maps.deleteStaticShare, [share_id])
         }
     }
 }
