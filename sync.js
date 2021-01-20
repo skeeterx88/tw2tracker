@@ -39,9 +39,6 @@ Sync.init = async function () {
     Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, () => syncAchievementsInProgress = false)
     Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAllAchievementsInProgress = true)
     Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAllAchievementsInProgress = false)
-
-    await fs.promises.mkdir('logs', {recursive: true})
-
     console.log('Sync.init()')
 
     process.on('SIGTERM', async function () {
