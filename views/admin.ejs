@@ -21,7 +21,16 @@
                                     <p class="world-id">
                                         <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
                                     </p>
-                                    <p>Last sync date: <span class="last-sync-date"><%= formatDate(world_last_sync) %></span></p>
+                                    <p>
+                                        Last sync date:
+                                        <span class="last-sync-date">
+                                            <% if (world.last_sync) { %>
+                                                <%= formatDate(world_last_sync) %>
+                                            <% } else { %>
+                                                Never
+                                            <% } %>
+                                        </span>
+                                    </p>
                                     <p>Last sync status: <span class="last-sync-status"><%= world.last_sync_status %></span></p>
                                 </div>
                                 <div class="actions">
