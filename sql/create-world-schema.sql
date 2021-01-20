@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.players (
     victory_points INT,
     first_seen TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     last_seen TIMESTAMP,
+    archived BOOLEAN DEFAULT FALSE,
 
     best_rank INT,
     best_points INT,
