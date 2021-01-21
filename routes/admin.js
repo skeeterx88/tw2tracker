@@ -61,7 +61,6 @@ const scrapeMarketsRouter = utils.asyncRouter(async function (req, res) {
 })
 
 router.get('/', adminPanelRouter)
-router.get('/scraper/status', scrapeStatusRouter)
 router.get('/scraper/all-worlds', scrapeAllWorldsRouter)
 router.get('/scraper/:marketId/:worldNumber', scrapeWorldRouter)
 router.get('/scraper/markets', scrapeMarketsRouter)
