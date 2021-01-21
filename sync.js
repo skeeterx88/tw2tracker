@@ -4,6 +4,7 @@ const path = require('path')
 const schedule = require('node-schedule')
 const colors = require('colors/safe')
 const puppeteer = require('puppeteer-core')
+const WebSocket = require('ws')
 
 const db = require('./db.js')
 const sql = require('./sql.js')
@@ -19,6 +20,7 @@ const scraperReadyState = require('./scraper-ready-state.js')
 const auths = {}
 const Sync = {}
 
+let syncSocketServer = null
 let browser = null
 let syncDataActiveWorlds = new Set()
 let syncDataAllRunning = false
@@ -27,6 +29,12 @@ let syncAchievementsRunning = false
 
 const achievementCommitTypes = {
     ADD: 'add',
+    UPDATE: 'update'
+}
+
+const syncStates = {
+    START: 'start',
+    FINISH: 'finish',
     UPDATE: 'update'
 }
 
@@ -66,6 +74,7 @@ Sync.init = async function () {
         process.exit(0)
     })
 
+    initSyncSocketServer()
     await initPuppeteerBrowser()
 
     const state = await db.one(sql.state.all)
@@ -1030,6 +1039,17 @@ async function fetchWorldTimeOffset (page, worldId) {
     } catch (error) {
         console.log(colors.red(`Error trying to fetch ${worldId} time offset: ${error.message}`))
     }
+}
+
+function initSyncSocketServer () {
+    syncSocketServer = new WebSocket.Server({port: 7777})
+
+    syncSocketServer.on('connection', function (ws) {
+        const send = (state, data) => ws.send(JSON.stringify([state, data]))
+
+        Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(syncStates.START, {worldId}))
+        Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(syncStates.FINISH, {worldId, status, date}))
+    })
 }
 
 module.exports = Sync

@@ -101,23 +101,21 @@ app.use(function (err, req, res, next) {
 app.set('port', port)
 
 module.exports = function () {
-    const server = http.createServer()
-    const wss = new WebSocket.Server({server})
+    const syncSocket = new WebSocket('ws://127.0.0.1:7777')
+    const httpServer = http.createServer()
+    const adminSocketServer = new WebSocket.Server({
+        server: httpServer
+    })
 
-    server.on('request', app)
+    httpServer.on('request', app)
 
-    wss.on('connection', function connection (ws) {
-        console.log('CONNECTED')
-        ws.on('message', function incoming (message) {
-            console.log(`received: ${message}`)
-
-            ws.send(JSON.stringify({
-                answer: 42
-            }))
+    adminSocketServer.on('connection', function connection (adminSocket) {
+        syncSocket.on('message', function (data) {
+            adminSocket.send(data)
         })
     })
 
-    server.on('error', function (error) {
+    httpServer.on('error', function (error) {
         if (error.syscall !== 'listen') {
             throw error
         }
@@ -143,8 +141,8 @@ module.exports = function () {
         }
     })
 
-    server.on('listening', function () {
-        const addr = server.address()
+    httpServer.on('listening', function () {
+        const addr = httpServer.address()
         const bind = typeof addr === 'string'
             ? `pipe ${addr}`
             : `port ${addr.port}`
@@ -152,5 +150,5 @@ module.exports = function () {
         debug(`Listening on ${bind}`)
     })
 
-    server.listen(port)
+    httpServer.listen(port)
 }
