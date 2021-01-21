@@ -4,14 +4,13 @@ const express = require('express')
 const createError = require('http-errors')
 const router = express.Router()
 const utils = require('../utils.js')
-const {asyncRouter} = utils
 const config = require('../config.js')
 const db = require('../db.js')
 const sql = require('../sql.js')
 
 const mapsAPIRouter = require('./maps-api.js')
 
-const marketsRouter = asyncRouter(async function (req, res, next) {
+const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     const worlds = await db.any(sql.getWorlds)
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)))
 
@@ -37,7 +36,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const worldsRouter = asyncRouter(async function (req, res, next) {
+const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2) {
         return next()
     }
@@ -72,7 +71,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const worldRouter = asyncRouter(async function (req, res, next) {
+const worldRouter = utils.asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }
@@ -107,7 +106,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const mapShareRouter = asyncRouter(async function (req, res, next) {
+const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next()
     }

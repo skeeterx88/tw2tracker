@@ -3,19 +3,16 @@ const path = require('path')
 const express = require('express')
 const createError = require('http-errors')
 const router = express.Router()
+
 const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
-const {asyncRouter} = utils
-const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
 const enums = require('../enums.js')
+const {paramWorldParse} = require('../router-helpers.js')
 
-const {
-    paramWorldParse
-} = require('../router-helpers.js')
+const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
 
-
-const getWorldInfoRouter = asyncRouter(async function (req, res) {
+const getWorldInfoRouter = utils.asyncRouter(async function (req, res) {
     const {
         marketId,
         worldId,
@@ -56,19 +53,19 @@ const getWorldInfoRouter = asyncRouter(async function (req, res) {
     res.end(data)
 })
 
-const getOpenWorldsRouter = asyncRouter(async function (req, res) {
+const getOpenWorldsRouter = utils.asyncRouter(async function (req, res) {
     const allWorlds = await db.any(sql.getOpenWorlds)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allWorlds))
 })
 
-const getMarketsRouters = asyncRouter(async function (req, res) {
+const getMarketsRouters = utils.asyncRouter(async function (req, res) {
     const allMarkets = await db.map(sql.markets.withAccount, [], market => market.id)
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify(allMarkets))
 })
 
-const getContinentRouter = asyncRouter(async function (req, res) {
+const getContinentRouter = utils.asyncRouter(async function (req, res) {
     const {
         marketId,
         worldId,
@@ -126,7 +123,7 @@ const getContinentRouter = asyncRouter(async function (req, res) {
     res.end(data)
 })
 
-const getStructRouter = asyncRouter(async function (req, res) {
+const getStructRouter = utils.asyncRouter(async function (req, res) {
     const {
         worldId
     } = await paramWorldParse(req)
@@ -157,7 +154,7 @@ const getStructRouter = asyncRouter(async function (req, res) {
     res.end(struct)
 })
 
-const crateShareRouter = asyncRouter(async function (req, res) {
+const crateShareRouter = utils.asyncRouter(async function (req, res) {
     const {
         marketId,
         worldNumber,
@@ -219,7 +216,7 @@ const crateShareRouter = asyncRouter(async function (req, res) {
     res.end(`/maps/${marketId}/${worldNumber}/share/${shareId}`)
 })
 
-const getShareRouter = asyncRouter(async function (req, res) {
+const getShareRouter = utils.asyncRouter(async function (req, res) {
     let {
         mapShareId,
         marketId,

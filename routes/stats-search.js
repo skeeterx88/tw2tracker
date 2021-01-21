@@ -4,7 +4,6 @@ const router = express.Router()
 const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
-const {asyncRouter} = utils
 const config = require('../config.js')
 
 const {
@@ -15,7 +14,7 @@ const {
 
 const searchCategories = ['players', 'tribes', 'villages']
 
-const searchPostRedirectRouter = asyncRouter(async function (req, res, next) {
+const searchPostRedirectRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -35,7 +34,7 @@ const searchPostRedirectRouter = asyncRouter(async function (req, res, next) {
     return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`)
 })
 
-const searchGetRedirectRouter = asyncRouter(async function (req, res, next) {
+const searchGetRedirectRouter = utils.asyncRouter(async function (req, res, next) {
     const {
         marketId,
         worldNumber
@@ -44,7 +43,7 @@ const searchGetRedirectRouter = asyncRouter(async function (req, res, next) {
     return res.redirect(302, `/stats/${marketId}/${worldNumber}`)
 })
 
-const categorySearchRouter = asyncRouter(async function (req, res, next) {
+const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
     const category = req.params.category
 
     if (!searchCategories.includes(category)) {

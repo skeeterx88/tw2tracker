@@ -4,7 +4,6 @@ const router = express.Router()
 const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
-const {asyncRouter} = utils
 const config = require('../config.js')
 
 const {
@@ -26,7 +25,7 @@ const rankingRouterSqlMap = {
     }
 }
 
-const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
+const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }

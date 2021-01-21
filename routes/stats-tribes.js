@@ -4,7 +4,6 @@ const router = express.Router()
 const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
-const {asyncRouter} = utils
 const enums = require('../enums.js')
 const config = require('../config.js')
 const achievementTitles = require('../achievement-titles.json')
@@ -18,8 +17,7 @@ const {
 
 const conquestCategories = ['gain', 'loss', 'all']
 
-
-const tribeRouter = asyncRouter(async function (req, res, next) {
+const tribeRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -76,7 +74,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
+const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -166,7 +164,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const tribeMembersRouter = asyncRouter(async function (req, res, next) {
+const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -209,7 +207,7 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
+const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -259,7 +257,7 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
+const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
@@ -319,7 +317,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
     })
 })
 
-const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
+const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next()
     }
