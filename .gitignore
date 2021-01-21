@@ -5,3 +5,4 @@ settings.json
 logs/
 .idea/
 .vscode/
+config.ini
