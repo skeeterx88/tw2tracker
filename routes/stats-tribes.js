@@ -5,6 +5,7 @@ const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
 const {asyncRouter} = utils
+const enums = require('../enums.js')
 const config = require('../config.js')
 const achievementTitles = require('../achievement-titles.json')
 
@@ -15,18 +16,8 @@ const {
     createPagination
 } = require('../router-helpers.js')
 
-const conquestTypes =  {
-    GAIN: 'gain',
-    LOSS: 'loss',
-    SELF: 'self'
-}
-
 const conquestCategories = ['gain', 'loss', 'all']
 
-const tribeMemberChangeTypes = {
-    LEFT: 'left',
-    JOIN: 'join'
-}
 
 const tribeRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
@@ -63,7 +54,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         tribe,
         conquestGainCount,
         conquestLossCount,
-        conquestTypes,
+        conquestTypes: enums.conquestTypes,
         achievementsRepeatableCount,
         achievementTitles,
         achievementsLatest,
@@ -133,11 +124,11 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
 
     const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
         if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
-            conquest.type = conquestTypes.SELF
+            conquest.type = enums.conquestTypes.SELF
         } else if (conquest.new_owner_tribe_id === tribeId) {
-            conquest.type = conquestTypes.GAIN
+            conquest.type = enums.conquestTypes.GAIN
         } else if (conquest.old_owner_tribe_id === tribeId) {
-            conquest.type = conquestTypes.LOSS
+            conquest.type = enums.conquestTypes.LOSS
         }
 
         return conquest
@@ -153,7 +144,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         world,
         tribe,
         conquests,
-        conquestTypes,
+        conquestTypes: enums.conquestTypes,
         category,
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),
@@ -300,7 +291,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
                 id: change.character_id,
                 name: playersName[change.character_id]
             },
-            type: change.old_tribe === tribeId ? tribeMemberChangeTypes.LEFT : tribeMemberChangeTypes.JOIN,
+            type: change.old_tribe === tribeId ? enums.tribeMemberChangeTypes.LEFT : enums.tribeMemberChangeTypes.JOIN,
             date: change.date
         })
     }
@@ -312,7 +303,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         tribe,
         world,
         memberChanges,
-        tribeMemberChangeTypes,
+        tribeMemberChangeTypes: enums.tribeMemberChangeTypes,
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,

@@ -8,16 +8,12 @@ const sql = require('../sql.js')
 const utils = require('../utils.js')
 const {asyncRouter} = utils
 const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
-const EMPTY_CONTINENT = 'empty_continent'
+const enums = require('../enums.js')
 
 const {
     paramWorldParse
 } = require('../router-helpers.js')
 
-const mapShareTypes = {
-    STATIC: 'static',
-    DYNAMIC: 'dynamic'
-}
 
 const getWorldInfoRouter = asyncRouter(async function (req, res) {
     const {
@@ -116,7 +112,7 @@ const getContinentRouter = asyncRouter(async function (req, res) {
 
         data = await fs.promises.readFile(dataPath)
     } catch (error) {
-        etag = EMPTY_CONTINENT
+        etag = enums.EMPTY_CONTINENT
 
         if (ifNoneMatchValue && ifNoneMatchValue === etag) {
             res.status(304)
@@ -197,7 +193,7 @@ const crateShareRouter = asyncRouter(async function (req, res) {
     const settingsString = JSON.stringify(settings)
     const {creation_date} = await db.one(sql.maps.createShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y])
 
-    if (shareType === mapShareTypes.STATIC) {
+    if (shareType === enums.mapShareTypes.STATIC) {
         const dateId = utils.getHourlyDir(creation_date)
         const worldId = marketId + worldNumber
         const copyDestination = path.join('.', 'data', 'static-maps', worldId, dateId)

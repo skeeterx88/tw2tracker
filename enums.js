@@ -16,5 +16,28 @@ module.exports = {
     SCRAPE_ACHIEVEMENT_WORLD_END: 'scrape_achievement_world_end',
     SCRAPE_ACHIEVEMENT_ALL_WORLD_START: 'scrape_achievement_all_world_start',
     SCRAPE_ACHIEVEMENT_ALL_WORLD_END: 'scrape_achievement_all_world_end',
-    REQUEST_SYNC_STATUS: 'request_sync_status'
+    REQUEST_SYNC_STATUS: 'request_sync_status',
+    EMPTY_CONTINENT: 'empty_continent',
+    achievementCommitTypes: {
+        ADD: 'add',
+        UPDATE: 'update'
+    },
+    syncStates: {
+        START: 'start',
+        FINISH: 'finish',
+        UPDATE: 'update'
+    },
+    mapShareTypes: {
+        STATIC: 'static',
+        DYNAMIC: 'dynamic'
+    },
+    conquestTypes: {
+        GAIN: 'gain',
+        LOSS: 'loss',
+        SELF: 'self'
+    },
+    tribeMemberChangeTypes: {
+        LEFT: 'left',
+        JOIN: 'join'
+    }
 }

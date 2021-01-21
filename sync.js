@@ -27,17 +27,6 @@ let syncDataAllRunning = false
 let syncAchievementsActiveWorlds = new Set()
 let syncAchievementsRunning = false
 
-const achievementCommitTypes = {
-    ADD: 'add',
-    UPDATE: 'update'
-}
-
-const syncStates = {
-    START: 'start',
-    FINISH: 'finish',
-    UPDATE: 'update'
-}
-
 Sync.init = async function () {
     console.log('Sync.init()')
 
@@ -739,12 +728,12 @@ async function commitDataDatabase (data, worldId) {
 async function commitAchievementsDatabase (data, worldId) {
     const sqlSubjectMap = {
         players: {
-            [achievementCommitTypes.ADD]: sql.addPlayerAchievement,
-            [achievementCommitTypes.UPDATE]: sql.updatePlayerAchievement
+            [enums.achievementCommitTypes.ADD]: sql.addPlayerAchievement,
+            [enums.achievementCommitTypes.UPDATE]: sql.updatePlayerAchievement
         },
         tribes: {
-            [achievementCommitTypes.ADD]: sql.addTribeAchievement,
-            [achievementCommitTypes.UPDATE]: sql.updateTribeAchievement
+            [enums.achievementCommitTypes.ADD]: sql.addTribeAchievement,
+            [enums.achievementCommitTypes.UPDATE]: sql.updateTribeAchievement
         }
     }
 
@@ -905,7 +894,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
 
                 for (let type of missingTypes) {
                     achievementsToMerge.push({
-                        commitType: achievementCommitTypes.ADD,
+                        commitType: enums.achievementCommitTypes.ADD,
                         achievement: newAchievements.unique[type]
                     })
                 }
@@ -914,7 +903,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
             for (let type of oldUniqueTypes) {
                 if (newAchievements.unique[type].level > oldAchievements.unique[type].level) {
                     achievementsToMerge.push({
-                        commitType: achievementCommitTypes.UPDATE,
+                        commitType: enums.achievementCommitTypes.UPDATE,
                         achievement: newAchievements.unique[type]
                     })
                 }
@@ -934,7 +923,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
 
                 achievementsToMerge.push(...merge.map(achievement => {
                     return {
-                        commitType: achievementCommitTypes.ADD,
+                        commitType: enums.achievementCommitTypes.ADD,
                         achievement
                     }
                 }))
@@ -942,7 +931,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
         } else {
             achievementsToMerge.push(...newAchievementsRaw.map(achievement => {
                 return {
-                    commitType: achievementCommitTypes.ADD,
+                    commitType: enums.achievementCommitTypes.ADD,
                     achievement
                 }
             }))
@@ -1047,13 +1036,13 @@ function initSyncSocketServer () {
     syncSocketServer.on('connection', function (ws) {
         const send = (state, data) => ws.send(JSON.stringify([state, data]))
 
-        Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(syncStates.START, {worldId}))
-        Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(syncStates.FINISH, {worldId, status, date}))
+        Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(enums.syncStates.START, {worldId}))
+        Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}))
 
         ws.on('message', function (code) {
             switch (code) {
                 case enums.REQUEST_SYNC_STATUS: {
-                    send(syncStates.UPDATE, Array.from(syncDataActiveWorlds.keys()))
+                    send(enums.syncStates.UPDATE, Array.from(syncDataActiveWorlds.keys()))
                     break
                 }   
             }
