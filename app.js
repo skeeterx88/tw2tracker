@@ -1,7 +1,14 @@
 (async function () {
     const db = require('./db.js')
-    const sql = require('./sql.js')
 
+    try {
+        const connection = await db.connect()
+        connection.done()
+    } catch (error) {
+        throw new Error(`Can't connect to PostgreSQL database: ${error.message}`)
+    }
+
+    const sql = require('./sql.js')
     const schemaInitialized = (await db.one(sql.helpers.schemaInitialized)).exists
 
     if (!schemaInitialized) {

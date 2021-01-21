@@ -7,6 +7,7 @@ if (!fs.existsSync('./db.ini')) {
 }
 
 const pgp = require('pg-promise')()
-const dbconfig = ini.decode(fs.readFileSync('./db.ini', 'utf-8'))
+const config = ini.decode(fs.readFileSync('./db.ini', 'utf-8'))
+const db = pgp(config)
 
-module.exports = pgp(dbconfig)
+module.exports = db
