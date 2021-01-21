@@ -51,11 +51,15 @@ define('updateWorldStatus', [
 require([
     'syncStates',
     'updateAllWorldsStatus',
-    'updateWorldStatus'
+    'updateWorldStatus',
+    'backendValues'
 ], function (
     syncStates,
     updateAllWorldsStatus,
-    updateWorldStatus
+    updateWorldStatus,
+    {
+        development
+    }
 ) {
     function setupSync() {
         const $worlds = document.querySelectorAll('#worlds-sync .world')
@@ -73,7 +77,8 @@ require([
     }
 
     function setupSocket () {
-        const socket = new WebSocket('wss://' + location.host)
+        const protocol = development ? 'ws' : 'wss'
+        const socket = new WebSocket(`${protocol}://${location.host}`)
 
         socket.addEventListener('message', function (event) {
             const [action, value] = JSON.parse(event.data)

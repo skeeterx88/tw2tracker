@@ -15,12 +15,16 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds)
     const closedWorlds = await db.any(sql.getClosedWorlds)
     const markets = await db.any(sql.markets.all)
+    const development = process.env.NODE_ENV === 'development'
 
     res.render('admin', {
         title: `Admin Panel - ${config.site_name}`,
         openWorlds,
         closedWorlds,
         markets,
+        backendValues: {
+            development
+        },
         ...utils.ejsHelpers
     })
 })

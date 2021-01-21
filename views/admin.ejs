@@ -58,6 +58,7 @@
         <%- include('./footer.ejs') %>
 
         <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
-        <script type="text/javascript" src="/javascripts/admin.js"></script>
+        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
+        <script defer type="text/javascript" src="/javascripts/admin.js"></script>
     </body>
 </html>
