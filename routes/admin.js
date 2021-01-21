@@ -7,7 +7,6 @@ const sql = require('../sql.js')
 const utils = require('../utils.js')
 const Sync = require('../sync.js')
 const config = require('../config.js')
-const syncStatus = require('../sync-status.js')
 
 router.use(connectEnsureLogin.ensureLoggedIn())
 
@@ -27,13 +26,6 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
         },
         ...utils.ejsHelpers
     })
-})
-
-const scrapeStatusRouter = utils.asyncRouter(async function (req, res) {
-    const response = syncStatus.getCurrent()
-
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(response))
 })
 
 const scrapeAllWorldsRouter = utils.asyncRouter(async function (req, res) {
