@@ -13,6 +13,7 @@ const passportLocal = require('passport-local')
 
 const db = require('./db.js')
 const config = require('./config.js')
+const enums = require('./enums.js')
 
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT
 const app = express()
@@ -113,6 +114,8 @@ module.exports = function () {
         syncSocket.on('message', function (data) {
             adminSocket.send(data)
         })
+
+        syncSocket.send(enums.REQUEST_SYNC_STATUS)
     })
 
     httpServer.on('error', function (error) {

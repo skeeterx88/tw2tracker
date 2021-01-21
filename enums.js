@@ -15,5 +15,6 @@ module.exports = {
     SCRAPE_ACHIEVEMENT_WORLD_START: 'scrape_achievement_world_start',
     SCRAPE_ACHIEVEMENT_WORLD_END: 'scrape_achievement_world_end',
     SCRAPE_ACHIEVEMENT_ALL_WORLD_START: 'scrape_achievement_all_world_start',
-    SCRAPE_ACHIEVEMENT_ALL_WORLD_END: 'scrape_achievement_all_world_end'
+    SCRAPE_ACHIEVEMENT_ALL_WORLD_END: 'scrape_achievement_all_world_end',
+    REQUEST_SYNC_STATUS: 'request_sync_status'
 }

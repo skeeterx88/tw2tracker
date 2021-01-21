@@ -1049,6 +1049,15 @@ function initSyncSocketServer () {
 
         Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(syncStates.START, {worldId}))
         Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(syncStates.FINISH, {worldId, status, date}))
+
+        ws.on('message', function (code) {
+            switch (code) {
+                case enums.REQUEST_SYNC_STATUS: {
+                    send(syncStates.UPDATE, Array.from(syncDataActiveWorlds.keys()))
+                    break
+                }   
+            }
+        })
     })
 }
 
