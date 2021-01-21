@@ -3,11 +3,11 @@ const zlib = require('zlib')
 const path = require('path')
 const schedule = require('node-schedule')
 const colors = require('colors/safe')
-const puppeteer = require('puppeteer-core')
 const WebSocket = require('ws')
 
 const db = require('./db.js')
 const sql = require('./sql.js')
+const puppeteer = require('./puppeteer.js')
 const utils = require('./utils.js')
 const config = require('./config.js')
 const Events = require('./events.js')
@@ -64,7 +64,6 @@ Sync.init = async function () {
     })
 
     initSyncSocketServer()
-    await initPuppeteerBrowser()
 
     const state = await db.one(sql.state.all)
 
@@ -841,11 +840,11 @@ async function commitRawDataFilesystem (data, worldId) {
     await fs.promises.writeFile(path.join(location, `${worldId}.json`), JSON.stringify(data))
 }
 
-async function initPuppeteerBrowser () {
-    browser = await puppeteer.launch({headless: true, executablePath: '/usr/bin/chromium'})
-}
-
 async function createPuppeteerPage (logId) {
+    if (!browser) {
+        browser = await puppeteer()
+    }
+
     const page = await browser.newPage()
 
     return page.on('console', function (msg) {
