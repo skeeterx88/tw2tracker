@@ -73,7 +73,7 @@ require([
     }
 
     function setupSocket () {
-        const socket = new WebSocket('ws://localhost:7777')
+        const socket = new WebSocket('wss://' + location.host)
 
         socket.addEventListener('message', function (event) {
             const [action, value] = JSON.parse(event.data)

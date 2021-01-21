@@ -5,6 +5,7 @@ const createError = require('http-errors')
 const compression = require('compression')
 const debug = require('debug')('tw2tracker:server')
 const http = require('http')
+const WebSocket = require('ws')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
@@ -100,7 +101,21 @@ app.use(function (err, req, res, next) {
 app.set('port', port)
 
 module.exports = function () {
-    const server = http.createServer(app)
+    const server = http.createServer()
+    const wss = new WebSocket.Server({server})
+
+    server.on('request', app)
+
+    wss.on('connection', function connection (ws) {
+        console.log('CONNECTED')
+        ws.on('message', function incoming (message) {
+            console.log(`received: ${message}`)
+
+            ws.send(JSON.stringify({
+                answer: 42
+            }))
+        })
+    })
 
     server.on('error', function (error) {
         if (error.syscall !== 'listen') {

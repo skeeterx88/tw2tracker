@@ -10,13 +10,11 @@
 
     const server = require('./server.js')
     const Sync = require('./sync.js')
-    const syncServer = require('./sync-server.js')
     const cluster = require('cluster')
     const cpus = require('os').cpus()
 
     if (cluster.isMaster) {
         Sync.init()
-        syncServer()
 
         for (let i = 0; i < cpus.length; i++) {
             const worker = cluster.fork()
