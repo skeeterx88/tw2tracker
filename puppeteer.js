@@ -10,7 +10,7 @@ if (!fs.existsSync('./puppeteer.ini')) {
 const config = ini.decode(fs.readFileSync('./puppeteer.ini', 'utf-8'))
 
 if (!fs.existsSync(config.chromium_path)) {
-    throw new Error(`Chromium executable not found: "${config.chromium_path}"`)
+    throw new Error(`Can't locate chrome executable: "${config.chromium_path}"`)
 }
 
 module.exports = async function () {
