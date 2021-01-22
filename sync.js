@@ -207,9 +207,12 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_START, [worldId])
+    if (syncAchievementsActiveWorlds.has(worldId)) {
+        return console.log(`Sync.achievements() ${colors.green(marketId + worldNumber)} already in progress`)
+    } 
 
     console.log(`Sync.achievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_START, [worldId])
 
     let page
 
