@@ -70,7 +70,8 @@ require([
         loader = new TW2DataLoader(marketId, worldNumber)
         tooltip = new TW2Tooltip('#map-tooltip')
         map = new TW2Map('#map', loader, tooltip, {
-            allowZoom: false,
+            allowZoom: true,
+            zoomWithShift: true,
             zoomLevel: 1,
             inlineHighlight: true,
             quickHighlightColor: '#000000'

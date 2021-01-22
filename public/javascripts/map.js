@@ -17,6 +17,7 @@ define('TW2Map', [
 
         const defaults = {
             allowZoom: true,
+            zoomWithShift: false,
             hexagonVillages: true,
             zoomLevel: 2,
             inlineHighlight: true,
@@ -418,6 +419,10 @@ define('TW2Map', [
 
             if (settings.allowZoom) {
                 $overlay.addEventListener('wheel', (event) => {
+                    if (settings.zoomWithShift && !event.shiftKey) {
+                        return
+                    }
+
                     if (event.deltaY < 0) {
                         this.zoomIn()
                     } else if (event.deltaY > 0) {
