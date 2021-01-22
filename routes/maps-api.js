@@ -10,7 +10,7 @@ const utils = require('../utils.js')
 const enums = require('../enums.js')
 const {paramWorldParse} = require('../router-helpers.js')
 
-const GZIP_EMPTY_CONTINENT = Buffer.from([31,139,8,0,0,0,0,0,0,3,171,174,5,0,67,191,166,163,2,0,0,0])
+const GZIP_EMPTY_CONTINENT = Buffer.from([31, 139, 8, 0, 0, 0, 0, 0, 0, 3, 171, 174, 5, 0, 67, 191, 166, 163, 2, 0, 0, 0])
 
 const getWorldInfoRouter = utils.asyncRouter(async function (req, res) {
     const {
@@ -202,9 +202,9 @@ const crateShareRouter = utils.asyncRouter(async function (req, res) {
             const worldData = await fs.promises.readdir(worldDataLocation)
             const toCopy = worldData.filter((file) => file !== 'struct')
 
-            await fs.promises.mkdir(copyDestination, { recursive: true })
+            await fs.promises.mkdir(copyDestination, {recursive: true})
 
-            for (let file of toCopy) {
+            for (const file of toCopy) {
                 await fs.promises.copyFile(
                     path.join(worldDataLocation, file),
                     path.join(copyDestination, file)
@@ -217,7 +217,7 @@ const crateShareRouter = utils.asyncRouter(async function (req, res) {
 })
 
 const getShareRouter = utils.asyncRouter(async function (req, res) {
-    let {
+    const {
         mapShareId,
         marketId,
         worldNumber,

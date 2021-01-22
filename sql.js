@@ -8,7 +8,7 @@ const getSqlTree = function (from, sub, tree = {}) {
 
     const items = fs.readdirSync(from)
 
-    for (let item of items) {
+    for (const item of items) {
         const itemStat = fs.lstatSync(path.join(from, item))
 
         if (itemStat.isFile()) {

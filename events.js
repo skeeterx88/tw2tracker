@@ -62,7 +62,7 @@ const trigger = function (id, args = []) {
         return false
     }
 
-    for (let handler of events.get(id)) {
+    for (const handler of events.get(id)) {
         handler.apply(this, args)
     }
 

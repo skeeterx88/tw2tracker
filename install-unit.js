@@ -4,7 +4,7 @@
     let environmentType
 
     const os = require('os')
-    const { exec } = require('child_process')
+    const {exec} = require('child_process')
     const fs = require('fs').promises
     const xdgBasedir = require('xdg-basedir')
     const readline = require('readline')

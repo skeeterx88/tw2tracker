@@ -40,7 +40,7 @@ module.exports = async function () {
                 order_dir: 0,
                 query: ''
             }, function (data) {
-                for (let tribe of data.ranking) {
+                for (const tribe of data.ranking) {
                     tribeIds.add(tribe.tribe_id)
                 }
 
@@ -64,7 +64,7 @@ module.exports = async function () {
                 loadTribes(offset),
                 loadTribes(offset + RANKING_QUERY_COUNT),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
-                loadTribes(offset + (RANKING_QUERY_COUNT * 3)),
+                loadTribes(offset + (RANKING_QUERY_COUNT * 3))
             ])
 
             await sleep(150)
@@ -81,7 +81,7 @@ module.exports = async function () {
                 order_dir: 0,
                 query: ''
             }, function (data) {
-                for (let player of data.ranking) {
+                for (const player of data.ranking) {
                     playerIds.add(player.character_id)
                 }
 
@@ -105,7 +105,7 @@ module.exports = async function () {
                 loadPlayers(offset),
                 loadPlayers(offset + RANKING_QUERY_COUNT),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
-                loadPlayers(offset + (RANKING_QUERY_COUNT * 3)),
+                loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
             ])
 
             await sleep(150)

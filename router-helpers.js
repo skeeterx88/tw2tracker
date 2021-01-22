@@ -129,7 +129,7 @@ function createPagination (current, total, limit, path) {
 function groupAchievements (achievements) {
     const group = {}
 
-    for (let achievement of achievements) {
+    for (const achievement of achievements) {
         group[achievement.type] = group[achievement.type] || []
         group[achievement.type].push(achievement)
     }

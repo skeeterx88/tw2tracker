@@ -23,7 +23,31 @@
         }],
         "no-empty": ["error", {
             "allowEmptyCatch": true
-        }]
+        }],
+        "array-callback-return": "error",
+        "array-bracket-newline": ["error", "consistent"],
+        "array-bracket-spacing": "error",
+        "array-element-newline": ["error", "consistent"],
+        "brace-style": "error",
+        "comma-dangle": "error",
+        "comma-spacing": "error",
+        "comma-style": "error",
+        "computed-property-spacing": ["error", "never"],
+        "consistent-this": ["error", "self"],
+        "func-call-spacing": ["error", "never"],
+        "function-call-argument-newline": ["error", "consistent"],
+        "function-paren-newline": ["error", "consistent"],
+        "implicit-arrow-linebreak": ["error", "beside"],
+        "no-multiple-empty-lines": ["error", {"max": 2}],
+        "space-before-function-paren": ["error", "always"],
+        "space-before-blocks": ["error", "always"],
+        "space-in-parens": ["error", "never"],
+        "no-var": "error",
+        "prefer-const": "error",
+        "one-var-declaration-per-line": ["error", "always"],
+        "object-curly-spacing": ["error", "never"],
+        "key-spacing": "error",
+        "no-multi-spaces": "error"
     },
     "globals": {
         "injector": true,

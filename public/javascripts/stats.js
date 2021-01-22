@@ -99,12 +99,12 @@ require([
 
         await loader.loadInfo
 
-        for (let $row of $highlightRows) {
+        for (const $row of $highlightRows) {
             $row.addEventListener('mouseenter', () => {
                 const id = parseInt($row.dataset.id, 10)
 
                 map.quickHighlight($row.dataset.highlightType, id)
-                let [averageX, averageY] = averagePositionFor($row.dataset.highlightType, id)
+                const [averageX, averageY] = averagePositionFor($row.dataset.highlightType, id)
                 map.moveTo(averageX, averageY)
             })
 
@@ -148,7 +148,7 @@ require([
             $searchInput.focus()
         }
 
-        for (let $searchCategory of $searchCategories) {
+        for (const $searchCategory of $searchCategories) {
             $searchCategory.addEventListener('click', function () {
                 selectCategory(this.dataset.searchCategory)
                 return false

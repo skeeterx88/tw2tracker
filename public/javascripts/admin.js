@@ -14,7 +14,7 @@ define('updateAllWorldsStatus', [
     updateWorldStatus
 ) {
     return function updateAllWorldsStatus (worlds) {
-        for (let worldId of worlds) {
+        for (const worldId of worlds) {
             updateWorldStatus({worldId}, syncStates.START)
         }
     }
@@ -25,7 +25,7 @@ define('updateWorldStatus', [
 ], function (
     syncStates
 ) {
-    return function updateWorldStatus({worldId, status, date}, stateType) {
+    return function updateWorldStatus ({worldId, status, date}, stateType) {
         const $world = document.querySelector('#' + worldId)
         const $date = $world.querySelector('.last-sync-date')
         const $status = $world.querySelector('.last-sync-status')
@@ -61,13 +61,13 @@ require([
         development
     }
 ) {
-    function setupSync() {
+    function setupSync () {
         const $worlds = document.querySelectorAll('#worlds-sync .world')
         const syncButtons = Array.from($worlds).map(function ($world) {
             return [$world.dataset, $world.querySelector('.sync-now')]
         })
 
-        for (let [{ marketId, worldNumber }, $sync] of syncButtons) {
+        for (const [{marketId, worldNumber}, $sync] of syncButtons) {
             $sync.addEventListener('click', function (event) {
                 event.preventDefault()
 

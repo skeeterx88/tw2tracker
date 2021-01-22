@@ -45,7 +45,7 @@ app.use(session({
     secret: 'neko loli pantsu',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }
+    cookie: {maxAge: 30 * 24 * 60 * 60 * 1000}
 }))
 
 passport.use(new passportLocal.Strategy(async function (username, password, callback) {

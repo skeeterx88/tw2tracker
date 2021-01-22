@@ -32,7 +32,7 @@ define('utils', function () {
 
 
     const querySelectorFrom = function (selector, elements) {
-        return [].filter.call(elements, function(element) {
+        return [].filter.call(elements, function (element) {
             return element.matches(selector)
         })
     }
@@ -91,7 +91,7 @@ define('utils', function () {
             return coord
         })
 
-        for (let [x, y] of coords) {
+        for (const [x, y] of coords) {
             averageX += parseInt(x, 10)
             averageY += parseInt(y, 10)
         }

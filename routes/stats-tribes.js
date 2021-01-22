@@ -279,7 +279,7 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
     const memberChangesRaw = await db.any(sql.getTribeMemberChanges, {worldId, id: tribeId})
     const memberChanges = []
 
-    for (let change of memberChangesRaw) {
+    for (const change of memberChangesRaw) {
         if (!utils.hasOwn(playersName, change.character_id)) {
             playersName[change.character_id] = (await db.one(sql.getPlayer, {worldId, playerId: change.character_id})).name
         }
@@ -348,7 +348,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
     const achievementsRepeatableLastEarned = {}
     const achievementsRepeatableDetailed = {}
 
-    for (let {period, type, time_last_level} of achievements) {
+    for (const {period, type, time_last_level} of achievements) {
         if (period) {
             if (!achievementsRepeatableLastEarned[type]) {
                 achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only')

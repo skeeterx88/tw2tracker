@@ -23,12 +23,12 @@ require([
     const KEEP_COLORPICKER_OPEN = 'keep_colorpicker_open'
 
     const getElemPosition = function ($ref) {
-        let { x, y, width, height } = $ref.getBoundingClientRect()
+        const {x, y, width, height} = $ref.getBoundingClientRect()
 
-        x = Math.floor(x + width + 5)
-        y = Math.floor(y + height + 5)
-
-        return { x, y }
+        return {
+            x: Math.floor(x + width + 5),
+            y: Math.floor(y + height + 5)
+        }
     }
 
     const setupQuickJump = () => {
@@ -93,7 +93,7 @@ require([
 
                         const matches = []
 
-                        for (let [name] of Object.values(loader.players)) {
+                        for (const [name] of Object.values(loader.players)) {
                             matches.push({
                                 search: name,
                                 id: name,
@@ -101,7 +101,7 @@ require([
                             })
                         }
 
-                        for (let [name, tag] of Object.values(loader.tribes)) {
+                        for (const [name, tag] of Object.values(loader.tribes)) {
                             matches.push({
                                 search: `${tag} (${name})`,
                                 id: tag,
@@ -158,7 +158,7 @@ require([
                 }
             })
 
-            $highlightId.addEventListener('autoComplete', ({ detail }) => {
+            $highlightId.addEventListener('autoComplete', ({detail}) => {
                 if (detail.event.key == 'Enter' && detail.matches > 0) {
                     autoComplete.listMatchedResults(autoComplete.dataStream).then(() => {
                         const first = autoComplete.resultsList.view.children.item(0)
@@ -255,10 +255,10 @@ require([
         const $colorPicker = document.querySelector('#color-picker')
         const $colorPickerTable = $colorPicker.querySelector('table')
 
-        for (let colorsRow of TW2Map.colorPalette) {
+        for (const colorsRow of TW2Map.colorPalette) {
             const $row = document.createElement('tr')
 
-            for (let color of colorsRow) {
+            for (const color of colorsRow) {
                 const $wrapper = document.createElement('td')
                 const $color = document.createElement('div')
                 $color.className = 'color'
@@ -282,7 +282,7 @@ require([
         }
 
         const updateActiveColor = (newColor) => {
-            for (let $color of $colors) {
+            for (const $color of $colors) {
                 if ($color.dataset.color === newColor) {
                     $color.classList.add('active')
                 }
@@ -300,11 +300,11 @@ require([
 
             clearActiveColor()
 
-            let { x, y } = getElemPosition($reference)
+            const {x, y} = getElemPosition($reference)
 
             $colorPicker.style.visibility = 'visible'
             $colorPicker.style.opacity = 1
-            $colorPicker.style.transform =  `translate3d(${x}px, ${y}px, 0px)`
+            $colorPicker.style.transform = `translate3d(${x}px, ${y}px, 0px)`
 
             const index = TW2Map.colorPalette.flat().indexOf(selectedColor)
 
@@ -364,7 +364,7 @@ require([
         $lastSync.classList.remove('hidden')
     }
 
-    const setupDisplayShareDate =  () => {
+    const setupDisplayShareDate = () => {
         if (!mapShare) {
             return
         }
@@ -441,7 +441,7 @@ require([
             visible = !visible
 
             if (visible) {
-                const { x, y } = getElemPosition($changeSettings)
+                const {x, y} = getElemPosition($changeSettings)
                 $settings.style.left = `${x}px`
                 $settings.style.top = `${y}px`
 
@@ -449,7 +449,7 @@ require([
             }
         })
 
-        for (let $option of $colorOptions) {
+        for (const $option of $colorOptions) {
             const id = $option.dataset.settingId
             const color = map.getSetting(id)
 
@@ -513,14 +513,14 @@ require([
             map.moveTo(mapShare.center_x, mapShare.center_y)
 
             if (mapShare.settings) {
-                for (let [id, value] of Object.entries(mapShare.settings)) {
+                for (const [id, value] of Object.entries(mapShare.settings)) {
                     map.changeSetting(id, value, TW2Map.INITIAL_SETUP)
                 }
             }
 
             await loader.loadInfo
 
-            for (let [highlightType, id, color] of mapShare.highlights) {
+            for (const [highlightType, id, color] of mapShare.highlights) {
                 map.addHighlight(highlightType, id, color)
             }
         }
@@ -602,7 +602,7 @@ require([
 
         $notifClose.addEventListener('click', () => $notif.classList.add('hidden'))
 
-        notif = ({ title = '', content = '', timeout = 3000, link = false }) => {
+        notif = ({title = '', content = '', timeout = 3000, link = false}) => {
             clearTimeout(activeTimeout)
 
             title = String(title)
@@ -673,7 +673,7 @@ require([
         }
 
         const buildWorldList = () => {
-            for (let market of allMarkets) {
+            for (const market of allMarkets) {
                 const $marketContainer = document.createElement('li')
                 const $button = document.createElement('div')
                 const $flag = document.createElement('span')
@@ -716,7 +716,7 @@ require([
                 $allMarketWorlds.removeChild($allMarketWorlds.lastChild)
             }
 
-            for (let {market, num, name} of marketWorlds) {
+            for (const {market, num, name} of marketWorlds) {
                 const $world = document.createElement('li')
                 const $archor = document.createElement('a')
                 const $button = document.createElement('button')
@@ -762,7 +762,7 @@ require([
             visible = !visible
 
             if (visible) {
-                const { x, y } = getElemPosition($currentWorld)
+                const {x, y} = getElemPosition($currentWorld)
                 $allWorlds.style.left = `${x}px`
                 $allWorlds.style.top = `${y}px`
 

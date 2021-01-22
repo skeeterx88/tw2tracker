@@ -47,7 +47,7 @@ const getHTML = function (url) {
 
             let body = ''
 
-            res.on('data', data => { body += data })
+            res.on('data', data => body += data)
             res.on('end', async function () {
                 resolve(HTMLParser.parse(body))
             })
@@ -58,7 +58,7 @@ const getHTML = function (url) {
 const getBuffer = function (url) {
     return new Promise(function (resolve) {
         https.get(url, function (res) {
-            let data = []
+            const data = []
 
             res.on('data', function (chunk) {
                 data.push(chunk)

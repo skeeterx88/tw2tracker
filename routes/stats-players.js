@@ -38,14 +38,14 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    let conquestsGainCount = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count
-    let conquestsLossCount = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count
+    const conquestsGainCount = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count
+    const conquestsLossCount = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count
 
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
     const achievementsLatest = achievements.slice(0, 5)
 
-    let achievementPoints = achievements.reduce(function (sum, {type, level}) {
+    const achievementPoints = achievements.reduce(function (sum, {type, level}) {
         const {milestone, points} = achievementTypes[type]
 
         if (!points) {
@@ -247,7 +247,7 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
     const tribeChanges = await db.any(sql.getPlayerTribeChanges, {worldId, id: playerId})
     const tribeTags = {}
 
-    for (let change of tribeChanges) {
+    for (const change of tribeChanges) {
         if (change.old_tribe && !utils.hasOwn(tribeTags, change.old_tribe)) {
             tribeTags[change.old_tribe] = (await db.one(sql.getTribe, {worldId, tribeId: change.old_tribe})).tag
         }
@@ -335,11 +335,11 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
     const achievementByCategory = {}
     const achievementsWithPoints = []
 
-    for (let category of achievementCategories) {
+    for (const category of achievementCategories) {
         achievementByCategory[category] = []
     }
 
-    for (let achievement of achievements) {
+    for (const achievement of achievements) {
         if (achievement.category !== 'repeatable') {
             const typeData = achievementTypes[achievement.type]
 
@@ -373,11 +373,11 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         
         const categoriesMaxPoints = {}
 
-        for (let category of achievementCategoriesUnique) {
+        for (const category of achievementCategoriesUnique) {
             categoriesMaxPoints[category] = 0
         }
 
-        for (let achievement of Object.values(achievementTypes)) {
+        for (const achievement of Object.values(achievementTypes)) {
             if (!achievement.repeatable) {
                 categoriesMaxPoints[achievement.category] += achievement.milestone
                     ? achievement.points[achievement.points.length - 1]
@@ -412,7 +412,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         categoryTemplate = 'repeatable'
         navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements'
 
-        for (let {type, time_last_level} of achievementsRepeatable) {
+        for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
                 achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only')
             }

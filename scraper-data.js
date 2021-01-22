@@ -9,50 +9,16 @@ module.exports = async function () {
     const RANKING_QUERY_COUNT = 25
     const CHUNK_SIZE = 50
     const COORDS_REFERENCE = {
-        topLeft: [
-            [0, 0], [100, 0], [200, 0], [300, 0],
-            [0, 100], [100, 100], [200, 100], [300, 100],
-            [0, 200], [100, 200], [200, 200], [300, 200],
-            [0, 300], [100, 300], [200, 300], [300, 300]
-        ],
-        topRight: [
-            [600, 0], [700, 0], [800, 0], [900, 0],
-            [600, 100], [700, 100], [800, 100], [900, 100],
-            [600, 200], [700, 200], [800, 200], [900, 200],
-            [600, 300], [700, 300], [800, 300], [900, 300]
-        ],
-        bottomLeft: [
-            [0, 600], [100, 600], [200, 600], [300, 600],
-            [0, 700], [100, 700], [200, 700], [300, 700],
-            [0, 800], [100, 800], [200, 800], [300, 800],
-            [0, 900], [100, 900], [200, 900], [300, 900]
-        ],
-        bottomRight: [
-            [600, 600], [700, 600], [800, 600], [900, 600],
-            [600, 700], [700, 700], [800, 700], [900, 700],
-            [600, 800], [700, 800], [800, 800], [900, 800],
-            [600, 900], [700, 900], [800, 900], [900, 900]
-        ]
+        topLeft: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
+        topRight: [[600, 0], [700, 0], [800, 0], [900, 0], [600, 100], [700, 100], [800, 100], [900, 100], [600, 200], [700, 200], [800, 200], [900, 200], [600, 300], [700, 300], [800, 300], [900, 300]],
+        bottomLeft: [[0, 600], [100, 600], [200, 600], [300, 600], [0, 700], [100, 700], [200, 700], [300, 700], [0, 800], [100, 800], [200, 800], [300, 800], [0, 900], [100, 900], [200, 900], [300, 900]],
+        bottomRight: [[600, 600], [700, 600], [800, 600], [900, 600], [600, 700], [700, 700], [800, 700], [900, 700], [600, 800], [700, 800], [800, 800], [900, 800], [600, 900], [700, 900], [800, 900], [900, 900]]
     }
     const BOUNDARIE_REFERENCE_COORDS = {
-        left: [
-            [400, 400], [400, 500], [300, 400], [300, 500],
-            [200, 400], [200, 500], [100, 400], [100, 500],
-            [0, 400], [0, 500]
-        ],
-        right: [
-            [500, 400], [500, 500], [600, 400], [600, 500],
-            [700, 400], [700, 500], [800, 400], [800, 500],
-            [900, 400], [900, 500]
-        ],
-        top: [
-            [400, 300], [500, 300], [400, 200], [500, 200],
-            [400, 100], [500, 100], [400, 0], [500, 0]
-        ],
-        bottom: [
-            [400, 600], [500, 600], [400, 700], [500, 700],
-            [400, 800], [500, 800], [400, 900], [500, 900]
-        ]
+        left: [[400, 400], [400, 500], [300, 400], [300, 500], [200, 400], [200, 500], [100, 400], [100, 500], [0, 400], [0, 500]],
+        right: [[500, 400], [500, 500], [600, 400], [600, 500], [700, 400], [700, 500], [800, 400], [800, 500], [900, 400], [900, 500]],
+        top: [[400, 300], [500, 300], [400, 200], [500, 200], [400, 100], [500, 100], [400, 0], [500, 0]],
+        bottom: [[400, 600], [500, 600], [400, 700], [500, 700], [400, 800], [500, 800], [400, 900], [500, 900]]
     }
 
     const playersByTribe = new Map()
@@ -77,7 +43,7 @@ module.exports = async function () {
             bottom: 500
         }
 
-        for (let side of ['left', 'right', 'top', 'bottom']) {
+        for (const side of ['left', 'right', 'top', 'bottom']) {
             for (let i = 0; i < BOUNDARIE_REFERENCE_COORDS[side].length; i++) {
                 const [x, y] = BOUNDARIE_REFERENCE_COORDS[side][i]
 
@@ -96,7 +62,7 @@ module.exports = async function () {
         return [
             ...COORDS_REFERENCE.topLeft.filter(([x, y]) => x >= boundaries.left && y >= boundaries.top),
             ...COORDS_REFERENCE.topRight.filter(([x, y]) => x <= boundaries.right && y >= boundaries.top),
-            ...COORDS_REFERENCE.bottomLeft.filter(([x, y]) => x >= boundaries.left  && y <= boundaries.bottom),
+            ...COORDS_REFERENCE.bottomLeft.filter(([x, y]) => x >= boundaries.left && y <= boundaries.bottom),
             ...COORDS_REFERENCE.bottomRight.filter(([x, y]) => x <= boundaries.right && y <= boundaries.bottom)
         ]
     }
@@ -143,7 +109,7 @@ module.exports = async function () {
             return
         }
 
-        for (let village of rawVillages) {
+        for (const village of rawVillages) {
             let province_id
 
             if (provinces.has(village.province_name)) {
@@ -174,7 +140,7 @@ module.exports = async function () {
                 order_dir: 0,
                 query: ''
             }, function (data) {
-                for (let tribe of data.ranking) {
+                for (const tribe of data.ranking) {
                     tribes.set(tribe.tribe_id, {
                         bash_points_def: tribe.bash_points_def,
                         bash_points_off: tribe.bash_points_off,
@@ -212,7 +178,7 @@ module.exports = async function () {
                 loadTribes(offset),
                 loadTribes(offset + RANKING_QUERY_COUNT),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
-                loadTribes(offset + (RANKING_QUERY_COUNT * 3)),
+                loadTribes(offset + (RANKING_QUERY_COUNT * 3))
             ])
 
             await sleep(150)
@@ -229,7 +195,7 @@ module.exports = async function () {
                 order_dir: 0,
                 query: ''
             }, function (data) {
-                for (let player of data.ranking) {
+                for (const player of data.ranking) {
                     players.set(player.character_id, {
                         bash_points_def: player.bash_points_def,
                         bash_points_off: player.bash_points_off,
@@ -264,7 +230,7 @@ module.exports = async function () {
                 loadPlayers(offset),
                 loadPlayers(offset + RANKING_QUERY_COUNT),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
-                loadPlayers(offset + (RANKING_QUERY_COUNT * 3)),
+                loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
             ])
 
             await sleep(150)
@@ -272,11 +238,11 @@ module.exports = async function () {
     }
 
     const processVillagesByPlayer = function () {
-        for (let character_id of players.keys()) {
+        for (const character_id of players.keys()) {
             villagesByPlayer.set(character_id, [])
         }
 
-        for (let [id, village] of villages.entries()) {
+        for (const [id, village] of villages.entries()) {
             const {character_id} = village
 
             if (character_id) {
@@ -286,11 +252,11 @@ module.exports = async function () {
     }
 
     const processPlayersByTribe = function () {
-        for (let tribe_id of tribes.keys()) {
+        for (const tribe_id of tribes.keys()) {
             playersByTribe.set(tribe_id, [])
         }
 
-        for (let [character_id, player] of players.entries()) {
+        for (const [character_id, player] of players.entries()) {
             const {tribe_id} = player
 
             if (tribe_id) {
@@ -302,7 +268,7 @@ module.exports = async function () {
     const boundaries = await getBoundaries()
     const missingBlocks = filterBlocks(boundaries)
 
-    for (let [x, y] of missingBlocks) {
+    for (const [x, y] of missingBlocks) {
         await loadContinent(x, y)
     }
 

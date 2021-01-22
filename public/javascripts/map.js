@@ -51,7 +51,7 @@ define('TW2Map', [
         let $grid
         let $gridContext
 
-        let {
+        const {
             width: viewportWidth,
             height: viewportHeight
         } = $container.getBoundingClientRect()
@@ -180,11 +180,11 @@ define('TW2Map', [
         }
 
         const resetZoomContinents = () => {
-            renderedZoomContinents = Array.from({ length: zoomLevels.length }).map(zoom => Object())
+            renderedZoomContinents = Array.from({length: zoomLevels.length}).map(zoom => Object())
         }
 
         const resetZoomGrid = () => {
-            renderedZoomGrid = Array.from({ length: zoomLevels.length }).map(zoom => Object())
+            renderedZoomGrid = Array.from({length: zoomLevels.length}).map(zoom => Object())
         }
 
         const setupZoom = function () {
@@ -265,7 +265,7 @@ define('TW2Map', [
                 const offsetY = touchstartEvent ? touchstartEvent.touches[0].pageY : event.offsetY
 
                 mouseCoordY = Math.floor((positionY - middleViewportOffsetY + offsetY) / zoomSettings.tileSize)
-                let off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
+                const off = mouseCoordY % 2 ? zoomSettings.villageOffset : 0
                 mouseCoordX = Math.floor((positionX - middleViewportOffsetX + offsetX - off) / zoomSettings.tileSize)
 
                 const villagesX = loader.villages[mouseCoordX]
@@ -483,7 +483,7 @@ define('TW2Map', [
                 }
             }
 
-            const sorted = visibleContinents.sort(function(a, b){
+            const sorted = visibleContinents.sort(function (a, b) {
                 return Math.abs(55 - a) - Math.abs(55 - b)
             })
 
@@ -491,7 +491,7 @@ define('TW2Map', [
         }
 
         const renderVisibleContinents = () => {
-            let nonRenderedContinents = getVisibleContinents().filter((continent) => {
+            const nonRenderedContinents = getVisibleContinents().filter((continent) => {
                 return !renderedZoomContinents[settings.zoomLevel][continent]
             })
 
@@ -583,9 +583,10 @@ define('TW2Map', [
                 return
             }
 
-            var bytePosInSegment    = tilePos % 8,
-                byteOffset          = (tilePos - bytePosInSegment) * 0.625,
-                result
+            const bytePosInSegment = tilePos % 8
+            const byteOffset = (tilePos - bytePosInSegment) * 0.625
+
+            let result
 
             switch (bytePosInSegment) {
                 case 0:
@@ -639,11 +640,11 @@ define('TW2Map', [
         }
 
         const renderVillages = (villages, forceColor = false, context = $cacheContext, zoomSettings = zoomLevels[settings.zoomLevel]) => {
-            for (let x in villages) {
-                for (let y in villages[x]) {
-                    let [, , , character_id] = villages[x][y]
+            for (const x in villages) {
+                for (const y in villages[x]) {
+                    const [, , , character_id] = villages[x][y]
 
-                    let tribeId = loader.players && character_id ? loader.players[character_id][1] : false
+                    const tribeId = loader.players && character_id ? loader.players[character_id][1] : false
 
                     if (forceColor) {
                         context.fillStyle = forceColor
@@ -657,13 +658,13 @@ define('TW2Map', [
                         context.fillStyle = settings.neutralColor
                     }
 
-                    let off = y % 2 ? zoomSettings.villageOffset : 0
+                    const off = y % 2 ? zoomSettings.villageOffset : 0
 
                     if (zoomSettings.hexagonShape && settings.hexagonVillages) {
                         context.fillRect(x * zoomSettings.tileSize + off + 1, y * zoomSettings.tileSize, 3, 1)
-                        context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 1, 5, 1)
-                        context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 2, 5, 1)
-                        context.fillRect(x * zoomSettings.tileSize + off    , y * zoomSettings.tileSize + 3, 5, 1)
+                        context.fillRect(x * zoomSettings.tileSize + off, y * zoomSettings.tileSize + 1, 5, 1)
+                        context.fillRect(x * zoomSettings.tileSize + off, y * zoomSettings.tileSize + 2, 5, 1)
+                        context.fillRect(x * zoomSettings.tileSize + off, y * zoomSettings.tileSize + 3, 5, 1)
                         context.fillRect(x * zoomSettings.tileSize + off + 1, y * zoomSettings.tileSize + 4, 3, 1)
                     } else {
                         context.fillRect(x * zoomSettings.tileSize + off, y * zoomSettings.tileSize, zoomSettings.villageSize, zoomSettings.villageSize)
@@ -692,7 +693,7 @@ define('TW2Map', [
             if (zoomSettings.activeVillageBorder) {
                 $overlayContext.fillStyle = settings.activeVillageBorderColor + settings.activeVillageBorderOpacity
 
-                let off = activeVillage.y % 2 ? zoomSettings.villageOffset : 0
+                const off = activeVillage.y % 2 ? zoomSettings.villageOffset : 0
 
                 const borderX = Math.abs(positionX - (activeVillage.x * zoomSettings.tileSize) - middleViewportOffsetX) - 1 + off
                 const borderY = Math.abs(positionY - (activeVillage.y * zoomSettings.tileSize) - middleViewportOffsetY) - 1
@@ -700,11 +701,11 @@ define('TW2Map', [
 
                 if (zoomSettings.hexagonShape && settings.hexagonVillages) {
                     $overlayContext.fillRect(borderX + 1, borderY - 1, 5, 1)
-                    $overlayContext.fillRect(borderX    , borderY    , 1, 1)
-                    $overlayContext.fillRect(borderX + 6, borderY    , 1, 1)
+                    $overlayContext.fillRect(borderX, borderY, 1, 1)
+                    $overlayContext.fillRect(borderX + 6, borderY, 1, 1)
                     $overlayContext.fillRect(borderX - 1, borderY + 1, 1, 5)
                     $overlayContext.fillRect(borderX + 7, borderY + 1, 1, 5)
-                    $overlayContext.fillRect(borderX    , borderY + 6, 1, 1)
+                    $overlayContext.fillRect(borderX, borderY + 6, 1, 1)
                     $overlayContext.fillRect(borderX + 6, borderY + 6, 1, 1)
                     $overlayContext.fillRect(borderX + 1, borderY + 7, 5, 1)
                 } else {
@@ -728,16 +729,16 @@ define('TW2Map', [
             $overlayContext.fillStyle = settings.quickHighlightColor
 
             for (let [x, y] of loader.playerVillages[characterId]) {
-                let off = y % 2 ? zoomSettings.villageOffset : 0
+                const off = y % 2 ? zoomSettings.villageOffset : 0
 
                 x = x * zoomSettings.tileSize - positionX + middleViewportOffsetX + off
                 y = y * zoomSettings.tileSize - positionY + middleViewportOffsetY
 
                 if (zoomSettings.hexagonShape && settings.hexagonVillages) {
                     $overlayContext.fillRect(x + 1, y, 3, 1)
-                    $overlayContext.fillRect(x    , y + 1, 5, 1)
-                    $overlayContext.fillRect(x    , y + 2, 5, 1)
-                    $overlayContext.fillRect(x    , y + 3, 5, 1)
+                    $overlayContext.fillRect(x, y + 1, 5, 1)
+                    $overlayContext.fillRect(x, y + 2, 5, 1)
+                    $overlayContext.fillRect(x, y + 3, 5, 1)
                     $overlayContext.fillRect(x + 1, y + 4, 3, 1)
                 } else {
                     $overlayContext.fillRect(x, y, zoomSettings.villageSize, zoomSettings.villageSize)
@@ -758,7 +759,7 @@ define('TW2Map', [
         }
 
         const formatVillagesToDraw = (villagesId = [], scope = {x: {}}) => {
-            for (let [x, y] of villagesId) {
+            for (const [x, y] of villagesId) {
                 scope[x] = scope[x] || {}
                 scope[x][y] = loader.villages[x][y]
             }
@@ -793,7 +794,7 @@ define('TW2Map', [
         }
 
         const getVillagesToDraw = (highlightType, realId) => {
-            let redrawVillages = {
+            const redrawVillages = {
                 x: {}
             }
 
@@ -803,7 +804,7 @@ define('TW2Map', [
                     break
                 }
                 case TW2Map.highlightTypes.TRIBES: {
-                    for (let playerId of loader.tribePlayers[realId]) {
+                    for (const playerId of loader.tribePlayers[realId]) {
                         formatVillagesToDraw(loader.playerVillages[playerId], redrawVillages)
                     }
 
@@ -844,13 +845,13 @@ define('TW2Map', [
                 let tribeTag
                 let tribePoints
                 let tribeVillages
-                let provinceName = loader.provinces[province_id]
+                const provinceName = loader.provinces[province_id]
 
                 if (villageCharacterId) {
-                    ([ playerName, tribeId, playerPoints, playerVillages ] = loader.players[villageCharacterId])
+                    ([playerName, tribeId, playerPoints, playerVillages] = loader.players[villageCharacterId])
 
                     if (tribeId) {
-                        ([ tribeName, tribeTag, tribePoints, tribeVillages ] = loader.tribes[tribeId])
+                        ([tribeName, tribeTag, tribePoints, tribeVillages] = loader.tribes[tribeId])
                     }
                 }
 
@@ -995,7 +996,7 @@ define('TW2Map', [
 
             const sortedZooms = Object.keys($zoomElements).sort((a, b) => a == settings.zoomLevel ? -1 : 0)
 
-            for (let zoomLevel of sortedZooms) {
+            for (const zoomLevel of sortedZooms) {
                 renderVillages(redrawVillages, false, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
             }
 
@@ -1023,7 +1024,7 @@ define('TW2Map', [
 
             const sortedZooms = Object.keys($zoomElements).sort((a, b) => a == settings.zoomLevel ? -1 : 0)
 
-            for (let zoomLevel of sortedZooms) {
+            for (const zoomLevel of sortedZooms) {
                 renderVillages(redrawVillages, false, $zoomElements[zoomLevel].$cacheContext, zoomLevels[zoomLevel])
             }
 
@@ -1099,11 +1100,11 @@ define('TW2Map', [
         this.shareMap = async (shareType) => {
             const highlightsExport = []
 
-            for (let [id, data] of Object.entries(highlights.players)) {
+            for (const [id, data] of Object.entries(highlights.players)) {
                 highlightsExport.push([TW2Map.highlightTypes.PLAYERS, parseInt(id, 10), data.color])
             }
 
-            for (let [id, data] of Object.entries(highlights.tribes)) {
+            for (const [id, data] of Object.entries(highlights.tribes)) {
                 highlightsExport.push([TW2Map.highlightTypes.TRIBES, parseInt(id, 10), data.color])
             }
 
@@ -1155,7 +1156,7 @@ define('TW2Map', [
 
         this.trigger = (event, args) => {
             if (utils.hasOwn(events, event)) {
-                for (let handler of events[event]) {
+                for (const handler of events[event]) {
                     handler.apply(this, args)
                 }
             }
@@ -1237,7 +1238,7 @@ define('TW2DataLoader', [
     }
 ) {
     const TW2DataLoader = function (marketId, worldNumber) {
-        let continentPromises = {}
+        const continentPromises = {}
 
         this.players = false
         this.playersByName = {}
@@ -1254,8 +1255,8 @@ define('TW2DataLoader', [
         this.struct = false
 
         const mergeVillages = (villages) => {
-            for (let x in villages) {
-                for (let y in villages[x]) {
+            for (const x in villages) {
+                for (const y in villages[x]) {
                     if (x in this.villages) {
                         this.villages[x][y] = villages[x][y]
                     } else {
@@ -1263,8 +1264,8 @@ define('TW2DataLoader', [
                         this.villages[x][y] = villages[x][y]
                     }
 
-                    let village = this.villages[x][y]
-                    let character_id = village[3]
+                    const village = this.villages[x][y]
+                    const character_id = village[3]
 
                     this.villagesById[village[0]] = {
                         x,
@@ -1273,7 +1274,7 @@ define('TW2DataLoader', [
                         name: village[1],
                         points: village[2],
                         character_id: village[3],
-                        province_id: village[4],
+                        province_id: village[4]
                     }
 
                     if (character_id) {
@@ -1299,8 +1300,8 @@ define('TW2DataLoader', [
             this.tribes = info.tribes
             this.provinces = info.provinces
 
-            for (let id in this.players) {
-                let [name, tribeId] = this.players[id]
+            for (const id in this.players) {
+                const [name, tribeId] = this.players[id]
                 this.playersByName[name.toLowerCase()] = parseInt(id, 10)
 
                 if (tribeId) {
@@ -1309,8 +1310,8 @@ define('TW2DataLoader', [
                 }
             }
 
-            for (let id in this.tribes) {
-                let [name, tag] = this.tribes[id]
+            for (const id in this.tribes) {
+                const [name, tag] = this.tribes[id]
                 this.tribesByName[name.toLowerCase()] = parseInt(id, 10)
                 this.tribesByTag[tag.toLowerCase()] = parseInt(id, 10)
             }
@@ -1371,18 +1372,18 @@ define('TW2Tooltip', [], function () {
         $tooltip.style.visibility = 'hidden'
         $tooltip.style.opacity = 0
 
-        let $villageName = $tooltip.querySelector('.village-name')
-        let $villageX = $tooltip.querySelector('.village-x')
-        let $villageY = $tooltip.querySelector('.village-y')
-        let $villagePoints = $tooltip.querySelector('.village-points')
-        let $playerName = $tooltip.querySelector('.player-name')
-        let $playerVillages = $tooltip.querySelector('.player-villages')
-        let $playerPoints = $tooltip.querySelector('.player-points')
-        let $tribeName = $tooltip.querySelector('.tribe-name')
-        let $tribeTag = $tooltip.querySelector('.tribe-tag')
-        let $tribePoints = $tooltip.querySelector('.tribe-points')
-        let $tribeVillages = $tooltip.querySelector('.tribe-villages')
-        let $provinceName = $tooltip.querySelector('.province-name')
+        const $villageName = $tooltip.querySelector('.village-name')
+        const $villageX = $tooltip.querySelector('.village-x')
+        const $villageY = $tooltip.querySelector('.village-y')
+        const $villagePoints = $tooltip.querySelector('.village-points')
+        const $playerName = $tooltip.querySelector('.player-name')
+        const $playerVillages = $tooltip.querySelector('.player-villages')
+        const $playerPoints = $tooltip.querySelector('.player-points')
+        const $tribeName = $tooltip.querySelector('.tribe-name')
+        const $tribeTag = $tooltip.querySelector('.tribe-tag')
+        const $tribePoints = $tooltip.querySelector('.tribe-points')
+        const $tribeVillages = $tooltip.querySelector('.tribe-villages')
+        const $provinceName = $tooltip.querySelector('.province-name')
 
         const mouseMoveHandler = (event) => {
             let x = event.pageX

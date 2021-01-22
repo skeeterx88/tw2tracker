@@ -22,9 +22,9 @@ const Sync = {}
 
 let syncSocketServer = null
 let browser = null
-let syncDataActiveWorlds = new Set()
+const syncDataActiveWorlds = new Set()
 let syncDataAllRunning = false
-let syncAchievementsActiveWorlds = new Set()
+const syncAchievementsActiveWorlds = new Set()
 let syncAchievementsRunning = false
 
 Sync.init = async function () {
@@ -111,7 +111,7 @@ Sync.daemon = async function () {
 
         const static_share_expire_time = config.static_share_expire_time * 60 * 1000
 
-        for (let { share_id, last_access } of shares) {
+        for (const {share_id, last_access} of shares) {
             if (now - last_access.getTime() < static_share_expire_time) {
                 await db.query(sql.maps.deleteStaticShare, [share_id])
             }
@@ -154,7 +154,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         page = await createPuppeteerPage()
 
         const account = await Sync.auth(marketId, credentials)
-        const worldCharacter = account.characters.find(({ world_id }) => world_id === worldId)
+        const worldCharacter = account.characters.find(({world_id}) => world_id === worldId)
 
         if (!worldCharacter) {
             await Sync.character(marketId, worldNumber)
@@ -164,7 +164,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         }
 
         const urlId = marketId === 'zz' ? 'beta' : marketId
-        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, { waitFor: ['domcontentloaded', 'networkidle2'] })
+        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
         await page.evaluate(scraperReadyState)
 
         if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
@@ -189,7 +189,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
         await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
 
-        const { last_sync } = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
+        const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
         const syncDate = utils.ejsHelpers.formatDate(last_sync)
 
         await page.close()
@@ -208,7 +208,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await db.query(sql.updateWorldSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
             await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
 
-            const { last_sync } = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
+            const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
             const syncDate = utils.ejsHelpers.formatDate(last_sync)
 
             Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
@@ -236,7 +236,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         const account = await Sync.auth(marketId, credentials)
         const urlId = marketId === 'zz' ? 'beta' : marketId
-        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, { waitFor: ['domcontentloaded', 'networkidle2'] })
+        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
         await page.evaluate(scraperReadyState)
 
         const achievements = await utils.timeout(async function () {
@@ -281,13 +281,13 @@ Sync.dataAll = async function (flag) {
     const simultaneousSyncs = 3
     const failedToSync = []
 
-    let queuedWorlds = await db.any(sql.getOpenWorlds)
+    const queuedWorlds = await db.any(sql.getOpenWorlds)
 
     await db.query(sql.state.update.lastScrapeAll)
 
     let runningSyncs = 0
 
-    async function asynchronousSync() {
+    async function asynchronousSync () {
         while (queuedWorlds.length) {
             if (runningSyncs < simultaneousSyncs) {
                 const world = queuedWorlds.shift()
@@ -333,11 +333,11 @@ Sync.achievementsAll = async function (flag) {
     const simultaneousSyncs = 3
     const failedToSync = []
 
-    let queuedWorlds = await db.any(sql.getOpenWorlds)
+    const queuedWorlds = await db.any(sql.getOpenWorlds)
 
     let runningSyncs = 0
 
-    async function asynchronousSync() {
+    async function asynchronousSync () {
         while (queuedWorlds.length) {
             if (runningSyncs < simultaneousSyncs) {
                 const world = queuedWorlds.shift()
@@ -376,7 +376,7 @@ Sync.worlds = async function () {
     await db.query(sql.state.update.registerWorlds)
     const markets = await db.any(sql.markets.withAccount)
 
-    for (let market of markets) {
+    for (const market of markets) {
         const marketId = market.id
 
         try {
@@ -404,7 +404,7 @@ Sync.worlds = async function () {
 
             const allWorlds = [...worlds, ...characters]
 
-            for (let world of allWorlds) {
+            for (const world of allWorlds) {
                 const {worldNumber, worldName, registered} = world
                 const worldId = marketId + worldNumber
 
@@ -446,7 +446,7 @@ Sync.markets = async function () {
 
     const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId))
 
-    for (let missingMarket of missingMarkets) {
+    for (const missingMarket of missingMarkets) {
         await db.query(sql.markets.add, missingMarket)
     }
 
@@ -608,16 +608,16 @@ async function commitDataDatabase (data, worldId) {
             }
         }
 
-        for (let id of missingPlayersIds) {
+        for (const id of missingPlayersIds) {
             await this.none(sql.archivePlayer, {worldId, id})
         }
 
-        for (let id of missingTribesIds) {
+        for (const id of missingTribesIds) {
             await this.none(sql.archiveTribe, {worldId, id})
         }
 
-        for (let type of ['tribes', 'players']) {
-            for (let [id, subject] of data[type]) {
+        for (const type of ['tribes', 'players']) {
+            for (const [id, subject] of data[type]) {
                 this.none(sqlSubjectMap[type].updateData, {worldId, id, ...subject})
 
                 const [best_rank, best_points, best_villages] = records[type].get(id) || []
@@ -636,15 +636,15 @@ async function commitDataDatabase (data, worldId) {
             }
         }
 
-        for (let [province_name, province_id] of data.provinces) {
+        for (const [province_name, province_id] of data.provinces) {
             this.none(sql.addProvince, {worldId, province_id, province_name})
         }
 
-        for (let [village_id, village] of data.villages) {
+        for (const [village_id, village] of data.villages) {
             this.none(sql.addVillage, {worldId, village_id, ...village})
         }
 
-        for (let [village_id, village] of villagesNew.entries()) {
+        for (const [village_id, village] of villagesNew.entries()) {
             const oldVillage = villagesOld.has(village_id)
                 ? villagesOld.get(village_id)
                 : {village_id, ...village}
@@ -683,7 +683,7 @@ async function commitDataDatabase (data, worldId) {
             }
         }
 
-        for (let [character_id, playerNewData] of playersNew.entries()) {
+        for (const [character_id, playerNewData] of playersNew.entries()) {
             const playerOldData = playersOld.get(character_id)
 
             const oldTribeId = playerOldData ? playerOldData.tribe_id : null
@@ -704,7 +704,7 @@ async function commitDataDatabase (data, worldId) {
             }
         }
 
-        for (let [character_id, villages_id] of data.villagesByPlayer) {
+        for (const [character_id, villages_id] of data.villagesByPlayer) {
             this.none(sql.updatePlayerVillages, {worldId, character_id, villages_id})
         }
 
@@ -737,10 +737,10 @@ async function commitAchievementsDatabase (data, worldId) {
     }
 
     await db.tx(async function () {
-        for (let subjectType of ['players', 'tribes']) {
+        for (const subjectType of ['players', 'tribes']) {
             const modifiedAchievements = await getModifiedAchievements(subjectType, data[subjectType], worldId)
 
-            for (let {commitType, achievement} of modifiedAchievements) {
+            for (const {commitType, achievement} of modifiedAchievements) {
                 this.none(sqlSubjectMap[subjectType][commitType], {
                     worldId,
                     id: achievement.id,
@@ -771,12 +771,12 @@ async function commitDataFilesystem (worldId) {
 
         await fs.promises.mkdir(dataPath, {recursive: true})
 
-        for (let {id, name, tribe_id, points, villages} of players) {
+        for (const {id, name, tribe_id, points, villages} of players) {
             parsedPlayers[id] = [name, tribe_id || 0, points, villages]
         }
 
-        for (let village of villages) {
-            let {id, x, y, name, points, character_id, province_id} = village
+        for (const village of villages) {
+            const {id, x, y, name, points, character_id, province_id} = village
 
             let kx
             let ky
@@ -806,16 +806,16 @@ async function commitDataFilesystem (worldId) {
             continents[k][x][y] = [id, name, points, character_id || 0, province_id]
         }
 
-        for (let k in continents) {
+        for (const k in continents) {
             const data = JSON.stringify(continents[k])
             await fs.promises.writeFile(path.join(dataPath, k), zlib.gzipSync(data))
         }
 
-        for (let {id, name, tag, points, villages} of tribes) {
+        for (const {id, name, tag, points, villages} of tribes) {
             parsedTribes[id] = [name, tag, points, villages]
         }
 
-        for (let {name} of provinces) {
+        for (const {name} of provinces) {
             parsedProvinces.push(name)
         }
 
@@ -876,7 +876,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
         tribes: sql.getTribeAchievements
     }
 
-    for (let [subjectId, newAchievementsRaw] of achievements) {
+    for (const [subjectId, newAchievementsRaw] of achievements) {
         const achievementsToMerge = []
 
         const oldAchievementsRaw = await db.any(sqlAchievementsMap[subjectType], {worldId, id: subjectId})
@@ -891,7 +891,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
             if (newAchievementsRaw.length > oldAchievementsRaw.length) {
                 const missingTypes = newUniqueTypes.filter(type => !oldUniqueTypes.includes(type))
 
-                for (let type of missingTypes) {
+                for (const type of missingTypes) {
                     achievementsToMerge.push({
                         commitType: enums.achievementCommitTypes.ADD,
                         achievement: newAchievements.unique[type]
@@ -899,7 +899,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
                 }
             }
 
-            for (let type of oldUniqueTypes) {
+            for (const type of oldUniqueTypes) {
                 if (newAchievements.unique[type].level > oldAchievements.unique[type].level) {
                     achievementsToMerge.push({
                         commitType: enums.achievementCommitTypes.UPDATE,
@@ -908,7 +908,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
                 }
             }
 
-            for (let type of Object.keys(newAchievements.repeatable)) {
+            for (const type of Object.keys(newAchievements.repeatable)) {
                 const newRepeatable = newAchievements.repeatable[type]
                 const oldRepeatable = oldAchievements.repeatable[type]
 
@@ -951,7 +951,7 @@ function mapAchievements (achievements) {
     const unique = {}
     const repeatable = {}
 
-    for (let achievement of achievements) {
+    for (const achievement of achievements) {
         if (achievement.period) {
             repeatable[achievement.type] = repeatable[achievement.type] || []
             repeatable[achievement.type].push(achievement)
@@ -989,14 +989,29 @@ async function fetchWorldConfig (page, worldId) {
             const filteredConfig = {}
 
             const selecteConfig = [
-                'speed', 'victory_points', 'barbarian_point_limit', 'barbarian_spawn_rate',
-                'barbarize_inactive_percent', 'bathhouse', 'chapel_bonus', 'church',
-                'farm_rule', 'instant_recruit', 'language_selection', 'loyalty_after_conquer',
-                'mass_buildings', 'mass_recruiting', 'noob_protection_days', 'relocate_units',
-                'resource_deposits', 'second_village', 'tribe_member_limit', 'tribe_skills'
+                'speed',
+                'victory_points',
+                'barbarian_point_limit',
+                'barbarian_spawn_rate',
+                'barbarize_inactive_percent',
+                'bathhouse',
+                'chapel_bonus',
+                'church',
+                'farm_rule',
+                'instant_recruit',
+                'language_selection',
+                'loyalty_after_conquer',
+                'mass_buildings',
+                'mass_recruiting',
+                'noob_protection_days',
+                'relocate_units',
+                'resource_deposits',
+                'second_village',
+                'tribe_member_limit',
+                'tribe_skills'
             ]
 
-            for (let key of selecteConfig) {
+            for (const key of selecteConfig) {
                 filteredConfig[key] = worldConfig[key]
             }
 
