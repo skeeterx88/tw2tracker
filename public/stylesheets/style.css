@@ -408,25 +408,16 @@ div.world-title {
     margin-top: -4px;
 }
 
-#worlds fieldset,
-#markets fieldset {
+fieldset {
     border: none;
     padding: 0px;
     margin-left: 15px;
 }
 
-#worlds fieldset legend,
-#markets fieldset legend {
+fieldset legend {
     margin-left: -10px;
     font-weight: bold;
     color: #100a07;
-}
-
-#worlds fieldset,
-#markets fieldset {
-    border: none;
-    padding: 0px;
-    margin-left: 15px;
 }
 
 #markets .stats,
@@ -754,6 +745,9 @@ a.achievement-subject:last-child:after {
 
 #admin .world .world-id {
     font-weight: bold;
+    vertical-align: top;
+    margin-top: 2px;
+    display: inline-block;
 }
 
 #admin .world p {
@@ -761,7 +755,7 @@ a.achievement-subject:last-child:after {
 }
 
 #admin .world ul {
-    margin: 5px 10px;
+    margin: 5px 0px;
     padding: 0px;
 }
 
@@ -770,20 +764,23 @@ a.achievement-subject:last-child:after {
 }
 
 #admin .world .actions {
-     
+    margin: 8px 0px;
 }
 
-#admin .in-progress {
+#admin .world .relax-button {
+    color: #e0bfbf;
+    text-decoration: none;
+    margin: 5px;
+    padding: 2px 4px;
+    font-weight: normal;
+}
+
+#admin .world .in-progress {
     box-shadow: 0 0 0 1px green, inset 0 0 0 1px green, 2px 2px 2px #000;
     border-color: #88bb7b;
 }
 
-#admin .relax-button {
-    color: #e0bfbf;
-    text-decoration: none;
-}
-
-#admin .in-progress .relax-button {
+#admin .world .in-progress .relax-button {
     cursor: wait;
 }
 
@@ -797,6 +794,15 @@ a.achievement-subject:last-child:after {
 #admin .sync-in-progress {
     font-weight: bold;
     color: green;
+}
+
+#worlds-sync fieldset {
+    border: 1px solid #b77b56;
+    display: inline-block;
+    min-width: 150px;
+    border-left: none;
+    border-bottom: none;
+    padding: 0 3px;
 }
 
 span[class^="flag-"] {
@@ -902,5 +908,13 @@ span[class^="flag-"] {
     menu .icon {
         height: 13px;
         background-size: 12px;
+    }
+
+    #worlds-sync fieldset {
+        display: block;
+    }
+
+    #admin .world .world-id {
+        display: block;
     }
 }

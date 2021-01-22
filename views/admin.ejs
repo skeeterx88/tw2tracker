@@ -21,24 +21,18 @@
                                     <p class="world-id">
                                         <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
                                     </p>
-                                    <p>
-                                        Last data sync date:
-                                        <span class="last-data-sync-date">
-                                            <% if (world.last_sync) { %>
-                                                <%= formatDate(world_last_sync) %>
-                                            <% } else { %>
-                                                Never
-                                            <% } %>
-                                        </span>
-                                    </p>
-                                    <p>Last data sync status: <span class="last-data-sync-status"><%= world.last_sync_status %></span></p>
-
-                                    <p>
-                                        Last achievements sync date:
-                                        <span class="last-achievements-sync-date"></span>
-                                    </p>
-                                    <p>Last achievements sync status: <span class="last-achievemnts-sync-status"></span></p>
+                                    <fieldset>
+                                        <legend>Data sync:</legend>
+                                        <p>Last time: <span class="last-data-sync-date"><% __append(world.last_sync ? formatDate(world_last_sync) : 'Never') %></span></p>
+                                        <p>Last status: <span class="last-data-sync-status"><%= world.last_sync_status %></span></p>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>Achievements sync:</legend>
+                                        <p>Last time: <span class="last-data-sync-date">-</span></p>
+                                        <p>Last status: <span class="last-data-sync-status">-</span></p>
+                                    </fieldset>
                                 </div>
+
                                 <div class="actions">
                                     <ul>
                                         <% if (world.open) { -%>
