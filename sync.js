@@ -198,6 +198,8 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     } catch (error) {
         console.log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
 
+        syncDataActiveWorlds.delete(worldId)
+
         if (page) {
             await page.close()
         }
