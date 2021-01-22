@@ -106,19 +106,7 @@ require([
                     updateAllWorldsStatus(value)
                     break
                 }
-                case syncStates.START: {
-                    updateWorldStatus(value, action)
-                    break
-                }
-                case syncStates.FINISH: {
-                    updateWorldStatus(value, action)
-                    break
-                }
-                case syncStates.ACHIEVEMENT_START: {
-                    updateWorldStatus(value, action)
-                    break
-                }
-                case syncStates.ACHIEVEMENT_FINISH: {
+                default: {
                     updateWorldStatus(value, action)
                     break
                 }
