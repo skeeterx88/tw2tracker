@@ -42,8 +42,8 @@
                                 <div class="actions">
                                     <ul>
                                         <% if (world.open) { -%>
-                                            <li><a class="sync-data" href="/admin/sync/data/<%= world.market %>/<%= world.num %>"><button class="relax-button small">Sync data</button></a></li>
-                                            <li><a class="sync-achievements" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>"><button class="relax-button small">Sync achievements</button></a></li>
+                                            <li><a class="sync-data relax-button small" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>">Sync data</a></li>
+                                            <li><a class="sync-achievements relax-button small" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>">Sync achievements</a></li>
                                         <% } -%>
                                     </ul>
                                 </div>

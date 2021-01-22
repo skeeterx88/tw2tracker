@@ -778,6 +778,11 @@ a.achievement-subject:last-child:after {
     border-color: #88bb7b;
 }
 
+#admin .relax-button {
+    color: #e0bfbf;
+    text-decoration: none;
+}
+
 #admin .in-progress .relax-button {
     cursor: wait;
 }

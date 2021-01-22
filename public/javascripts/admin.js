@@ -29,26 +29,30 @@ define('updateWorldStatus', [
         const $world = document.querySelector('#' + worldId)
         const $dataDate = $world.querySelector('.last-data-sync-date')
         const $dataStatus = $world.querySelector('.last-data-sync-status')
-        const $dataSync = $world.querySelector('.sync-data button')
-        const $achievementsSync = $world.querySelector('.sync-achievements button')
+        const $dataSync = $world.querySelector('.sync-data')
+        const $achievementsSync = $world.querySelector('.sync-achievements')
 
         switch (action) {
             case syncStates.START: {
                 $dataSync.innerHTML = 'Sync data in progress...'
+                $dataSync.dataset.active = 'yes'
                 break
             }
             case syncStates.FINISH: {
                 $dataSync.innerHTML = 'Sync data'
                 $dataDate.innerHTML = date
                 $dataStatus.innerHTML = status
+                $dataSync.dataset.active = 'no'
                 break
             }
             case syncStates.ACHIEVEMENT_START: {
                 $achievementsSync.innerHTML = 'Sync achievements in progress...'
+                $achievementsSync.dataset.active = 'yes'
                 break
             }
             case syncStates.ACHIEVEMENT_FINISH: {
                 $achievementsSync.innerHTML = 'Sync achievements'
+                $achievementsSync.dataset.active = 'no'
                 break
             }
         }
@@ -80,7 +84,11 @@ require([
             for (const $button of $buttons) {
                 $button.addEventListener('click', function (event) {
                     event.preventDefault()
-                    fetch(this.href)
+
+                    if ($button.dataset.active === 'no') {
+                        fetch(this.href)
+                        $button.dataset.active = 'yes'
+                    }
                 })
             }
         }
