@@ -255,10 +255,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 }
 
 Sync.dataAll = async function (flag) {
-    console.log('Sync.allWorlds()')
+    console.log('Sync.dataAll()')
 
     if (syncDataAllRunning) {
-        console.log(colors.red('\nA Scrape All Worlds is already in progress\n'))
+        console.log(colors.red('Sync all data is already in progress'))
         return false
     }
 
@@ -307,7 +307,7 @@ Sync.dataAll = async function (flag) {
 }
 
 Sync.achievementsAll = async function (flag) {
-    console.log('Sync.allWorldsAchievements()')
+    console.log('Sync.achievementsAll()')
 
     if (syncAchievementsAllRunning) {
         console.log(colors.red('Sync all achievements is already in progress'))
@@ -440,7 +440,7 @@ Sync.markets = async function () {
 }
 
 Sync.character = async function (marketId, worldNumber) {
-    console.log(`Sync.registerCharacter() ${marketId}${worldNumber}`)
+    console.log(`Sync.character() ${marketId}${worldNumber}`)
 
     const page = await createPuppeteerPage()
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
