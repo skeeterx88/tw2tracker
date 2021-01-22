@@ -176,6 +176,7 @@ define('TW2Map', [
             renderVisibleDemarcations()
             renderVisibleContinents()
             renderViewport()
+            renderOverlay()
         }
 
         const resetZoomContinents = () => {
