@@ -22,10 +22,11 @@ const Sync = {}
 
 let syncSocketServer = null
 let browser = null
+
 const syncDataActiveWorlds = new Set()
-let syncDataAllRunning = false
 const syncAchievementsActiveWorlds = new Set()
-// let syncAchievementsRunning = false
+let syncDataAllRunning = false
+let syncAchievementsAllRunning = false
 
 Sync.init = async function () {
     console.log('Sync.init()')
@@ -36,8 +37,8 @@ Sync.init = async function () {
     Events.on(enums.SCRAPE_ALL_WORLD_END, () => syncDataAllRunning = false)
     Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, (worldId) => syncAchievementsActiveWorlds.add(worldId))
     Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId) => syncAchievementsActiveWorlds.delete(worldId))
-    // Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAchievementsRunning = true)
-    // Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAchievementsRunning = false)
+    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAchievementsAllRunning = true)
+    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAchievementsAllRunning = false)
 
     process.on('SIGTERM', async function () {
         console.log(colors.red('Stopping tw2-tracker'))
@@ -308,8 +309,8 @@ Sync.dataAll = async function (flag) {
 Sync.achievementsAll = async function (flag) {
     console.log('Sync.allWorldsAchievements()')
 
-    if (syncAchievementsActiveWorlds.size) {
-        console.log(colors.red('A Scrape All Achievement Worlds is already in progress'))
+    if (syncAchievementsAllRunning) {
+        console.log(colors.red('Sync all achievements is already in progress'))
         return false
     }
 
