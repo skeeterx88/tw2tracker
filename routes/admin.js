@@ -5,8 +5,9 @@ const connectEnsureLogin = require('connect-ensure-login')
 const db = require('../db.js')
 const sql = require('../sql.js')
 const utils = require('../utils.js')
-const Sync = require('../sync.js')
 const config = require('../config.js')
+const enums = require('../enums.js')
+const syncSocket = require('../sync-socket.js')
 
 router.use(connectEnsureLogin.ensureLoggedIn())
 
@@ -29,9 +30,9 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
 })
 
 const scrapeAllWorldsRouter = utils.asyncRouter(async function (req, res) {
-    process.send({
-        action: 'syncAllWorlds'
-    })
+    syncSocket.send(JSON.stringify({
+        code: enums.SYNC_REQUEST_SYNC_DATA_ALL
+    }))
 
     res.end()
 })
@@ -43,21 +44,22 @@ const scrapeWorldRouter = utils.asyncRouter(async function (req, res) {
     const worlds = await db.map(sql.getWorlds, [], world => world.num)
     
     if (enabledMarkets.includes(marketId) && worlds.includes(worldNumber)) {
-        process.send({
-            action: 'syncWorld',
+        syncSocket.send(JSON.stringify({
+            code: enums.SYNC_REQUEST_SYNC_DATA,
             marketId,
             worldNumber
-        })
+        }))
     }
     
     res.end()
 })
 
 const scrapeMarketsRouter = utils.asyncRouter(async function (req, res) {
-    const addedMarkets = await Sync.markets()
+    syncSocket.send(JSON.stringify({
+        code: enums.SYNC_REQUEST_SYNC_MARKETS
+    }))
 
-    res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify(addedMarkets))
+    res.end()
 })
 
 router.get('/', adminPanelRouter)

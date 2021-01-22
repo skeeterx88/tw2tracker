@@ -1055,12 +1055,26 @@ function initSyncSocketServer () {
         Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(enums.syncStates.START, {worldId}))
         Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}))
 
-        ws.on('message', function (code) {
-            switch (code) {
-                case enums.REQUEST_SYNC_STATUS: {
+        ws.on('message', function (raw) {
+            const data = JSON.parse(raw)
+
+            switch (data.code) {
+                case enums.SYNC_REQUEST_STATUS: {
                     send(enums.syncStates.UPDATE, Array.from(syncDataActiveWorlds.keys()))
                     break
-                }   
+                }
+                case enums.SYNC_REQUEST_SYNC_DATA_ALL: {
+                    Sync.dataAll()
+                    break
+                }
+                case enums.SYNC_REQUEST_SYNC_DATA: {
+                    Sync.data(data.marketId, data.worldNumber)
+                    break
+                }
+                case enums.SYNC_REQUEST_SYNC_MARKETS: {
+                    Sync.markets()
+                    break
+                }
             }
         })
     })

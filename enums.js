@@ -16,7 +16,12 @@ module.exports = {
     SCRAPE_ACHIEVEMENT_WORLD_END: 'scrape_achievement_world_end',
     SCRAPE_ACHIEVEMENT_ALL_WORLD_START: 'scrape_achievement_all_world_start',
     SCRAPE_ACHIEVEMENT_ALL_WORLD_END: 'scrape_achievement_all_world_end',
-    REQUEST_SYNC_STATUS: 'request_sync_status',
+    SYNC_REQUEST_STATUS: 'request_sync_status',
+    SYNC_REQUEST_SYNC_DATA: 'sync_request_sync_data',
+    SYNC_REQUEST_SYNC_DATA_ALL: 'sync_request_sync_data_all',
+    SYNC_REQUEST_SYNC_ACHIEVEMENTS: 'sync_request_sync_achievements',
+    SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL: 'sync_request_sync_achievements_all',
+    SYNC_REQUEST_SYNC_MARKETS: 'sync_request_sync_markets',
     EMPTY_CONTINENT: 'empty_continent',
     achievementCommitTypes: {
         ADD: 'add',

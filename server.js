@@ -102,7 +102,7 @@ app.use(function (err, req, res, next) {
 app.set('port', port)
 
 module.exports = function () {
-    const syncSocket = new WebSocket('ws://127.0.0.1:7777')
+    const syncSocket = require('./sync-socket.js')
     const httpServer = http.createServer()
     const adminSocketServer = new WebSocket.Server({
         server: httpServer
@@ -115,7 +115,9 @@ module.exports = function () {
             adminSocket.send(data)
         })
 
-        syncSocket.send(enums.REQUEST_SYNC_STATUS)
+        syncSocket.send(JSON.stringify({
+            code: enums.SYNC_REQUEST_STATUS
+        }))
     })
 
     httpServer.on('error', function (error) {

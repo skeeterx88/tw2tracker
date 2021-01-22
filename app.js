@@ -24,20 +24,7 @@
         Sync.init()
 
         for (let i = 0; i < cpus.length; i++) {
-            const worker = cluster.fork()
-
-            worker.on('message', function (data) {
-                switch (data.action) {
-                    case 'syncWorld': {
-                        Sync.data(data.marketId, data.worldNumber)
-                        break
-                    }
-                    case 'syncAllWorlds': {
-                        Sync.dataAll()
-                        break
-                    }
-                }
-            })
+            cluster.fork()
         }
     } else {
         server()
