@@ -20,7 +20,7 @@ module.exports = function () {
             } else {
                 reject('Could not get ready state (timeout)')
             }
-        }, 10000)
+        }, 20000)
 
         const waitForInjector = function (callback) {
             if (typeof injector === 'undefined') {
