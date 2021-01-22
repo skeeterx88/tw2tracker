@@ -25,7 +25,7 @@ let browser = null
 const syncDataActiveWorlds = new Set()
 let syncDataAllRunning = false
 const syncAchievementsActiveWorlds = new Set()
-let syncAchievementsRunning = false
+// let syncAchievementsRunning = false
 
 Sync.init = async function () {
     console.log('Sync.init()')
@@ -36,30 +36,13 @@ Sync.init = async function () {
     Events.on(enums.SCRAPE_ALL_WORLD_END, () => syncDataAllRunning = false)
     Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, (worldId) => syncAchievementsActiveWorlds.add(worldId))
     Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId) => syncAchievementsActiveWorlds.delete(worldId))
-    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAchievementsRunning = true)
-    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAchievementsRunning = false)
+    // Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAchievementsRunning = true)
+    // Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAchievementsRunning = false)
 
     process.on('SIGTERM', async function () {
         console.log(colors.red('Stopping tw2-tracker'))
 
-        if (syncDataActiveWorlds.size) {
-            console.log(colors.red('Waiting pendent sync to end...'))
-            // TODO: handle multiple data syncs running simultaneously
-            await Events.on(enums.SCRAPE_WORLD_END)
-        }
-
-        if (syncAchievementsRunning) {
-            console.log(colors.red('Waiting pendent achievement sync to end...'))
-            // TODO: handle multiple achievement syncs running simultaneously
-            await Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END)
-        }
-
-        if (browser) {
-            await browser.close()
-        }
-
         await db.$pool.end()
-
         process.exit(0)
     })
 
