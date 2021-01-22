@@ -782,8 +782,10 @@ a.achievement-subject:last-child:after {
     cursor: wait;
 }
 
-#admin .last-sync-date,
-#admin .last-sync-status {
+#admin .last-data-sync-date,
+#admin .last-data-sync-status,
+#admin .last-achievements-sync-date,
+#admin .last-achievements-sync-status {
     font-weight: bold;
 }
 

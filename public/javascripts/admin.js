@@ -1,47 +1,54 @@
-define('syncStates', [], function () {
-    return {
-        START: 'start',
-        FINISH: 'finish',
-        UPDATE: 'update'
-    }
-})
-
 define('updateAllWorldsStatus', [
-    'syncStates',
-    'updateWorldStatus'
+    'updateWorldStatus',
+    'backendValues'
 ], function (
-    syncStates,
-    updateWorldStatus
+    updateWorldStatus,
+    {
+        syncStates
+    }
 ) {
-    return function updateAllWorldsStatus (worlds) {
-        for (const worldId of worlds) {
+    return function updateAllWorldsStatus ({data, achievements}) {
+        for (const worldId of data) {
             updateWorldStatus({worldId}, syncStates.START)
+        }
+
+        for (const worldId of achievements) {
+            updateWorldStatus({worldId}, syncStates.ACHIEVEMENT_START)
         }
     }
 })
 
 define('updateWorldStatus', [
-    'syncStates'
+    'backendValues'
 ], function (
-    syncStates
+    {
+        syncStates
+    }
 ) {
-    return function updateWorldStatus ({worldId, status, date}, stateType) {
+    return function updateWorldStatus ({worldId, status, date}, action) {
         const $world = document.querySelector('#' + worldId)
-        const $date = $world.querySelector('.last-sync-date')
-        const $status = $world.querySelector('.last-sync-status')
-        const $syncButton = $world.querySelector('.sync-now button')
+        const $dataDate = $world.querySelector('.last-data-sync-date')
+        const $dataStatus = $world.querySelector('.last-data-sync-status')
+        const $dataSync = $world.querySelector('.sync-data button')
+        const $achievementsSync = $world.querySelector('.sync-achievements button')
 
-        switch (stateType) {
+        switch (action) {
             case syncStates.START: {
-                $world.classList.add('in-progress')
-                $syncButton.innerHTML = 'Sync in progress...'
+                $dataSync.innerHTML = 'Sync data in progress...'
                 break
             }
             case syncStates.FINISH: {
-                $world.classList.remove('in-progress')
-                $syncButton.innerHTML = 'Sync now'
-                $date.innerHTML = date
-                $status.innerHTML = status
+                $dataSync.innerHTML = 'Sync data'
+                $dataDate.innerHTML = date
+                $dataStatus.innerHTML = status
+                break
+            }
+            case syncStates.ACHIEVEMENT_START: {
+                $achievementsSync.innerHTML = 'Sync achievements in progress...'
+                break
+            }
+            case syncStates.ACHIEVEMENT_FINISH: {
+                $achievementsSync.innerHTML = 'Sync achievements'
                 break
             }
         }
@@ -49,30 +56,33 @@ define('updateWorldStatus', [
 })
 
 require([
-    'syncStates',
     'updateAllWorldsStatus',
     'updateWorldStatus',
     'backendValues'
 ], function (
-    syncStates,
     updateAllWorldsStatus,
     updateWorldStatus,
     {
-        development
+        development,
+        syncStates
     }
 ) {
     function setupSync () {
         const $worlds = document.querySelectorAll('#worlds-sync .world')
-        const syncButtons = Array.from($worlds).map(function ($world) {
-            return [$world.dataset, $world.querySelector('.sync-now')]
+        const $worldButtons = Array.from($worlds).map(function ($world) {
+            return [
+                $world.querySelector('.sync-data'),
+                $world.querySelector('.sync-achievements')
+            ]
         })
 
-        for (const [{marketId, worldNumber}, $sync] of syncButtons) {
-            $sync.addEventListener('click', function (event) {
-                event.preventDefault()
-
-                fetch(`/admin/scraper/${marketId}/${worldNumber}`)
-            })
+        for (const $buttons of $worldButtons) {
+            for (const $button of $buttons) {
+                $button.addEventListener('click', function (event) {
+                    event.preventDefault()
+                    fetch(this.href)
+                })
+            }
         }
     }
 
@@ -89,11 +99,19 @@ require([
                     break
                 }
                 case syncStates.START: {
-                    updateWorldStatus(value, syncStates.START)
+                    updateWorldStatus(value, action)
                     break
                 }
                 case syncStates.FINISH: {
-                    updateWorldStatus(value, syncStates.FINISH)
+                    updateWorldStatus(value, action)
+                    break
+                }
+                case syncStates.ACHIEVEMENT_START: {
+                    updateWorldStatus(value, action)
+                    break
+                }
+                case syncStates.ACHIEVEMENT_FINISH: {
+                    updateWorldStatus(value, action)
                     break
                 }
             }

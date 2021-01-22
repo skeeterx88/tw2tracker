@@ -30,7 +30,9 @@ module.exports = {
     syncStates: {
         START: 'start',
         FINISH: 'finish',
-        UPDATE: 'update'
+        UPDATE: 'update',
+        ACHIEVEMENT_START: 'achievement_start',
+        ACHIEVEMENT_FINISH: 'achievement_finish'
     },
     mapShareTypes: {
         STATIC: 'static',

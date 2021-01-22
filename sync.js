@@ -207,7 +207,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_START, [marketId])
+    Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_START, [worldId])
 
     console.log(`Sync.achievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
 
@@ -237,7 +237,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await page.close()
 
-        Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [marketId])
+        Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId])
     } catch (error) {
         console.log(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
 
@@ -248,7 +248,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < 3) {
             return await Sync.achievements(marketId, worldNumber, flag, ++attempt)
         } else {
-            Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [marketId])
+            Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId])
             throw new Error(error.message)
         }
     }
@@ -1038,13 +1038,18 @@ function initSyncSocketServer () {
 
         Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(enums.syncStates.START, {worldId}))
         Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}))
+        Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, (worldId) => send(enums.syncStates.ACHIEVEMENT_START, {worldId}))
+        Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId}))
 
         ws.on('message', function (raw) {
             const data = JSON.parse(raw)
 
             switch (data.code) {
                 case enums.SYNC_REQUEST_STATUS: {
-                    send(enums.syncStates.UPDATE, Array.from(syncDataActiveWorlds.keys()))
+                    send(enums.syncStates.UPDATE, {
+                        data: Array.from(syncDataActiveWorlds),
+                        achievements: Array.from(syncAchievementsActiveWorlds)
+                    })
                     break
                 }
                 case enums.SYNC_REQUEST_SYNC_DATA_ALL: {
@@ -1053,6 +1058,14 @@ function initSyncSocketServer () {
                 }
                 case enums.SYNC_REQUEST_SYNC_DATA: {
                     Sync.data(data.marketId, data.worldNumber)
+                    break
+                }
+                case enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL: {
+                    Sync.achievementsAll()
+                    break
+                }
+                case enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS: {
+                    Sync.achievements(data.marketId, data.worldNumber)
                     break
                 }
                 case enums.SYNC_REQUEST_SYNC_MARKETS: {

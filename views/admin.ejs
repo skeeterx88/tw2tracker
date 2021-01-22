@@ -22,8 +22,8 @@
                                         <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
                                     </p>
                                     <p>
-                                        Last sync date:
-                                        <span class="last-sync-date">
+                                        Last data sync date:
+                                        <span class="last-data-sync-date">
                                             <% if (world.last_sync) { %>
                                                 <%= formatDate(world_last_sync) %>
                                             <% } else { %>
@@ -31,14 +31,19 @@
                                             <% } %>
                                         </span>
                                     </p>
-                                    <p>Last sync status: <span class="last-sync-status"><%= world.last_sync_status %></span></p>
+                                    <p>Last data sync status: <span class="last-data-sync-status"><%= world.last_sync_status %></span></p>
+
+                                    <p>
+                                        Last achievements sync date:
+                                        <span class="last-achievements-sync-date"></span>
+                                    </p>
+                                    <p>Last achievements sync status: <span class="last-achievemnts-sync-status"></span></p>
                                 </div>
                                 <div class="actions">
                                     <ul>
                                         <% if (world.open) { -%>
-                                            <li>
-                                                <a class="sync-now" href="/admin/scraper/<%= world.market %>/<%= world.num %>"><button class="relax-button small">Sync now</button></a>
-                                            </li>
+                                            <li><a class="sync-data" href="/admin/sync/data/<%= world.market %>/<%= world.num %>"><button class="relax-button small">Sync data</button></a></li>
+                                            <li><a class="sync-achievements" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>"><button class="relax-button small">Sync achievements</button></a></li>
                                         <% } -%>
                                     </ul>
                                 </div>
