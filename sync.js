@@ -275,23 +275,22 @@ Sync.dataAll = async function (flag) {
     Events.trigger(enums.SYNC_DATA_ALL_START)
 
     const simultaneousSyncs = 3
-    const failedToSync = []
-
-    const queuedWorlds = await db.any(sql.getOpenWorlds)
 
     await db.query(sql.state.update.lastScrapeAll)
 
-    let runningSyncs = 0
-
     async function asynchronousSync () {
-        while (queuedWorlds.length) {
-            if (runningSyncs < simultaneousSyncs) {
-                const world = queuedWorlds.shift()
+        const queue = await db.any(sql.getOpenWorlds)
+        const fails = []
+        let running = 0
 
-                runningSyncs++
+        while (queue.length) {
+            if (running < simultaneousSyncs) {
+                const world = queue.shift()
+
+                running++
 
                 Sync.data(world.market, world.num, flag).catch(function (error) {
-                    failedToSync.push({
+                    fails.push({
                         marketId: world.market,
                         worldNumber: world.num,
                         message: error.message
@@ -299,14 +298,14 @@ Sync.dataAll = async function (flag) {
                 })
             } else {
                 await Events.on(enums.SYNC_DATA_FINISH)
-                runningSyncs--
+                running--
             }
         }
+
+        return fails
     }
 
-    await asynchronousSync()
-
-    Events.trigger(enums.SYNC_DATA_ALL_FINISH, failedToSync)
+    Events.trigger(enums.SYNC_DATA_ALL_FINISH, await asynchronousSync())
 }
 
 Sync.achievementsAll = async function (flag) {
@@ -320,21 +319,20 @@ Sync.achievementsAll = async function (flag) {
     Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START)
 
     const simultaneousSyncs = 3
-    const failedToSync = []
-
-    const queuedWorlds = await db.any(sql.getOpenWorlds)
-
-    let runningSyncs = 0
 
     async function asynchronousSync () {
-        while (queuedWorlds.length) {
-            if (runningSyncs < simultaneousSyncs) {
-                const world = queuedWorlds.shift()
+        const queue = await db.any(sql.getOpenWorlds)
+        const fails = []
+        let running = 0
 
-                runningSyncs++
+        while (queue.length) {
+            if (running < simultaneousSyncs) {
+                const world = queue.shift()
+
+                running++
 
                 Sync.achievements(world.market, world.num, flag).catch(function (error) {
-                    failedToSync.push({
+                    fails.push({
                         marketId: world.market,
                         worldNumber: world.num,
                         message: error.message
@@ -342,14 +340,14 @@ Sync.achievementsAll = async function (flag) {
                 })
             } else {
                 await Events.on(enums.SYNC_ACHIEVEMENTS_FINISH)
-                runningSyncs--
+                running--
             }
         }
+
+        return fails
     }
 
-    await asynchronousSync()
-
-    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, failedToSync)
+    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, await asynchronousSync())
 }
 
 Sync.worlds = async function () {
