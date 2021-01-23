@@ -255,7 +255,13 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < 3) {
             return await Sync.achievements(marketId, worldNumber, flag, ++attempt)
         } else {
-            Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId])
+            await db.query(sql.updateAchievementsSync, [enums.SYNC_FAIL, marketId, worldNumber])
+
+            const {last_achievements_sync_date} = await db.one(sql.getAchievementsSync, [marketId, worldNumber])
+            const syncDate = utils.ejsHelpers.formatDate(last_achievements_sync_date)
+
+            Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
+
             throw new Error(error.message)
         }
     }
@@ -1046,7 +1052,7 @@ function initSyncSocketServer () {
         Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(enums.syncStates.START, {worldId}))
         Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}))
         Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, (worldId) => send(enums.syncStates.ACHIEVEMENT_START, {worldId}))
-        Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId}))
+        Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId, status, date) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId, status, date}))
 
         ws.on('message', function (raw) {
             const data = JSON.parse(raw)
