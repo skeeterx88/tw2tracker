@@ -306,14 +306,7 @@ Sync.dataAll = async function (flag) {
 
     await asynchronousSync()
 
-    Events.trigger(enums.SYNC_DATA_ALL_FINISH)
-
-    if (failedToSync.length) {
-        const allFail = failedToSync.length === queuedWorlds.length
-        return allFail ? enums.SYNC_ERROR_ALL : enums.SYNC_ERROR_SOME
-    } else {
-        return enums.SYNC_SUCCESS_ALL
-    }
+    Events.trigger(enums.SYNC_DATA_ALL_FINISH, failedToSync)
 }
 
 Sync.achievementsAll = async function (flag) {
@@ -356,14 +349,7 @@ Sync.achievementsAll = async function (flag) {
 
     await asynchronousSync()
 
-    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH)
-
-    if (failedToSync.length) {
-        const allFail = failedToSync.length === queuedWorlds.length
-        return allFail ? enums.SYNC_ACHIEVEMENTS_ERROR_ALL : enums.SYNC_ACHIEVEMENTS_ERROR_SOME
-    } else {
-        return enums.SYNC_ACHIEVEMENTS_SUCCESS_ALL
-    }
+    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, failedToSync)
 }
 
 Sync.worlds = async function () {

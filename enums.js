@@ -1,12 +1,6 @@
 module.exports = {
     SYNC_SUCCESS: 'success',
     SYNC_FAIL: 'fail',
-    SYNC_SUCCESS_ALL: 'sync_success_all',
-    SYNC_ERROR_ALL: 'sync_error_all',
-    SYNC_ERROR_SOME: 'sync_error_some',
-    SYNC_ACHIEVEMENTS_SUCCESS_ALL: 'sync_achievements_success_all',
-    SYNC_ACHIEVEMENTS_ERROR_ALL: 'sync_achievements_error_all',
-    SYNC_ACHIEVEMENTS_ERROR_SOME: 'sync_achievements_error_some',
 
     SYNC_DATA_START: 'sync_data_start',
     SYNC_DATA_FINISH: 'sync_data_finish',
