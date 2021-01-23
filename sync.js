@@ -172,7 +172,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         await commitDataFilesystem(worldId)
         await db.query(sql.updateDataSync, [enums.SYNC_SUCCESS, marketId, worldNumber])
 
-        const {last_data_sync_date} = await db.one(sql.getDataSync, [marketId, worldNumber])
+        const {last_data_sync_date} = await db.one(sql.getWorldSyncData, [marketId, worldNumber])
         const syncDate = utils.ejsHelpers.formatDate(last_data_sync_date)
 
         await page.close()
@@ -192,7 +192,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         } else {
             await db.query(sql.updateDataSync, [enums.SYNC_FAIL, marketId, worldNumber])
 
-            const {last_data_sync_date} = await db.one(sql.getDataSync, [marketId, worldNumber])
+            const {last_data_sync_date} = await db.one(sql.getWorldSyncData, [marketId, worldNumber])
             const syncDate = utils.ejsHelpers.formatDate(last_data_sync_date)
 
             Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
@@ -234,7 +234,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         await commitAchievementsDatabase(achievements, worldId)
         await db.query(sql.updateAchievementsSync, [enums.SYNC_SUCCESS, marketId, worldNumber])
 
-        const {last_achievements_sync_date} = await db.one(sql.getAchievementsSync, [marketId, worldNumber])
+        const {last_achievements_sync_date} = await db.one(sql.getWorldSyncAchievements, [marketId, worldNumber])
         const syncDate = utils.ejsHelpers.formatDate(last_achievements_sync_date)
 
         await page.close()
@@ -254,7 +254,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         } else {
             await db.query(sql.updateAchievementsSync, [enums.SYNC_FAIL, marketId, worldNumber])
 
-            const {last_achievements_sync_date} = await db.one(sql.getAchievementsSync, [marketId, worldNumber])
+            const {last_achievements_sync_date} = await db.one(sql.getWorldSyncAchievements, [marketId, worldNumber])
             const syncDate = utils.ejsHelpers.formatDate(last_achievements_sync_date)
 
             Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
