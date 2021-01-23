@@ -246,6 +246,8 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     } catch (error) {
         console.log(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
 
+        syncAchievementsActiveWorlds.delete(worldId)
+
         if (page) {
             await page.close()
         }
