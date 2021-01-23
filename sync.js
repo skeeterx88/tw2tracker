@@ -31,14 +31,14 @@ let syncAchievementsAllRunning = false
 Sync.init = async function () {
     console.log('Sync.init()')
 
-    Events.on(enums.SCRAPE_WORLD_START, (worldId) => syncDataActiveWorlds.add(worldId))
-    Events.on(enums.SCRAPE_WORLD_END, (worldId) => syncDataActiveWorlds.delete(worldId))
-    Events.on(enums.SCRAPE_ALL_WORLD_START, () => syncDataAllRunning = true)
-    Events.on(enums.SCRAPE_ALL_WORLD_END, () => syncDataAllRunning = false)
-    Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, (worldId) => syncAchievementsActiveWorlds.add(worldId))
-    Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId) => syncAchievementsActiveWorlds.delete(worldId))
-    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START, () => syncAchievementsAllRunning = true)
-    Events.on(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END, () => syncAchievementsAllRunning = false)
+    Events.on(enums.SYNC_DATA_START, (worldId) => syncDataActiveWorlds.add(worldId))
+    Events.on(enums.SYNC_DATA_FINISH, (worldId) => syncDataActiveWorlds.delete(worldId))
+    Events.on(enums.SYNC_DATA_ALL_START, () => syncDataAllRunning = true)
+    Events.on(enums.SYNC_DATA_ALL_FINISH, () => syncDataAllRunning = false)
+    Events.on(enums.SYNC_ACHIEVEMENTS_START, (worldId) => syncAchievementsActiveWorlds.add(worldId))
+    Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, (worldId) => syncAchievementsActiveWorlds.delete(worldId))
+    Events.on(enums.SYNC_ACHIEVEMENTS_ALL_START, () => syncAchievementsAllRunning = true)
+    Events.on(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, () => syncAchievementsAllRunning = false)
 
     process.on('SIGTERM', async function () {
         console.log(colors.red('Stopping tw2-tracker'))
@@ -118,7 +118,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         return
     }
 
-    Events.trigger(enums.SCRAPE_WORLD_START, [worldId])
+    Events.trigger(enums.SYNC_DATA_START, [worldId])
 
     console.log(`Sync.data() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
 
@@ -177,7 +177,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await page.close()
 
-        Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_SUCCESS, syncDate])
+        Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
         console.log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
 
@@ -195,7 +195,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             const {last_data_sync_date} = await db.one(sql.getWorldSyncData, [marketId, worldNumber])
             const syncDate = utils.ejsHelpers.formatDate(last_data_sync_date)
 
-            Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
+            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, syncDate])
 
             throw new Error(error.message)
         }
@@ -210,7 +210,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     } 
 
     console.log(`Sync.achievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_START, [worldId])
+    Events.trigger(enums.SYNC_ACHIEVEMENTS_START, [worldId])
 
     let page
 
@@ -239,7 +239,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await page.close()
 
-        Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId, enums.SYNC_SUCCESS, syncDate])
+        Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
         console.log(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
 
@@ -257,7 +257,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             const {last_achievements_sync_date} = await db.one(sql.getWorldSyncAchievements, [marketId, worldNumber])
             const syncDate = utils.ejsHelpers.formatDate(last_achievements_sync_date)
 
-            Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
+            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, syncDate])
 
             throw new Error(error.message)
         }
@@ -272,7 +272,7 @@ Sync.dataAll = async function (flag) {
         return false
     }
 
-    Events.trigger(enums.SCRAPE_ALL_WORLD_START)
+    Events.trigger(enums.SYNC_DATA_ALL_START)
 
     const simultaneousSyncs = 3
     const failedToSync = []
@@ -298,7 +298,7 @@ Sync.dataAll = async function (flag) {
                     })
                 })
             } else {
-                await Events.on(enums.SCRAPE_WORLD_END)
+                await Events.on(enums.SYNC_DATA_FINISH)
                 runningSyncs--
             }
         }
@@ -306,7 +306,7 @@ Sync.dataAll = async function (flag) {
 
     await asynchronousSync()
 
-    Events.trigger(enums.SCRAPE_ALL_WORLD_END)
+    Events.trigger(enums.SYNC_DATA_ALL_FINISH)
 
     if (failedToSync.length) {
         const allFail = failedToSync.length === queuedWorlds.length
@@ -324,7 +324,7 @@ Sync.achievementsAll = async function (flag) {
         return false
     }
 
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_START)
+    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START)
 
     const simultaneousSyncs = 3
     const failedToSync = []
@@ -348,7 +348,7 @@ Sync.achievementsAll = async function (flag) {
                     })
                 })
             } else {
-                await Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END)
+                await Events.on(enums.SYNC_ACHIEVEMENTS_FINISH)
                 runningSyncs--
             }
         }
@@ -356,7 +356,7 @@ Sync.achievementsAll = async function (flag) {
 
     await asynchronousSync()
 
-    Events.trigger(enums.SCRAPE_ACHIEVEMENT_ALL_WORLD_END)
+    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH)
 
     if (failedToSync.length) {
         const allFail = failedToSync.length === queuedWorlds.length
@@ -1052,10 +1052,10 @@ function initSyncSocketServer () {
     syncSocketServer.on('connection', function (ws) {
         const send = (state, data) => ws.send(JSON.stringify([state, data]))
 
-        Events.on(enums.SCRAPE_WORLD_START, (worldId) => send(enums.syncStates.START, {worldId}))
-        Events.on(enums.SCRAPE_WORLD_END, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}))
-        Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_START, (worldId) => send(enums.syncStates.ACHIEVEMENT_START, {worldId}))
-        Events.on(enums.SCRAPE_ACHIEVEMENT_WORLD_END, (worldId, status, date) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId, status, date}))
+        Events.on(enums.SYNC_DATA_START, (worldId) => send(enums.syncStates.START, {worldId}))
+        Events.on(enums.SYNC_DATA_FINISH, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}))
+        Events.on(enums.SYNC_ACHIEVEMENTS_START, (worldId) => send(enums.syncStates.ACHIEVEMENT_START, {worldId}))
+        Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, (worldId, status, date) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId, status, date}))
 
         ws.on('message', function (raw) {
             const data = JSON.parse(raw)
