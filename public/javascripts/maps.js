@@ -15,7 +15,7 @@ require([
         marketId,
         worldNumber,
         mapShare,
-        lastSync
+        lastDataSyncDate
     }
 ) {
     let colorPicker
@@ -354,13 +354,13 @@ require([
         const $lastSync = document.querySelector('#last-sync')
         const $lastSyncDate = document.querySelector('#last-sync-date')
 
-        if (!lastSync) {
+        if (!lastDataSyncDate) {
             $lastSyncDate.innerHTML = 'never'
 
             return
         }
 
-        $lastSyncDate.innerHTML = utils.formatSince(lastSync)
+        $lastSyncDate.innerHTML = utils.formatSince(lastDataSyncDate)
         $lastSync.classList.remove('hidden')
     }
 

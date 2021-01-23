@@ -91,7 +91,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     }
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
-    const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
+    const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false
 
     res.render('maps/map', {
         title: `Map ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
@@ -101,7 +101,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
             marketId,
             worldNumber,
             worldName: world.name,
-            lastSync
+            lastDataSyncDate
         }
     })
 })
@@ -124,7 +124,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     }
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
-    const lastSync = world.last_sync ? new Date(world.last_sync).getTime() : false
+    const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false
 
     try {
         mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber])
@@ -145,7 +145,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
             marketId,
             worldNumber,
             worldName: world.name,
-            lastSync,
+            lastDataSyncDate,
             mapShare
         }
     })
