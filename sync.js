@@ -561,13 +561,13 @@ async function commitDataDatabase (data, worldId) {
     await db.tx(async function () {
         const playersNew = new Map(data.players)
         const playersNewIds = Array.from(playersNew.keys())
-        const playersOld = new Map(await this.map(sql.worldPlayers, {worldId}, player => [player.id, player]))
+        const playersOld = new Map(await this.map(sql.worldActivePlayers, {worldId}, player => [player.id, player]))
         const playersOldIds = Array.from(playersOld.keys())
         const missingPlayersIds = playersOldIds.filter(tribeId => !playersNewIds.includes(tribeId))
 
         const tribesNew = new Map(data.tribes)
         const tribesNewIds = Array.from(tribesNew.keys())
-        const tribesOld = new Map(await this.map(sql.worldTribes, {worldId}, tribe => [tribe.id, tribe]))
+        const tribesOld = new Map(await this.map(sql.worldActiveTribes, {worldId}, tribe => [tribe.id, tribe]))
         const tribesOldIds = Array.from(tribesOld.keys())
         const missingTribesIds = tribesOldIds.filter(tribeId => !tribesNewIds.includes(tribeId))
 
