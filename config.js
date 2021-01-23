@@ -1,9 +1,16 @@
 const fs = require('fs')
 const ini = require('ini')
 
+const defaultsRaw = fs.readFileSync('./share/config.default.ini', 'utf-8')
+const defaults = ini.decode(defaultsRaw)
+
 if (!fs.existsSync('./config.ini')) {
-    const defaults = fs.readFileSync('./share/config.default.ini', 'utf-8')
-    fs.writeFileSync('./config.ini', defaults)
+    fs.writeFileSync('./config.ini', defaultsRaw)
 }
 
-module.exports = ini.decode(fs.readFileSync('./config.ini', 'utf-8'))
+const user = ini.decode(fs.readFileSync('./config.ini', 'utf-8'))
+
+module.exports = {
+    ...defaults,
+    ...user
+}
