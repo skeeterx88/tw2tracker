@@ -73,27 +73,27 @@ Sync.init = async function () {
 Sync.daemon = async function () {
     console.log('Sync.daemon()')
 
-    const scrapeWorldsJob = schedule.scheduleJob(config.scrape_all_interval, async function () {
+    const scrapeWorldsJob = schedule.scheduleJob(config.sync.interval_data_all, async function () {
         await Sync.dataAll()
         console.log('Next data sync', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const scrapeAchievementsWorldsJob = schedule.scheduleJob(config.scrape_achievements_all_interval, async function () {
+    const scrapeAchievementsWorldsJob = schedule.scheduleJob(config.sync.interval_achievements_all, async function () {
         await Sync.achievementsAll()
         console.log('Next achievements sync', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const registerWorldsJob = schedule.scheduleJob(config.register_worlds_interval, async function () {
+    const registerWorldsJob = schedule.scheduleJob(config.sync.interval_worlds, async function () {
         await Sync.markets()
         await Sync.worlds()
         console.log('Next markets/worlds sync', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const cleanSharesJob = schedule.scheduleJob(config.clean_shares_check_interval, async function () {
+    const cleanSharesJob = schedule.scheduleJob(config.sync.interval_clean_shares, async function () {
         const now = Date.now()
         const shares = await db.any(sql.maps.getShareLastAccess)
 
-        const static_share_expire_time = config.static_share_expire_time * 60 * 1000
+        const static_share_expire_time = config.sync.static_share_expire_time * 60 * 1000
 
         for (const {share_id, last_access} of shares) {
             if (now - last_access.getTime() < static_share_expire_time) {

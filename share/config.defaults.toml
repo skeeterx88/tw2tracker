@@ -4,11 +4,12 @@ ranking_items_per_page = 20
 sync_data_all_parallel_syncs = 3
 sync_achievements_all_parallel_syncs = 3
 
-scrape_all_interval = "30 */1 * * *"
-scrape_achievements_all_interval = "0 */12 * * *"
-register_worlds_interval = "10 */12 * * *"
-clean_shares_check_interval = "0 */12 * * *"
-static_share_expire_time = "129600"
+[sync]
+interval_data_all = "30 */1 * * *"
+interval_achievements_all = "0 */12 * * *"
+interval_worlds = "10 */12 * * *"
+interval_clean_shares = "0 */12 * * *"
+static_share_expire_time = 129600
 
 [database]
 user = "postgres"
