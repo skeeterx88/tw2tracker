@@ -230,10 +230,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             return await page.evaluate(scraperAchievements, marketId, worldNumber)
         }, 1000000, 'scraperAchievements evaluation timeout')
 
-        // // WRITE DATA TO FS SO IT CAN BE FAST-LOADED WITHOUT CALLING THE SYNC.
-        // await fs.promises.writeFile(path.join('.', 'data', `${worldId}-achievements.freeze.json`), JSON.stringify(achievements))
-        // return
-
+        await commitRawAchievementsFilesystem(achievements, worldId)
         await commitAchievementsDatabase(achievements, worldId)
         await db.query(sql.updateAchievementsSync, [enums.SYNC_SUCCESS, marketId, worldNumber])
 
@@ -837,6 +834,12 @@ async function commitRawDataFilesystem (data, worldId) {
     const location = path.join('.', 'data', 'raw')
     await fs.promises.mkdir(location, {recursive: true})
     await fs.promises.writeFile(path.join(location, `${worldId}.json`), JSON.stringify(data))
+}
+
+async function commitRawAchievementsFilesystem (achievements, worldId) {
+    const location = path.join('.', 'data', 'raw')
+    await fs.promises.mkdir(location, {recursive: true})
+    await fs.promises.writeFile(path.join(location, `${worldId}-achievements.json`), JSON.stringify(achievements))
 }
 
 async function createPuppeteerPage (logId) {
