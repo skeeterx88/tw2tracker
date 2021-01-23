@@ -14,8 +14,6 @@
                         <h1>Open Worlds</h1>
 
                         <% for (let world of openWorlds) { %>
-                            <% const world_last_sync = world.last_sync ? new Date(world.last_sync) : 'Never' %>
-
                             <div class="world world-container" id="<%= world.world_id %>" data-market-id="<%= world.market %>" data-world-number="<%= world.num %>">
                                 <div class="short-info">
                                     <p class="world-id">
