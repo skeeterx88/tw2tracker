@@ -24,6 +24,8 @@ CREATE TABLE public.worlds (
     name VARCHAR (255) NOT NULL,
     last_sync TIMESTAMP,
     last_sync_status public.map_sync_status,
+    last_achievements_sync_status public.map_sync_status,
+    last_achievements_sync_date TIMESTAMP,
     open BOOLEAN NOT NULL DEFAULT TRUE,
     config JSONB,
     player_count INT DEFAULT 0,

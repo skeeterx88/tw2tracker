@@ -27,10 +27,14 @@ define('updateWorldStatus', [
 ) {
     return function updateWorldStatus ({worldId, status, date}, action) {
         const $world = document.querySelector('#' + worldId)
+
+        const $dataSync = $world.querySelector('.sync-data')
         const $dataDate = $world.querySelector('.last-data-sync-date')
         const $dataStatus = $world.querySelector('.last-data-sync-status')
-        const $dataSync = $world.querySelector('.sync-data')
+
         const $achievementsSync = $world.querySelector('.sync-achievements')
+        const $achievementsDate = $world.querySelector('.last-achievements-sync-date')
+        const $achievementsStatus = $world.querySelector('.last-achievements-sync-status')
 
         switch (action) {
             case syncStates.START: {
@@ -52,6 +56,8 @@ define('updateWorldStatus', [
             }
             case syncStates.ACHIEVEMENT_FINISH: {
                 $achievementsSync.innerHTML = 'Sync achievements'
+                $achievementsDate.innerHTML = date
+                $achievementsStatus.innerHTML = status
                 $achievementsSync.dataset.active = 'no'
                 break
             }

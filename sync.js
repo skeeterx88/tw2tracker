@@ -237,10 +237,14 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         // return
 
         await commitAchievementsDatabase(achievements, worldId)
+        await db.query(sql.updateAchievementsSync, [enums.SYNC_SUCCESS, marketId, worldNumber])
+
+        const {last_achievements_sync_date} = await db.one(sql.getAchievementsSync, [marketId, worldNumber])
+        const syncDate = utils.ejsHelpers.formatDate(last_achievements_sync_date)
 
         await page.close()
 
-        Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId])
+        Events.trigger(enums.SCRAPE_ACHIEVEMENT_WORLD_END, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
         console.log(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
 
