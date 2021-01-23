@@ -1,16 +1,14 @@
 const fs = require('fs')
-const ini = require('ini')
+const defaults = require('./share/config.defaults.toml')
+const defaultsRaw = fs.readFileSync('./share/config.defaults.toml', 'utf-8')
 
-const defaultsRaw = fs.readFileSync('./share/config.default.ini', 'utf-8')
-const defaults = ini.decode(defaultsRaw)
-
-if (!fs.existsSync('./config.ini')) {
-    fs.writeFileSync('./config.ini', defaultsRaw)
+if (!fs.existsSync('./config.toml')) {
+    fs.writeFileSync('./config.toml', defaultsRaw)
 }
 
-const user = ini.decode(fs.readFileSync('./config.ini', 'utf-8'))
+const userDefined = require('./config.toml')
 
 module.exports = {
     ...defaults,
-    ...user
+    ...userDefined
 }

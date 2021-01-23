@@ -1,0 +1,22 @@
+site_name = "Tw2-Tracker"
+admin_password = "admin"
+ranking_items_per_page = 20
+sync_data_all_parallel_syncs = 3
+sync_achievements_all_parallel_syncs = 3
+
+scrape_all_interval = "30 */1 * * *"
+scrape_achievements_all_interval = "0 */12 * * *"
+register_worlds_interval = "10 */12 * * *"
+clean_shares_check_interval = "0 */12 * * *"
+static_share_expire_time = "129600"
+
+[database]
+user = "postgres"
+host = "127.0.0.1"
+database = "tw2tracker"
+password = "DATABASE_PASSWORD_HERE" # the password cannot be empty!
+port = 5432
+
+[puppeteer]
+chromium_path = "/usr/bin/chromium"
+headless = true

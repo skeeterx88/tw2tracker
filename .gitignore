@@ -5,6 +5,4 @@ settings.json
 logs/
 .idea/
 .vscode/
-config.ini
-db.ini
-puppeteer.ini
+config.toml

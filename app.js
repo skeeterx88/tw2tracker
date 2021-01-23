@@ -1,4 +1,6 @@
 (async function () {
+    require('toml-require').install()
+
     const db = require('./db.js')
 
     try {
