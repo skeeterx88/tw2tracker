@@ -21,13 +21,13 @@
                                     </p>
                                     <fieldset>
                                         <legend>Data sync:</legend>
-                                        <p>Last time: <span class="last-data-sync-date"><% __append(world.last_sync ? formatDate(world.last_sync) : 'Never') %></span></p>
-                                        <p>Last status: <span class="last-data-sync-status"><%= world.last_sync_status %></span></p>
+                                        <p>Last time: <span class="last-data-sync-date"><% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date) : 'never') %></span></p>
+                                        <p>Last status: <span class="last-data-sync-status"><% __append(world.last_data_sync_status || '-') %></span></p>
                                     </fieldset>
                                     <fieldset>
                                         <legend>Achievements sync:</legend>
                                         <p>Last time: <span class="last-achievements-sync-date"><% __append(world.last_achievements_sync_date ? formatDate(world.last_achievements_sync_date) : 'never') %></span></p>
-                                        <p>Last status: <span class="last-achievements-sync-status"><% __append(world.last_achievements_sync_status ? world.last_achievements_sync_status : '-') %></span></p>
+                                        <p>Last status: <span class="last-achievements-sync-status"><% __append(world.last_achievements_sync_status || '-') %></span></p>
                                     </fieldset>
                                 </div>
 

@@ -170,11 +170,10 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         await commitRawDataFilesystem(data, worldId)
         await commitDataDatabase(data, worldId)
         await commitDataFilesystem(worldId)
-        await db.query(sql.updateWorldSyncStatus, [enums.SYNC_SUCCESS, marketId, worldNumber])
-        await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
+        await db.query(sql.updateDataSync, [enums.SYNC_SUCCESS, marketId, worldNumber])
 
-        const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
-        const syncDate = utils.ejsHelpers.formatDate(last_sync)
+        const {last_data_sync_date} = await db.one(sql.getDataSync, [marketId, worldNumber])
+        const syncDate = utils.ejsHelpers.formatDate(last_data_sync_date)
 
         await page.close()
 
@@ -191,11 +190,10 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < 3) {
             return await Sync.data(marketId, worldNumber, flag, ++attempt)
         } else {
-            await db.query(sql.updateWorldSyncStatus, [enums.SYNC_FAIL, marketId, worldNumber])
-            await db.query(sql.updateWorldSyncDate, [marketId, worldNumber])
+            await db.query(sql.updateDataSync, [enums.SYNC_FAIL, marketId, worldNumber])
 
-            const {last_sync} = await db.one(sql.getWorldSyncDate, [marketId, worldNumber])
-            const syncDate = utils.ejsHelpers.formatDate(last_sync)
+            const {last_data_sync_date} = await db.one(sql.getDataSync, [marketId, worldNumber])
+            const syncDate = utils.ejsHelpers.formatDate(last_data_sync_date)
 
             Events.trigger(enums.SCRAPE_WORLD_END, [worldId, enums.SYNC_FAIL, syncDate])
 
