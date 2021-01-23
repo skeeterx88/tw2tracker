@@ -274,8 +274,6 @@ Sync.dataAll = async function (flag) {
 
     Events.trigger(enums.SYNC_DATA_ALL_START)
 
-    const simultaneousSyncs = 3
-
     await db.query(sql.state.update.lastScrapeAll)
 
     async function asynchronousSync () {
@@ -284,7 +282,7 @@ Sync.dataAll = async function (flag) {
         let running = 0
 
         while (queue.length) {
-            if (running < simultaneousSyncs) {
+            if (running < config.sync_data_all_parallel_syncs) {
                 const world = queue.shift()
 
                 running++
@@ -318,15 +316,13 @@ Sync.achievementsAll = async function (flag) {
 
     Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START)
 
-    const simultaneousSyncs = 3
-
     async function asynchronousSync () {
         const queue = await db.any(sql.getOpenWorlds)
         const fails = []
         let running = 0
 
         while (queue.length) {
-            if (running < simultaneousSyncs) {
+            if (running < config.sync_achievements_all_parallel_syncs) {
                 const world = queue.shift()
 
                 running++
