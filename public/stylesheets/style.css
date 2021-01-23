@@ -740,7 +740,7 @@ a.achievement-subject:last-child:after {
 
 #admin .world {
     padding: 3px 5px;
-    width: 95%;
+    display: block;
 }
 
 #admin .world .world-id {
