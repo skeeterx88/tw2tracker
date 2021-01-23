@@ -11,5 +11,6 @@ SELECT
 FROM ${worldId:name}.players
 LEFT OUTER JOIN ${worldId:name}.tribes
 ON (${worldId:name}.players.tribe_id = tribes.id)
+WHERE archived = false
 ORDER BY players.rank ASC
 LIMIT ${limit} OFFSET ${offset}
