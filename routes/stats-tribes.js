@@ -93,7 +93,7 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
-    const limit = parseInt(config.ranking_items_per_page, 10)
+    const limit = config.ui.ranking_page_items_per_page
     const offset = limit * (page - 1)
 
     const conquestsTypeMap = {
@@ -226,7 +226,7 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
-    const limit = parseInt(config.ranking_items_per_page, 10)
+    const limit = config.ui.ranking_page_items_per_page
     const offset = limit * (page - 1)
     const allVillages = await db.any(sql.getTribeVillages, {worldId, tribeId})
     const villages = allVillages.slice(offset, offset + limit)

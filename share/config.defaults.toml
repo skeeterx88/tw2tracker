@@ -1,6 +1,8 @@
 site_name = "Tw2-Tracker"
 admin_password = "admin"
-ranking_items_per_page = 20
+
+[ui]
+ranking_page_items_per_page = 20
 
 [sync]
 static_share_expire_time = "90 days"
