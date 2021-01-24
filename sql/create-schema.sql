@@ -6,7 +6,7 @@ CREATE TABLE public.state (
 
 INSERT INTO public.state (first_run) VALUES (TRUE);
 
-CREATE TABLE public.daemon_intervals (
+CREATE TABLE public.tasks (
     id VARCHAR (100) PRIMARY KEY,
     last_run TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );

@@ -63,52 +63,22 @@ Sync.init = async function () {
         })
     }
 
-    try {
-        await Sync.daemon()
-    } catch (error) {
-        console.log(colors.red(error))
-    }
-}
+    const taskHandlers = new Map()
 
-Sync.daemon = async function () {
-    console.log('Sync.daemon()')
-
-    async function getLastRuns () {
-        return new Map(await db.map(sql.getDaemonIntervals, [], ({id, last_run}) => [id, last_run]))
-    }
-
-    async function addMissingIntervals () {
-        for (const id of Object.keys(config.sync.intervals)) {
-            await db.query(sql.addDaemonInterval, {id})
-        }
-    }
-
-    function getIntervals () {
-        const entries = Object.entries(config.sync.intervals)
-        const parsed = entries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)])
-        return new Map(parsed)
-    }
-
-    await addMissingIntervals()
-
-    const checkHandlers = new Map()
-    const intervals = getIntervals()
-    const checkInterval = humanInterval('1 minute')
-
-    checkHandlers.set('data_all', function () {
+    taskHandlers.set('data_all', function () {
         Sync.dataAll()
     })
 
-    checkHandlers.set('achievements_all', function () {
+    taskHandlers.set('achievements_all', function () {
         Sync.achievementsAll()
     })
 
-    checkHandlers.set('worlds', async function () {
+    taskHandlers.set('worlds', async function () {
         await Sync.markets()
         await Sync.worlds()
     })
 
-    checkHandlers.set('clean_shares', async function () {
+    taskHandlers.set('clean_shares', async function () {
         const now = Date.now()
         const shares = await db.any(sql.maps.getShareLastAccess)
         const expireTime = humanInterval(config.sync.static_share_expire_time)
@@ -120,24 +90,22 @@ Sync.daemon = async function () {
         }
     })
 
-    function timeSince (date) {
-        const now = Date.now() + (date.getTimezoneOffset() * 1000 * 60)
-        return now - date.getTime()
-    }
+    const intervals = getTasksInterval()
 
     setInterval(async function () {
-        const lastRuns = await getLastRuns()
+        const lastRuns = await getTasksLastRun()
 
-        for (const [id, handler] of checkHandlers.entries()) {
+        for (const [id, handler] of taskHandlers.entries()) {
             const interval = intervals.get(id)
             const lastRun = lastRuns.get(id)
+            const elapsedTime = timeSince(lastRun)
 
-            if (!lastRun || timeSince(lastRun) > interval) {
+            if (!lastRun || elapsedTime > interval) {
                 handler()
-                db.query(sql.updateDaemonIntervalRun, {id})
+                db.query(sql.updateTaskLastRun, {id})
             }
         }
-    }, checkInterval)
+    }, humanInterval('1 minute'))
 }
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
@@ -1096,6 +1064,26 @@ function initSyncSocketServer () {
             }
         })
     })
+}
+
+async function getTasksLastRun () {
+    return new Map(await db.map(sql.getTasks, [], ({id, last_run}) => [id, last_run]))
+}
+
+function getTasksInterval () {
+    const entries = Object.entries(config.sync.intervals)
+    const parsed = entries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)])
+
+    for (const [id] of entries) {
+        db.query(sql.addTaskIfMissing, {id})
+    }
+
+    return new Map(parsed)
+}
+
+function timeSince (date) {
+    const now = Date.now() + (date.getTimezoneOffset() * 1000 * 60)
+    return now - date.getTime()
 }
 
 module.exports = Sync
