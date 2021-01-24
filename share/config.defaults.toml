@@ -11,11 +11,11 @@ static_share_expire_time = "90 days"
 parallel_achievements_sync = 3
 parallel_data_sync = 3
 
-[sync.intervals]
-data_all = "60 minutes"
-achievements_all = "6 hours"
-worlds = "3 hours"
-clean_shares = "24 hours"
+  [sync.intervals]
+  data_all = "60 minutes"
+  achievements_all = "6 hours"
+  worlds = "3 hours"
+  clean_shares = "24 hours"
 
 [database]
 user = "postgres"
