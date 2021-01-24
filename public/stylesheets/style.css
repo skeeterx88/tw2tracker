@@ -349,6 +349,10 @@ div.world-title {
     margin-bottom: 10px;
 }
 
+#worlds a {
+    display: inline-block;
+}
+
 #worlds a:hover,
 #markets a:hover {
     text-decoration: none;
@@ -356,6 +360,8 @@ div.world-title {
 
 #worlds .world {
     width: 250px;
+    height: 110px;
+    vertical-align: top;
 }
 
 #markets .market {
