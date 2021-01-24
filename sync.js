@@ -1,7 +1,6 @@
 const fs = require('fs')
 const zlib = require('zlib')
 const path = require('path')
-const schedule = require('node-schedule')
 const colors = require('colors/safe')
 const WebSocket = require('ws')
 const humanInterval = require('human-interval')
