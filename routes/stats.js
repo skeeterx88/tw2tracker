@@ -104,9 +104,9 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         lastWeeklyTribeAchievements
     ] = await Promise.all([
         db.one(sql.getWorld, [marketId, worldNumber]),
-        db.any(sql.getWorldTopPlayers, {worldId}),
-        db.any(sql.getWorldTopTribes, {worldId}),
-        db.any(sql.getWorldLastConquests, {worldId}),
+        db.any(sql.getWorldTopPlayers, {worldId, limit: config.ui.world_page_maximum_ranking_items}),
+        db.any(sql.getWorldTopTribes, {worldId, limit: config.ui.world_page_maximum_ranking_items}),
+        db.any(sql.getWorldLastConquests, {worldId, limit: config.ui.world_page_maximum_last_conquests}),
         db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-%-%'}),
         db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-W%'}),
         db.any(sql.getWorldLastTribeRepeatableAchievements, {worldId, period: '%-%-%'}),
