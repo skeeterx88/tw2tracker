@@ -4,6 +4,7 @@ const path = require('path')
 const schedule = require('node-schedule')
 const colors = require('colors/safe')
 const WebSocket = require('ws')
+const humanInterval = require('human-interval')
 
 const db = require('./db.js')
 const sql = require('./sql.js')
@@ -49,18 +50,17 @@ Sync.init = async function () {
 
     initSyncSocketServer()
 
-    const state = await db.one(sql.state.all)
+    const appState = await db.one(sql.getProgramState)
 
-    if (!state.last_sync_markets) {
+    if (appState.first_run) {
         await Sync.markets()
-    }
-
-    if (!state.last_sync_worlds) {
         await Sync.worlds()
-    }
-
-    if (!state.last_sync_data_all) {
         await Sync.dataAll()
+
+        await db.query(sql.updateProgramState, {
+            column: 'first_run',
+            value: false
+        })
     }
 
     try {
@@ -73,41 +73,71 @@ Sync.init = async function () {
 Sync.daemon = async function () {
     console.log('Sync.daemon()')
 
-    const scrapeWorldsJob = schedule.scheduleJob(config.sync.interval_data_all, async function () {
-        await Sync.dataAll()
-        console.log('Next data sync', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
+    async function getLastRuns () {
+        return new Map(await db.map(sql.getDaemonIntervals, [], ({id, last_run}) => [id, last_run]))
+    }
+
+    async function addMissingIntervals () {
+        for (const id of Object.keys(config.sync.intervals)) {
+            await db.query(sql.addDaemonInterval, {id})
+        }
+    }
+
+    function getIntervals () {
+        const entries = Object.entries(config.sync.intervals)
+        const parsed = entries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)])
+        return new Map(parsed)
+    }
+
+    await addMissingIntervals()
+
+    const checkHandlers = new Map()
+    const intervals = getIntervals()
+    const checkInterval = humanInterval('1 minute')
+
+    checkHandlers.set('data_all', function () {
+        Sync.dataAll()
     })
 
-    const scrapeAchievementsWorldsJob = schedule.scheduleJob(config.sync.interval_achievements_all, async function () {
-        await Sync.achievementsAll()
-        console.log('Next achievements sync', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
+    checkHandlers.set('achievements_all', function () {
+        Sync.achievementsAll()
     })
 
-    const registerWorldsJob = schedule.scheduleJob(config.sync.interval_worlds, async function () {
+    checkHandlers.set('worlds', async function () {
         await Sync.markets()
         await Sync.worlds()
-        console.log('Next markets/worlds sync', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
     })
 
-    const cleanSharesJob = schedule.scheduleJob(config.sync.interval_clean_shares, async function () {
+    checkHandlers.set('clean_shares', async function () {
         const now = Date.now()
         const shares = await db.any(sql.maps.getShareLastAccess)
-
-        const static_share_expire_time = config.sync.static_share_expire_time * 60 * 1000
+        const expireTime = humanInterval(config.sync.static_share_expire_time)
 
         for (const {share_id, last_access} of shares) {
-            if (now - last_access.getTime() < static_share_expire_time) {
+            if (now - last_access.getTime() < expireTime) {
                 await db.query(sql.maps.deleteStaticShare, [share_id])
             }
         }
-
-        console.log('Next map shares vacuum', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
     })
 
-    console.log('Next data sync', colors.green(scrapeWorldsJob.nextInvocation()._date.calendar()))
-    console.log('Next achievements sync', colors.green(scrapeAchievementsWorldsJob.nextInvocation()._date.calendar()))
-    console.log('Next markets/worlds sync', colors.green(registerWorldsJob.nextInvocation()._date.calendar()))
-    console.log('Next map shares vacuum', colors.green(cleanSharesJob.nextInvocation()._date.calendar()))
+    function timeSince (date) {
+        const now = Date.now() + (date.getTimezoneOffset() * 1000 * 60)
+        return now - date.getTime()
+    }
+
+    setInterval(async function () {
+        const lastRuns = await getLastRuns()
+
+        for (const [id, handler] of checkHandlers.entries()) {
+            const interval = intervals.get(id)
+            const lastRun = lastRuns.get(id)
+
+            if (!lastRun || timeSince(lastRun) > interval) {
+                handler()
+                db.query(sql.updateDaemonIntervalRun, {id})
+            }
+        }
+    }, checkInterval)
 }
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
@@ -274,8 +304,6 @@ Sync.dataAll = async function (flag) {
 
     Events.trigger(enums.SYNC_DATA_ALL_START)
 
-    await db.query(sql.state.update.lastScrapeAll)
-
     async function asynchronousSync () {
         const queue = await db.any(sql.getOpenWorlds)
         const fails = []
@@ -349,7 +377,6 @@ Sync.achievementsAll = async function (flag) {
 Sync.worlds = async function () {
     console.log('Sync.worlds()')
 
-    await db.query(sql.state.update.registerWorlds)
     const markets = await db.any(sql.markets.withAccount)
 
     for (const market of markets) {
@@ -408,8 +435,6 @@ Sync.worlds = async function () {
 
 Sync.markets = async function () {
     console.log('Sync.markets()')
-
-    await db.query(sql.state.update.lastFetchMarkets)
 
     const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
     const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')

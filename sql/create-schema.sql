@@ -1,13 +1,15 @@
 SET TIMEZONE='UTC';
 
 CREATE TABLE public.state (
-    initialized BOOLEAN DEFAULT FALSE,
-    last_sync_data_all TIMESTAMP DEFAULT NULL,
-    last_sync_worlds TIMESTAMP DEFAULT NULL,
-    last_sync_markets TIMESTAMP DEFAULT NULL
+    first_run BOOLEAN DEFAULT TRUE
 );
 
-INSERT INTO public.state VALUES (FALSE, NULL, NULL, NULL);
+INSERT INTO public.state (first_run) VALUES (TRUE);
+
+CREATE TABLE public.daemon_intervals (
+    id VARCHAR (100) PRIMARY KEY,
+    last_run TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
 
 CREATE TABLE public.markets (
     id VARCHAR (10) PRIMARY KEY,

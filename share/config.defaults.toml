@@ -5,11 +5,13 @@ sync_data_all_parallel_syncs = 3
 sync_achievements_all_parallel_syncs = 3
 
 [sync]
-interval_data_all = "30 */1 * * *"
-interval_achievements_all = "0 */12 * * *"
-interval_worlds = "10 */12 * * *"
-interval_clean_shares = "0 */12 * * *"
-static_share_expire_time = 129600
+static_share_expire_time = "90 days"
+
+[sync.intervals]
+data_all = "60 minutes"
+achievements_all = "6 hours"
+worlds = "3 hours"
+clean_shares = "24 hours"
 
 [database]
 user = "postgres"
