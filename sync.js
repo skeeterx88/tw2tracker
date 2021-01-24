@@ -310,7 +310,7 @@ Sync.dataAll = async function (flag) {
         let running = 0
 
         while (queue.length) {
-            if (running < config.sync_data_all_parallel_syncs) {
+            if (running < config.sync.parallel_data_sync) {
                 const world = queue.shift()
 
                 running++
@@ -350,7 +350,7 @@ Sync.achievementsAll = async function (flag) {
         let running = 0
 
         while (queue.length) {
-            if (running < config.sync_achievements_all_parallel_syncs) {
+            if (running < config.sync.parallel_achievements_sync) {
                 const world = queue.shift()
 
                 running++

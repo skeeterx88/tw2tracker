@@ -1,11 +1,11 @@
 site_name = "Tw2-Tracker"
 admin_password = "admin"
 ranking_items_per_page = 20
-sync_data_all_parallel_syncs = 3
-sync_achievements_all_parallel_syncs = 3
 
 [sync]
 static_share_expire_time = "90 days"
+parallel_achievements_sync = 3
+parallel_data_sync = 3
 
 [sync.intervals]
 data_all = "60 minutes"
