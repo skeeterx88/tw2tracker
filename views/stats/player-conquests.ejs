@@ -12,6 +12,7 @@
                 <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><li <% __append(category === 'all' ? ' class="selected"' : '') %>>All</li></a>
                 <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain"><li <% __append(category === 'gain' ? ' class="selected"' : '') %>>Gains</li></a>
                 <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss"><li <% __append(category === 'loss' ? ' class="selected"' : '') %>>Losses</li></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/self"><li <% __append(category === 'self' ? ' class="selected"' : '') %>>Self</li></a>
             </ul>
 
             <div class="content">

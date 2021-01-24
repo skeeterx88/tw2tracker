@@ -15,7 +15,7 @@ const {
     createPagination
 } = require('../router-helpers.js')
 
-const conquestCategories = ['gain', 'loss', 'all']
+const conquestCategories = ['gain', 'loss', 'all', 'self']
 
 const tribeRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
@@ -113,6 +113,11 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
             sqlConquests: sql.getTribeConquestsLoss,
             sqlCount: sql.getTribeConquestsLossCount,
             navigationTitle: 'Conquest Losses'
+        },
+        self: {
+            sqlConquests: sql.getTribeConquestsSelf,
+            sqlCount: sql.getTribeConquestsSelfCount,
+            navigationTitle: 'Conquest Self'
         }
     }
 

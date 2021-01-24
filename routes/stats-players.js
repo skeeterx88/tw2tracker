@@ -17,7 +17,7 @@ const {
     createPagination
 } = require('../router-helpers.js')
 
-const conquestCategories = ['gain', 'loss', 'all']
+const conquestCategories = ['gain', 'loss', 'all', 'self']
 
 const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
@@ -173,6 +173,11 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
             sqlConquests: sql.getPlayerConquestsLoss,
             sqlCount: sql.getPlayerConquestsLossCount,
             navigationTitle: 'Conquest Losses'
+        },
+        self: {
+            sqlConquests: sql.getPlayerConquestsSelf,
+            sqlCount: sql.getPlayerConquestsSelfCount,
+            navigationTitle: 'Conquest Self'
         }
     }
 
