@@ -38,6 +38,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
     const conquestCount = (await db.one(sql.getTribeConquestsCount, {worldId, tribeId})).count
     const conquestGainCount = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count
     const conquestLossCount = (await db.one(sql.getTribeConquestsLossCount, {worldId, tribeId})).count
+    const conquestSelfCount = (await db.one(sql.getTribeConquestsSelfCount, {worldId, tribeId})).count
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId})
     const achievementsLatest = achievements.slice(0, 5)
@@ -54,6 +55,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
         conquestCount,
         conquestGainCount,
         conquestLossCount,
+        conquestSelfCount,
         conquestTypes: enums.conquestTypes,
         achievementsRepeatableCount,
         achievementTitles,

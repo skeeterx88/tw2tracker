@@ -67,7 +67,8 @@
                                         <td>
                                             <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestCount) %></a>
                                             (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain"><%= formatNumbers(conquestGainCount) %></a>
-                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss"><%= formatNumbers(conquestLossCount) %></a>)
+                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss"><%= formatNumbers(conquestLossCount) %></a>
+                                            =<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/self"><%= formatNumbers(conquestSelfCount) %></a>)
                                         </td>
                                     </tr>
                                     <tr>
