@@ -65,9 +65,9 @@
                                     <tr>
                                         <th>Village Conquers:</th>
                                         <td>
-                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestsGainCount + conquestsLossCount) %></a>
-                                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain"><%= formatNumbers(conquestsGainCount) %></a>
-                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss"><%= formatNumbers(conquestsLossCount) %></a>)
+                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestCount) %></a>
+                                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain"><%= formatNumbers(conquestGainCount) %></a>
+                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss"><%= formatNumbers(conquestLossCount) %></a>)
                                         </td>
                                     </tr>
                                     <tr>

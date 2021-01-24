@@ -38,8 +38,9 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
-    const conquestsGainCount = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count
-    const conquestsLossCount = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count
+    const conquestCount = (await db.one(sql.getPlayerConquestsCount, {worldId, playerId})).count
+    const conquestGainCount = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count
+    const conquestLossCount = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count
 
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]))
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId})
@@ -67,8 +68,9 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
         world,
         player,
         tribe,
-        conquestsGainCount,
-        conquestsLossCount,
+        conquestCount,
+        conquestGainCount,
+        conquestLossCount,
         conquestTypes: enums.conquestTypes,
         achievementPoints,
         achievementTitles,
