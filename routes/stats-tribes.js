@@ -35,6 +35,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber])
 
+    const conquestCount = (await db.one(sql.getTribeConquestsCount, {worldId, tribeId})).count
     const conquestGainCount = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count
     const conquestLossCount = (await db.one(sql.getTribeConquestsLossCount, {worldId, tribeId})).count
 
@@ -50,6 +51,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
         worldNumber,
         world,
         tribe,
+        conquestCount,
         conquestGainCount,
         conquestLossCount,
         conquestTypes: enums.conquestTypes,
