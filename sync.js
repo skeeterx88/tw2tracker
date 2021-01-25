@@ -128,7 +128,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
             const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60
             if (minutesSinceLastSync < config.scraper_interval_minutes) {
-                throw new Error(`${worldId} already sincronized`)
+                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, syncDate])
             }
         }
 
@@ -141,7 +141,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await Sync.character(marketId, worldNumber)
         } else if (!worldCharacter.allow_login) {
             await db.query(sql.closeWorld, [marketId, worldNumber])
-            throw new Error('world is not open')
+            return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate])
         }
 
         const urlId = marketId === 'zz' ? 'beta' : marketId

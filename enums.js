@@ -1,6 +1,8 @@
 module.exports = {
     SYNC_SUCCESS: 'success',
     SYNC_FAIL: 'fail',
+    SYNC_ALREADY_SYNCED: 'already_synced',
+    SYNC_WORLD_CLOSED: 'world_closed',
 
     SYNC_DATA_START: 'sync_data_start',
     SYNC_DATA_FINISH: 'sync_data_finish',
