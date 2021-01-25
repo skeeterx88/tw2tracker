@@ -814,7 +814,13 @@ async function commitRawAchievementsFilesystem (achievements, worldId) {
 
 async function createPuppeteerPage () {
     if (!browser) {
-        browser = await puppeteer()
+        browser = new Promise(function (resolve) {
+            puppeteer().then(resolve)
+        })
+    }
+
+    if (browser instanceof Promise) {
+        browser = await browser
     }
 
     const page = await browser.newPage()
