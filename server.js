@@ -3,7 +3,6 @@ const session = require('express-session')
 const connectPgSimple = require('connect-pg-simple')
 const createError = require('http-errors')
 const compression = require('compression')
-const debug = require('debug')('tw2tracker:server')
 const http = require('http')
 const WebSocket = require('ws')
 const path = require('path')
@@ -144,15 +143,6 @@ module.exports = function () {
                 throw error
             }
         }
-    })
-
-    httpServer.on('listening', function () {
-        const addr = httpServer.address()
-        const bind = typeof addr === 'string'
-            ? `pipe ${addr}`
-            : `port ${addr.port}`
-
-        debug(`Listening on ${bind}`)
     })
 
     httpServer.listen(port)

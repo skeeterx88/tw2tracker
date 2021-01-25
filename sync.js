@@ -4,6 +4,9 @@ const path = require('path')
 const colors = require('colors/safe')
 const WebSocket = require('ws')
 const humanInterval = require('human-interval')
+const debug = require('debug')
+const debugSync = debug('tw2tracker:sync')
+const debugTasks = debug('tw2tracker:tasks')
 
 const db = require('./db.js')
 const sql = require('./sql.js')
@@ -29,7 +32,7 @@ let syncDataAllRunning = false
 let syncAchievementsAllRunning = false
 
 Sync.init = async function () {
-    console.log('Sync.init()')
+    debugSync('Sync.init()')
 
     Events.on(enums.SYNC_DATA_START, (worldId) => syncDataActiveWorlds.add(worldId))
     Events.on(enums.SYNC_DATA_FINISH, (worldId) => syncDataActiveWorlds.delete(worldId))
@@ -41,8 +44,6 @@ Sync.init = async function () {
     Events.on(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, () => syncAchievementsAllRunning = false)
 
     process.on('SIGTERM', async function () {
-        console.log(colors.red('Stopping tw2-tracker'))
-
         await db.$pool.end()
         process.exit(0)
     })
@@ -111,13 +112,12 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
     if (syncDataActiveWorlds.has(worldId)) {
-        console.log(`Sync.data() ${colors.green(marketId + worldNumber)} already in progress`)
-        return
+        return debugSync(`Sync.data() ${colors.green(marketId + worldNumber)} already in progress`)
     }
 
     Events.trigger(enums.SYNC_DATA_START, [worldId])
 
-    console.log(`Sync.data() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    debugSync(`Sync.data() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
 
     let page
 
@@ -176,7 +176,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
         Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
-        console.log(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
+        debugSync(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
 
         syncDataActiveWorlds.delete(worldId)
 
@@ -203,10 +203,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
     if (syncAchievementsActiveWorlds.has(worldId)) {
-        return console.log(`Sync.achievements() ${colors.green(marketId + worldNumber)} already in progress`)
+        return debugSync(`Sync.achievements() ${colors.green(marketId + worldNumber)} already in progress`)
     } 
 
-    console.log(`Sync.achievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    debugSync(`Sync.achievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
     Events.trigger(enums.SYNC_ACHIEVEMENTS_START, [worldId])
 
     let page
@@ -238,7 +238,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
-        console.log(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
+        debugSync(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
 
         syncAchievementsActiveWorlds.delete(worldId)
 
@@ -262,11 +262,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 }
 
 Sync.dataAll = async function (flag) {
-    console.log('Sync.dataAll()')
+    debugSync('Sync.dataAll()')
 
     if (syncDataAllRunning) {
-        console.log(colors.red('Sync all data is already in progress'))
-        return false
+        return debugSync(colors.red('Sync all data is already in progress'))
     }
 
     Events.trigger(enums.SYNC_DATA_ALL_START)
@@ -302,11 +301,10 @@ Sync.dataAll = async function (flag) {
 }
 
 Sync.achievementsAll = async function (flag) {
-    console.log('Sync.achievementsAll()')
+    debugSync('Sync.achievementsAll()')
 
     if (syncAchievementsAllRunning) {
-        console.log(colors.red('Sync all achievements is already in progress'))
-        return false
+        return debugSync(colors.red('Sync all achievements is already in progress'))
     }
 
     Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START)
@@ -342,7 +340,7 @@ Sync.achievementsAll = async function (flag) {
 }
 
 Sync.worlds = async function () {
-    console.log('Sync.worlds()')
+    debugSync('Sync.worlds()')
 
     const markets = await db.any(sql.markets.withAccount)
 
@@ -383,7 +381,7 @@ Sync.worlds = async function () {
                 }
 
                 if (!await utils.worldEntryExists(worldId)) {
-                    console.log(`Creating world entry for ${worldId}`)
+                    debugSync(`Creating world entry for ${worldId}`)
 
                     await db.query(sql.createWorldSchema, {
                         worldId,
@@ -395,13 +393,13 @@ Sync.worlds = async function () {
                 }
             }
         } catch (error) {
-            console.log(colors.red(`Failed to register worlds on market ${marketId}: ${error.message}`))
+            debugSync(colors.red(`Failed to register worlds on market ${marketId}: ${error.message}`))
         }
     }
 }
 
 Sync.markets = async function () {
-    console.log('Sync.markets()')
+    debugSync('Sync.markets()')
 
     const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
     const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
@@ -422,7 +420,7 @@ Sync.markets = async function () {
 }
 
 Sync.character = async function (marketId, worldNumber) {
-    console.log(`Sync.character() ${marketId}${worldNumber}`)
+    debugSync(`Sync.character() ${marketId}${worldNumber}`)
 
     const page = await createPuppeteerPage()
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
@@ -449,7 +447,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
         return await auths[marketId]
     }
 
-    console.log(`Sync.auth() market:${marketId}`)
+    debugSync(`Sync.auth() market:${marketId}`)
 
     let page
 
@@ -524,7 +522,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
         if (auth_attempt < 3) {
             auth_attempt++
 
-            console.log(colors.red(`Error trying to auth (${error.message})`))
+            debugSync(colors.red(`Error trying to auth (${error.message})`))
 
             return await Sync.auth(marketId, {
                 account_name,
@@ -796,7 +794,7 @@ async function commitDataFilesystem (worldId) {
         const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
         await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
     } catch (error) {
-        console.log(colors.red(`Failed to write ${worldId} data to filesystem: ${error.message}`))
+        debugSync(colors.red(`Failed to write ${worldId} data to filesystem: ${error.message}`))
     }
 
     return false
@@ -814,15 +812,17 @@ async function commitRawAchievementsFilesystem (achievements, worldId) {
     await fs.promises.writeFile(path.join(location, `${worldId}-achievements.json`), JSON.stringify(achievements))
 }
 
-async function createPuppeteerPage (logId) {
+async function createPuppeteerPage () {
     if (!browser) {
         browser = await puppeteer()
     }
 
     const page = await browser.newPage()
 
-    return page.on('console', function (msg) {
-        if (msg._type === 'log' && msg._text.startsWith('Scraper:')) console.log(logId, msg._text)
+    return page.on('console', function ({_type, _text}) {
+        if (_type === 'log' && _text.startsWith('Sync:')) {
+            debugSync(_text.replace('Sync:', ''))
+        }
     })
 }
 
@@ -938,7 +938,7 @@ function mapAchievements (achievements) {
 }
 
 async function fetchWorldMapStructure (page, worldId, urlId) {
-    console.log(`Scraper: Fetching ${worldId} map structure`)
+    debugSync(`Fetching ${worldId} map structure`)
 
     const structPath = await page.evaluate(function () {
         const cdn = require('cdn')
@@ -955,7 +955,7 @@ async function fetchWorldMapStructure (page, worldId, urlId) {
 
 async function fetchWorldConfig (page, worldId) {
     try {
-        console.log(`Scraper: Fetching ${worldId} config`)
+        debugSync(`Fetching ${worldId} config`)
 
         const worldConfig = await page.evaluate(function () {
             const modelDataService = injector.get('modelDataService')
@@ -997,13 +997,13 @@ async function fetchWorldConfig (page, worldId) {
             worldConfig
         })
     } catch (error) {
-        console.log(colors.red(`Error trying to fetch ${worldId} config: ${error.message}`))
+        debugSync(colors.red(`Error trying to fetch ${worldId} config: ${error.message}`))
     }
 }
 
 async function fetchWorldTimeOffset (page, worldId) {
     try {
-        console.log(`Scraper: Fetching ${worldId} time offset`)
+        debugSync(`Fetching ${worldId} time offset`)
 
         const timeOffset = await page.evaluate(function () {
             return require('helper/time').getGameTimeOffset()
@@ -1014,7 +1014,7 @@ async function fetchWorldTimeOffset (page, worldId) {
             timeOffset
         })
     } catch (error) {
-        console.log(colors.red(`Error trying to fetch ${worldId} time offset: ${error.message}`))
+        debugSync(colors.red(`Error trying to fetch ${worldId} time offset: ${error.message}`))
     }
 }
 
