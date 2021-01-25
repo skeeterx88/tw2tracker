@@ -17,18 +17,19 @@
         await db.query(sql.createSchema)
     }
 
-    const server = require('./server.js')
-    const Sync = require('./sync.js')
     const cluster = require('cluster')
-    const cpus = require('os').cpus()
 
     if (cluster.isMaster) {
+        const cpus = require('os').cpus()
+        const Sync = require('./sync.js')
+
         Sync.init()
 
         for (let i = 0; i < cpus.length; i++) {
             cluster.fork()
         }
     } else {
+        const server = require('./server.js')
         server()
     }
 })()
