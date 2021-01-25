@@ -4,10 +4,8 @@ const path = require('path')
 const colors = require('colors/safe')
 const WebSocket = require('ws')
 const humanInterval = require('human-interval')
-const debug = require('debug')
-const debugSync = debug('tw2tracker:sync')
-const debugTasks = debug('tw2tracker:tasks')
 
+const debug = require('./debug.js')
 const db = require('./db.js')
 const sql = require('./sql.js')
 const puppeteer = require('./puppeteer.js')
@@ -32,7 +30,7 @@ let syncDataAllRunning = false
 let syncAchievementsAllRunning = false
 
 Sync.init = async function () {
-    debugSync('Sync.init()')
+    debug.sync('Starting sync script')
 
     Events.on(enums.SYNC_DATA_START, (worldId) => syncDataActiveWorlds.add(worldId))
     Events.on(enums.SYNC_DATA_FINISH, (worldId) => syncDataActiveWorlds.delete(worldId))
@@ -53,6 +51,8 @@ Sync.init = async function () {
     const appState = await db.one(sql.getProgramState)
 
     if (appState.first_run) {
+        debug.sync('First run detected: An initial sync will now run.')
+
         await Sync.markets()
         await Sync.worlds()
         await Sync.dataAll()
@@ -101,6 +101,7 @@ Sync.init = async function () {
             const elapsedTime = timeSince(lastRun)
 
             if (!lastRun || elapsedTime > interval) {
+                debug.tasks('Running task "%s"', id)
                 handler()
                 db.query(sql.updateTaskLastRun, {id})
             }
@@ -112,12 +113,11 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
     if (syncDataActiveWorlds.has(worldId)) {
-        return debugSync(`Sync.data() ${colors.green(marketId + worldNumber)} already in progress`)
+        debug.sync('World %s is already syncing data', worldId)
     }
 
     Events.trigger(enums.SYNC_DATA_START, [worldId])
-
-    debugSync(`Sync.data() ${colors.green(marketId + worldNumber)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    debug.sync('Start to sync data on world %s (attemp %d)', worldId, attempt)
 
     let page
 
@@ -128,6 +128,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
             const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60
             if (minutesSinceLastSync < config.scraper_interval_minutes) {
+                debug.sync('World %s is already sincronized', worldId, attempt)
                 return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, syncDate])
             }
         }
@@ -141,11 +142,15 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await Sync.character(marketId, worldNumber)
         } else if (!worldCharacter.allow_login) {
             await db.query(sql.closeWorld, [marketId, worldNumber])
+            debug.sync('World %s is not open anymore. Closing...', worldId)
             return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate])
         }
 
+        debug.sync('Loading game on world %s', worldId)
         const urlId = marketId === 'zz' ? 'beta' : marketId
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']})
+
+        debug.sync('Awaiting game ready state on world %s', worldId)
         await page.evaluate(scraperReadyState)
 
         if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
@@ -160,6 +165,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await fetchWorldTimeOffset(page, worldId)
         }
 
+        debug.sync('Fetching world %s data', worldId)
         const data = await utils.timeout(async function () {
             return await page.evaluate(scraperData)
         }, humanInterval('2 minutes'), '2 minutes timeout')
@@ -174,9 +180,10 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await page.close()
 
+        debug.sync('World %s sync finished', worldId)
         Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
-        debugSync(colors.red(`Failed to synchronize ${worldId}: ${error.message}`))
+        debug.sync('Sync on world %s failed: %s', worldId, error.message)
 
         syncDataActiveWorlds.delete(worldId)
 
@@ -203,10 +210,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber
 
     if (syncAchievementsActiveWorlds.has(worldId)) {
-        return debugSync(`Sync.achievements() ${colors.green(marketId + worldNumber)} already in progress`)
+        return debug.sync('World %s is already syncing achievements', worldId)
     } 
 
-    debugSync(`Sync.achievements() ${colors.green(worldId)}`, colors.magenta(attempt > 1 ? `(attempt ${attempt})` : ''))
+    debug.sync('Start to sync achievements on world %s (attemp %d)', worldId, attempt)
     Events.trigger(enums.SYNC_ACHIEVEMENTS_START, [worldId])
 
     let page
@@ -238,7 +245,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate])
     } catch (error) {
-        debugSync(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
+        debug.sync(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`))
 
         syncAchievementsActiveWorlds.delete(worldId)
 
@@ -262,10 +269,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 }
 
 Sync.dataAll = async function (flag) {
-    debugSync('Sync.dataAll()')
+    debug.sync('Begin data synchronization of all worlds. Parallel syncs: %d', config.sync.parallel_data_sync)
 
     if (syncDataAllRunning) {
-        return debugSync(colors.red('Sync all data is already in progress'))
+        return debug.sync('Data synchronization of all worlds is already in progress')
     }
 
     Events.trigger(enums.SYNC_DATA_ALL_START)
@@ -297,14 +304,15 @@ Sync.dataAll = async function (flag) {
         return fails
     }
 
+    debug.sync('Finish data synchronization of all worlds')
     Events.trigger(enums.SYNC_DATA_ALL_FINISH, await asynchronousSync())
 }
 
 Sync.achievementsAll = async function (flag) {
-    debugSync('Sync.achievementsAll()')
+    debug.sync('Begin achievements synchronization of all worlds. Parallel syncs: %d', config.sync.parallel_achievements_sync)
 
     if (syncAchievementsAllRunning) {
-        return debugSync(colors.red('Sync all achievements is already in progress'))
+        return debug.sync('Achievements synchronization of all worlds is already in progress')
     }
 
     Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START)
@@ -336,16 +344,19 @@ Sync.achievementsAll = async function (flag) {
         return fails
     }
 
+    debug.sync('Finish achievements synchronization of all worlds')
     Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, await asynchronousSync())
 }
 
 Sync.worlds = async function () {
-    debugSync('Sync.worlds()')
+    debug.worlds('Syncronize world list')
 
     const markets = await db.any(sql.markets.withAccount)
 
     for (const market of markets) {
         const marketId = market.id
+
+        debug.worlds('Check missing worlds on market %s', marketId)
 
         try {
             const account = await Sync.auth(marketId, market)
@@ -381,7 +392,7 @@ Sync.worlds = async function () {
                 }
 
                 if (!await utils.worldEntryExists(worldId)) {
-                    debugSync(`Creating world entry for ${worldId}`)
+                    debug.worlds('Creating world database entry for %s', worldId)
 
                     await db.query(sql.createWorldSchema, {
                         worldId,
@@ -393,13 +404,13 @@ Sync.worlds = async function () {
                 }
             }
         } catch (error) {
-            debugSync(colors.red(`Failed to register worlds on market ${marketId}: ${error.message}`))
+            debug.worlds('Failed to register worlds on market %s: %s', marketId, error.message)
         }
     }
 }
 
 Sync.markets = async function () {
-    debugSync('Sync.markets()')
+    debug.sync('Syncronize market list')
 
     const storedMarkets = await db.map(sql.markets.all, [], market => market.id)
     const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html')
@@ -420,34 +431,38 @@ Sync.markets = async function () {
 }
 
 Sync.character = async function (marketId, worldNumber) {
-    debugSync(`Sync.character() ${marketId}${worldNumber}`)
+    const worldId = marketId + worldNumber
+
+    debug.sync(`Creating character on world %s`, worldId)
 
     const page = await createPuppeteerPage()
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
     await page.waitFor(2000)
 
-    await page.evaluate(function (marketId, worldNumber) {
+    await page.evaluate(function (worldId) {
         return new Promise(function (resolve) {
             const socketService = injector.get('socketService')
             const routeProvider = injector.get('routeProvider')
 
+            console.log(`tw2tracker: Emitting create character request on world ${worldId}`)
+
             socketService.emit(routeProvider.CREATE_CHARACTER, {
-                world: marketId + worldNumber
+                world: worldId
             }, resolve)
         })
-    }, marketId, worldNumber)
+    }, worldId)
 
-    await page.waitFor(2000)
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
-    await page.waitFor(2000)
+
+    debug.sync(`Character created on world %s`, worldId)
 }
 
-Sync.auth = async function (marketId, {account_name, account_password}, auth_attempt = 1) {
+Sync.auth = async function (marketId, {account_name, account_password}, attempt = 1) {
     if (utils.hasOwn(auths, marketId)) {
         return await auths[marketId]
     }
 
-    debugSync(`Sync.auth() market:${marketId}`)
+    debug.auth('Logging in on market %s (attempt %d)', marketId, attempt)
 
     let page
 
@@ -455,11 +470,12 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
         auths[marketId] = utils.timeout(async function () {
             const urlId = marketId === 'zz' ? 'beta' : marketId
 
+            debug.auth('Loading %s market page', marketId)
             page = await createPuppeteerPage()
             await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
             await page.waitFor(1000)
 
-            const account = await page.evaluate(function (account_name, account_password) {
+            const account = await page.evaluate(function (account_name, account_password, marketId) {
                 return new Promise(function (resolve) {
                     const socketService = injector.get('socketService')
                     const routeProvider = injector.get('routeProvider')
@@ -467,6 +483,8 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
                     const loginTimeout = setTimeout(function () {
                         resolve(false)
                     }, 5000)
+
+                    console.log(`tw2tracker: Emitting ${marketId} login request`)
 
                     socketService.emit(routeProvider.LOGIN, {
                         name: account_name,
@@ -477,12 +495,14 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
                         resolve(data)
                     })
                 })
-            }, account_name, account_password)
+            }, account_name, account_password, marketId)
 
             if (!account) {
                 const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent)
                 throw new Error(error)
             }
+
+            debug.auth('Setting up market %s cookie', marketId)
 
             await page.setCookie({
                 name: 'globalAuthCookie',
@@ -500,15 +520,18 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
                 session: false
             })
 
+            debug.auth('Checking if auth on market %s succeded', marketId)
+
             await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']})
 
             try {
                 await page.waitForSelector('.player-worlds', {timeout: 3000})
             } catch (error) {
-                throw new Error(`Authentication to market:${marketId} failed "unknown reason"`)
+                throw new Error('Unknown reason')
             }
 
             await page.close()
+            debug.auth('Authenticated on market %s with success', marketId)
 
             return account
         }, humanInterval('1 minute'), '1 minute timeout')
@@ -519,15 +542,15 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
             await page.close()
         }
 
-        if (auth_attempt < 3) {
-            auth_attempt++
+        debug.auth('Auth on market %s failed: %s', marketId, error.message)
 
-            debugSync(colors.red(`Error trying to auth (${error.message})`))
+        if (attempt < 3) {
+            attempt++
 
             return await Sync.auth(marketId, {
                 account_name,
                 account_password
-            }, auth_attempt)
+            }, attempt)
         } else {
             throw new Error(error.message)
         }
@@ -535,24 +558,34 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
 }
 
 async function commitDataDatabase (data, worldId) {
+    debug.db('Commiting world %s data to database', worldId)
+
     await db.tx(async function () {
+        const log = {}
+
         const playersNew = new Map(data.players)
         const playersNewIds = Array.from(playersNew.keys())
         const playersOld = new Map(await this.map(sql.worldActivePlayers, {worldId}, player => [player.id, player]))
         const playersOldIds = Array.from(playersOld.keys())
         const missingPlayersIds = playersOldIds.filter(tribeId => !playersNewIds.includes(tribeId))
+        const newPlayersIds = playersNewIds.filter(tribeId => !playersOldIds.includes(tribeId))
 
         const tribesNew = new Map(data.tribes)
         const tribesNewIds = Array.from(tribesNew.keys())
         const tribesOld = new Map(await this.map(sql.worldActiveTribes, {worldId}, tribe => [tribe.id, tribe]))
         const tribesOldIds = Array.from(tribesOld.keys())
         const missingTribesIds = tribesOldIds.filter(tribeId => !tribesNewIds.includes(tribeId))
+        const newTribesIds = tribesNewIds.filter(tribeId => !tribesOldIds.includes(tribeId))
 
         const villagesNew = new Map(data.villages)
         const villagesNewIds = Array.from(villagesNew.keys())
         const villagesOld = new Map(await this.map(sql.worldVillages, {worldId}, village => [village.id, village]))
         const villagesOldIds = Array.from(villagesOld.keys())
         const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId))
+        const newVillagesIds = villagesOldIds.filter(villageId => !villagesNewIds.includes(villageId))
+
+        let conquestsCount = 0
+        let tribeChangesCount = 0
 
         const records = {
             tribes: new Map(await db.map(sql.getTribesRecords, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]])),
@@ -646,6 +679,8 @@ async function commitDataDatabase (data, worldId) {
                     village_points_then: village.points,
                     ...tribeData
                 })
+
+                conquestsCount++
             }
         }
 
@@ -667,6 +702,8 @@ async function commitDataDatabase (data, worldId) {
                     old_tribe_tag_then: oldTribe ? oldTribe.tag : null,
                     new_tribe_tag_then: newTribe ? newTribe.tag : null
                 })
+
+                tribeChangesCount++
             }
         }
 
@@ -674,23 +711,29 @@ async function commitDataDatabase (data, worldId) {
             this.none(sql.updatePlayerVillages, {worldId, character_id, villages_id})
         }
 
-        this.none(sql.updateWorldStats, {
-            worldId,
+        const worldStats = {
             villages: data.villages.length,
             players: data.players.length,
             tribes: data.tribes.length
-        })
-    })
+        }
 
-    await db.query(sql.updateWorldStats, {
-        worldId,
-        villages: data.villages.length,
-        players: data.players.length,
-        tribes: data.tribes.length
+        this.none(sql.updateWorldStats, {worldId, ...worldStats})
+
+        log['archived players'] = missingPlayersIds.length
+        log['added players'] = newPlayersIds.length
+        log['archived tribes'] = missingTribesIds.length
+        log['added tribes'] = newTribesIds.length
+        log['added villages'] = newVillagesIds.length
+        log['new conquests'] = conquestsCount
+        log['new tribe changes'] = tribeChangesCount
+
+        debug.db('World %s data update: %o', worldId, log)
     })
 }
 
 async function commitAchievementsDatabase (data, worldId) {
+    debug.sync('Commiting world %s achievements to database', worldId)
+
     const sqlSubjectMap = {
         players: {
             [enums.achievementCommitTypes.ADD]: sql.addPlayerAchievement,
@@ -703,6 +746,8 @@ async function commitAchievementsDatabase (data, worldId) {
     }
 
     await db.tx(async function () {
+        const log = {}
+
         for (const subjectType of ['players', 'tribes']) {
             const modifiedAchievements = await getModifiedAchievements(subjectType, data[subjectType], worldId)
 
@@ -717,11 +762,20 @@ async function commitAchievementsDatabase (data, worldId) {
                     time_last_level: achievement.time_last_level ? new Date(achievement.time_last_level * 1000) : null
                 })
             }
+
+            log[subjectType] = {
+                added: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.ADD),
+                updated: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.UPDATE)
+            }
         }
+
+        debug.db('World %s achievements update: %o', worldId, log)
     })
 }
 
 async function commitDataFilesystem (worldId) {
+    debug.sync('Commiting world %s updated data to filesystem', worldId)
+
     try {
         const players = await db.any(sql.getWorldData, {worldId, table: 'players'})
         const villages = await db.any(sql.getWorldData, {worldId, table: 'villages'})
@@ -794,19 +848,23 @@ async function commitDataFilesystem (worldId) {
         const gzippedInfo = zlib.gzipSync(JSON.stringify(info))
         await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo)
     } catch (error) {
-        debugSync(colors.red(`Failed to write ${worldId} data to filesystem: ${error.message}`))
+        debug.sync('Failed to write %s data to filesystem: %s', worldId, error.message)
     }
 
     return false
 }
 
 async function commitRawDataFilesystem (data, worldId) {
+    debug.sync('Commiting world %s raw data to filesystem', worldId)
+
     const location = path.join('.', 'data', 'raw')
     await fs.promises.mkdir(location, {recursive: true})
     await fs.promises.writeFile(path.join(location, `${worldId}.json`), JSON.stringify(data))
 }
 
 async function commitRawAchievementsFilesystem (achievements, worldId) {
+    debug.sync('Commiting world %s raw achievements to filesystem', worldId)
+
     const location = path.join('.', 'data', 'raw')
     await fs.promises.mkdir(location, {recursive: true})
     await fs.promises.writeFile(path.join(location, `${worldId}-achievements.json`), JSON.stringify(achievements))
@@ -827,7 +885,7 @@ async function createPuppeteerPage () {
 
     return page.on('console', function ({_type, _text}) {
         if (_type === 'log' && _text.startsWith('Sync:')) {
-            debugSync(_text.replace('Sync:', ''))
+            debug.sync(_text.replace('Sync:', ''))
         }
     })
 }
@@ -944,7 +1002,7 @@ function mapAchievements (achievements) {
 }
 
 async function fetchWorldMapStructure (page, worldId, urlId) {
-    debugSync(`Fetching ${worldId} map structure`)
+    debug.sync('Fetching world %s map structure', worldId)
 
     const structPath = await page.evaluate(function () {
         const cdn = require('cdn')
@@ -961,7 +1019,7 @@ async function fetchWorldMapStructure (page, worldId, urlId) {
 
 async function fetchWorldConfig (page, worldId) {
     try {
-        debugSync(`Fetching ${worldId} config`)
+        debug.sync('Fetching world %s config', worldId)
 
         const worldConfig = await page.evaluate(function () {
             const modelDataService = injector.get('modelDataService')
@@ -1003,13 +1061,13 @@ async function fetchWorldConfig (page, worldId) {
             worldConfig
         })
     } catch (error) {
-        debugSync(colors.red(`Error trying to fetch ${worldId} config: ${error.message}`))
+        debug.sync(colors.red(`Error trying to fetch ${worldId} config: ${error.message}`))
     }
 }
 
 async function fetchWorldTimeOffset (page, worldId) {
     try {
-        debugSync(`Fetching ${worldId} time offset`)
+        debug.sync('Fetching world %s timezone offset', worldId)
 
         const timeOffset = await page.evaluate(function () {
             return require('helper/time').getGameTimeOffset()
@@ -1020,15 +1078,20 @@ async function fetchWorldTimeOffset (page, worldId) {
             timeOffset
         })
     } catch (error) {
-        debugSync(colors.red(`Error trying to fetch ${worldId} time offset: ${error.message}`))
+        debug.sync('Error trying to fetch %s time timezone: %s', worldId, error.message)
     }
 }
 
 function initSyncSocketServer () {
+    debug.socket('Starting sync socket server')
+
     syncSocketServer = new WebSocket.Server({port: 7777})
 
     syncSocketServer.on('connection', function (ws) {
-        const send = (state, data) => ws.send(JSON.stringify([state, data]))
+        const send = (state, data) => {
+            debug.socket('syncSocket emitting: %o', [state, data])
+            ws.send(JSON.stringify([state, data]))
+        }
 
         Events.on(enums.SYNC_DATA_START, (worldId) => send(enums.syncStates.START, {worldId}))
         Events.on(enums.SYNC_DATA_FINISH, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}))
@@ -1037,6 +1100,8 @@ function initSyncSocketServer () {
 
         ws.on('message', function (raw) {
             const data = JSON.parse(raw)
+
+            debug.socket('syncSocket receive: %o', data)
 
             switch (data.code) {
                 case enums.SYNC_REQUEST_STATUS: {

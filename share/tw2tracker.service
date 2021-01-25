@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Environment=PORT=3000
 Environment=TZ=UTC
+Environment=DEBUG=tw2tracker*
 Environment=NODE_ENV=${tw2tracker.environment}
 Type=simple
 ${tw2tracker.user}
