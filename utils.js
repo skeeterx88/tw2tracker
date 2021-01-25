@@ -2,6 +2,7 @@ const db = require('./db.js')
 const sql = require('./sql.js')
 const https = require('https')
 const crypto = require('crypto')
+const humanInterval = require('human-interval')
 
 const noop = function () {}
 
@@ -112,8 +113,9 @@ const asyncRouter = function (handler) {
 const timeout = function (handler, time, errorMessage) {
     return new Promise(async function (resolve, reject) {
         const id = setTimeout(function () {
-            reject(new Error(errorMessage))
-        }, time)
+            const timeoutMessage = typeof time === 'string' ? `${time} timeout` : `${time}ms timeout`
+            reject(new Error(errorMessage ? errorMessage : timeoutMessage))
+        }, typeof time === 'string' ? humanInterval(time) : time)
 
         handler().then(function (result) {
             clearTimeout(id)

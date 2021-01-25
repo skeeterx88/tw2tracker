@@ -168,7 +168,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         debug.sync('Fetching world %s data', worldId)
         const data = await utils.timeout(async function () {
             return await page.evaluate(scraperData)
-        }, humanInterval('2 minutes'), '2 minutes timeout')
+        }, '2 minutes')
 
         await commitRawDataFilesystem(data, worldId)
         await commitDataDatabase(data, worldId)
@@ -232,7 +232,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         const achievements = await utils.timeout(async function () {
             return await page.evaluate(scraperAchievements, marketId, worldNumber)
-        }, 1000000, 'scraperAchievements evaluation timeout')
+        }, '20 minutes')
 
         await commitRawAchievementsFilesystem(achievements, worldId)
         await commitAchievementsDatabase(achievements, worldId)
@@ -534,7 +534,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
             debug.auth('Authenticated on market %s with success', marketId)
 
             return account
-        }, humanInterval('1 minute'), '1 minute timeout')
+        }, '1 minute')
 
         return await auths[marketId]
     } catch (error) {
