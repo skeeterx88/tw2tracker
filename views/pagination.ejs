@@ -1,51 +1,25 @@
 <table class="pagination">
-    <colgroup>
-        <col width="80px">
-        <col width="100px">
-        <col width="*">
-        <col width="100px">
-        <col width="80px">
-    </colgroup>
-
-    <% if (pagination.showGotoFirst) { -%>
+    <tr>
         <td>
-            <a class="page" href="<%= pagination.path %>/">&lt;&lt;&lt; First</a>
-        </td>
-    <% } else { -%>
-        <td></td>
-    <% } -%>
-
-    <% if (pagination.showGotoPrev) { -%>
-        <td>
-            <a class="page" href="<%= pagination.path %>/page/<%= (pagination.current - 1) %>">&lt; Previous</a>
-        </td>
-    <% } else { -%>
-        <td></td>
-    <% } -%>
-
-    <td>
-        <% for (let i = pagination.start; i <= pagination.end; i++) { -%>
-            <% if (i === pagination.current) { -%>
-                <span class="page current"><a href="<%= pagination.path %>/page/<%= i %>"><%= i %></a></span>
-            <% } else { -%>
-                <a class="page" href="<%= pagination.path %>/page/<%= i %>"><%= i %></a>
+            <% if (pagination.showGotoFirst) { -%>
+                <a class="page first" href="<%= pagination.path %>/">&lt;&lt;&lt; First</a>
             <% } -%>
-        <% } -%>
-    </td>
-
-    <% if (pagination.showGotoNext) { -%>
-        <td>
-            <a class="page" href="<%= pagination.path %>/page/<%= (pagination.current + 1) %>">Next &gt;</a>
+            <% if (pagination.showGotoPrev) { -%>
+                <a class="page prev" href="<%= pagination.path %>/page/<%= (pagination.current - 1) %>">&lt; Previous</a>
+            <% } -%>
+            <% for (let i = pagination.start; i <= pagination.end; i++) { -%>
+                <% if (i === pagination.current) { -%>
+                    <span class="page current"><a href="<%= pagination.path %>/page/<%= i %>"><%= i %></a></span>
+                <% } else { -%>
+                    <a class="page" href="<%= pagination.path %>/page/<%= i %>"><%= i %></a>
+                <% } -%>
+            <% } -%>
+            <% if (pagination.showGotoLast) { -%>
+                <a class="page last" href="<%= pagination.path %>/page/<%= pagination.last %>">Last &gt;&gt;&gt;</a>
+            <% } -%>
+            <% if (pagination.showGotoNext) { -%>
+                <a class="page next" href="<%= pagination.path %>/page/<%= (pagination.current + 1) %>">Next &gt;</a>
+            <% } -%>
         </td>
-    <% } else { -%>
-        <td></td>
-    <% } -%>
-
-    <% if (pagination.showGotoLast) { -%>
-        <td>
-            <a class="page" href="<%= pagination.path %>/page/<%= pagination.last %>">Last &gt;&gt;&gt;</a>
-        </td>
-    <% } else { -%>
-        <td></td>
-    <% } -%>
+    </tr>
 </table>

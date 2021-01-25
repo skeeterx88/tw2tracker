@@ -473,6 +473,16 @@ fieldset legend {
     border-radius: 3px;
 }
 
+.pagination .page.next,
+.pagination .page.last {
+    float: right;
+}
+
+.pagination .page.prev,
+.pagination .page.first {
+    float: left;
+}
+
 #map {
     touch-action: none;
     height: 481px;
