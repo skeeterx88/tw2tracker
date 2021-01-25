@@ -884,8 +884,8 @@ async function createPuppeteerPage () {
     const page = await browser.newPage()
 
     return page.on('console', function ({_type, _text}) {
-        if (_type === 'log' && _text.startsWith('Sync:')) {
-            debug.sync(_text.replace('Sync:', ''))
+        if (_type === 'log' && _text.startsWith('tw2tracker: ')) {
+            debug.sync(_text.replace('tw2tracker: ', ''))
         }
     })
 }
