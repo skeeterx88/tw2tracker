@@ -162,7 +162,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
         const data = await utils.timeout(async function () {
             return await page.evaluate(scraperData)
-        }, 120000, 'Scrape evaluation timeout')
+        }, humanInterval('2 minutes'), '2 minutes timeout')
 
         await commitRawDataFilesystem(data, worldId)
         await commitDataDatabase(data, worldId)
@@ -511,7 +511,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, auth_att
             await page.close()
 
             return account
-        }, 60000, 'Auth took more than 1 minute')
+        }, humanInterval('1 minute'), '1 minute timeout')
 
         return await auths[marketId]
     } catch (error) {
