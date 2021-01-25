@@ -63,22 +63,22 @@ Sync.init = async function () {
         })
     }
 
-    const taskHandlers = new Map()
+    const tasks = await Sync.tasks()
 
-    taskHandlers.set('data_all', function () {
+    tasks.add('data_all', function () {
         Sync.dataAll()
     })
 
-    taskHandlers.set('achievements_all', function () {
+    tasks.add('achievements_all', function () {
         Sync.achievementsAll()
     })
 
-    taskHandlers.set('worlds', async function () {
+    tasks.add('worlds', async function () {
         await Sync.markets()
         await Sync.worlds()
     })
 
-    taskHandlers.set('clean_shares', async function () {
+    tasks.add('clean_shares', async function () {
         const now = Date.now()
         const shares = await db.any(sql.maps.getShareLastAccess)
         const expireTime = humanInterval(config.sync.static_share_expire_time)
@@ -90,23 +90,7 @@ Sync.init = async function () {
         }
     })
 
-    const intervals = getTasksInterval()
-
-    setInterval(async function () {
-        const lastRuns = await getTasksLastRun()
-
-        for (const [id, handler] of taskHandlers.entries()) {
-            const interval = intervals.get(id)
-            const lastRun = lastRuns.get(id)
-            const elapsedTime = timeSince(lastRun)
-
-            if (!lastRun || elapsedTime > interval) {
-                debug.tasks('Running task "%s"', id)
-                handler()
-                db.query(sql.updateTaskLastRun, {id})
-            }
-        }
-    }, humanInterval('1 minute'))
+    tasks.initChecker()
 }
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
@@ -553,6 +537,56 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
             }, attempt)
         } else {
             throw new Error(error.message)
+        }
+    }
+}
+
+Sync.tasks = async function () {
+    debug.tasks('Initializing tasks')
+
+    const taskHandlers = new Map()
+    const intervalKeys = Object.keys(config.sync.intervals)
+    const presentTasks = await db.any(sql.getTasks)
+    const taskCheckInterval = humanInterval(config.sync.task_check_interval)
+
+    for (const {id} of presentTasks) {
+        if (!intervalKeys.includes(id)) {
+            debug.tasks('Adding missing task "%s" to the database', id)
+            db.query(sql.addTaskIfMissing, {id})
+        }
+    }
+
+    return {
+        add: function (id, handler) {
+            debug.tasks('Added task handler "%s"', id)
+            taskHandlers.set(id, handler)
+        },
+        initChecker: function () {
+            debug.tasks('Initializing task checker')
+            debug.tasks('Checking tasks every %s', config.sync.task_check_interval)
+
+            const intervalEntries = Object.entries(config.sync.intervals)
+            const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)])
+            const mappedIntervals = new Map(parsedIntervals)
+
+            setInterval(async function () {
+                debug.tasks('Checking tasks...')
+
+                const lastRunEntries = await db.map(sql.getTasks, [], ({id, last_run}) => [id, last_run])
+                const mappedLastRuns = new Map(lastRunEntries)
+
+                for (const [id, handler] of taskHandlers.entries()) {
+                    const interval = mappedIntervals.get(id)
+                    const lastRun = mappedLastRuns.get(id)
+                    const elapsedTime = (Date.now() + (lastRun.getTimezoneOffset() * 1000 * 60)) - lastRun.getTime()
+
+                    if (!lastRun || elapsedTime > interval) {
+                        debug.tasks('Running task "%s"', id)
+                        handler()
+                        db.query(sql.updateTaskLastRun, {id})
+                    }
+                }
+            }, taskCheckInterval)
         }
     }
 }
@@ -1134,26 +1168,6 @@ function initSyncSocketServer () {
             }
         })
     })
-}
-
-async function getTasksLastRun () {
-    return new Map(await db.map(sql.getTasks, [], ({id, last_run}) => [id, last_run]))
-}
-
-function getTasksInterval () {
-    const entries = Object.entries(config.sync.intervals)
-    const parsed = entries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)])
-
-    for (const [id] of entries) {
-        db.query(sql.addTaskIfMissing, {id})
-    }
-
-    return new Map(parsed)
-}
-
-function timeSince (date) {
-    const now = Date.now() + (date.getTimezoneOffset() * 1000 * 60)
-    return now - date.getTime()
 }
 
 module.exports = Sync
