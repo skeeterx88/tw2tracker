@@ -15,7 +15,8 @@ require([
         marketId,
         worldNumber,
         mapShare,
-        lastDataSyncDate
+        lastDataSyncDate,
+        staticMapExpireTime
     }
 ) {
     let colorPicker;
@@ -575,6 +576,7 @@ require([
 
                 notif({
                     title: 'Static map',
+                    content: `Static maps expires in ${staticMapExpireTime} after the last link access.`,
                     link: location.origin + result,
                     timeout: 0
                 });

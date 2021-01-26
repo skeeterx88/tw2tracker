@@ -101,7 +101,8 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
             marketId,
             worldNumber,
             worldName: world.name,
-            lastDataSyncDate
+            lastDataSyncDate,
+            staticMapExpireTime: config.sync.static_share_expire_time
         }
     });
 });
