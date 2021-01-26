@@ -1,89 +1,89 @@
-const express = require('express')
-const createError = require('http-errors')
-const router = express.Router()
-const db = require('../db.js')
-const sql = require('../sql.js')
-const utils = require('../utils.js')
-const config = require('../config.js')
+const express = require('express');
+const createError = require('http-errors');
+const router = express.Router();
+const db = require('../db.js');
+const sql = require('../sql.js');
+const utils = require('../utils.js');
+const config = require('../config.js');
 
 const {
     paramWorld,
     paramWorldParse,
     createPagination
-} = require('../router-helpers.js')
+} = require('../router-helpers.js');
 
-const searchCategories = ['players', 'tribes', 'villages']
+const searchCategories = ['players', 'tribes', 'villages'];
 
 const searchPostRedirectRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
-        return next()
+        return next();
     }
 
     const {
         marketId,
         worldNumber
-    } = await paramWorldParse(req)
+    } = await paramWorldParse(req);
 
-    const rawQuery = encodeURIComponent(req.body.query)
-    const category = (req.body.category || '').toLowerCase()
+    const rawQuery = encodeURIComponent(req.body.query);
+    const category = (req.body.category || '').toLowerCase();
 
     if (!searchCategories.includes(category)) {
-        throw createError(404, 'This search category does not exist')
+        throw createError(404, 'This search category does not exist');
     }
 
-    return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`)
-})
+    return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
+});
 
 const searchGetRedirectRouter = utils.asyncRouter(async function (req, res, next) {
     const {
         marketId,
         worldNumber
-    } = await paramWorldParse(req)
+    } = await paramWorldParse(req);
 
-    return res.redirect(302, `/stats/${marketId}/${worldNumber}`)
-})
+    return res.redirect(302, `/stats/${marketId}/${worldNumber}`);
+});
 
 const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
-    const category = req.params.category
+    const category = req.params.category;
 
     if (!searchCategories.includes(category)) {
-        return next()
+        return next();
     }
 
     if (!paramWorld(req)) {
-        return next()
+        return next();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req)
+    } = await paramWorldParse(req);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
 
-    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1
-    const limit = config.ui.ranking_page_items_per_page
-    const offset = limit * (page - 1)
+    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
+    const limit = config.ui.ranking_page_items_per_page;
+    const offset = limit * (page - 1);
 
-    const rawQuery = decodeURIComponent(req.params.query)
+    const rawQuery = decodeURIComponent(req.params.query);
 
     if (!rawQuery) {
-        throw createError(500, 'No search specified')
+        throw createError(500, 'No search specified');
     }
 
     if (rawQuery.length < 3) {
-        throw createError(500, 'Minimum search characters is 3')
+        throw createError(500, 'Minimum search characters is 3');
     }
 
     if (rawQuery.length > 20) {
-        throw createError(500, 'Maximum search characters is 20')
+        throw createError(500, 'Maximum search characters is 20');
     }
 
-    const query = '%' + rawQuery + '%'
-    const allResults = await db.any(sql.search[category], {worldId, query})
-    const results = allResults.slice(offset, offset + limit)
-    const total = allResults.length
+    const query = '%' + rawQuery + '%';
+    const allResults = await db.any(sql.search[category], {worldId, query});
+    const results = allResults.slice(offset, offset + limit);
+    const total = allResults.length;
 
     return res.render('stats/search', {
         title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
@@ -104,12 +104,12 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
             worldNumber
         },
         ...utils.ejsHelpers
-    })
-})
+    });
+});
 
-router.post('/stats/:marketId/:worldNumber/search/', searchPostRedirectRouter)
-router.get('/stats/:marketId/:worldNumber/search/', searchGetRedirectRouter)
-router.get('/stats/:marketId/:worldNumber/search/:category/:query', categorySearchRouter)
-router.get('/stats/:marketId/:worldNumber/search/:category/:query/page/:page', categorySearchRouter)
+router.post('/stats/:marketId/:worldNumber/search/', searchPostRedirectRouter);
+router.get('/stats/:marketId/:worldNumber/search/', searchGetRedirectRouter);
+router.get('/stats/:marketId/:worldNumber/search/:category/:query', categorySearchRouter);
+router.get('/stats/:marketId/:worldNumber/search/:category/:query/page/:page', categorySearchRouter);
 
-module.exports = router
+module.exports = router;

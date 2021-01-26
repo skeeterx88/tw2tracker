@@ -2,9 +2,9 @@
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
 module.exports = async function () {
-    const socketService = injector.get('socketService')
-    const routeProvider = injector.get('routeProvider')
-    const RANKING_QUERY_COUNT = 25
+    const socketService = injector.get('socketService');
+    const routeProvider = injector.get('routeProvider');
+    const RANKING_QUERY_COUNT = 25;
 
     const achievementsMap = {
         players: {
@@ -15,20 +15,20 @@ module.exports = async function () {
             router: routeProvider.ACHIEVEMENT_GET_TRIBE_ACHIEVEMENTS,
             key: 'tribe_id'
         }
-    }
+    };
     
-    const playerIds = new Set()
-    const tribeIds = new Set()
+    const playerIds = new Set();
+    const tribeIds = new Set();
     const achievementsData = {
         players: new Map(),
         tribes: new Map()
-    }
+    };
 
     const sleep = function (ms) {
         return new Promise(function (resolve) {
-            setTimeout(resolve, typeof ms === 'number' ? ms : 1000)
-        })
-    }
+            setTimeout(resolve, typeof ms === 'number' ? ms : 1000);
+        });
+    };
 
     const loadTribes = function (offset) {
         return new Promise(function (resolve) {
@@ -41,22 +41,22 @@ module.exports = async function () {
                 query: ''
             }, function (data) {
                 for (const tribe of data.ranking) {
-                    tribeIds.add(tribe.tribe_id)
+                    tribeIds.add(tribe.tribe_id);
                 }
 
-                resolve(data.total)
-            })
-        })
-    }
+                resolve(data.total);
+            });
+        });
+    };
 
     const processTribes = async function () {
-        let offset = 0
+        let offset = 0;
 
-        const total = await loadTribes(offset)
-        offset += RANKING_QUERY_COUNT
+        const total = await loadTribes(offset);
+        offset += RANKING_QUERY_COUNT;
 
         if (total <= RANKING_QUERY_COUNT) {
-            return
+            return;
         }
 
         for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
@@ -65,11 +65,11 @@ module.exports = async function () {
                 loadTribes(offset + RANKING_QUERY_COUNT),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 3))
-            ])
+            ]);
 
-            await sleep(150)
+            await sleep(150);
         }
-    }
+    };
 
     const loadPlayers = function (offset) {
         return new Promise(function (resolve) {
@@ -82,22 +82,22 @@ module.exports = async function () {
                 query: ''
             }, function (data) {
                 for (const player of data.ranking) {
-                    playerIds.add(player.character_id)
+                    playerIds.add(player.character_id);
                 }
 
-                resolve(data.total)
-            })
-        })
-    }
+                resolve(data.total);
+            });
+        });
+    };
 
     const processPlayers = async function () {
-        let offset = 0
+        let offset = 0;
 
-        const total = await loadPlayers(offset)
-        offset += RANKING_QUERY_COUNT
+        const total = await loadPlayers(offset);
+        offset += RANKING_QUERY_COUNT;
 
         if (total <= RANKING_QUERY_COUNT) {
-            return
+            return;
         }
 
         for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
@@ -106,34 +106,34 @@ module.exports = async function () {
                 loadPlayers(offset + RANKING_QUERY_COUNT),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
-            ])
+            ]);
 
-            await sleep(150)
+            await sleep(150);
         }
-    }
+    };
 
     const loadAchievements = function (type, id) {
         return new Promise(function (resolve) {
             if (!id) {
-                return resolve()
+                return resolve();
             }
 
             const {
                 router,
                 key
-            } = achievementsMap[type]
+            } = achievementsMap[type];
 
             socketService.emit(router, {
                 [key]: id
             }, function ({achievements}) {
-                achievementsData[type].set(id, achievements.filter(achievement => achievement.level))
-                resolve()
-            })
-        })
-    }
+                achievementsData[type].set(id, achievements.filter(achievement => achievement.level));
+                resolve();
+            });
+        });
+    };
 
     const loadTribesAchievements = async function () {
-        const tribeIdsArray = Array.from(tribeIds.values())
+        const tribeIdsArray = Array.from(tribeIds.values());
 
         for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
             await Promise.all([
@@ -141,12 +141,12 @@ module.exports = async function () {
                 loadAchievements('tribes', tribeIdsArray[i + 1]),
                 loadAchievements('tribes', tribeIdsArray[i + 2]),
                 loadAchievements('tribes', tribeIdsArray[i + 3])
-            ])
+            ]);
         }
-    }
+    };
 
     const loadPlayersAchievements = async function () {
-        const playerIdsArray = Array.from(playerIds.values())
+        const playerIdsArray = Array.from(playerIds.values());
 
         for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
             await Promise.all([
@@ -154,17 +154,17 @@ module.exports = async function () {
                 loadAchievements('players', playerIdsArray[i + 1]),
                 loadAchievements('players', playerIdsArray[i + 2]),
                 loadAchievements('players', playerIdsArray[i + 3])
-            ])
+            ]);
         }
-    }
+    };
 
-    await processTribes()
-    await processPlayers()
-    await loadTribesAchievements()
-    await loadPlayersAchievements()
+    await processTribes();
+    await processPlayers();
+    await loadTribesAchievements();
+    await loadPlayersAchievements();
 
     return {
         players: Array.from(achievementsData.players),
         tribes: Array.from(achievementsData.tribes)
-    }
-}
+    };
+};

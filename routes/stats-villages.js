@@ -1,35 +1,35 @@
-const express = require('express')
-const router = express.Router()
-const db = require('../db.js')
-const sql = require('../sql.js')
-const utils = require('../utils.js')
-const config = require('../config.js')
+const express = require('express');
+const router = express.Router();
+const db = require('../db.js');
+const sql = require('../sql.js');
+const utils = require('../utils.js');
+const config = require('../config.js');
 
 const {
     paramWorld,
     paramWorldParse,
     paramVillageParse
-} = require('../router-helpers.js')
+} = require('../router-helpers.js');
 
 const villageRouter = utils.asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
-        return next()
+        return next();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req)
+    } = await paramWorldParse(req);
 
     const {
         villageId,
         village
-    } = await paramVillageParse(req, worldId)
+    } = await paramVillageParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber])
+    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
 
-    const conquests = await db.any(sql.getVillageConquests, {worldId, villageId})
+    const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
 
     res.render('stats/village', {
         title: `Village ${village.name} (${village.x}|${village.y}) - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
@@ -52,9 +52,9 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
             mapHighlightsType: 'villages'
         },
         ...utils.ejsHelpers
-    })
-})
+    });
+});
 
-router.get('/stats/:marketId/:worldNumber/villages/:villageId', villageRouter)
+router.get('/stats/:marketId/:worldNumber/villages/:villageId', villageRouter);
 
-module.exports = router
+module.exports = router;

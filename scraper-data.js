@@ -2,38 +2,38 @@
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
 module.exports = async function () {
-    const socketService = injector.get('socketService')
-    const routeProvider = injector.get('routeProvider')
-    const tribeSkillService = injector.get('tribeSkillService')
-    const LOAD_VILLAGE_SECTION_TIMEOUT = 'load_village_section_timeout'
-    const RANKING_QUERY_COUNT = 25
-    const CHUNK_SIZE = 50
+    const socketService = injector.get('socketService');
+    const routeProvider = injector.get('routeProvider');
+    const tribeSkillService = injector.get('tribeSkillService');
+    const LOAD_VILLAGE_SECTION_TIMEOUT = 'load_village_section_timeout';
+    const RANKING_QUERY_COUNT = 25;
+    const CHUNK_SIZE = 50;
     const COORDS_REFERENCE = {
         topLeft: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
         topRight: [[600, 0], [700, 0], [800, 0], [900, 0], [600, 100], [700, 100], [800, 100], [900, 100], [600, 200], [700, 200], [800, 200], [900, 200], [600, 300], [700, 300], [800, 300], [900, 300]],
         bottomLeft: [[0, 600], [100, 600], [200, 600], [300, 600], [0, 700], [100, 700], [200, 700], [300, 700], [0, 800], [100, 800], [200, 800], [300, 800], [0, 900], [100, 900], [200, 900], [300, 900]],
         bottomRight: [[600, 600], [700, 600], [800, 600], [900, 600], [600, 700], [700, 700], [800, 700], [900, 700], [600, 800], [700, 800], [800, 800], [900, 800], [600, 900], [700, 900], [800, 900], [900, 900]]
-    }
+    };
     const BOUNDARIE_REFERENCE_COORDS = {
         left: [[400, 400], [400, 500], [300, 400], [300, 500], [200, 400], [200, 500], [100, 400], [100, 500], [0, 400], [0, 500]],
         right: [[500, 400], [500, 500], [600, 400], [600, 500], [700, 400], [700, 500], [800, 400], [800, 500], [900, 400], [900, 500]],
         top: [[400, 300], [500, 300], [400, 200], [500, 200], [400, 100], [500, 100], [400, 0], [500, 0]],
         bottom: [[400, 600], [500, 600], [400, 700], [500, 700], [400, 800], [500, 800], [400, 900], [500, 900]]
-    }
+    };
 
-    const playersByTribe = new Map()
-    const villagesByPlayer = new Map()
-    const villages = new Map()
-    const tribes = new Map()
-    const players = new Map()
-    const provinces = new Map()
-    const playersAchievement = new Map()
+    const playersByTribe = new Map();
+    const villagesByPlayer = new Map();
+    const villages = new Map();
+    const tribes = new Map();
+    const players = new Map();
+    const provinces = new Map();
+    const playersAchievement = new Map();
 
     const sleep = function (ms) {
         return new Promise(function (resolve) {
-            setTimeout(resolve, typeof ms === 'number' ? ms : 1000)
-        })
-    }
+            setTimeout(resolve, typeof ms === 'number' ? ms : 1000);
+        });
+    };
 
     const getBoundaries = async function () {
         const boundaries = {
@@ -41,22 +41,22 @@ module.exports = async function () {
             right: 500,
             top: 500,
             bottom: 500
-        }
+        };
 
         for (const side of ['left', 'right', 'top', 'bottom']) {
             for (let i = 0; i < BOUNDARIE_REFERENCE_COORDS[side].length; i++) {
-                const [x, y] = BOUNDARIE_REFERENCE_COORDS[side][i]
+                const [x, y] = BOUNDARIE_REFERENCE_COORDS[side][i];
 
                 if (await loadContinent(x, y) === 0) {
-                    break
+                    break;
                 }
 
-                boundaries[side] = (side === 'left' || side === 'right') ? x : y
+                boundaries[side] = (side === 'left' || side === 'right') ? x : y;
             }
         }
 
-        return boundaries
-    }
+        return boundaries;
+    };
 
     const filterBlocks = function (boundaries) {
         return [
@@ -64,14 +64,14 @@ module.exports = async function () {
             ...COORDS_REFERENCE.topRight.filter(([x, y]) => x <= boundaries.right && y >= boundaries.top),
             ...COORDS_REFERENCE.bottomLeft.filter(([x, y]) => x >= boundaries.left && y <= boundaries.bottom),
             ...COORDS_REFERENCE.bottomRight.filter(([x, y]) => x <= boundaries.right && y <= boundaries.bottom)
-        ]
-    }
+        ];
+    };
 
     const loadVillageSection = function (x, y) {
         return new Promise(function (resolve, reject) {
             const timeoutId = setTimeout(function () {
-                reject(LOAD_VILLAGE_SECTION_TIMEOUT)
-            }, 15000)
+                reject(LOAD_VILLAGE_SECTION_TIMEOUT);
+            }, 15000);
 
             socketService.emit(routeProvider.MAP_GETVILLAGES, {
                 x: x,
@@ -79,44 +79,44 @@ module.exports = async function () {
                 width: CHUNK_SIZE,
                 height: CHUNK_SIZE
             }, function (section) {
-                clearTimeout(timeoutId)
-                processVillages(section.villages)
-                resolve(section.villages.length)
-            })
-        })
-    }
+                clearTimeout(timeoutId);
+                processVillages(section.villages);
+                resolve(section.villages.length);
+            });
+        });
+    };
 
     const loadContinent = function (x, y) {
         return new Promise(async function (resolve, reject) {
             const timeout = setTimeout(function () {
-                reject(new Error('Failed to fetch villages section'))
-            }, 10000)
+                reject(new Error('Failed to fetch villages section'));
+            }, 10000);
 
             const loadVillages = await Promise.all([
                 loadVillageSection(x, y),
                 loadVillageSection(x + CHUNK_SIZE, y),
                 loadVillageSection(x, y + CHUNK_SIZE),
                 loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
-            ])
+            ]);
 
-            clearTimeout(timeout)
-            resolve(loadVillages.reduce((sum, value) => sum + value))
-        })
-    }
+            clearTimeout(timeout);
+            resolve(loadVillages.reduce((sum, value) => sum + value));
+        });
+    };
 
     const processVillages = function (rawVillages) {
         if (!rawVillages.length) {
-            return
+            return;
         }
 
         for (const village of rawVillages) {
-            let province_id
+            let province_id;
 
             if (provinces.has(village.province_name)) {
-                province_id = provinces.get(village.province_name)
+                province_id = provinces.get(village.province_name);
             } else {
-                province_id = provinces.size
-                provinces.set(village.province_name, province_id)
+                province_id = provinces.size;
+                provinces.set(village.province_name, province_id);
             }
 
             villages.set(village.id, {
@@ -126,9 +126,9 @@ module.exports = async function () {
                 points: village.points,
                 character_id: village.character_id || null,
                 province_id
-            })
+            });
         }
-    }
+    };
 
     const loadTribes = function (offset) {
         return new Promise(function (resolve) {
@@ -155,22 +155,22 @@ module.exports = async function () {
                         victory_points: tribe.victory_points,
                         villages: tribe.villages,
                         level: tribeSkillService.getTribeLevel(tribe.power)
-                    })
+                    });
                 }
 
-                resolve(data.total)
-            })
-        })
-    }
+                resolve(data.total);
+            });
+        });
+    };
 
     const processTribes = async function () {
-        let offset = 0
+        let offset = 0;
 
-        const total = await loadTribes(offset)
-        offset += RANKING_QUERY_COUNT
+        const total = await loadTribes(offset);
+        offset += RANKING_QUERY_COUNT;
 
         if (total <= RANKING_QUERY_COUNT) {
-            return
+            return;
         }
 
         for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
@@ -179,11 +179,11 @@ module.exports = async function () {
                 loadTribes(offset + RANKING_QUERY_COUNT),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 3))
-            ])
+            ]);
 
-            await sleep(150)
+            await sleep(150);
         }
-    }
+    };
 
     const loadPlayers = function (offset) {
         return new Promise(function (resolve) {
@@ -207,22 +207,22 @@ module.exports = async function () {
                         tribe_id: player.tribe_id,
                         victory_points: player.victory_points,
                         villages: player.villages
-                    })
+                    });
                 }
 
-                resolve(data.total)
-            })
-        })
-    }
+                resolve(data.total);
+            });
+        });
+    };
 
     const processPlayers = async function () {
-        let offset = 0
+        let offset = 0;
 
-        const total = await loadPlayers(offset)
-        offset += RANKING_QUERY_COUNT
+        const total = await loadPlayers(offset);
+        offset += RANKING_QUERY_COUNT;
 
         if (total <= RANKING_QUERY_COUNT) {
-            return
+            return;
         }
 
         for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
@@ -231,52 +231,52 @@ module.exports = async function () {
                 loadPlayers(offset + RANKING_QUERY_COUNT),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
-            ])
+            ]);
 
-            await sleep(150)
+            await sleep(150);
         }
-    }
+    };
 
     const processVillagesByPlayer = function () {
         for (const character_id of players.keys()) {
-            villagesByPlayer.set(character_id, [])
+            villagesByPlayer.set(character_id, []);
         }
 
         for (const [id, village] of villages.entries()) {
-            const {character_id} = village
+            const {character_id} = village;
 
             if (character_id) {
-                villagesByPlayer.get(character_id).push(id)
+                villagesByPlayer.get(character_id).push(id);
             }
         }
-    }
+    };
 
     const processPlayersByTribe = function () {
         for (const tribe_id of tribes.keys()) {
-            playersByTribe.set(tribe_id, [])
+            playersByTribe.set(tribe_id, []);
         }
 
         for (const [character_id, player] of players.entries()) {
-            const {tribe_id} = player
+            const {tribe_id} = player;
 
             if (tribe_id) {
-                playersByTribe.get(tribe_id).push(character_id)
+                playersByTribe.get(tribe_id).push(character_id);
             }
         }
-    }
+    };
 
-    const boundaries = await getBoundaries()
-    const missingBlocks = filterBlocks(boundaries)
+    const boundaries = await getBoundaries();
+    const missingBlocks = filterBlocks(boundaries);
 
     for (const [x, y] of missingBlocks) {
-        await loadContinent(x, y)
+        await loadContinent(x, y);
     }
 
-    await processTribes()
-    await processPlayers()
+    await processTribes();
+    await processPlayers();
 
-    processVillagesByPlayer()
-    processPlayersByTribe()
+    processVillagesByPlayer();
+    processPlayersByTribe();
 
     return {
         villages: Array.from(villages),
@@ -286,5 +286,5 @@ module.exports = async function () {
         villagesByPlayer: Array.from(villagesByPlayer),
         playersByTribe: Array.from(playersByTribe),
         playersAchievement: Array.from(playersAchievement)
-    }
-}
+    };
+};

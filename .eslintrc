@@ -8,6 +8,7 @@
         "es6": true,
         "browser": true
     },
+    "ignorePatterns": [".ejs"],
     "rules": {
         "no-async-promise-executor": ["off"],
         "indent": ["error", 4, {
@@ -16,7 +17,7 @@
         "quotes": ["error", "single", {
             "allowTemplateLiterals": true
         }],
-        "semi": ["error", "never"],
+        "semi": ["error", "always"],
         "no-unused-vars": ["error", {
             "vars": "all",
             "args": "none"

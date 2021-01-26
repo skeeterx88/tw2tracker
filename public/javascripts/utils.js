@@ -1,7 +1,7 @@
 define('utils', function () {
     const hasOwn = function (obj, property) {
-        return Object.prototype.hasOwnProperty.call(obj, property)
-    }
+        return Object.prototype.hasOwnProperty.call(obj, property);
+    };
 
     const ajaxPost = async function (url = '', data = {}) {
         const response = await fetch(url, {
@@ -11,96 +11,96 @@ define('utils', function () {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-        })
+        });
 
-        return await response.json()
-    }
+        return await response.json();
+    };
 
     const boundNumber = function (value, min, max) {
-        return Math.min(max, Math.max(parseInt(value, 10), min))
-    }
+        return Math.min(max, Math.max(parseInt(value, 10), min));
+    };
 
     const arrayRandom = function (arr) {
-        return arr[Math.floor(Math.random() * arr.length)]
-    }
+        return arr[Math.floor(Math.random() * arr.length)];
+    };
 
-    const noop = function () {}
+    const noop = function () {};
 
     const normalizeString = function (value) {
-        return String(value).toLowerCase().replace(/[^\w]/g, '')
-    }
+        return String(value).toLowerCase().replace(/[^\w]/g, '');
+    };
 
 
     const querySelectorFrom = function (selector, elements) {
         return [].filter.call(elements, function (element) {
-            return element.matches(selector)
-        })
-    }
+            return element.matches(selector);
+        });
+    };
 
     const formatSince = (date) => {
-        const elapsedTime = Date.now() - date
+        const elapsedTime = Date.now() - date;
 
-        const seconds = elapsedTime / 1000
-        const minutes = seconds / 60
-        const hours = minutes / 60
-        const days = hours / 24
+        const seconds = elapsedTime / 1000;
+        const minutes = seconds / 60;
+        const hours = minutes / 60;
+        const days = hours / 24;
 
-        let format = ''
+        let format = '';
 
         if (minutes <= 1) {
-            format = 'just now'
+            format = 'just now';
         } else if (hours <= 1) {
             if (minutes < 2) {
-                format = '1 minute ago'
+                format = '1 minute ago';
             } else {
-                format = Math.floor(minutes) + ' minutes ago'
+                format = Math.floor(minutes) + ' minutes ago';
             }
         } else if (days <= 1) {
             if (hours < 2) {
-                format = '1 hour ago'
+                format = '1 hour ago';
             } else {
-                format = Math.floor(hours) + ' hours ago'
+                format = Math.floor(hours) + ' hours ago';
             }
         } else {
             if (days > 2) {
-                format = Math.floor(days) + ' days ago'
+                format = Math.floor(days) + ' days ago';
             } else {
-                const dayHours = hours % 24
+                const dayHours = hours % 24;
 
                 if (dayHours <= 2) {
-                    format = '1 day ago'
+                    format = '1 day ago';
                 } else {
-                    format = '1 day and ' + Math.floor(dayHours) + ' hours ago'
+                    format = '1 day and ' + Math.floor(dayHours) + ' hours ago';
                 }
                 
             }
         }
 
-        return format
-    }
+        return format;
+    };
 
     const averageCoords = (coords) => {
         if (!coords) {
-            return [500, 500]
+            return [500, 500];
         }
 
-        let averageX = 0
-        let averageY = 0
+        let averageX = 0;
+        let averageY = 0;
 
         coords = coords.filter(function (coord) {
-            return coord
-        })
+            return coord;
+        });
 
         for (const [x, y] of coords) {
-            averageX += parseInt(x, 10)
-            averageY += parseInt(y, 10)
+            averageX += parseInt(x, 10);
+            averageY += parseInt(y, 10);
         }
 
-        averageX = Math.floor(averageX / coords.length)
-        averageY = Math.floor(averageY / coords.length)
+        averageX = Math.floor(averageX / coords.length);
+        averageY = Math.floor(averageY / coords.length);
 
-        return [averageX, averageY]
-    }
+        return [averageX, averageY];
+    };
 
     return {
         hasOwn,
@@ -112,5 +112,5 @@ define('utils', function () {
         querySelectorFrom,
         formatSince,
         averageCoords
-    }
-})
+    };
+});

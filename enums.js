@@ -46,4 +46,4 @@ module.exports = {
         LEFT: 'left',
         JOIN: 'join'
     }
-}
+};

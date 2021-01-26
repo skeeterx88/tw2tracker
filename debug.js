@@ -1,4 +1,4 @@
-const debug = require('debug')
+const debug = require('debug');
 
 module.exports = {
     log: debug('tw2tracker'),
@@ -8,4 +8,4 @@ module.exports = {
     worlds: debug('tw2tracker:sync:worlds'),
     db: debug('tw2tracker:sync:db'),
     socket: debug('tw2tracker:socket')
-}
+};

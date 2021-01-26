@@ -18,155 +18,155 @@ require([
         tribe
     }
 ) {
-    let map
-    let loader
-    let tooltip
+    let map;
+    let loader;
+    let tooltip;
 
-    const colors = ['#ffee00', '#0000ff', '#ff0000']
+    const colors = ['#ffee00', '#0000ff', '#ff0000'];
 
     const averagePositionFor = (type, id) => {
-        let averageX
-        let averageY
+        let averageX;
+        let averageY;
 
         switch (type) {
             case TW2Map.highlightTypes.TRIBES: {
-                [averageX, averageY] = utils.averageCoords(loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat())
-                break
+                [averageX, averageY] = utils.averageCoords(loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat());
+                break;
             }
             case TW2Map.highlightTypes.PLAYERS: {
-                [averageX, averageY] = utils.averageCoords(loader.playerVillages[id])
-                break
+                [averageX, averageY] = utils.averageCoords(loader.playerVillages[id]);
+                break;
             }
             case TW2Map.highlightTypes.VILLAGES: {
-                averageX = loader.villagesById[id].x
-                averageY = loader.villagesById[id].y
-                break
+                averageX = loader.villagesById[id].x;
+                averageY = loader.villagesById[id].y;
+                break;
             }
             default: {
-                throw new Error('averagePositionFor: Invalid type.')
+                throw new Error('averagePositionFor: Invalid type.');
             }
         }
 
-        return [averageX, averageY]
-    }
+        return [averageX, averageY];
+    };
 
     const setupTopRankingColors = () => {
-        const $topColors = document.querySelectorAll('.top-colors')
+        const $topColors = document.querySelectorAll('.top-colors');
 
         if (!$topColors.length) {
-            return false
+            return false;
         }
 
         for (let i = 0; i < mapHighlights.length; i++) {
-            $topColors[i].style.backgroundColor = colors[i]
+            $topColors[i].style.backgroundColor = colors[i];
         }
-    }
+    };
 
     const setupMapPreview = async () => {
         if (!document.querySelector('#map')) {
-            return false
+            return false;
         }
 
-        loader = new TW2DataLoader(marketId, worldNumber)
-        tooltip = new TW2Tooltip('#map-tooltip')
+        loader = new TW2DataLoader(marketId, worldNumber);
+        tooltip = new TW2Tooltip('#map-tooltip');
         map = new TW2Map('#map', loader, tooltip, {
             allowZoom: true,
             zoomWithShift: true,
             zoomLevel: 1,
             inlineHighlight: true,
             quickHighlightColor: '#000000'
-        })
+        });
 
-        map.init()
+        map.init();
 
-        addEventListener('resize', map.recalcSize)
+        addEventListener('resize', map.recalcSize);
 
-        await loader.loadInfo
+        await loader.loadInfo;
 
         if (typeof mapHighlights !== 'undefined') {
             for (let i = 0; i < mapHighlights.length; i++) {
-                map.addHighlight(mapHighlightsType, mapHighlights[i].name, colors[i])
+                map.addHighlight(mapHighlightsType, mapHighlights[i].name, colors[i]);
             }
         }
-    }
+    };
 
     const setupQuickHighlight = async () => {
-        const $highlightRows = document.querySelectorAll('.quick-highlight tbody tr')
+        const $highlightRows = document.querySelectorAll('.quick-highlight tbody tr');
 
         if (!$highlightRows.length) {
-            return false
+            return false;
         }
 
-        await loader.loadInfo
+        await loader.loadInfo;
 
         for (const $row of $highlightRows) {
             $row.addEventListener('mouseenter', () => {
-                const id = parseInt($row.dataset.id, 10)
+                const id = parseInt($row.dataset.id, 10);
 
-                map.quickHighlight($row.dataset.highlightType, id)
-                const [averageX, averageY] = averagePositionFor($row.dataset.highlightType, id)
-                map.moveTo(averageX, averageY)
-            })
+                map.quickHighlight($row.dataset.highlightType, id);
+                const [averageX, averageY] = averagePositionFor($row.dataset.highlightType, id);
+                map.moveTo(averageX, averageY);
+            });
 
             $row.addEventListener('mouseleave', () => {
-                map.quickHighlightOff()
-            })
+                map.quickHighlightOff();
+            });
         }
-    }
+    };
 
     const setupSearch = async () => {
         if (!document.querySelector('#search')) {
-            return false
+            return false;
         }
 
         const SEARCH_CATEGORIES = {
             players: 'players',
             tribes: 'tribes',
             villages: 'villages'
-        }
+        };
 
-        const $searchCategories = document.querySelectorAll('#search-categories li')
-        const $searchInput = document.querySelector('#search-input')
-        const $form = document.querySelector('#search form')
-        const $hiddenInput = document.querySelector('#search-category')
+        const $searchCategories = document.querySelectorAll('#search-categories li');
+        const $searchInput = document.querySelector('#search-input');
+        const $form = document.querySelector('#search form');
+        const $hiddenInput = document.querySelector('#search-category');
 
         const selectCategory = (category) => {
             if (!utils.hasOwn(SEARCH_CATEGORIES, category)) {
-                return false
+                return false;
             }
 
-            const $selected = document.querySelector('#search-categories li.selected')
+            const $selected = document.querySelector('#search-categories li.selected');
 
             if ($selected) {
-                $selected.classList.remove('selected')
+                $selected.classList.remove('selected');
             }
 
-            const $toSelect = document.querySelector(`#search-categories li[data-search-category=${category}]`)
-            $toSelect.classList.add('selected')
-            $hiddenInput.value = category
+            const $toSelect = document.querySelector(`#search-categories li[data-search-category=${category}]`);
+            $toSelect.classList.add('selected');
+            $hiddenInput.value = category;
 
-            $searchInput.focus()
-        }
+            $searchInput.focus();
+        };
 
         for (const $searchCategory of $searchCategories) {
             $searchCategory.addEventListener('click', function () {
-                selectCategory(this.dataset.searchCategory)
-                return false
-            })
+                selectCategory(this.dataset.searchCategory);
+                return false;
+            });
         }
 
         $form.addEventListener('submit', function (event) {
-            const length = $searchInput.value.length
+            const length = $searchInput.value.length;
 
             if (!length || length > 20) {
-                event.preventDefault()
+                event.preventDefault();
             }
-        })
-    }
+        });
+    };
 
     const setupMapCenter = async (type, id) => {
         if (typeof id !== 'number') {
-            throw new Error('setupMapCenter: Invalid id.')
+            throw new Error('setupMapCenter: Invalid id.');
         }
 
         await Promise.all([
@@ -175,19 +175,19 @@ require([
             loader.loadContinent(54),
             loader.loadContinent(45),
             loader.loadContinent(44)
-        ])
+        ]);
 
-        map.moveTo(...averagePositionFor(type, id))
-    }
+        map.moveTo(...averagePositionFor(type, id));
+    };
 
-    setupMapPreview()
-    setupTopRankingColors()
-    setupQuickHighlight()
-    setupSearch()
+    setupMapPreview();
+    setupTopRankingColors();
+    setupQuickHighlight();
+    setupSearch();
 
     if (typeof player !== 'undefined') {
-        setupMapCenter(TW2Map.highlightTypes.PLAYERS, player.id)
+        setupMapCenter(TW2Map.highlightTypes.PLAYERS, player.id);
     } else if (typeof tribe !== 'undefined') {
-        setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id)
+        setupMapCenter(TW2Map.highlightTypes.TRIBES, tribe.id);
     }
-})
+});

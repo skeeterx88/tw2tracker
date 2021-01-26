@@ -3,42 +3,42 @@
  */
 module.exports = function () {
     return new Promise(function (resolve, reject) {
-        let injectorTimeout
+        let injectorTimeout;
 
         const timeout = setTimeout(function () {
-            clearTimeout(injectorTimeout)
+            clearTimeout(injectorTimeout);
 
             if (document.querySelector('.modal-establish-village')) {
-                return resolve()
+                return resolve();
             }
 
-            const transferredSharedDataService = injector.get('transferredSharedDataService')
-            const mapScope = transferredSharedDataService.getSharedData('MapController')
+            const transferredSharedDataService = injector.get('transferredSharedDataService');
+            const mapScope = transferredSharedDataService.getSharedData('MapController');
 
             if (mapScope && mapScope.isInitialized) {
-                resolve()
+                resolve();
             } else {
-                reject('Could not get ready state (timeout)')
+                reject('Could not get ready state (timeout)');
             }
-        }, 20000)
+        }, 20000);
 
         const waitForInjector = function (callback) {
             if (typeof injector === 'undefined') {
-                injectorTimeout = setTimeout(waitForInjector, 100)
+                injectorTimeout = setTimeout(waitForInjector, 100);
             } else {
-                callback()
+                callback();
             }
-        }
+        };
 
         waitForInjector(function () {
-            const $rootScope = injector.get('$rootScope')
-            const eventTypeProvider = injector.get('eventTypeProvider')
+            const $rootScope = injector.get('$rootScope');
+            const eventTypeProvider = injector.get('eventTypeProvider');
 
             $rootScope.$on(eventTypeProvider.CHARACTER_INFO, function () {
-                clearTimeout(timeout)
-                clearTimeout(injectorTimeout)
-                resolve()
-            })
-        })
-    })
-}
+                clearTimeout(timeout);
+                clearTimeout(injectorTimeout);
+                resolve();
+            });
+        });
+    });
+};
