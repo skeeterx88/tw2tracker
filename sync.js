@@ -460,9 +460,11 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
             const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             debug.auth('Loading %s market page', marketId);
+
             page = await createPuppeteerPage();
-            await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']});
-            await page.waitFor(1000);
+            await page.goto(`https://${urlId}.tribalwars2.com/page`, {
+                waitUntil: ['domcontentloaded', 'networkidle0']
+            });
 
             const account = await page.evaluate(function (account_name, account_password, marketId) {
                 return new Promise(function (resolve) {
@@ -511,7 +513,9 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
 
             debug.auth('Checking if auth on market %s succeded', marketId);
 
-            await page.goto(`https://${urlId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']});
+            await page.goto(`https://${urlId}.tribalwars2.com/page`, {
+                waitUntil: ['domcontentloaded', 'networkidle0']
+            });
 
             try {
                 await page.waitForSelector('.player-worlds', {timeout: 3000});
