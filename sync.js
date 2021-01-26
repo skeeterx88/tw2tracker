@@ -420,10 +420,11 @@ Sync.character = async function (marketId, worldNumber) {
     debug.sync(`Creating character on world %s`, worldId);
 
     const page = await createPuppeteerPage();
-    await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']});
-    await page.waitFor(2000);
+    await page.goto(`https://${marketId}.tribalwars2.com/page`, {
+        waitUntil: ['domcontentloaded', 'networkidle0']
+    });
 
-    await page.evaluate(function (worldId) {
+    const response = await page.evaluate(function (worldId) {
         return new Promise(function (resolve) {
             const socketService = injector.get('socketService');
             const routeProvider = injector.get('routeProvider');
@@ -436,9 +437,13 @@ Sync.character = async function (marketId, worldNumber) {
         });
     }, worldId);
 
-    await page.goto(`https://${marketId}.tribalwars2.com/page`, {waitUntil: ['domcontentloaded', 'networkidle0']});
+    page.close();
 
-    debug.sync(`Character created on world %s`, worldId);
+    if (response.id && response.world_id) {
+        debug.sync(`Character created on world %s: %o`, worldId. response);
+    } else {
+        debug.sync(`Character not created on world %s: %o`, worldId, response);
+    }
 };
 
 Sync.auth = async function (marketId, {account_name, account_password}, attempt = 1) {
