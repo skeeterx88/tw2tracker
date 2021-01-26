@@ -25,6 +25,30 @@ define('updateWorldStatus', [
         syncStates
     }
 ) {
+    const $syncDataAllActive = document.querySelector('#sync-data-all-active');
+    const $syncActiveDataWorlds = document.querySelector('#sync-active-data-worlds');
+    const $syncAchievementsAllActive = document.querySelector('#sync-achievements-all-active');
+    const $syncActiveAchievementWorlds = document.querySelector('#sync-active-achievement-worlds');
+
+    function addActiveWorld ($container, worldId) {
+        const $world = document.createElement('span');
+        $world.innerHTML = worldId;
+        $world.classList.add('active-world');
+        $world.classList.add(worldId);
+
+        $container.querySelector('.empty').style.display = 'none';
+        $container.appendChild($world);
+    }
+
+    function removeActiveWorld ($container, worldId) {
+        const $world = $container.querySelector('.' + worldId);
+        $world.remove();
+
+        if ($container.children.length === 1) {
+            $container.querySelector('.empty').style.display = '';
+        }
+    }
+
     return function updateWorldStatus ({worldId, status, date}, action) {
         const $world = document.querySelector('#' + worldId);
 
@@ -40,6 +64,7 @@ define('updateWorldStatus', [
             case syncStates.START: {
                 $dataSync.innerHTML = 'Sync data in progress...';
                 $dataSync.dataset.active = 'yes';
+                addActiveWorld($syncActiveDataWorlds, worldId);
                 break;
             }
             case syncStates.FINISH: {
@@ -47,11 +72,13 @@ define('updateWorldStatus', [
                 $dataDate.innerHTML = date;
                 $dataStatus.innerHTML = status;
                 $dataSync.dataset.active = 'no';
+                removeActiveWorld($syncActiveDataWorlds, worldId);
                 break;
             }
             case syncStates.ACHIEVEMENT_START: {
                 $achievementsSync.innerHTML = 'Sync achievements in progress...';
                 $achievementsSync.dataset.active = 'yes';
+                addActiveWorld($syncActiveAchievementWorlds, worldId);
                 break;
             }
             case syncStates.ACHIEVEMENT_FINISH: {
@@ -59,6 +86,7 @@ define('updateWorldStatus', [
                 $achievementsDate.innerHTML = date;
                 $achievementsStatus.innerHTML = status;
                 $achievementsSync.dataset.active = 'no';
+                removeActiveWorld($syncActiveAchievementWorlds, worldId);
                 break;
             }
         }
