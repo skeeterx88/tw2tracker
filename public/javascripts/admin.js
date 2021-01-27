@@ -33,7 +33,7 @@ define('updateWorldStatus', [
     function addActiveWorld ($container, worldId) {
         const $world = document.createElement('span');
         $world.innerHTML = worldId;
-        $world.classList.add('active-world');
+        $world.classList.add('active');
         $world.classList.add(worldId);
 
         $container.querySelector('.empty').style.display = 'none';
@@ -106,7 +106,7 @@ require([
     }
 ) {
     function setupSync () {
-        const $worlds = document.querySelectorAll('#worlds-sync .world');
+        const $worlds = document.querySelectorAll('#sync-worlds .world');
         const $worldButtons = Array.from($worlds).map(function ($world) {
             return [
                 $world.querySelector('.sync-data'),
