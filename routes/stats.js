@@ -36,8 +36,9 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         };
     });
 
-    res.render('stats/servers', {
+    res.render('market-list', {
         title: config.site_name,
+        pageType: 'stats',
         marketStats,
         navigation: [
             `<a href="/stats">Stats</a>`,
@@ -66,10 +67,11 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
         ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
     ];
 
-    res.render('stats/worlds', {
+    res.render('world-list', {
         title: `${marketId.toUpperCase()} - ${config.site_name}`,
         marketId,
         worlds,
+        pageType: 'stats',
         navigation: [
             `<a href="/stats">Stats</a>`,
             `Server <a href="/stats/${marketId}">${marketId.toUpperCase()}</a>`,

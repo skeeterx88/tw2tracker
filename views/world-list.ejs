@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('../head.ejs') %>
+    <%- include('./head.ejs') %>
     <body>
         <header></header>
-        <%- include('../menu.ejs') %>
+        <%- include('./menu.ejs') %>
 
         <main class="content-border">
-            <%- include('../navigation.ejs') %>
+            <%- include('./navigation.ejs') %>
 
             <div class="content">
                 <div class="single">
@@ -17,7 +17,7 @@
                                     <h2><%= label %></h2>
                                     <div>
                                         <% for (let world of data) { -%>
-                                            <a href="/stats/<%= marketId %>/<%= world.num %>">
+                                            <a href="/<%= pageType %>/<%= marketId %>/<%= world.num %>">
                                                 <div class="world world-container">
                                                     <div class="world-title">
                                                         <span class="flag-<%= marketId %>"></span>
@@ -66,6 +66,6 @@
             </div>
         </main>
 
-        <%- include('../footer.ejs') %>
+        <%- include('./footer.ejs') %>
     </body>
 </html>

@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('../head.ejs') %>
+    <%- include('./head.ejs') %>
     <body>
         <header></header>
-        <%- include('../menu.ejs') %>
+        <%- include('./menu.ejs') %>
 
         <main class="content-border">
-            <%- include('../navigation.ejs') %>
+            <%- include('./navigation.ejs') %>
 
             <div class="content">
                 <div class="single">
                     <section id="markets">
                         <% for (let market of marketStats) { -%>
-                            <a href="/stats/<%= market.id %>">
+                            <a href="/<%= pageType %>/<%= market.id %>">
                                 <div class="market market-container">
                                     <div class="market-title">
                                         <span class="flag-<%= market.id %>"></span>
@@ -47,6 +47,6 @@
             </div>
         </main>
 
-        <%- include('../footer.ejs') %>
+        <%- include('./footer.ejs') %>
     </body>
 </html>
