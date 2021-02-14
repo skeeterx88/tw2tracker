@@ -21,7 +21,7 @@ const scraperReadyState = require('./scraper-ready-state.js');
 const auths = {};
 const Sync = {};
 
-let syncSocketServer = null;
+let internalCommSocket = null;
 let browser = null;
 
 const syncDataActiveWorlds = new Set();
@@ -30,7 +30,7 @@ let syncDataAllRunning = false;
 let syncAchievementsAllRunning = false;
 
 Sync.init = async function () {
-    debug.sync('Starting sync script');
+    debug.sync('initializing sync system');
 
     Events.on(enums.SYNC_DATA_START, (worldId) => syncDataActiveWorlds.add(worldId));
     Events.on(enums.SYNC_DATA_FINISH, (worldId) => syncDataActiveWorlds.delete(worldId));
@@ -51,7 +51,7 @@ Sync.init = async function () {
     const appState = await db.one(sql.getProgramState);
 
     if (appState.first_run) {
-        debug.sync('First run detected: An initial sync will now run.');
+        debug.sync('first run detected');
 
         await Sync.markets();
         await Sync.worlds();
@@ -91,17 +91,19 @@ Sync.init = async function () {
     });
 
     tasks.initChecker();
+
+    await Sync.dataAll();
 };
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber;
 
     if (syncDataActiveWorlds.has(worldId)) {
-        debug.sync('World %s is already syncing data', worldId);
+        debug.sync('world:%s sync in progress', worldId);
     }
 
     Events.trigger(enums.SYNC_DATA_START, [worldId]);
-    debug.sync('Start to sync data on world %s (attemp %d)', worldId, attempt);
+    debug.sync('world:%s start data sync (attempt %i)', worldId, attempt);
 
     let page;
 
@@ -112,7 +114,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
             const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60;
             if (minutesSinceLastSync < config.scraper_interval_minutes) {
-                debug.sync('World %s is already sincronized', worldId, attempt);
+                debug.sync('world:%s already sinced', worldId, attempt);
                 return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, syncDate]);
             }
         }
@@ -126,15 +128,17 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await Sync.character(marketId, worldNumber);
         } else if (!worldCharacter.allow_login) {
             await db.query(sql.closeWorld, [marketId, worldNumber]);
-            debug.sync('World %s is not open anymore. Closing...', worldId);
+            debug.sync('world:%s closing', worldId);
             return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate]);
         }
 
-        debug.sync('Loading game on world %s', worldId);
+        debug.sync('world:%s loading game page', worldId);
+
         const urlId = marketId === 'zz' ? 'beta' : marketId;
         await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
 
-        debug.sync('Awaiting game ready state on world %s', worldId);
+        debug.sync('world:%s waiting ready state', worldId);
+
         await page.evaluate(scraperReadyState);
 
         if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
@@ -149,7 +153,8 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await fetchWorldTimeOffset(page, worldId);
         }
 
-        debug.sync('Fetching world %s data', worldId);
+        debug.sync('world:%s fetching data', worldId);
+
         const data = await utils.timeout(async function () {
             return await page.evaluate(scraperData);
         }, '2 minutes');
@@ -164,10 +169,10 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await page.close();
 
-        debug.sync('World %s sync finished', worldId);
+        debug.sync('world:%s data sync finished', worldId);
         Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate]);
     } catch (error) {
-        debug.sync('Sync on world %s failed: %s', worldId, error.message);
+        debug.sync('world:%s data sync failed (%s)', worldId, error.message);
 
         syncDataActiveWorlds.delete(worldId);
 
@@ -175,8 +180,8 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await page.close();
         }
 
-        if (attempt < 3) {
-            return await Sync.data(marketId, worldNumber, flag, ++attempt);
+        if (attempt < config.sync.max_sync_attempts) {
+            return await Sync.data(marketId, worldNumber, flag, attempt + 1);
         } else {
             await db.query(sql.updateDataSync, [enums.SYNC_FAIL, marketId, worldNumber]);
 
@@ -194,10 +199,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber;
 
     if (syncAchievementsActiveWorlds.has(worldId)) {
-        return debug.sync('World %s is already syncing achievements', worldId);
+        return debug.sync('world:%s is already syncing achievements', worldId);
     } 
 
-    debug.sync('Start to sync achievements on world %s (attemp %d)', worldId, attempt);
+    debug.sync('world:%s start achievements sync (attempt %d)', worldId, attempt);
     Events.trigger(enums.SYNC_ACHIEVEMENTS_START, [worldId]);
 
     let page;
@@ -237,8 +242,8 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             await page.close();
         }
 
-        if (attempt < 3) {
-            return await Sync.achievements(marketId, worldNumber, flag, ++attempt);
+        if (attempt < config.sync.max_sync_attempts) {
+            return await Sync.achievements(marketId, worldNumber, flag, attempt + 1);
         } else {
             await db.query(sql.updateAchievementsSync, [enums.SYNC_FAIL, marketId, worldNumber]);
 
@@ -253,10 +258,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 };
 
 Sync.dataAll = async function (flag) {
-    debug.sync('Begin data synchronization of all worlds. Parallel syncs: %d', config.sync.parallel_data_sync);
+    debug.sync('all-worlds-data sync start (parallel: %d)', config.sync.parallel_data_sync);
 
     if (syncDataAllRunning) {
-        return debug.sync('Data synchronization of all worlds is already in progress');
+        return debug.sync('all-worlds-data sync in progress');
     }
 
     Events.trigger(enums.SYNC_DATA_ALL_START);
@@ -288,15 +293,16 @@ Sync.dataAll = async function (flag) {
         return fails;
     }
 
-    debug.sync('Finish data synchronization of all worlds');
-    Events.trigger(enums.SYNC_DATA_ALL_FINISH, await asynchronousSync());
+    const fails = await asynchronousSync();
+    debug.sync('all-worlds-data sync finish');
+    Events.trigger(enums.SYNC_DATA_ALL_FINISH, fails);
 };
 
 Sync.achievementsAll = async function (flag) {
-    debug.sync('Begin achievements synchronization of all worlds. Parallel syncs: %d', config.sync.parallel_achievements_sync);
+    debug.sync('all-worlds-achievements sync start (parallel: %d)', config.sync.parallel_achievements_sync);
 
     if (syncAchievementsAllRunning) {
-        return debug.sync('Achievements synchronization of all worlds is already in progress');
+        return debug.sync('all-worlds-achievements in progress');
     }
 
     Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START);
@@ -328,19 +334,20 @@ Sync.achievementsAll = async function (flag) {
         return fails;
     }
 
-    debug.sync('Finish achievements synchronization of all worlds');
-    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, await asynchronousSync());
+    const fails = await asynchronousSync();
+    debug.sync('all-worlds-achievements sync start');
+    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, fails);
 };
 
 Sync.worlds = async function () {
-    debug.worlds('Syncronize world list');
+    debug.worlds('start world list sync');
 
     const markets = await db.any(sql.markets.withAccount);
 
     for (const market of markets) {
         const marketId = market.id;
 
-        debug.worlds('Check missing worlds on market %s', marketId);
+        debug.worlds('market:%s check missing worlds', marketId);
 
         try {
             const account = await Sync.auth(marketId, market);
@@ -376,7 +383,7 @@ Sync.worlds = async function () {
                 }
 
                 if (!await utils.worldEntryExists(worldId)) {
-                    debug.worlds('Creating world database entry for %s', worldId);
+                    debug.worlds('world:%s creating world db entry', worldId);
 
                     await db.query(sql.createWorldSchema, {
                         worldId,
@@ -388,13 +395,13 @@ Sync.worlds = async function () {
                 }
             }
         } catch (error) {
-            debug.worlds('Failed to register worlds on market %s: %s', marketId, error.message);
+            debug.worlds('market:%s failed to sync worlds (%s)', marketId, error.message);
         }
     }
 };
 
 Sync.markets = async function () {
-    debug.sync('Syncronize market list');
+    debug.sync('start market list sync');
 
     const storedMarkets = await db.map(sql.markets.all, [], market => market.id);
     const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html');
@@ -417,7 +424,7 @@ Sync.markets = async function () {
 Sync.character = async function (marketId, worldNumber) {
     const worldId = marketId + worldNumber;
 
-    debug.sync(`Creating character on world %s`, worldId);
+    debug.sync('world:%s create character', worldId);
 
     const page = await createPuppeteerPage();
     await page.goto(`https://${marketId}.tribalwars2.com/page`, {
@@ -429,7 +436,7 @@ Sync.character = async function (marketId, worldNumber) {
             const socketService = injector.get('socketService');
             const routeProvider = injector.get('routeProvider');
 
-            console.log(`tw2tracker: Emitting create character request on world ${worldId}`);
+            debugSync('world:%s emit create character command', worldId);
 
             socketService.emit(routeProvider.CREATE_CHARACTER, {
                 world: worldId
@@ -440,9 +447,9 @@ Sync.character = async function (marketId, worldNumber) {
     page.close();
 
     if (response.id && response.world_id) {
-        debug.sync(`Character created on world %s: %o`, worldId. response);
+        debug.sync('world:%s character created %o', worldId. response);
     } else {
-        debug.sync(`Character not created on world %s: %o`, worldId, response);
+        debug.sync('world:%s failed to create character %o', worldId, response);
     }
 };
 
@@ -451,7 +458,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
         return await auths[marketId];
     }
 
-    debug.auth('Logging in on market %s (attempt %d)', marketId, attempt);
+    debug.auth('market:%s authenticating (attempt %d)', marketId, attempt);
 
     let page;
 
@@ -459,7 +466,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
         auths[marketId] = utils.timeout(async function () {
             const urlId = marketId === 'zz' ? 'beta' : marketId;
 
-            debug.auth('Loading %s market page', marketId);
+            debug.auth('market:%s loading page', marketId);
 
             page = await createPuppeteerPage();
             await page.goto(`https://${urlId}.tribalwars2.com/page`, {
@@ -475,7 +482,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
                         resolve(false);
                     }, 5000);
 
-                    console.log(`tw2tracker: Emitting ${marketId} login request`);
+                    debugSync('market:%s emit login command', marketId);
 
                     socketService.emit(routeProvider.LOGIN, {
                         name: account_name,
@@ -493,7 +500,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
                 throw new Error(error);
             }
 
-            debug.auth('Setting up market %s cookie', marketId);
+            debug.auth('market:%s setup cookie', marketId);
 
             await page.setCookie({
                 name: 'globalAuthCookie',
@@ -511,7 +518,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
                 session: false
             });
 
-            debug.auth('Checking if auth on market %s succeded', marketId);
+            debug.auth('market:%s checking auth success', marketId);
 
             await page.goto(`https://${urlId}.tribalwars2.com/page`, {
                 waitUntil: ['domcontentloaded', 'networkidle0']
@@ -524,7 +531,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
             }
 
             await page.close();
-            debug.auth('Authenticated on market %s with success', marketId);
+            debug.auth('market:%s authentication success', marketId);
 
             return account;
         }, '1 minute');
@@ -535,9 +542,9 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
             await page.close();
         }
 
-        debug.auth('Auth on market %s failed: %s', marketId, error.message);
+        debug.auth('market:%s authentication failed (%s)', marketId, error.message);
 
-        if (attempt < 3) {
+        if (attempt < config.sync.max_login_attempts) {
             attempt++;
 
             return await Sync.auth(marketId, {
@@ -551,35 +558,31 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
 };
 
 Sync.tasks = async function () {
-    debug.tasks('Initializing tasks');
+    debug.tasks('initializing task system (interval: %s)', config.sync.task_check_interval);
 
     const taskHandlers = new Map();
     const intervalKeys = Object.keys(config.sync.intervals);
     const presentTasks = await db.any(sql.getTasks);
-    const taskCheckInterval = humanInterval(config.sync.task_check_interval);
+    const interval = humanInterval(config.sync.task_check_interval);
 
     for (const {id} of presentTasks) {
         if (!intervalKeys.includes(id)) {
-            debug.tasks('Adding missing task "%s" to the database', id);
+            debug.tasks('task:%s add missing db entry', id);
             db.query(sql.addTaskIfMissing, {id});
         }
     }
 
     return {
         add: function (id, handler) {
-            debug.tasks('Added task handler "%s"', id);
             taskHandlers.set(id, handler);
         },
         initChecker: function () {
-            debug.tasks('Initializing task checker');
-            debug.tasks('Checking tasks every %s', config.sync.task_check_interval);
-
             const intervalEntries = Object.entries(config.sync.intervals);
             const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
             const mappedIntervals = new Map(parsedIntervals);
 
             setInterval(async function () {
-                debug.tasks('Checking tasks...');
+                debug.tasks('checking tasks...');
 
                 const lastRunEntries = await db.map(sql.getTasks, [], ({id, last_run}) => [id, last_run]);
                 const mappedLastRuns = new Map(lastRunEntries);
@@ -606,7 +609,7 @@ Sync.tasks = async function () {
 };
 
 async function commitDataDatabase (data, worldId) {
-    debug.db('Commiting world %s data to database', worldId);
+    debug.db('world:%s commit db data', worldId);
 
     await db.tx(async function () {
         const log = {};
@@ -775,12 +778,12 @@ async function commitDataDatabase (data, worldId) {
         log['new conquests'] = conquestsCount;
         log['new tribe changes'] = tribeChangesCount;
 
-        debug.db('World %s data update: %o', worldId, log);
+        debug.db('world:%s commit db data result %o', worldId, log);
     });
 }
 
 async function commitAchievementsDatabase (data, worldId) {
-    debug.sync('Commiting world %s achievements to database', worldId);
+    debug.db('world:%s commit db achievements', worldId);
 
     const sqlSubjectMap = {
         players: {
@@ -817,12 +820,12 @@ async function commitAchievementsDatabase (data, worldId) {
             };
         }
 
-        debug.db('World %s achievements update: %o', worldId, log);
+        debug.db('world:%s commit db achievements result %o', worldId, log);
     });
 }
 
 async function commitDataFilesystem (worldId) {
-    debug.sync('Commiting world %s updated data to filesystem', worldId);
+    debug.sync('world:%s commit fs data', worldId);
 
     try {
         const players = await db.any(sql.getWorldData, {worldId, table: 'players'});
@@ -896,14 +899,14 @@ async function commitDataFilesystem (worldId) {
         const gzippedInfo = zlib.gzipSync(JSON.stringify(info));
         await fs.promises.writeFile(path.join(dataPath, 'info'), gzippedInfo);
     } catch (error) {
-        debug.sync('Failed to write %s data to filesystem: %s', worldId, error.message);
+        debug.sync('world:%s failed to commit fs data (%s)', worldId, error.message);
     }
 
     return false;
 }
 
 async function commitRawDataFilesystem (data, worldId) {
-    debug.sync('Commiting world %s raw data to filesystem', worldId);
+    debug.sync('world:%s commit fs raw data', worldId);
 
     const location = path.join('.', 'data', 'raw');
     await fs.promises.mkdir(location, {recursive: true});
@@ -911,7 +914,7 @@ async function commitRawDataFilesystem (data, worldId) {
 }
 
 async function commitRawAchievementsFilesystem (achievements, worldId) {
-    debug.sync('Commiting world %s raw achievements to filesystem', worldId);
+    debug.sync('world:%s commit fs raw achievements', worldId);
 
     const location = path.join('.', 'data', 'raw');
     await fs.promises.mkdir(location, {recursive: true});
@@ -930,12 +933,14 @@ async function createPuppeteerPage () {
     }
 
     const page = await browser.newPage();
+    await page.exposeFunction('debugSync', debug.sync);
+    return page;
 
-    return page.on('console', function ({_type, _text}) {
-        if (_type === 'log' && _text.startsWith('tw2tracker: ')) {
-            debug.sync(_text.replace('tw2tracker: ', ''));
-        }
-    });
+    // return page.on('console', function ({_type, _text}) {
+    //     if (_type === 'log' && _text.startsWith('tw2tracker: ')) {
+    //         debug.sync(_text.replace('tw2tracker: ', ''));
+    //     }
+    // });
 }
 
 async function getWorld (marketId, worldNumber) {
@@ -1050,7 +1055,7 @@ function mapAchievements (achievements) {
 }
 
 async function fetchWorldMapStructure (page, worldId, urlId) {
-    debug.sync('Fetching world %s map structure', worldId);
+    debug.sync('world:%s fetch map structure', worldId);
 
     const structPath = await page.evaluate(function () {
         const cdn = require('cdn');
@@ -1067,7 +1072,7 @@ async function fetchWorldMapStructure (page, worldId, urlId) {
 
 async function fetchWorldConfig (page, worldId) {
     try {
-        debug.sync('Fetching world %s config', worldId);
+        debug.sync('world:%s fetch config', worldId);
 
         const worldConfig = await page.evaluate(function () {
             const modelDataService = injector.get('modelDataService');
@@ -1109,13 +1114,13 @@ async function fetchWorldConfig (page, worldId) {
             worldConfig
         });
     } catch (error) {
-        debug.sync(colors.red(`Error trying to fetch ${worldId} config: ${error.message}`));
+        debug.sync('world:%s error fetching config (%s)', worldId, error.message);
     }
 }
 
 async function fetchWorldTimeOffset (page, worldId) {
     try {
-        debug.sync('Fetching world %s timezone offset', worldId);
+        debug.sync('world:%s fetch timezone', worldId);
 
         const timeOffset = await page.evaluate(function () {
             return require('helper/time').getGameTimeOffset();
@@ -1126,18 +1131,18 @@ async function fetchWorldTimeOffset (page, worldId) {
             timeOffset
         });
     } catch (error) {
-        debug.sync('Error trying to fetch %s time timezone: %s', worldId, error.message);
+        debug.sync('world:%s error fetching timezone (%s)', worldId, error.message);
     }
 }
 
 function initSyncSocketServer () {
-    debug.socket('Starting sync socket server');
+    debug.comm('initializing internal communication socket');
 
-    syncSocketServer = new WebSocket.Server({port: 7777});
+    internalCommSocket = new WebSocket.Server({port: 7777});
 
-    syncSocketServer.on('connection', function (ws) {
+    internalCommSocket.on('connection', function (ws) {
         const send = (state, data) => {
-            debug.socket('syncSocket emitting: %o', [state, data]);
+            debug.comm('emit %o', [state, data]);
             ws.send(JSON.stringify([state, data]));
         };
 
@@ -1149,7 +1154,7 @@ function initSyncSocketServer () {
         ws.on('message', function (raw) {
             const data = JSON.parse(raw);
 
-            debug.socket('syncSocket receive: %o', data);
+            debug.comm('message %o', data);
 
             switch (data.code) {
                 case enums.SYNC_REQUEST_STATUS: {

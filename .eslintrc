@@ -54,6 +54,7 @@
         "injector": true,
         "$rootScope": true,
         "require": true,
-        "define": true
+        "define": true,
+        "debugSync": true
     }
 }
