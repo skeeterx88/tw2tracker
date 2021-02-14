@@ -587,15 +587,20 @@ Sync.tasks = async function () {
                 for (const [id, handler] of taskHandlers.entries()) {
                     const interval = mappedIntervals.get(id);
                     const lastRun = mappedLastRuns.get(id);
-                    const elapsedTime = (Date.now() + (lastRun.getTimezoneOffset() * 1000 * 60)) - lastRun.getTime();
 
-                    if (!lastRun || elapsedTime > interval) {
-                        debug.tasks('Running task "%s"', id);
-                        handler();
-                        db.query(sql.updateTaskLastRun, {id});
+                    if (lastRun) {
+                        const elapsedTime = (Date.now() + (lastRun.getTimezoneOffset() * 1000 * 60)) - lastRun.getTime();
+
+                        if (elapsedTime < interval) {
+                            continue;
+                        }
                     }
+
+                    debug.tasks('task:%s running', id);
+                    handler();
+                    db.query(sql.updateTaskLastRun, {id});
                 }
-            }, taskCheckInterval);
+            }, interval);
         }
     };
 };
