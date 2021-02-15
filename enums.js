@@ -12,6 +12,8 @@ module.exports = {
     SYNC_ACHIEVEMENTS_FINISH: 'sync_achievements_finish',
     SYNC_ACHIEVEMENTS_ALL_START: 'sync_achievements_all_start',
     SYNC_ACHIEVEMENTS_ALL_FINISH: 'sync_achievements_all_finish',
+    SYNC_WORLDS_START: 'sync_worlds_start',
+    SYNC_WORLDS_FINISH: 'sync_worlds_finish',
 
     IGNORE_LAST_SYNC: 'ignore_last_sync',
 
@@ -21,6 +23,7 @@ module.exports = {
     SYNC_REQUEST_SYNC_ACHIEVEMENTS: 'sync_request_sync_achievements',
     SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL: 'sync_request_sync_achievements_all',
     SYNC_REQUEST_SYNC_MARKETS: 'sync_request_sync_markets',
+    SYNC_REQUEST_SYNC_WORLDS: 'sync_request_sync_worlds',
     EMPTY_CONTINENT: 'empty_continent',
     achievementCommitTypes: {
         ADD: 'add',
@@ -31,7 +34,9 @@ module.exports = {
         FINISH: 'finish',
         UPDATE: 'update',
         ACHIEVEMENT_START: 'achievement_start',
-        ACHIEVEMENT_FINISH: 'achievement_finish'
+        ACHIEVEMENT_FINISH: 'achievement_finish',
+        WORLDS_START: 'worlds_start',
+        WORLDS_FINISH: 'worlds_finish'
     },
     mapShareTypes: {
         STATIC: 'static',

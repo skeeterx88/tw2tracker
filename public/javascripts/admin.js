@@ -1,13 +1,15 @@
 define('updateAllWorldsStatus', [
     'updateWorldStatus',
+    'updateWorldSyncStatus',
     'backendValues'
 ], function (
     updateWorldStatus,
+    updateWorldSyncStatus,
     {
         syncStates
     }
 ) {
-    return function updateAllWorldsStatus ({data, achievements}) {
+    return function updateAllWorldsStatus ({data, achievements, other}) {
         for (const worldId of data) {
             updateWorldStatus({worldId}, syncStates.START);
         }
@@ -15,6 +17,8 @@ define('updateAllWorldsStatus', [
         for (const worldId of achievements) {
             updateWorldStatus({worldId}, syncStates.ACHIEVEMENT_START);
         }
+
+        updateWorldSyncStatus(other.worldList);
     };
 });
 
@@ -93,19 +97,37 @@ define('updateWorldStatus', [
     };
 });
 
+define('updateWorldSyncStatus', [
+    'backendValues'
+], function (
+    {
+        syncStates
+    }
+) {
+    return function updateWorldSyncStatus (running) {
+        const $button = document.querySelector('#sync-world-list');
+        $button.innerHTML = running
+            ? 'Syncing world list...'
+            : 'Sync world list';
+    };
+});
+
 require([
     'updateAllWorldsStatus',
     'updateWorldStatus',
+    'updateWorldSyncStatus',
     'backendValues'
 ], function (
     updateAllWorldsStatus,
     updateWorldStatus,
+    updateWorldSyncStatus,
     {
         development,
         syncStates
     }
 ) {
     function setupSync () {
+        const $syncWorldList = document.querySelector('#sync-world-list');
         const $worlds = document.querySelectorAll('#sync-worlds .world');
         const $worldButtons = Array.from($worlds).map(function ($world) {
             return [
@@ -126,6 +148,17 @@ require([
                 });
             }
         }
+
+        $syncWorldList.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            if ($syncWorldList.dataset.active === 'no') {
+                fetch(this.href);
+                $syncWorldList.dataset.active = 'yes';
+            }
+
+            return false;
+        });
     }
 
     function setupSocket () {
@@ -138,6 +171,14 @@ require([
             switch (action) {
                 case syncStates.UPDATE: {
                     updateAllWorldsStatus(value);
+                    break;
+                }
+                case syncStates.WORLDS_START: {
+                    updateWorldSyncStatus(true);
+                    break;
+                }
+                case syncStates.WORLDS_FINISH: {
+                    updateWorldSyncStatus(false);
                     break;
                 }
                 default: {

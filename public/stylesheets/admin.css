@@ -26,6 +26,15 @@
     font-size: 11px;
 }
 
+#sync-panel ul {
+    margin: 5px 0px;
+    padding: 0px;
+}
+
+#sync-panel .relax-button {
+    font-size: 0.8em;
+}
+
 #sync-worlds .world {
     padding: 3px 5px;
     margin: 10px 5px;
@@ -56,7 +65,7 @@
     margin: 8px 0px;
 }
 
-#sync-worlds .world .relax-button {
+.relax-button {
     color: #e0bfbf;
     text-decoration: none;
     margin: 5px;

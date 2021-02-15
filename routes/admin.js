@@ -88,11 +88,20 @@ const scrapeMarketsRouter = utils.asyncRouter(async function (req, res) {
     res.end('ok');
 });
 
+const scrapeWorldsRouter = utils.asyncRouter(async function (req, res) {
+    syncSocket.send(JSON.stringify({
+        code: enums.SYNC_REQUEST_SYNC_WORLDS
+    }));
+
+    res.end('ok');
+});
+
 router.get('/', adminPanelRouter);
 router.get('/sync/data/all', syncDataAllRouter);
 router.get('/sync/data/:marketId/:worldNumber', syncDataRouter);
 router.get('/sync/achievements/all', syncAchievementsAllRouter);
 router.get('/sync/achievements/:marketId/:worldNumber', syncAchievementsRouter);
 router.get('/sync/markets', scrapeMarketsRouter);
+router.get('/sync/worlds', scrapeWorldsRouter);
 
 module.exports = router;

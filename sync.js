@@ -28,6 +28,7 @@ const syncDataActiveWorlds = new Set();
 const syncAchievementsActiveWorlds = new Set();
 let syncDataAllRunning = false;
 let syncAchievementsAllRunning = false;
+let syncWorldListRunning = false;
 
 Sync.init = async function () {
     debug.sync('initializing sync system');
@@ -40,6 +41,8 @@ Sync.init = async function () {
     Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, (worldId) => syncAchievementsActiveWorlds.delete(worldId));
     Events.on(enums.SYNC_ACHIEVEMENTS_ALL_START, () => syncAchievementsAllRunning = true);
     Events.on(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, () => syncAchievementsAllRunning = false);
+    Events.on(enums.SYNC_WORLDS_START, () => syncWorldListRunning = true);
+    Events.on(enums.SYNC_WORLDS_FINISH, () => syncWorldListRunning = false);
 
     process.on('SIGTERM', async function () {
         await db.$pool.end();
@@ -344,6 +347,8 @@ Sync.worlds = async function () {
 
     const markets = await db.any(sql.markets.withAccount);
 
+    Events.trigger(enums.SYNC_WORLDS_START);
+
     for (const market of markets) {
         const marketId = market.id;
 
@@ -398,6 +403,8 @@ Sync.worlds = async function () {
             debug.worlds('market:%s failed to sync worlds (%s)', marketId, error.message);
         }
     }
+
+    Events.trigger(enums.SYNC_WORLDS_FINISH);
 };
 
 Sync.markets = async function () {
@@ -1150,6 +1157,8 @@ function initSyncSocketServer () {
         Events.on(enums.SYNC_DATA_FINISH, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}));
         Events.on(enums.SYNC_ACHIEVEMENTS_START, (worldId) => send(enums.syncStates.ACHIEVEMENT_START, {worldId}));
         Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, (worldId, status, date) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId, status, date}));
+        Events.on(enums.SYNC_WORLDS_START, () => send(enums.syncStates.WORLDS_START));
+        Events.on(enums.SYNC_WORLDS_FINISH, () => send(enums.syncStates.WORLDS_FINISH));
 
         ws.on('message', function (raw) {
             const data = JSON.parse(raw);
@@ -1160,7 +1169,10 @@ function initSyncSocketServer () {
                 case enums.SYNC_REQUEST_STATUS: {
                     send(enums.syncStates.UPDATE, {
                         data: Array.from(syncDataActiveWorlds),
-                        achievements: Array.from(syncAchievementsActiveWorlds)
+                        achievements: Array.from(syncAchievementsActiveWorlds),
+                        other: {
+                            worldList: syncWorldListRunning
+                        }
                     });
                     break;
                 }
@@ -1182,6 +1194,10 @@ function initSyncSocketServer () {
                 }
                 case enums.SYNC_REQUEST_SYNC_MARKETS: {
                     Sync.markets();
+                    break;
+                }
+                case enums.SYNC_REQUEST_SYNC_WORLDS: {
+                    Sync.worlds();
                     break;
                 }
             }
