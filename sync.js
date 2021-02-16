@@ -998,6 +998,11 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
             }
 
             for (const type of oldUniqueTypes) {
+                if (!newAchievements.unique[type]) {
+                    debug.sync('*New* achievement do not have *old* achievement: %s', type);
+                    continue;
+                }
+
                 if (newAchievements.unique[type].level > oldAchievements.unique[type].level) {
                     achievementsToMerge.push({
                         commitType: enums.achievementCommitTypes.UPDATE,
