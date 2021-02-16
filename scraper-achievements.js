@@ -1,7 +1,8 @@
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
-module.exports = async function () {
+module.exports = async function (marketId, worldNumber) {
+    const worldId = marketId + worldNumber;
     const socketService = injector.get('socketService');
     const routeProvider = injector.get('routeProvider');
     const RANKING_QUERY_COUNT = 25;
@@ -31,6 +32,8 @@ module.exports = async function () {
     };
 
     const loadTribes = function (offset) {
+        debug('world:%s load tribes ranking %i/?', worldId, offset);
+
         return new Promise(function (resolve) {
             socketService.emit(routeProvider.RANKING_TRIBE, {
                 area_type: 'world',
@@ -72,6 +75,8 @@ module.exports = async function () {
     };
 
     const loadPlayers = function (offset) {
+        debug('world:%s load players ranking %i/?', worldId, offset);
+
         return new Promise(function (resolve) {
             socketService.emit(routeProvider.RANKING_CHARACTER, {
                 area_type: 'world',
@@ -136,6 +141,8 @@ module.exports = async function () {
         const tribeIdsArray = Array.from(tribeIds.values());
 
         for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
+            debug('world:%s load tribe achievements %i/%i', worldId, i, l);
+
             await Promise.all([
                 loadAchievements('tribes', tribeIdsArray[i]),
                 loadAchievements('tribes', tribeIdsArray[i + 1]),
@@ -149,6 +156,8 @@ module.exports = async function () {
         const playerIdsArray = Array.from(playerIds.values());
 
         for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
+            debug('world:%s load player achievements %i/%i', worldId, i, l);
+
             await Promise.all([
                 loadAchievements('players', playerIdsArray[i]),
                 loadAchievements('players', playerIdsArray[i + 1]),

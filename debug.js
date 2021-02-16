@@ -8,5 +8,6 @@ module.exports = {
     worlds: debug('tw2tracker:worlds'),
     db: debug('tw2tracker:db'),
     socket: debug('tw2tracker:socket'),
-    comm: debug('tw2tracker:comm')
+    comm: debug('tw2tracker:comm'),
+    puppeteer: debug('tw2tracker:puppeteer')
 };

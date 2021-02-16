@@ -235,7 +235,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate]);
     } catch (error) {
-        debug.sync(colors.red(`Sync.achievements() ${colors.green(worldId)} failed: ${error.message}`));
+        debug.sync('world:%s achievements sync failed (%s)', worldId, error.message);
 
         syncAchievementsActiveWorlds.delete(worldId);
 
@@ -441,7 +441,7 @@ Sync.character = async function (marketId, worldNumber) {
             const socketService = injector.get('socketService');
             const routeProvider = injector.get('routeProvider');
 
-            debugSync('world:%s emit create character command', worldId);
+            debug('world:%s emit create character command', worldId);
 
             socketService.emit(routeProvider.CREATE_CHARACTER, {
                 world: worldId
@@ -487,7 +487,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
                         resolve(false);
                     }, 5000);
 
-                    debugSync('market:%s emit login command', marketId);
+                    debug('market:%s emit login command', marketId);
 
                     socketService.emit(routeProvider.LOGIN, {
                         name: account_name,
@@ -563,7 +563,7 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
 };
 
 Sync.tasks = async function () {
-    debug.tasks('initializing task system (interval: %s)', config.sync.task_check_interval);
+    debug.tasks('initializing task system');
 
     const taskHandlers = new Map();
     const intervalKeys = Object.keys(config.sync.intervals);
@@ -582,6 +582,8 @@ Sync.tasks = async function () {
             taskHandlers.set(id, handler);
         },
         initChecker: function () {
+            debug.tasks('start task checker (interval: %s)', config.sync.task_check_interval);
+
             const intervalEntries = Object.entries(config.sync.intervals);
             const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
             const mappedIntervals = new Map(parsedIntervals);
@@ -820,8 +822,8 @@ async function commitAchievementsDatabase (data, worldId) {
             }
 
             log[subjectType] = {
-                added: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.ADD),
-                updated: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.UPDATE)
+                added: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.ADD).length,
+                updated: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.UPDATE).length
             };
         }
 
@@ -938,7 +940,7 @@ async function createPuppeteerPage () {
     }
 
     const page = await browser.newPage();
-    await page.exposeFunction('debugSync', debug.sync);
+    await page.exposeFunction('debug', debug.puppeteer);
     return page;
 
     // return page.on('console', function ({_type, _text}) {
