@@ -94,8 +94,6 @@ Sync.init = async function () {
     });
 
     tasks.initChecker();
-
-    await Sync.dataAll();
 };
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
