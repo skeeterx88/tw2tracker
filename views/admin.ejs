@@ -72,6 +72,7 @@
                                         <div class="actions">
                                             <ul>
                                                 <% if (world.open) { -%>
+                                                    <li><a class="sync-toggle relax-button small" href="/admin/sync/toggle/<%= world.market %>/<%= world.num %>">Disable sync</a></li>
                                                     <li><a class="sync-data relax-button small" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>">Sync data</a></li>
                                                     <li><a class="sync-achievements relax-button small" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>">Sync achievements</a></li>
                                                 <% } -%>

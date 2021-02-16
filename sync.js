@@ -30,6 +30,11 @@ let syncDataAllRunning = false;
 let syncAchievementsAllRunning = false;
 let syncWorldListRunning = false;
 
+const updateSyncStatusMap = {
+    data: sql.updateDataSync,
+    achievements: sql.updateAchievementsSync
+}
+
 Sync.init = async function () {
     debug.sync('initializing sync system');
 
@@ -93,7 +98,9 @@ Sync.init = async function () {
         }
     });
 
-    tasks.initChecker();
+    if (process.env.NODE_ENV === 'production') {
+        tasks.initChecker();
+    }
 };
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
@@ -110,6 +117,12 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
     try {
         const world = await getWorld(marketId, worldNumber);
+
+        if (!world.sync_enabled) {
+            const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
+            return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, date]);
+        }
+
         const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
 
         if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
@@ -163,15 +176,12 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         await commitRawDataFilesystem(data, worldId);
         await commitDataDatabase(data, worldId);
         await commitDataFilesystem(worldId);
-        await db.query(sql.updateDataSync, [enums.SYNC_SUCCESS, marketId, worldNumber]);
-
-        const {last_data_sync_date} = await db.one(sql.getWorldSyncData, [marketId, worldNumber]);
-        const syncDate = utils.ejsHelpers.formatDate(last_data_sync_date);
 
         await page.close();
 
         debug.sync('world:%s data sync finished', worldId);
-        Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate]);
+        const date = await updateSyncLastStatus('data', enums.SYNC_SUCCESS, marketId, worldNumber);
+        Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
     } catch (error) {
         debug.sync('world:%s data sync failed (%s)', worldId, error.message);
 
@@ -184,13 +194,8 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < config.sync.max_sync_attempts) {
             return await Sync.data(marketId, worldNumber, flag, attempt + 1);
         } else {
-            await db.query(sql.updateDataSync, [enums.SYNC_FAIL, marketId, worldNumber]);
-
-            const {last_data_sync_date} = await db.one(sql.getWorldSyncData, [marketId, worldNumber]);
-            const syncDate = utils.ejsHelpers.formatDate(last_data_sync_date);
-
-            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, syncDate]);
-
+            const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
+            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, date]);
             throw new Error(error.message);
         }
     }
@@ -209,7 +214,12 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     let page;
 
     try {
-        await getWorld(marketId, worldNumber);
+        const world = await getWorld(marketId, worldNumber);
+
+        if (!world.sync_enabled) {
+            const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
+            return Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, date]);
+        }
 
         const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
 
@@ -226,14 +236,12 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
         await commitRawAchievementsFilesystem(achievements, worldId);
         await commitAchievementsDatabase(achievements, worldId);
-        await db.query(sql.updateAchievementsSync, [enums.SYNC_SUCCESS, marketId, worldNumber]);
-
-        const {last_achievements_sync_date} = await db.one(sql.getWorldSyncAchievements, [marketId, worldNumber]);
-        const syncDate = utils.ejsHelpers.formatDate(last_achievements_sync_date);
 
         await page.close();
 
-        Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, syncDate]);
+        debug.sync('world:%s achievements sync finished', worldId);
+        const date = await updateSyncLastStatus('achievements', enums.SYNC_SUCCESS, marketId, worldNumber);
+        Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
     } catch (error) {
         debug.sync('world:%s achievements sync failed (%s)', worldId, error.message);
 
@@ -246,13 +254,8 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < config.sync.max_sync_attempts) {
             return await Sync.achievements(marketId, worldNumber, flag, attempt + 1);
         } else {
-            await db.query(sql.updateAchievementsSync, [enums.SYNC_FAIL, marketId, worldNumber]);
-
-            const {last_achievements_sync_date} = await db.one(sql.getWorldSyncAchievements, [marketId, worldNumber]);
-            const syncDate = utils.ejsHelpers.formatDate(last_achievements_sync_date);
-
-            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, syncDate]);
-
+            const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
+            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, date]);
             throw new Error(error.message);
         }
     }
@@ -268,7 +271,7 @@ Sync.dataAll = async function (flag) {
     Events.trigger(enums.SYNC_DATA_ALL_START);
 
     async function asynchronousSync () {
-        const queue = await db.any(sql.getOpenWorlds);
+        const queue = await db.any(sql.getSyncEnabledWorlds);
         const fails = [];
         let running = 0;
 
@@ -309,7 +312,7 @@ Sync.achievementsAll = async function (flag) {
     Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START);
 
     async function asynchronousSync () {
-        const queue = await db.any(sql.getOpenWorlds);
+        const queue = await db.any(sql.getSyncEnabledWorlds);
         const fails = [];
         let running = 0;
 
@@ -613,6 +616,21 @@ Sync.tasks = async function () {
             }, interval);
         }
     };
+};
+
+Sync.toggle = async function (marketId, worldNumber) {
+    const world = await getWorld(marketId, worldNumber);
+    const enabled = !world.sync_enabled;
+
+    await db.query(sql.syncToggleWorld, {
+        marketId,
+        worldNumber,
+        enabled
+    });
+
+    Events.trigger(enums.SYNC_TOGGLE_WORLD, [marketId, worldNumber, enabled]);
+
+    return true;
 };
 
 async function commitDataDatabase (data, worldId) {
@@ -1164,15 +1182,19 @@ function initSyncSocketServer () {
         Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, (worldId, status, date) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId, status, date}));
         Events.on(enums.SYNC_WORLDS_START, () => send(enums.syncStates.WORLDS_START));
         Events.on(enums.SYNC_WORLDS_FINISH, () => send(enums.syncStates.WORLDS_FINISH));
+        Events.on(enums.SYNC_TOGGLE_WORLD, (marketId, worldNumber, enabled) => send(enums.syncStates.TOGGLE_WORLD, {marketId, worldNumber, enabled}));
 
-        ws.on('message', function (raw) {
+        ws.on('message', async function (raw) {
             const data = JSON.parse(raw);
 
             debug.comm('message %o', data);
 
             switch (data.code) {
                 case enums.SYNC_REQUEST_STATUS: {
+                    const worlds = Array.from(await db.any(sql.getOpenWorlds));
+
                     send(enums.syncStates.UPDATE, {
+                        worlds,
                         data: Array.from(syncDataActiveWorlds),
                         achievements: Array.from(syncAchievementsActiveWorlds),
                         other: {
@@ -1205,9 +1227,18 @@ function initSyncSocketServer () {
                     Sync.worlds();
                     break;
                 }
+                case enums.SYNC_TOGGLE_WORLD: {
+                    Sync.toggle(data.marketId, data.worldNumber);
+                    break;
+                }
             }
         });
     });
+}
+
+async function updateSyncLastStatus (type, status, marketId, worldNumber) {
+    const {last_sync_date} = await db.one(updateSyncStatusMap[type], [status, marketId, worldNumber]);
+    return utils.ejsHelpers.formatDate(last_sync_date);
 }
 
 module.exports = Sync;

@@ -15,6 +15,9 @@ module.exports = {
     SYNC_WORLDS_START: 'sync_worlds_start',
     SYNC_WORLDS_FINISH: 'sync_worlds_finish',
 
+    SYNC_TOGGLE_WORLD: 'sync_toggle_world',
+    SYNC_TOGGLE_MARKET: 'sync_toggle_market',
+
     IGNORE_LAST_SYNC: 'ignore_last_sync',
 
     SYNC_REQUEST_STATUS: 'request_sync_status',
@@ -36,7 +39,8 @@ module.exports = {
         ACHIEVEMENT_START: 'achievement_start',
         ACHIEVEMENT_FINISH: 'achievement_finish',
         WORLDS_START: 'worlds_start',
-        WORLDS_FINISH: 'worlds_finish'
+        WORLDS_FINISH: 'worlds_finish',
+        TOGGLE_WORLD: 'toggle_world'
     },
     mapShareTypes: {
         STATIC: 'static',

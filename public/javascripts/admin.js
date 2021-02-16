@@ -1,15 +1,25 @@
 define('updateAllWorldsStatus', [
     'updateWorldStatus',
     'updateWorldSyncStatus',
+    'updateWorldSyncEnabled',
     'backendValues'
 ], function (
     updateWorldStatus,
     updateWorldSyncStatus,
+    updateWorldSyncEnabled,
     {
         syncStates
     }
 ) {
-    return function updateAllWorldsStatus ({data, achievements, other}) {
+    return function updateAllWorldsStatus ({worlds, data, achievements, other}) {
+        for (const world of worlds) {
+            updateWorldSyncEnabled({
+                marketId: world.market,
+                worldNumber: world.num,
+                enabled: world.sync_enabled
+            });
+        }
+
         for (const worldId of data) {
             updateWorldStatus({worldId}, syncStates.START);
         }
@@ -112,15 +122,31 @@ define('updateWorldSyncStatus', [
     };
 });
 
+define('updateWorldSyncEnabled', [
+    'backendValues'
+], function (
+    {
+        syncStates
+    }
+) {
+    return function updateWorldSyncEnabled ({marketId, worldNumber, enabled}) {
+        const worldId = marketId + worldNumber;
+        const $button = document.querySelector(`#${worldId} .sync-toggle`);
+        $button.innerHTML = enabled ? 'Disable sync' : 'Enable sync';
+    };
+});
+
 require([
     'updateAllWorldsStatus',
     'updateWorldStatus',
     'updateWorldSyncStatus',
+    'updateWorldSyncEnabled',
     'backendValues'
 ], function (
     updateAllWorldsStatus,
     updateWorldStatus,
     updateWorldSyncStatus,
+    updateWorldSyncEnabled,
     {
         development,
         syncStates
@@ -132,7 +158,8 @@ require([
         const $worldButtons = Array.from($worlds).map(function ($world) {
             return [
                 $world.querySelector('.sync-data'),
-                $world.querySelector('.sync-achievements')
+                $world.querySelector('.sync-achievements'),
+                $world.querySelector('.sync-toggle')
             ];
         });
 
@@ -141,9 +168,13 @@ require([
                 $button.addEventListener('click', function (event) {
                     event.preventDefault();
 
-                    if ($button.dataset.active === 'no') {
+                    if ($button.dataset.active) {
+                        if ($button.dataset.active === 'no') {
+                            fetch(this.href);
+                            $button.dataset.active = 'yes';
+                        }
+                    } else {
                         fetch(this.href);
-                        $button.dataset.active = 'yes';
                     }
                 });
             }
@@ -179,6 +210,10 @@ require([
                 }
                 case syncStates.WORLDS_FINISH: {
                     updateWorldSyncStatus(false);
+                    break;
+                }
+                case syncStates.TOGGLE_WORLD: {
+                    updateWorldSyncEnabled(value);
                     break;
                 }
                 default: {

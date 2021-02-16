@@ -36,7 +36,8 @@ CREATE TABLE public.worlds (
     time_offset INT,
     close_date TIMESTAMP NULL,
     open_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
-    incomplete_data BOOLEAN DEFAULT FALSE
+    incomplete_data BOOLEAN DEFAULT FALSE,
+    sync_enabled BOOLEAN DEFAULT TRUE
 );
 
 CREATE TYPE public.map_share_type AS ENUM ('static', 'dynamic');

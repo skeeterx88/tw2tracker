@@ -1,3 +1,3 @@
 SELECT * FROM public.worlds
-WHERE open
+WHERE open AND sync_enabled
 ORDER BY market ASC, num ASC
