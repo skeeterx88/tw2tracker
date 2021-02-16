@@ -70,7 +70,7 @@ module.exports = async function (marketId, worldNumber) {
                 loadTribes(offset + (RANKING_QUERY_COUNT * 3))
             ]);
 
-            await sleep(150);
+            // await sleep(150);
         }
     };
 
@@ -113,7 +113,7 @@ module.exports = async function (marketId, worldNumber) {
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
             ]);
 
-            await sleep(150);
+            // await sleep(150);
         }
     };
 
