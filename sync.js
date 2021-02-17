@@ -98,7 +98,7 @@ Sync.init = async function () {
         }
     });
 
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV !== 'development') {
         tasks.initChecker();
     }
 };
