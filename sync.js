@@ -116,72 +116,69 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     let page;
 
     try {
-        const world = await getWorld(marketId, worldNumber);
+        await utils.timeout(async function () {
+            const world = await getWorld(marketId, worldNumber);
 
-        if (!world.sync_enabled) {
-            const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
-            return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, date]);
-        }
-
-        const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
-
-        if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
-            const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60;
-            if (minutesSinceLastSync < config.scraper_interval_minutes) {
-                debug.sync('world:%s already sinced', worldId, attempt);
-                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, syncDate]);
+            if (!world.sync_enabled) {
+                const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
+                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, date]);
             }
-        }
 
-        page = await createPuppeteerPage();
+            const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
 
-        const account = await Sync.auth(marketId, credentials);
-        const worldCharacter = account.characters.find(({world_id}) => world_id === worldId);
+            if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
+                const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60;
+                if (minutesSinceLastSync < config.scraper_interval_minutes) {
+                    debug.sync('world:%s already sinced', worldId, attempt);
+                    return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, syncDate]);
+                }
+            }
 
-        if (!worldCharacter) {
-            await Sync.character(marketId, worldNumber);
-        } else if (!worldCharacter.allow_login) {
-            await db.query(sql.closeWorld, [marketId, worldNumber]);
-            debug.sync('world:%s closing', worldId);
-            return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate]);
-        }
+            page = await createPuppeteerPage();
 
-        debug.sync('world:%s loading game page', worldId);
+            const account = await Sync.auth(marketId, credentials);
+            const worldCharacter = account.characters.find(({world_id}) => world_id === worldId);
 
-        const urlId = marketId === 'zz' ? 'beta' : marketId;
-        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
+            if (!worldCharacter) {
+                await Sync.character(marketId, worldNumber);
+            } else if (!worldCharacter.allow_login) {
+                await db.query(sql.closeWorld, [marketId, worldNumber]);
+                debug.sync('world:%s closing', worldId);
+                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate]);
+            }
 
-        debug.sync('world:%s waiting ready state', worldId);
+            const urlId = marketId === 'zz' ? 'beta' : marketId;
+            await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
 
-        await page.evaluate(scraperReadyState);
+            debug.sync('world:%s waiting ready state', worldId);
 
-        if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
-            await fetchWorldMapStructure(page, worldId, urlId);
-        }
+            await page.evaluate(scraperReadyState);
 
-        if (!world.config) {
-            await fetchWorldConfig(page, worldId);
-        }
+            if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
+                await fetchWorldMapStructure(page, worldId, urlId);
+            }
 
-        if (world.time_offset === null) {
-            await fetchWorldTimeOffset(page, worldId);
-        }
+            if (!world.config) {
+                await fetchWorldConfig(page, worldId);
+            }
 
-        debug.sync('world:%s fetching data', worldId);
+            if (world.time_offset === null) {
+                await fetchWorldTimeOffset(page, worldId);
+            }
 
-        const data = await utils.timeout(async function () {
-            return await page.evaluate(scraperData);
-        }, '2 minutes');
+            debug.sync('world:%s fetching data', worldId);
 
-        await commitRawDataFilesystem(data, worldId);
-        await commitDataDatabase(data, worldId);
-        await commitDataFilesystem(worldId);
+            const data = await page.evaluate(scraperData);
+            await commitRawDataFilesystem(data, worldId);
+            await commitDataDatabase(data, worldId);
+            await commitDataFilesystem(worldId);
 
-        await page.close();
+            await page.close();
 
-        debug.sync('world:%s data sync finished', worldId);
-        const date = await updateSyncLastStatus('data', enums.SYNC_SUCCESS, marketId, worldNumber);
-        Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
+            debug.sync('world:%s data sync finished', worldId);
+            const date = await updateSyncLastStatus('data', enums.SYNC_SUCCESS, marketId, worldNumber);
+            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
+        }, '3 minutes');
     } catch (error) {
         debug.sync('world:%s data sync failed (%s)', worldId, error.message);
 
@@ -214,34 +211,33 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     let page;
 
     try {
-        const world = await getWorld(marketId, worldNumber);
+        await utils.timeout(async function () {
+            const world = await getWorld(marketId, worldNumber);
 
-        if (!world.sync_enabled) {
-            const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
-            return Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, date]);
-        }
+            if (!world.sync_enabled) {
+                const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
+                return Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, date]);
+            }
 
-        const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
+            const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
 
-        page = await createPuppeteerPage();
+            page = await createPuppeteerPage();
 
-        const account = await Sync.auth(marketId, credentials);
-        const urlId = marketId === 'zz' ? 'beta' : marketId;
-        await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
-        await page.evaluate(scraperReadyState);
+            const account = await Sync.auth(marketId, credentials);
+            const urlId = marketId === 'zz' ? 'beta' : marketId;
+            await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
+            await page.evaluate(scraperReadyState);
 
-        const achievements = await utils.timeout(async function () {
-            return await page.evaluate(scraperAchievements, marketId, worldNumber);
+            const achievements =  await page.evaluate(scraperAchievements, marketId, worldNumber);
+            await commitRawAchievementsFilesystem(achievements, worldId);
+            await commitAchievementsDatabase(achievements, worldId);
+
+            await page.close();
+
+            debug.sync('world:%s achievements sync finished', worldId);
+            const date = await updateSyncLastStatus('achievements', enums.SYNC_SUCCESS, marketId, worldNumber);
+            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
         }, '20 minutes');
-
-        await commitRawAchievementsFilesystem(achievements, worldId);
-        await commitAchievementsDatabase(achievements, worldId);
-
-        await page.close();
-
-        debug.sync('world:%s achievements sync finished', worldId);
-        const date = await updateSyncLastStatus('achievements', enums.SYNC_SUCCESS, marketId, worldNumber);
-        Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
     } catch (error) {
         debug.sync('world:%s achievements sync failed (%s)', worldId, error.message);
 
