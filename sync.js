@@ -351,7 +351,7 @@ Sync.achievementsAll = async function (flag) {
 Sync.worlds = async function () {
     debug.worlds('start world list sync');
 
-    const markets = await db.any(sql.markets.withAccount);
+    const markets = await db.any(sql.getMarkets);
 
     Events.trigger(enums.SYNC_WORLDS_START);
 
@@ -416,7 +416,7 @@ Sync.worlds = async function () {
 Sync.markets = async function () {
     debug.sync('start market list sync');
 
-    const storedMarkets = await db.map(sql.markets.all, [], market => market.id);
+    const storedMarkets = await db.map(sql.getMarkets, [], market => market.id);
     const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html');
     const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a');
 
@@ -427,8 +427,8 @@ Sync.markets = async function () {
 
     const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId));
 
-    for (const missingMarket of missingMarkets) {
-        await db.query(sql.markets.add, missingMarket);
+    for (const marketId of missingMarkets) {
+        await db.query(sql.addMarket, {marketId});
     }
 
     return missingMarkets;
@@ -472,6 +472,12 @@ Sync.auth = async function (marketId, attempt = 1) {
     }
 
     const accounts = await db.any(sql.getMarketAccounts, {marketId});
+
+    if (!accounts.length) {
+        debug.auth('market:%s do not have any accounts', marketId, attempt);
+        return false;
+    }
+
     const credentials = accounts[attempt - 1];
 
     if (!credentials) {

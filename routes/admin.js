@@ -15,7 +15,7 @@ router.use(connectEnsureLogin.ensureLoggedIn());
 const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
     const closedWorlds = await db.any(sql.getClosedWorlds);
-    const markets = await db.any(sql.markets.all);
+    const markets = await db.any(sql.getMarkets);
     const development = process.env.NODE_ENV === 'development';
 
     res.render('admin', {
@@ -34,10 +34,10 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
 const syncDataRouter = utils.asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = parseInt(req.params.worldNumber, 10);
-    const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id);
+    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
     const worlds = await db.map(sql.getWorlds, [], world => world.num);
-    
-    if (enabledMarkets.includes(marketId) && worlds.includes(worldNumber)) {
+
+    if (marketsWithAccounts.includes(marketId) && worlds.includes(worldNumber)) {
         syncSocket.send(JSON.stringify({
             code: enums.SYNC_REQUEST_SYNC_DATA,
             marketId,
@@ -59,10 +59,10 @@ const syncDataAllRouter = utils.asyncRouter(async function (req, res) {
 const syncAchievementsRouter = utils.asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = parseInt(req.params.worldNumber, 10);
-    const enabledMarkets = await db.map(sql.markets.withAccount, [], market => market.id);
+    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
     const worlds = await db.map(sql.getWorlds, [], world => world.num);
 
-    if (enabledMarkets.includes(marketId) && worlds.includes(worldNumber)) {
+    if (marketsWithAccounts.includes(marketId) && worlds.includes(worldNumber)) {
         syncSocket.send(JSON.stringify({
             code: enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS,
             marketId,

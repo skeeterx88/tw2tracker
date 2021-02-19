@@ -19,7 +19,7 @@ CREATE TABLE public.accounts (
     id SERIAL PRIMARY KEY,
     name VARCHAR (255) NOT NULL,
     pass VARCHAR (255) NOT NULL,
-    markets VARCHAR[]
+    markets VARCHAR[] DEFAULT '{}'
 );
 
 CREATE TYPE public.map_sync_status AS ENUM ('success', 'fail');

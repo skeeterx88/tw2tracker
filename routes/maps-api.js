@@ -60,9 +60,9 @@ const getOpenWorldsRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const getMarketsRouters = utils.asyncRouter(async function (req, res) {
-    const allMarkets = await db.map(sql.markets.withAccount, [], market => market.id);
+    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(allMarkets));
+    res.end(JSON.stringify(marketsWithAccounts));
 });
 
 const getContinentRouter = utils.asyncRouter(async function (req, res) {
