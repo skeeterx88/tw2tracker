@@ -12,9 +12,14 @@ CREATE TABLE public.tasks (
 );
 
 CREATE TABLE public.markets (
-    id VARCHAR (10) PRIMARY KEY,
-    account_name VARCHAR (255) DEFAULT 'tribalwarstracker',
-    account_password VARCHAR (255) DEFAULT '7FONlraMpdnvrNIVE8aOgSGISVW00A'
+    id VARCHAR (10) PRIMARY KEY
+);
+
+CREATE TABLE public.accounts (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR (255) NOT NULL,
+    pass VARCHAR (255) NOT NULL,
+    markets VARCHAR[]
 );
 
 CREATE TYPE public.map_sync_status AS ENUM ('success', 'fail');

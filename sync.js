@@ -33,7 +33,7 @@ let syncWorldListRunning = false;
 const updateSyncStatusMap = {
     data: sql.updateDataSync,
     achievements: sql.updateAchievementsSync
-}
+};
 
 Sync.init = async function () {
     debug.sync('initializing sync system');
@@ -118,13 +118,12 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     try {
         await utils.timeout(async function () {
             const world = await getWorld(marketId, worldNumber);
+            const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             if (!world.sync_enabled) {
                 const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
                 return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, date]);
             }
-
-            const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
 
             if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
                 const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60;
@@ -134,9 +133,14 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
                 }
             }
 
-            page = await createPuppeteerPage();
+            const account = await Sync.auth(marketId);
 
-            const account = await Sync.auth(marketId, credentials);
+            if (!account) {
+                debug.sync('world:%s all accounts failed to authenticate', worldId);
+                const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
+                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS, date]);
+            }
+
             const worldCharacter = account.characters.find(({world_id}) => world_id === worldId);
 
             if (!worldCharacter) {
@@ -147,7 +151,8 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
                 return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate]);
             }
 
-            const urlId = marketId === 'zz' ? 'beta' : marketId;
+            
+            page = await createPuppeteerPage();
             await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
 
             debug.sync('world:%s waiting ready state', worldId);
@@ -213,22 +218,26 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     try {
         await utils.timeout(async function () {
             const world = await getWorld(marketId, worldNumber);
+            const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             if (!world.sync_enabled) {
                 const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
                 return Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, date]);
             }
 
-            const credentials = await db.one(sql.markets.oneWithAccount, [marketId]);
+            const account = await Sync.auth(marketId);
+
+            if (!account) {
+                debug.sync('world:%s all accounts failed to authenticate', worldId);
+                const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
+                return Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS, date]);
+            }
 
             page = await createPuppeteerPage();
-
-            const account = await Sync.auth(marketId, credentials);
-            const urlId = marketId === 'zz' ? 'beta' : marketId;
             await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
             await page.evaluate(scraperReadyState);
 
-            const achievements =  await page.evaluate(scraperAchievements, marketId, worldNumber);
+            const achievements = await page.evaluate(scraperAchievements, marketId, worldNumber);
             await commitRawAchievementsFilesystem(achievements, worldId);
             await commitAchievementsDatabase(achievements, worldId);
 
@@ -352,7 +361,7 @@ Sync.worlds = async function () {
         debug.worlds('market:%s check missing worlds', marketId);
 
         try {
-            const account = await Sync.auth(marketId, market);
+            const account = await Sync.auth(marketId);
 
             if (!account) {
                 continue;
@@ -457,9 +466,17 @@ Sync.character = async function (marketId, worldNumber) {
     }
 };
 
-Sync.auth = async function (marketId, {account_name, account_password}, attempt = 1) {
+Sync.auth = async function (marketId, attempt = 1) {
     if (utils.hasOwn(auths, marketId)) {
         return await auths[marketId];
+    }
+
+    const accounts = await db.any(sql.getMarketAccounts, {marketId});
+    const credentials = accounts[attempt - 1];
+
+    if (!credentials) {
+        debug.auth('market:%s all accounts failed to authenticate', marketId, attempt);
+        return false;
     }
 
     debug.auth('market:%s authenticating (attempt %d)', marketId, attempt);
@@ -477,27 +494,23 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
                 waitUntil: ['domcontentloaded', 'networkidle0']
             });
 
-            const account = await page.evaluate(function (account_name, account_password, marketId) {
-                return new Promise(function (resolve) {
+            const account = await page.evaluate(function (marketId, credentials) {
+                return new Promise(function (resolve, reject) {
                     const socketService = injector.get('socketService');
                     const routeProvider = injector.get('routeProvider');
 
                     const loginTimeout = setTimeout(function () {
-                        resolve(false);
+                        reject('emit credentials timeout');
                     }, 5000);
 
                     debug('market:%s emit login command', marketId);
 
-                    socketService.emit(routeProvider.LOGIN, {
-                        name: account_name,
-                        pass: account_password,
-                        ref_param: ''
-                    }, function (data) {
+                    socketService.emit(routeProvider.LOGIN, {...credentials, ref_param: ''}, function (data) {
                         clearTimeout(loginTimeout);
                         resolve(data);
                     });
                 });
-            }, account_name, account_password, marketId);
+            }, marketId, credentials);
 
             if (!account) {
                 const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent);
@@ -542,20 +555,17 @@ Sync.auth = async function (marketId, {account_name, account_password}, attempt 
 
         return await auths[marketId];
     } catch (error) {
+        delete auths[marketId];
+
         if (page) {
             await page.close();
         }
 
-        debug.auth('market:%s authentication failed (%s)', marketId, error.message);
-
         if (attempt < config.sync.max_login_attempts) {
-            attempt++;
-
-            return await Sync.auth(marketId, {
-                account_name,
-                account_password
-            }, attempt);
+            debug.auth('market:%s authentication failed (%s)', marketId, error.message);
+            return await Sync.auth(marketId, attempt + 1);
         } else {
+            debug.auth('market:%s authentication failed (maximum attempts reached)');
             throw new Error(error.message);
         }
     }
