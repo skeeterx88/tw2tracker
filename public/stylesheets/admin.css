@@ -13,7 +13,7 @@
     text-align: right;
 }
 
-#sync-summary .active {
+.world-label {
     border: 1px solid #794929;
     border-radius: 2px;
     background: url(/images/noise.webp), linear-gradient(#8d5b39, #583f2d);
@@ -101,6 +101,26 @@
     border-left: none;
     border-bottom: none;
     padding: 0 3px;
+}
+
+#accounts .content-border {
+    background: #ab80455e;
+}
+
+#accounts p {
+    display: block;
+    margin: 5px 0px;
+}
+
+#accounts p span {
+    display: inline-block;
+    width: 50px;
+    text-align: right;
+    padding: 0 5px;
+}
+
+#accounts .actions {
+    margin: 10px 0px;
 }
 
 @media (max-width: 860px) {

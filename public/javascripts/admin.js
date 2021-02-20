@@ -47,7 +47,7 @@ define('updateWorldStatus', [
     function addActiveWorld ($container, worldId) {
         const $world = document.createElement('span');
         $world.innerHTML = worldId;
-        $world.classList.add('active');
+        $world.classList.add('world-label');
         $world.classList.add(worldId);
 
         $container.querySelector('.empty').style.display = 'none';

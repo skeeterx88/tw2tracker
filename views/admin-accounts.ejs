@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('./admin/head.ejs') %>
+    <body id="admin">
+        <header></header>
+        <%- include('./menu.ejs') %>
+
+        <main class="content-border">
+            <%- include('./navigation.ejs') %>
+
+            <div class="content">
+                <div class="single">
+                    <div id="accounts">
+                        <section>
+                            <h1>Accounts</h1>
+
+                            <div class="content-border">
+                                <% for (let account of accounts) { %>
+                                    <div class="account account-<%= account.id %>" data-account-id="<%= account.id %>">
+                                        <p>
+                                            <span>Name:</span>
+                                            <input type="text" class="relax-input" name="name" value="<%= account.name %>">
+                                        </p>
+                                        <p>
+                                            <span>Pass:</span>
+                                            <input type="text" class="relax-input" name="pass" value="<%= account.pass %>">
+                                        </p>
+
+                                        <fieldset>
+                                            <legend>Account markets:</legend>
+                                            <% for (let marketId of account.markets) { %>
+                                                <a href="/admin/accounts/remove-market/<%= account.id %>/<%= marketId %>"><span title="<%= marketId %>" class="flag-<%= marketId %>"></span></a>
+                                            <% } %>
+                                        </fieldset>
+
+                                        <div class="actions">
+                                            <a class="relax-button small" href="/admin/accounts/add-market/<%= account.id %>">Add market</a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="right"></div>
+            </div>
+        </main>
+
+        <%- include('./footer.ejs') %>
+
+        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
+        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
+    </body>
+</html>

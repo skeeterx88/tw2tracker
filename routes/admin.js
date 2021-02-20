@@ -9,6 +9,7 @@ const config = require('../config.js');
 const enums = require('../enums.js');
 const syncSocket = require('../sync-socket.js');
 const debug = require('../debug.js');
+const development = process.env.NODE_ENV === 'development';
 
 router.use(connectEnsureLogin.ensureLoggedIn());
 
@@ -16,10 +17,10 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
     const closedWorlds = await db.any(sql.getClosedWorlds);
     const markets = await db.any(sql.getMarkets);
-    const development = process.env.NODE_ENV === 'development';
 
     res.render('admin', {
         title: `Admin Panel - ${config.site_name}`,
+        subPage: 'sync',
         openWorlds,
         closedWorlds,
         markets,
@@ -118,7 +119,25 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
     res.end('ok');
 });
 
+const accountsRouter = utils.asyncRouter(async function (req, res) {
+    const accounts = await db.any(sql.getAccounts);
+    const markets = await db.any(sql.getMarkets);
+
+    res.render('admin', {
+        title: `Admin Panel - Accounts - ${config.site_name}`,
+        subPage: 'accounts',
+        accounts,
+        markets,
+        backendValues: {
+            development,
+            syncStates: enums.syncStates
+        },
+        ...utils.ejsHelpers
+    });
+});
+
 router.get('/', adminPanelRouter);
+router.get('/accounts', accountsRouter);
 router.get('/sync/data/all', syncDataAllRouter);
 router.get('/sync/data/:marketId/:worldNumber', syncDataRouter);
 router.get('/sync/achievements/all', syncAchievementsAllRouter);

@@ -8,84 +8,12 @@
         <main class="content-border">
             <%- include('./navigation.ejs') %>
 
-            <div class="content">
-                <div class="left">
-                    <div id="sync">
-                        <section id="sync-summary">
-                            <h1>Sync Summary</h1>
+            <ul class="sub-menu">
+                <a href="/admin/sync"><li <% __append(subPage === 'sync' ? ' class="selected"' : '') %>>Sync</li></a>
+                <a href="/admin/accounts"><li <% __append(subPage === 'accounts' ? ' class="selected"' : '') %>>Accounts</li></a>
+            </ul>
 
-                            <div class="content-border">
-                                <p>
-                                    <label>Sync data all worlds active:</label>
-                                    <span id="sync-data-all-active">No</span>
-                                </p>
-
-                                <p>
-                                    <label>Currently active sync data worlds:</label>
-                                    <span id="sync-active-data-worlds"><span class="empty">None</span></span>
-                                </p>
-
-                                <p>
-                                    <label>Sync achievements all worlds active:</label>
-                                    <span id="sync-achievements-all-active">No</span>
-                                </p>
-
-                                <p>
-                                    <label>Currently active sync achievement worlds:</label>
-                                    <span id="sync-active-achievement-worlds"><span class="empty">None</span></span>
-                                </p>
-                            </div>
-                        </section>
-
-                        <section id="sync-panel">
-                            <h1>Sync Panel</h1>
-
-                            <div class="content-border">
-                                <ul>
-                                    <li><a id="sync-world-list" class="relax-button small" data-active="no" href="/admin/sync/worlds">Sync world list</a></li>
-                                </ul>
-                            </div>
-                        </section>
-
-                        <section id="sync-worlds">
-                            <h1>Sync Worlds</h1>
-
-                            <div class="content-border">
-                                <% for (let world of openWorlds) { %>
-                                    <div class="world world-container" id="<%= world.world_id %>" data-market-id="<%= world.market %>" data-world-number="<%= world.num %>">
-                                        <div class="short-info">
-                                            <p class="world-id">
-                                                <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
-                                            </p>
-                                            <fieldset>
-                                                <legend>Data sync:</legend>
-                                                <p>Last time: <span class="last-data-sync-date"><% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date) : 'never') %></span></p>
-                                                <p>Last status: <span class="last-data-sync-status"><% __append(world.last_data_sync_status || '-') %></span></p>
-                                            </fieldset>
-                                            <fieldset>
-                                                <legend>Achievements sync:</legend>
-                                                <p>Last time: <span class="last-achievements-sync-date"><% __append(world.last_achievements_sync_date ? formatDate(world.last_achievements_sync_date) : 'never') %></span></p>
-                                                <p>Last status: <span class="last-achievements-sync-status"><% __append(world.last_achievements_sync_status || '-') %></span></p>
-                                            </fieldset>
-                                        </div>
-
-                                        <div class="actions">
-                                            <ul>
-                                                <% if (world.open) { -%>
-                                                    <li><a class="sync-toggle relax-button small" href="/admin/sync/toggle/<%= world.market %>/<%= world.num %>">Disable sync</a></li>
-                                                    <li><a class="sync-data relax-button small" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>">Sync data</a></li>
-                                                    <li><a class="sync-achievements relax-button small" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>">Sync achievements</a></li>
-                                                <% } -%>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                <% } %>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-                <div class="right"></div>
-            </div>
+            <%- include('./admin/' + subPage + '.ejs') %>
         </main>
 
         <%- include('./footer.ejs') %>
