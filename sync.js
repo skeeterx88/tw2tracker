@@ -1,7 +1,6 @@
 const fs = require('fs');
 const zlib = require('zlib');
 const path = require('path');
-const colors = require('colors/safe');
 const WebSocket = require('ws');
 const humanInterval = require('human-interval');
 
@@ -101,6 +100,8 @@ Sync.init = async function () {
     if (process.env.NODE_ENV !== 'development') {
         tasks.initChecker();
     }
+
+    // await Sync.worlds();
 };
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
