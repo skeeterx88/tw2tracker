@@ -17,6 +17,7 @@
         await db.query(sql.createSchema);
     }
 
+    const server = require('./server.js');
     const cluster = require('cluster');
 
     if (cluster.isMaster) {
@@ -25,8 +26,12 @@
 
         Sync.init();
 
-        for (let i = 0; i < cpus.length; i++) {
-            cluster.fork();
+        if (process.env.NODE_ENV === 'development') {
+            server();
+        } else {
+            for (let i = 0; i < l; i++) {
+                cluster.fork();
+            }
         }
     } else {
         const server = require('./server.js');
