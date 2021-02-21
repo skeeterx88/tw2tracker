@@ -149,7 +149,8 @@ require([
     updateWorldSyncEnabled,
     {
         development,
-        syncStates
+        syncStates,
+        subPage
     }
 ) {
     function setupSync () {
@@ -224,6 +225,8 @@ require([
         });
     }
 
-    setupSync();
-    setupSocket();
+    if (subPage === 'sync') {
+        setupSync();
+        setupSocket();
+    }
 });

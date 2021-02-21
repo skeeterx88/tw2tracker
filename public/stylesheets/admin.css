@@ -107,6 +107,12 @@
     background: #ab80455e;
 }
 
+#accounts .account {
+    display: block;
+    width: 96%;
+    max-width: 500px;
+}
+
 #accounts p {
     display: block;
     margin: 5px 0px;
@@ -114,13 +120,18 @@
 
 #accounts p span {
     display: inline-block;
-    width: 50px;
+    width: 10%;
     text-align: right;
-    padding: 0 5px;
 }
 
 #accounts .actions {
     margin: 10px 0px;
+}
+
+#accounts .relax-input {
+    height: 17px;
+    width: 80%;
+    font-family: monospace;
 }
 
 @media (max-width: 860px) {

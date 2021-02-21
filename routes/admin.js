@@ -17,16 +17,18 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
     const closedWorlds = await db.any(sql.getClosedWorlds);
     const markets = await db.any(sql.getMarkets);
+    const subPage = 'sync';
 
     res.render('admin', {
         title: `Admin Panel - ${config.site_name}`,
-        subPage: 'sync',
+        subPage,
         openWorlds,
         closedWorlds,
         markets,
         backendValues: {
             development,
-            syncStates: enums.syncStates
+            syncStates: enums.syncStates,
+            subPage
         },
         ...utils.ejsHelpers
     });
@@ -122,21 +124,23 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
 const accountsRouter = utils.asyncRouter(async function (req, res) {
     const accounts = await db.any(sql.getAccounts);
     const markets = await db.any(sql.getMarkets);
+    const subPage = 'accounts';
 
     res.render('admin', {
         title: `Admin Panel - Accounts - ${config.site_name}`,
-        subPage: 'accounts',
+        subPage,
         accounts,
         markets,
         backendValues: {
             development,
-            syncStates: enums.syncStates
+            syncStates: enums.syncStates,
+            subPage
         },
         ...utils.ejsHelpers
     });
 });
 
-router.get('/', adminPanelRouter);
+router.get('/sync', adminPanelRouter);
 router.get('/accounts', accountsRouter);
 router.get('/sync/data/all', syncDataAllRouter);
 router.get('/sync/data/:marketId/:worldNumber', syncDataRouter);
