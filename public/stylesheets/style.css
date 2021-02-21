@@ -322,6 +322,7 @@ menu .icon-heart {
     padding: 0px 5px;
     outline: none;
     cursor: pointer;
+    text-decoration: none;
     color: #e0bfbf;
     text-shadow: 1px 1px 0px #000;
     border-radius: 1px;
@@ -335,8 +336,22 @@ menu .icon-heart {
                 inset -1px -1px 2px #000;
 }
 
+.relax-button:hover {
+    background: url(/images/noise.webp), linear-gradient(#af7046, #583f2d);
+    color: #e0bfbf;
+    text-decoration: none;
+}
+
 .relax-button.small {
     height: 20px;
+}
+
+.relax-button.red {
+    background: url(/images/noise.webp), linear-gradient(#b33b3b, #843838);
+}
+
+.relax-button.red:hover {
+    background: url(/images/noise.webp), linear-gradient(#ca5151, #843838);
 }
 
 form input[type="submit"]:hover,
