@@ -28,7 +28,9 @@
                             </fieldset>
 
                             <div class="actions">
-                                <a class="relax-button small" href="/admin/accounts/add-market/<%= account.id %>">Add market</a>
+                                <a class="relax-button small" href="/admin/accounts/add-market/<%= account.id %>">Add markets</a>
+                                <a class="relax-button small" href="/admin/accounts/test/<%= account.id %>">Test account</a>
+                                <a class="relax-button small red" href="/admin/accounts/delete/<%= account.id %>">Delete account</a>
                             </div>
                         </div>
                     <% } %>
@@ -36,5 +38,4 @@
             </section>
         </div>
     </div>
-    <div class="right"></div>
 </div>
