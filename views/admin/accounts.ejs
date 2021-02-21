@@ -18,8 +18,12 @@
 
                             <fieldset>
                                 <legend>Account markets:</legend>
-                                <% for (let marketId of account.markets) { %>
-                                    <a href="/admin/accounts/remove-market/<%= account.id %>/<%= marketId %>"><span title="<%= marketId %>" class="flag-<%= marketId %>"></span></a>
+                                <% if (account.markets.length) { %>
+                                    <% for (let marketId of account.markets) { %>
+                                        <a href="/admin/accounts/remove-market/<%= account.id %>/<%= marketId %>"><span title="Click to remove market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
+                                    <% } %>
+                                <% } else { %>
+                                    <span>This account have no markets.</span>
                                 <% } %>
                             </fieldset>
 
