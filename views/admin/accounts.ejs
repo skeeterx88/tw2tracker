@@ -6,15 +6,19 @@
 
                 <div class="content-border">
                     <% for (let account of accounts) { %>
-                        <div class="account account-<%= account.id %>" data-account-id="<%= account.id %>">
-                            <p>
-                                <span>Name:</span>
-                                <input type="text" class="relax-input" name="name" value="<%= account.name %>">
-                            </p>
-                            <p>
-                                <span>Pass:</span>
-                                <input type="text" class="relax-input" name="pass" value="<%= account.pass %>">
-                            </p>
+                        <div class="account account-<%= account.id %> world-container" data-account-id="<%= account.id %>">
+                            <form method="POST" action="/admin/accounts/update">
+                                <p>
+                                    <span>Name:</span>
+                                    <input type="text" class="relax-input" name="name" value="<%= account.name %>">
+                                </p>
+                                <p>
+                                    <span>Pass:</span>
+                                    <input type="text" class="relax-input" name="pass" value="<%= account.pass %>">
+                                </p>
+
+                                <input type="hidden" name="id" value="<%= account.id %>"/>
+                            </form>
 
                             <fieldset>
                                 <legend>Account markets:</legend>
