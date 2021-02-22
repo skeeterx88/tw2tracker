@@ -354,6 +354,14 @@ menu .icon-heart {
     background: url(/images/noise.webp), linear-gradient(#ca5151, #843838);
 }
 
+.relax-button.green {
+    background: url(/images/noise.webp), linear-gradient(#47a439, #1a5b1b);
+}
+
+.relax-button.green:hover {
+    background: url(/images/noise.webp), linear-gradient(#46c134, #1a5b1b);
+}
+
 form input[type="submit"]:hover,
 form input[type="submit"]:focus {
     background: url(/images/noise.webp), linear-gradient(#af7046, #583f2d);

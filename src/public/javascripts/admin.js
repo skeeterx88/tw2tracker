@@ -132,7 +132,16 @@ define('updateWorldSyncEnabled', [
     return function updateWorldSyncEnabled ({marketId, worldNumber, enabled}) {
         const worldId = marketId + worldNumber;
         const $button = document.querySelector(`#${worldId} .sync-toggle`);
-        $button.innerHTML = enabled ? 'Disable sync' : 'Enable sync';
+
+        if (enabled) {
+            $button.classList.add('red');
+            $button.classList.remove('green');
+            $button.innerHTML = 'Disable sync';
+        } else {
+            $button.classList.add('green');
+            $button.classList.remove('red');
+            $button.innerHTML = 'Enable sync';
+        }
     };
 });
 
