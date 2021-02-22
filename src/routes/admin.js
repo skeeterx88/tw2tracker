@@ -257,6 +257,7 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
     res.end('ok');
 });
 
+router.get('/', adminPanelRouter);
 router.get('/sync', adminPanelRouter);
 router.get('/sync/data/all', syncDataAllRouter);
 router.get('/sync/data/:marketId/:worldNumber', syncDataRouter);
