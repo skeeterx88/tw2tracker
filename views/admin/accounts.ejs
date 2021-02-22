@@ -7,7 +7,7 @@
                 <div class="content-border">
                     <% for (let account of accounts) { %>
                         <div class="account account-<%= account.id %> world-container" data-account-id="<%= account.id %>">
-                            <form method="POST" action="/admin/accounts/update">
+                            <form method="POST" action="/admin/accounts/edit">
                                 <p>
                                     <span>Name:</span>
                                     <input type="text" class="relax-input" name="name" value="<%= account.name %>">
@@ -17,7 +17,8 @@
                                     <input type="text" class="relax-input" name="pass" value="<%= account.pass %>">
                                 </p>
 
-                                <input type="hidden" name="id" value="<%= account.id %>"/>
+                                <input type="hidden" name="id" value="<%= account.id %>" />
+                                <input type="submit" hidden />
                             </form>
 
                             <fieldset>
@@ -32,8 +33,8 @@
                             </fieldset>
 
                             <div class="actions">
-                                <a class="relax-button small" href="/admin/accounts/add-market/<%= account.id %>">Add markets</a>
-                                <a class="relax-button small" href="/admin/accounts/test/<%= account.id %>">Test account</a>
+                                <a class="relax-button small" href="/admin/accounts/markets/add/<%= account.id %>">Add markets</a>
+                                <a class="relax-button small" href="/admin/accounts/markets/remove/<%= account.id %>">Test account</a>
                                 <a class="relax-button small red" href="/admin/accounts/delete/<%= account.id %>">Delete account</a>
                             </div>
                         </div>

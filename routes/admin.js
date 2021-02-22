@@ -140,8 +140,124 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
     });
 });
 
+const accountsAddMarketRouter = utils.asyncRouter(async function (req, res) {
+    const accountId = req.params.accountId;
+    const marketId = req.params.marketId;
+    const account = await db.any(sql.getAccount, {accountId});
+    const market = await db.any(sql.getMarket, {marketId});
+
+    if (!account.length) {
+        return res.end(`Account "${accountId}" does not exist.`);
+    }
+
+    if (!market.length) {
+        return res.end(`Market "${marketId}" does not exist.`);
+    }
+
+    if (account[0].markets.includes(marketId)) {
+        return res.end('Account already has market included.');
+    }
+
+    await db.query(sql.addAccountMarket, {
+        accountId,
+        marketId
+    });
+
+    res.end('ok');
+});
+
+const accountsRemoveMarketRouter = utils.asyncRouter(async function (req, res) {
+    const accountId = req.params.accountId;
+    const marketId = req.params.marketId;
+    const account = await db.any(sql.getAccount, {accountId});
+    const market = await db.any(sql.getMarket, {marketId});
+
+    if (!account.length) {
+        return res.end(`Account "${accountId}" does not exist.`);
+    }
+
+    if (!market.length) {
+        return res.end(`Market "${marketId}" does not exist.`);
+    }
+
+    if (!account[0].markets.includes(marketId)) {
+        return res.end('Account already does not have market included.');
+    }
+
+    await db.query(sql.removeAccountMarket, {
+        accountId,
+        marketId
+    });
+
+    res.end('ok');
+});
+
+const accountsDeleteRouter = utils.asyncRouter(async function (req, res) {
+    const accountId = req.params.accountId;
+    const account = await db.any(sql.getAccount, {accountId});
+
+    if (!account.length) {
+        return res.end(`Account "${accountId}" does not exist.`);
+    }
+
+    await db.query(sql.deleteAccount, {
+        accountId,
+    });
+
+    res.end('ok');
+});
+
+const accountsEditRouter = utils.asyncRouter(async function (req, res) {
+    const {name, pass, id: accountId} = req.body;
+    const account = await db.any(sql.getAccount, {accountId});
+
+    if (!account.length) {
+        return res.end(`Account "${id}" does not exist.`);
+    }
+
+    if (pass.length < 4) {
+        return res.end(`Password minimum length is 4.`);
+    }
+
+    if (name.length < 4) {
+        return res.end(`Account name minimum length is 4.`);
+    }
+
+    await db.query(sql.editAccount, {
+        accountId,
+        name,
+        pass
+    });
+
+    res.end('ok');
+});
+
+const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
+    const {name, pass, id: accountId} = req.body;
+
+    if (pass.length < 4) {
+        return res.end(`Password minimum length is 4.`);
+    }
+
+    if (name.length < 4) {
+        return res.end(`Account name minimum length is 4.`);
+    }
+
+    const accountExists = await db.any(sql.getAccountByName, {name});
+
+    if (accountExists.length) {
+        return res.end(`Account with name "${name}" already exists.`);
+    }
+
+    await db.query(sql.addAccount, {
+        name,
+        pass
+    });
+
+    res.end('ok');
+});
+
 router.get('/sync', adminPanelRouter);
-router.get('/accounts', accountsRouter);
 router.get('/sync/data/all', syncDataAllRouter);
 router.get('/sync/data/:marketId/:worldNumber', syncDataRouter);
 router.get('/sync/achievements/all', syncAchievementsAllRouter);
@@ -149,5 +265,11 @@ router.get('/sync/achievements/:marketId/:worldNumber', syncAchievementsRouter);
 router.get('/sync/markets', scrapeMarketsRouter);
 router.get('/sync/worlds', scrapeWorldsRouter);
 router.get('/sync/toggle/:marketId/:worldNumber?', toggleSyncRouter);
+router.get('/accounts', accountsRouter);
+router.get('/accounts/markets/add/:accountId/:marketId', accountsAddMarketRouter);
+router.get('/accounts/markets/remove/:accountId/:marketId', accountsRemoveMarketRouter);
+router.get('/accounts/delete/:accountId', accountsDeleteRouter);
+router.post('/accounts/edit/', accountsEditRouter);
+router.post('/accounts/create/', accountsCreateRouter);
 
 module.exports = router;
