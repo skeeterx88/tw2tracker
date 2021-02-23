@@ -48,7 +48,7 @@ const syncDataRouter = utils.asyncRouter(async function (req, res) {
         }));
     }
     
-    res.end('ok');
+    res.redirect('/admin/sync');
 });
 
 const syncDataAllRouter = utils.asyncRouter(async function (req, res) {
@@ -56,7 +56,7 @@ const syncDataAllRouter = utils.asyncRouter(async function (req, res) {
         code: enums.SYNC_REQUEST_SYNC_DATA_ALL
     }));
 
-    res.end('ok');
+    res.redirect('/admin/sync');
 });
 
 const syncAchievementsRouter = utils.asyncRouter(async function (req, res) {
@@ -73,7 +73,7 @@ const syncAchievementsRouter = utils.asyncRouter(async function (req, res) {
         }));
     }
     
-    res.end('ok');
+    res.redirect('/admin/sync');
 });
 
 const syncAchievementsAllRouter = utils.asyncRouter(async function (req, res) {
@@ -81,7 +81,7 @@ const syncAchievementsAllRouter = utils.asyncRouter(async function (req, res) {
         code: enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL
     }));
 
-    res.end('ok');
+    res.redirect('/admin/sync');
 });
 
 const scrapeMarketsRouter = utils.asyncRouter(async function (req, res) {
@@ -89,7 +89,7 @@ const scrapeMarketsRouter = utils.asyncRouter(async function (req, res) {
         code: enums.SYNC_REQUEST_SYNC_MARKETS
     }));
 
-    res.end('ok');
+    res.redirect('/admin/sync');
 });
 
 const scrapeWorldsRouter = utils.asyncRouter(async function (req, res) {
@@ -97,7 +97,7 @@ const scrapeWorldsRouter = utils.asyncRouter(async function (req, res) {
         code: enums.SYNC_REQUEST_SYNC_WORLDS
     }));
 
-    res.end('ok');
+    res.redirect('/admin/sync');
 });
 
 const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
@@ -118,7 +118,7 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
         worldNumber
     }));
 
-    res.end('ok');
+    res.redirect('/admin/sync');
 });
 
 const accountsRouter = utils.asyncRouter(async function (req, res) {
