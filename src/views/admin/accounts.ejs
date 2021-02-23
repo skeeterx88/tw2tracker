@@ -1,6 +1,28 @@
 <div class="content">
     <div class="single">
         <div id="accounts">
+
+            <section>
+                <h1>Add Account</h1>
+
+                <div class="content-border">
+                    <div class="account world-container">
+                        <form method="POST" action="/admin/accounts/create">
+                            <p>
+                                <span>Name:</span>
+                                <input type="text" class="relax-input" name="name" minlength="4">
+                            </p>
+                            <p>
+                                <span>Pass:</span>
+                                <input type="text" class="relax-input" name="pass" minlength="4">
+                            </p>
+
+                            <input type="submit"  class="relax-button small" value="Add account"/>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
             <section>
                 <h1>Accounts</h1>
 
