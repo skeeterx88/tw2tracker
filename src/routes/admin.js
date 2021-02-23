@@ -122,9 +122,18 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const accountsRouter = utils.asyncRouter(async function (req, res) {
-    const accounts = await db.any(sql.getAccounts);
-    const markets = await db.any(sql.getMarkets);
     const subPage = 'accounts';
+    const markets = await db.map(sql.getMarkets, [], market => market.id);
+    const accounts = await db.map(sql.getAccounts, [], function (account) {
+        account.missingMarkets = getMissingMarkets(account.markets, markets);
+        return account;
+    });
+
+    function getMissingMarkets (accountMarkets, markets) {
+        return markets.filter(function (marketId) {
+            return !accountMarkets.includes(marketId);
+        });
+    }
 
     res.render('admin', {
         title: `Admin Panel - Accounts - ${config.site_name}`,

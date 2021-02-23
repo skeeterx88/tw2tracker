@@ -25,10 +25,21 @@
                                 <legend>Account markets:</legend>
                                 <% if (account.markets.length) { %>
                                     <% for (let marketId of account.markets) { %>
-                                        <a href="/admin/accounts/remove-market/<%= account.id %>/<%= marketId %>"><span title="Click to remove market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
+                                        <a href="/admin/accounts/markets/remove/<%= account.id %>/<%= marketId %>"><span title="Click to remove market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
                                     <% } %>
                                 <% } else { %>
-                                    <span>This account have no markets.</span>
+                                    <span>No markets included.</span>
+                                <% } %>
+                            </fieldset>
+
+                            <fieldset>
+                                <legend>Available markets:</legend>
+                                <% if (account.missingMarkets.length) { %>
+                                    <% for (let marketId of account.missingMarkets) { %>
+                                        <a href="/admin/accounts/markets/add/<%= account.id %>/<%= marketId %>"><span title="Click to add market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
+                                    <% } %>
+                                <% } else { %>
+                                    <span>All markets included.</span>
                                 <% } %>
                             </fieldset>
 
