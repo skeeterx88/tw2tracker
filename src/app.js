@@ -29,7 +29,7 @@
         if (process.env.NODE_ENV === 'development') {
             server();
         } else {
-            for (let i = 0; i < l; i++) {
+            for (let i = 0; i < cpus.length; i++) {
                 cluster.fork();
             }
         }
