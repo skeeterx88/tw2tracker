@@ -28,7 +28,7 @@
 
                 <div class="content-border">
                     <% for (let account of accounts) { %>
-                        <div class="account account-<%= account.id %> world-container" data-account-id="<%= account.id %>">
+                        <div id="account-<%= account.id %>" class="account world-container">
                             <form method="POST" action="/admin/accounts/edit">
                                 <p>
                                     <span>Name:</span>

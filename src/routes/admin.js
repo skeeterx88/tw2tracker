@@ -169,7 +169,7 @@ const accountsAddMarketRouter = utils.asyncRouter(async function (req, res) {
         marketId
     });
 
-    res.redirect('/admin/accounts');
+    res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
 const accountsRemoveMarketRouter = utils.asyncRouter(async function (req, res) {
@@ -195,7 +195,7 @@ const accountsRemoveMarketRouter = utils.asyncRouter(async function (req, res) {
         marketId
     });
 
-    res.redirect('/admin/accounts');
+    res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
 const accountsDeleteRouter = utils.asyncRouter(async function (req, res) {
@@ -235,7 +235,7 @@ const accountsEditRouter = utils.asyncRouter(async function (req, res) {
         pass
     });
 
-    res.redirect('/admin/accounts');
+    res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
 const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
@@ -260,7 +260,7 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
         pass
     });
 
-    res.redirect('/admin/accounts');
+    res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
 const router = Router();
