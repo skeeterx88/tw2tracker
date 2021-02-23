@@ -1,6 +1,5 @@
-const express = require('express');
-const router = express.Router();
-const connectEnsureLogin = require('connect-ensure-login');
+const {Router} = require('express');
+const {ensureLoggedIn} = require('connect-ensure-login');
 
 const db = require('../db.js');
 const sql = require('../sql.js');
@@ -10,8 +9,6 @@ const enums = require('../enums.js');
 const syncSocket = require('../sync-socket.js');
 const debug = require('../debug.js');
 const development = process.env.NODE_ENV === 'development';
-
-router.use(connectEnsureLogin.ensureLoggedIn());
 
 const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
@@ -266,6 +263,8 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/accounts');
 });
 
+const router = Router();
+router.use(ensureLoggedIn());
 router.get('/', adminPanelRouter);
 router.get('/sync', adminPanelRouter);
 router.get('/sync/data/all', syncDataAllRouter);
