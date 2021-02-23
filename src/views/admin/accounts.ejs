@@ -32,11 +32,11 @@
                             <form method="POST" action="/admin/accounts/edit">
                                 <p>
                                     <span>Name:</span>
-                                    <input type="text" class="relax-input" name="name" value="<%= account.name %>">
+                                    <input type="text" class="relax-input" name="name" value="<%= account.name %>" minlength="4">
                                 </p>
                                 <p>
                                     <span>Pass:</span>
-                                    <input type="text" class="relax-input" name="pass" value="<%= account.pass %>">
+                                    <input type="text" class="relax-input" name="pass" value="<%= account.pass %>" minlength="4">
                                 </p>
 
                                 <input type="hidden" name="id" value="<%= account.id %>" />
