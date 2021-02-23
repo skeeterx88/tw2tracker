@@ -34,6 +34,7 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
 const syncDataRouter = utils.asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = parseInt(req.params.worldNumber, 10);
+    const worldId = marketId + worldNumber;
     const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
     const worlds = await db.map(sql.getWorlds, [], world => world.num);
 
@@ -44,8 +45,8 @@ const syncDataRouter = utils.asyncRouter(async function (req, res) {
             worldNumber
         }));
     }
-    
-    res.redirect('/admin/sync');
+
+    res.redirect(`/admin/sync#world-${worldId}`);
 });
 
 const syncDataAllRouter = utils.asyncRouter(async function (req, res) {
@@ -59,6 +60,7 @@ const syncDataAllRouter = utils.asyncRouter(async function (req, res) {
 const syncAchievementsRouter = utils.asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = parseInt(req.params.worldNumber, 10);
+    const worldId = marketId + worldNumber;
     const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
     const worlds = await db.map(sql.getWorlds, [], world => world.num);
 
@@ -70,7 +72,7 @@ const syncAchievementsRouter = utils.asyncRouter(async function (req, res) {
         }));
     }
     
-    res.redirect('/admin/sync');
+    res.redirect(`/admin/sync#world-${worldId}`);
 });
 
 const syncAchievementsAllRouter = utils.asyncRouter(async function (req, res) {
@@ -100,6 +102,7 @@ const scrapeWorldsRouter = utils.asyncRouter(async function (req, res) {
 const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = req.params.worldNumber ? parseInt(req.params.worldNumber, 10) : false;
+    const worldId = marketId + worldNumber;
     const code = worldNumber ? enums.SYNC_TOGGLE_WORLD : enums.SYNC_TOGGLE_MARKET;
 
     if (!worldNumber) {
@@ -115,7 +118,7 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
         worldNumber
     }));
 
-    res.redirect('/admin/sync');
+    res.redirect(`/admin/sync#world-${worldId}`);
 });
 
 const accountsRouter = utils.asyncRouter(async function (req, res) {
