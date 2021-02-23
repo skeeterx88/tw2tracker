@@ -317,6 +317,10 @@ menu .icon-heart {
     text-shadow: none;
 }
 
+.relax-input:invalid {
+    border: 1px solid #BD4F44;
+}
+
 .relax-button {
     height: 26px;
     padding: 0px 5px;
