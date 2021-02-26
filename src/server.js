@@ -9,8 +9,12 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const passportLocal = require('passport-local');
+const connectFlash = require('connect-flash');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const db = require('./db.js');
+const sql = require('./sql.js');
 const config = require('./config.js');
 const enums = require('./enums.js');
 
@@ -47,16 +51,32 @@ app.use(session({
     cookie: {maxAge: 30 * 24 * 60 * 60 * 1000}
 }));
 
-passport.use(new passportLocal.Strategy(async function (username, password, callback) {
-    if (!config || !config.admin_password) {
-        return callback(null, false);
+passport.use(new passportLocal.Strategy({
+    passReqToCallback: true
+}, async function (req, name, pass, done) {
+    const [account] = await db.any(sql.getModAccountByName, {name});
+
+    if (!account) {
+        return done(null, false, {
+            message: enums.AUTH_ERROR_ACCOUNT_NOT_EXIST
+        });
     }
 
-    if (config.admin_password !== password) {
-        return callback(null, false);
+    if (!account.enabled) {
+        return done(null, false, {
+            message: enums.AUTH_ERROR_ACCOUNT_NOT_ENABLED
+        });
     }
 
-    callback(null, username);
+    const match = await bcrypt.compare(pass, account.pass);
+
+    if (!match) {
+        return done(null, false, {
+            message: enums.AUTH_ERROR_INVALID_PASSWORD
+        });
+    }
+
+    done(null, name);
 }));
 
 passport.serializeUser(function (username, callback) {
@@ -69,6 +89,7 @@ passport.deserializeUser(function (username, callback) {
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(connectFlash());
 
 const statsRouter = require('./routes/stats.js');
 const adminRouter = require('./routes/admin.js');

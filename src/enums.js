@@ -28,6 +28,11 @@ module.exports = {
     SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL: 'sync_request_sync_achievements_all',
     SYNC_REQUEST_SYNC_MARKETS: 'sync_request_sync_markets',
     SYNC_REQUEST_SYNC_WORLDS: 'sync_request_sync_worlds',
+
+    AUTH_ERROR_ACCOUNT_NOT_EXIST: 'auth_error_account_not_exist',
+    AUTH_ERROR_ACCOUNT_NOT_ENABLED: 'auth_error_account_not_enabled',
+    AUTH_ERROR_INVALID_PASSWORD: 'auth_error_invalid_password',
+
     EMPTY_CONTINENT: 'empty_continent',
     achievementCommitTypes: {
         ADD: 'add',

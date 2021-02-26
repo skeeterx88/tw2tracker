@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-    <%- include('./head.ejs') %>
-    <body>
+    <%- include('./admin/head.ejs') %>
+    <body id="admin">
         <header></header>
         <%- include('./menu.ejs') %>
 
@@ -9,24 +9,40 @@
             <%- include('./navigation.ejs') %>
 
             <div class="content">
-                <div class="single">
-                    <section id="worlds">
+                <div class="left">
+                    <section id="login">
                         <h1>Admin login</h1>
 
-                        <form action="/login" method="POST">
-                            <input type="password" name="password" placeholder="password" class="relax-input">
-                            <input type="submit" value="Login" class="relax-button">
-                            <input type="hidden" name="username" value="admin">
-                        </form>
+                        <% if (error) { %>
+                            <p class="error"><%= error %></p>
+                        <% } %>
+
+                        <div class="content-border">
+                            <form action="/login" method="POST">
+                                <label class="input">
+                                    <span>Name:</span>
+                                    <input type="text" class="relax-input" name="username" required>
+                                </label>
+                                <label class="input">
+                                    <span>Pass:</span>
+                                    <input type="password" class="relax-input" name="password" required>
+                                </label>
+
+                                <div class="actions">
+                                    <input type="submit" value="Login" class="relax-button">
+                                </div>
+                            </form>
+                        </div>
                     </section>
                 </div>
+                <div class="right"></div>
             </div>
         </main>
 
         <%- include('./footer.ejs') %>
 
         <script defer type="text/javascript">
-            document.querySelector('input[name=password]').focus()
+            document.querySelector('input[name=pass]').focus()
         </script>
     </body>
 </html>
