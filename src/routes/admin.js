@@ -10,6 +10,9 @@ const syncSocket = require('../sync-socket.js');
 const debug = require('../debug.js');
 const development = process.env.NODE_ENV === 'development';
 const pgArray = require('pg').types.arrayParser;
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const createError = require('http-errors');
 
 const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
@@ -288,6 +291,34 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
     });
 });
 
+const modsEditRouter = utils.asyncRouter(async function (req, res) {
+    const {id, name, pass} = req.body;
+    const rawPrivileges = req.body.privileges;
+
+    let privileges;
+
+    if (!rawPrivileges) {
+        privileges = [];
+    } else if (typeof rawPrivileges === 'string') {
+        privileges = [rawPrivileges];
+    } else {
+        privileges = rawPrivileges;
+    }
+
+    const privilegeTypes = await db.map(sql.getModPrivilegeTypes, [], ({type}) => type);
+
+    for (const type of privileges) {
+        if (!privilegeTypes.includes(type)) {
+            throw createError(400, 'Invalid privilege type');
+        }
+    }
+
+    const hash = await bcrypt.hash(pass, saltRounds);
+    await db.query(sql.updateModAccount, {id, name, pass: hash, privileges});
+
+    res.redirect('/admin/mods');
+});
+
 const router = Router();
 router.use(ensureLoggedIn());
 router.get('/', adminPanelRouter);
@@ -306,5 +337,7 @@ router.get('/accounts/delete/:accountId', accountsDeleteRouter);
 router.post('/accounts/edit/', accountsEditRouter);
 router.post('/accounts/create/', accountsCreateRouter);
 router.get('/mods', modsRouter);
+router.post('/mods/edit', modsEditRouter);
+// router.get('/mods/delete/:modId', modsDeleteRouter);
 
 module.exports = router;

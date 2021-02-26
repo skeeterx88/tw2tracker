@@ -10,11 +10,11 @@
                             <form method="POST" action="/admin/mods/edit">
                                 <p>
                                     <span>Name:</span>
-                                    <input type="text" class="relax-input" name="name" value="<%= mod.name %>" minlength="4">
+                                    <input type="text" class="relax-input" name="name" value="<%= mod.name %>" minlength="3" required>
                                 </p>
                                 <p>
                                     <span>Pass:</span>
-                                    <input type="text" class="relax-input" name="pass" value="" minlength="4">
+                                    <input type="text" class="relax-input" name="pass" value="" minlength="4" required>
                                 </p>
 
                                 <fieldset class="align-checkbox">
@@ -22,7 +22,7 @@
 
                                     <% for (let privilege of modPrivilegeTypes) { %>
                                         <label>
-                                            <input type="checkbox" name="privileges[<%= privilege %>]" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
+                                            <input type="checkbox" name="privileges" value="<%= privilege %>" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
                                             <span><%= privilege %></span>
                                         </label>
                                     <% } %>
