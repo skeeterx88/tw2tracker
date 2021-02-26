@@ -29,6 +29,7 @@ CREATE TABLE public.mods (
     name VARCHAR (25) UNIQUE NOT NULL,
     pass VARCHAR (255) NOT NULL,
     privileges public.mod_privilege_types[] DEFAULT '{control_sync}',
+    email VARCHAR (255) NOT NULL,
     enabled BOOLEAN NOT NULL DEFAULT TRUE
 );
 

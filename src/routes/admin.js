@@ -292,7 +292,7 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const modsEditRouter = utils.asyncRouter(async function (req, res) {
-    const {id, name, pass} = req.body;
+    const {id, name, pass, email} = req.body;
     const rawPrivileges = req.body.privileges;
 
     let privileges;
@@ -314,7 +314,7 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
     }
 
     const hash = await bcrypt.hash(pass, saltRounds);
-    await db.query(sql.updateModAccount, {id, name, pass: hash, privileges});
+    await db.query(sql.updateModAccount, {id, name, pass: hash, privileges, email});
 
     res.redirect('/admin/mods');
 });
