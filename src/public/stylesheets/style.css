@@ -296,6 +296,10 @@ menu .icon-heart {
     width: 75%;
 }
 
+#search .relax-button {
+    height: 26px;
+}
+
 .relax-input {
     height: 22px;
     border-radius: 1px;
@@ -322,8 +326,8 @@ menu .icon-heart {
 }
 
 .relax-button {
-    height: 26px;
-    padding: 0px 5px;
+    display: inline-block;
+    height: 20px;
     outline: none;
     cursor: pointer;
     text-decoration: none;
@@ -348,10 +352,12 @@ menu .icon-heart {
 
 .relax-button.small {
     height: 20px;
+    line-height: 18px;
 }
 
 .relax-button.red {
     background: url(/images/noise.webp), linear-gradient(#b33b3b, #843838);
+    float: right;
 }
 
 .relax-button.red:hover {
@@ -364,6 +370,10 @@ menu .icon-heart {
 
 .relax-button.green:hover {
     background: url(/images/noise.webp), linear-gradient(#46c134, #1a5b1b);
+}
+
+.relax-button.right {
+    float: right;
 }
 
 form input[type="submit"]:hover,
