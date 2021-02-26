@@ -8,6 +8,14 @@ html {
     color: #50311d;
 }
 
+textarea,
+input,
+button,
+select {
+    font-family: inherit;
+    font-size: inherit;
+}
+
 body {
     width: 90vw;
     max-width: 1100px;
@@ -16,10 +24,9 @@ body {
 }
 
 input,
-button {
+button,
+textarea {
     outline: none;
-    font-size: 1em;
-    font-family: Arial, Helvetica, sans-serif;
 }
 
 table {
@@ -328,6 +335,7 @@ menu .icon-heart {
 .relax-button {
     display: inline-block;
     height: 20px;
+    font-weight: bold;
     outline: none;
     cursor: pointer;
     text-decoration: none;
@@ -403,10 +411,16 @@ div.world-title {
     width: 170px;
 }
 
+#markets .world-container,
+#markets .market-container,
+#worlds .world-container,
+#worlds .market-container {
+    font-size: 0.8em;
+}
+
 .world-container,
 .market-container {
     color: #311a11;
-    font-size: 0.8em;
     border-color: #b18e76;
     border-radius: 1px;
     background: url(/images/noise.webp) #f9eed166;

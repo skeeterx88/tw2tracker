@@ -18,16 +18,11 @@
     text-shadow: 1px 1px 0px #000;
     margin: 0px 1px;
     cursor: default;
-    font-size: 11px;
 }
 
 #sync-panel ul {
     margin: 5px 0px;
     padding: 0px;
-}
-
-#sync-panel .relax-button {
-    font-size: 0.8em;
 }
 
 #sync-worlds .world-id {
@@ -80,21 +75,10 @@
     padding: 0 3px;
 }
 
-#accounts p {
-    display: block;
-    margin: 5px 0px;
-}
-
 #accounts p span {
     display: inline-block;
     width: 10%;
     text-align: right;
-}
-
-#accounts .relax-input {
-    height: 17px;
-    width: 80%;
-    font-family: monospace;
 }
 
 #mods .mod {
@@ -112,12 +96,6 @@
     display: inline-block;
     width: 10%;
     text-align: right;
-}
-
-#mods .relax-input {
-    height: 17px;
-    width: 80%;
-    font-family: monospace;
 }
 
 #admin .relax-button {
@@ -153,6 +131,23 @@
 
 .align-checkbox label span {
     vertical-align: middle;
+}
+
+#admin .relax-input {
+    height: 17px;
+    width: 80%;
+    font-family: monospace;
+}
+
+#admin form label.input {
+    display: block;
+    margin: 5px 0px;
+}
+
+#admin form label.input span {
+    display: inline-block;
+    width: 50px;
+    text-align: right;
 }
 
 @media (max-width: 860px) {

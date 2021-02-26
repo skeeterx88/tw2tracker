@@ -8,14 +8,15 @@
                 <div class="content-border">
                     <div class="account world-container">
                         <form method="POST" action="/admin/accounts/create">
-                            <p>
+                            <label class="input">
                                 <span>Name:</span>
                                 <input type="text" class="relax-input" name="name" minlength="4">
-                            </p>
-                            <p>
+                            </label>
+
+                            <label class="input">
                                 <span>Pass:</span>
                                 <input type="text" class="relax-input" name="pass" minlength="4">
-                            </p>
+                            </label>
 
                             <div class="actions">
                                 <input type="submit"  class="relax-button small" value="Add account"/>
@@ -32,14 +33,14 @@
                     <% for (let account of accounts) { %>
                         <div id="account-<%= account.id %>" class="account world-container">
                             <form method="POST" action="/admin/accounts/edit">
-                                <p>
+                                <label class="input">
                                     <span>Name:</span>
                                     <input type="text" class="relax-input" name="name" value="<%= account.name %>" minlength="4">
-                                </p>
-                                <p>
+                                </label>
+                                <label class="input">
                                     <span>Pass:</span>
                                     <input type="text" class="relax-input" name="pass" value="<%= account.pass %>" minlength="4">
-                                </p>
+                                </label>
 
                                 <input type="hidden" name="id" value="<%= account.id %>" />
                                 <input type="submit" hidden />

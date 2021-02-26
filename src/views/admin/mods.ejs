@@ -8,14 +8,14 @@
                     <% for (let mod of mods) { %>
                         <div id="mod-<%= mod.id %>" class="mod world-container">
                             <form method="POST" action="/admin/mods/edit">
-                                <p>
+                                <label class="input">
                                     <span>Name:</span>
                                     <input type="text" class="relax-input" name="name" value="<%= mod.name %>" minlength="3" required>
-                                </p>
-                                <p>
+                                </label>
+                                <label class="input">
                                     <span>Pass:</span>
                                     <input type="text" class="relax-input" name="pass" value="" minlength="4" required>
-                                </p>
+                                </label>
 
                                 <fieldset class="align-checkbox">
                                     <legend>Mod privileges:</legend>
