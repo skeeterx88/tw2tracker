@@ -1,0 +1,45 @@
+<div class="content">
+    <div class="left">
+        <div id="mods">
+            <section id="mods-panel">
+                <h1>Mods Panel</h1>
+
+                <div class="content-border">
+                    <% for (let mod of mods) { %>
+                        <div id="mod-<%= mod.id %>" class="mod world-container">
+                            <form method="POST" action="/admin/mods/edit">
+                                <p>
+                                    <span>Name:</span>
+                                    <input type="text" class="relax-input" name="name" value="<%= mod.name %>" minlength="4">
+                                </p>
+                                <p>
+                                    <span>Pass:</span>
+                                    <input type="text" class="relax-input" name="pass" value="" minlength="4">
+                                </p>
+
+                                <fieldset class="align-checkbox">
+                                    <legend>Mod privileges:</legend>
+
+                                    <% for (let privilege of modPrivilegeTypes) { %>
+                                        <label>
+                                            <input type="checkbox" name="privileges[<%= privilege %>]" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
+                                            <span><%= privilege %></span>
+                                        </label>
+                                    <% } %>
+                                </fieldset>
+
+                                <input type="hidden" name="id" value="<%= mod.id %>" />
+
+                                <div class="actions">
+                                    <input type="submit" class="relax-button small" value="Save" />
+                                    <a class="relax-button small red" href="/admin/mods/delete/<%= mod.id %>">Delete</a>
+                                </div>
+                            </form>
+                        </div>
+                    <% } %>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="right"></div>
+</div>

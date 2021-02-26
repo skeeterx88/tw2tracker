@@ -9,6 +9,7 @@ const enums = require('../enums.js');
 const syncSocket = require('../sync-socket.js');
 const debug = require('../debug.js');
 const development = process.env.NODE_ENV === 'development';
+const pgArray = require('pg').types.arrayParser;
 
 const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
@@ -266,6 +267,27 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
+const modsRouter = utils.asyncRouter(async function (req, res) {
+    const subPage = 'mods';
+    const modPrivilegeTypes = await db.map(sql.getModPrivilegeTypes, [], (privilege) => privilege.type);
+    const mods = await db.map(sql.getMods, [], function (mod) {
+        mod.privileges = pgArray.create(mod.privileges, String).parse();
+        return mod;
+    });
+
+    res.render('admin', {
+        title: `Admin Panel - Accounts - ${config.site_name}`,
+        subPage,
+        mods,
+        modPrivilegeTypes,
+        backendValues: {
+            development,
+            subPage
+        },
+        ...utils.ejsHelpers
+    });
+});
+
 const router = Router();
 router.use(ensureLoggedIn());
 router.get('/', adminPanelRouter);
@@ -283,5 +305,6 @@ router.get('/accounts/markets/remove/:accountId/:marketId', accountsRemoveMarket
 router.get('/accounts/delete/:accountId', accountsDeleteRouter);
 router.post('/accounts/edit/', accountsEditRouter);
 router.post('/accounts/create/', accountsCreateRouter);
+router.get('/mods', modsRouter);
 
 module.exports = router;

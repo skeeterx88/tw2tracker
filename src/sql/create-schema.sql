@@ -22,6 +22,16 @@ CREATE TABLE public.accounts (
     markets VARCHAR[] DEFAULT '{}'
 );
 
+CREATE TYPE public.mod_privilege_types AS ENUM ('control_sync', 'modify_accounts', 'modify_mods', 'modify_settings');
+
+CREATE TABLE public.mods (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR (25) UNIQUE NOT NULL,
+    pass VARCHAR (255) NOT NULL,
+    privileges public.mod_privilege_types[] DEFAULT '{control_sync}',
+    enabled BOOLEAN NOT NULL DEFAULT TRUE
+);
+
 CREATE TYPE public.map_sync_status AS ENUM ('success', 'fail');
 
 CREATE TABLE public.worlds (
