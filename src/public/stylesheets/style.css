@@ -357,7 +357,6 @@ menu .icon-heart {
 
 .relax-button.red {
     background: url(/images/noise.webp), linear-gradient(#b33b3b, #843838);
-    float: right;
 }
 
 .relax-button.red:hover {
