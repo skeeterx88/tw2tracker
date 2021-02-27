@@ -1,6 +1,46 @@
 <div class="content">
     <div class="left">
         <div id="mods">
+            <section>
+                <h1>Add Mod Account</h1>
+
+                <div class="content-border">
+                    <div class="world-container">
+                        <form method="POST" action="/admin/mods/create">
+                            <label class="input">
+                                <span>Name:</span>
+                                <input type="text" class="relax-input" name="name" minlength="3" required>
+                            </label>
+
+                            <label class="input">
+                                <span>Pass:</span>
+                                <input type="text" class="relax-input" name="pass" minlength="4" required>
+                            </label>
+
+                            <label class="input">
+                                <span>Email:</span>
+                                <input type="email" class="relax-input" name="email">
+                            </label>
+
+                            <fieldset class="align-checkbox">
+                                <legend>Mod privileges:</legend>
+
+                                <% for (let privilege of modPrivilegeTypes) { %>
+                                    <label>
+                                        <input type="checkbox" name="privileges" value="<%= privilege %>" />
+                                        <span><%= privilege %></span>
+                                    </label>
+                                <% } %>
+                            </fieldset>
+
+                            <div class="actions">
+                                <input type="submit"  class="relax-button" value="Create"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
             <section id="mods-panel">
                 <h1>Mods Panel</h1>
 

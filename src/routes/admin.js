@@ -313,6 +313,8 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
         }
     }
 
+    // TODO: validate password length
+
     if (pass) {
         const hash = await bcrypt.hash(pass, saltRounds);
         await db.query(sql.updateModAccount, {id, name, pass: hash, privileges, email});
@@ -320,7 +322,39 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
         await db.query(sql.updateModAccountKeepPass, {id, name, privileges, email});
     }
 
+    // TODO: redirect to #mod-${id}
     res.redirect('/admin/mods');
+});
+
+const modsCreateRouter = utils.asyncRouter(async function (req, res) {
+    let {name, pass, email, privileges} = req.body;
+
+    if (name.length < 4) {
+        throw createError(400, 'Minimum username length is 4');
+    }
+
+    if (pass.length < 4) {
+        throw createError(400, 'Minimum password length is 4');
+    }
+
+    if (!privileges) {
+        privileges = [];
+    } else if (typeof privileges === 'string') {
+        privileges = [privileges];
+    }
+
+    const privilegeTypes = await db.map(sql.getModPrivilegeTypes, [], ({type}) => type);
+
+    for (const type of privileges) {
+        if (!privilegeTypes.includes(type)) {
+            throw createError(400, 'Invalid privilege type');
+        }
+    }
+
+    const hash = await bcrypt.hash(pass, saltRounds);
+    const {id} = await db.one(sql.createModAccount, {name, pass: hash, privileges, email});
+
+    res.redirect(`/admin/mods#mod-${id}`);
 });
 
 const router = Router();
@@ -342,6 +376,7 @@ router.post('/accounts/edit/', accountsEditRouter);
 router.post('/accounts/create/', accountsCreateRouter);
 router.get('/mods', modsRouter);
 router.post('/mods/edit', modsEditRouter);
+router.post('/mods/create', modsCreateRouter);
 // router.get('/mods/delete/:modId', modsDeleteRouter);
 
 module.exports = router;
