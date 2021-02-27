@@ -68,7 +68,9 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
         backendValues: {
             development,
             syncStates: enums.syncStates,
-            subPage
+            subPage,
+            accountPrivileges: req.user.privileges,
+            privilegeTypes
         },
         ...utils.ejsHelpers
     });

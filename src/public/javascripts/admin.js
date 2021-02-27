@@ -8,16 +8,20 @@ define('updateAllWorldsStatus', [
     updateWorldSyncStatus,
     updateWorldSyncEnabled,
     {
-        syncStates
+        syncStates,
+        accountPrivileges,
+        privilegeTypes
     }
 ) {
     return function updateAllWorldsStatus ({worlds, data, achievements, other}) {
-        for (const world of worlds) {
-            updateWorldSyncEnabled({
-                marketId: world.market,
-                worldNumber: world.num,
-                enabled: world.sync_enabled
-            });
+        if (accountPrivileges[privilegeTypes.CONTROL_SYNC]) {
+            for (const world of worlds) {
+                updateWorldSyncEnabled({
+                    marketId: world.market,
+                    worldNumber: world.num,
+                    enabled: world.sync_enabled
+                });
+            }
         }
 
         for (const worldId of data) {
@@ -28,7 +32,9 @@ define('updateAllWorldsStatus', [
             updateWorldStatus({worldId}, syncStates.ACHIEVEMENT_START);
         }
 
-        updateWorldSyncStatus(other.worldList);
+        if (accountPrivileges[privilegeTypes.START_SYNC]) {
+            updateWorldSyncStatus(other.worldList);
+        }
     };
 });
 
@@ -36,7 +42,9 @@ define('updateWorldStatus', [
     'backendValues'
 ], function (
     {
-        syncStates
+        syncStates,
+        accountPrivileges,
+        privilegeTypes
     }
 ) {
     const $syncDataAllActive = document.querySelector('#sync-data-all-active');
@@ -76,30 +84,38 @@ define('updateWorldStatus', [
 
         switch (action) {
             case syncStates.START: {
-                $dataSync.innerHTML = 'Sync data in progress...';
-                $dataSync.dataset.active = 'yes';
+                if ($dataSync) {
+                    $dataSync.innerHTML = 'Sync data in progress...';
+                    $dataSync.dataset.active = 'yes';
+                }
                 addActiveWorld($syncActiveDataWorlds, worldId);
                 break;
             }
             case syncStates.FINISH: {
-                $dataSync.innerHTML = 'Sync data';
+                if ($dataSync) {
+                    $dataSync.innerHTML = 'Sync data';
+                    $dataSync.dataset.active = 'no';
+                }
                 $dataDate.innerHTML = date;
                 $dataStatus.innerHTML = status;
-                $dataSync.dataset.active = 'no';
                 removeActiveWorld($syncActiveDataWorlds, worldId);
                 break;
             }
             case syncStates.ACHIEVEMENT_START: {
-                $achievementsSync.innerHTML = 'Sync achievements in progress...';
-                $achievementsSync.dataset.active = 'yes';
+                if ($achievementsSync) {
+                    $achievementsSync.innerHTML = 'Sync achievements in progress...';
+                    $achievementsSync.dataset.active = 'yes';
+                }
                 addActiveWorld($syncActiveAchievementWorlds, worldId);
                 break;
             }
             case syncStates.ACHIEVEMENT_FINISH: {
-                $achievementsSync.innerHTML = 'Sync achievements';
+                if ($achievementsSync) {
+                    $achievementsSync.innerHTML = 'Sync achievements';
+                    $achievementsSync.dataset.active = 'no';
+                }
                 $achievementsDate.innerHTML = date;
                 $achievementsStatus.innerHTML = status;
-                $achievementsSync.dataset.active = 'no';
                 removeActiveWorld($syncActiveAchievementWorlds, worldId);
                 break;
             }
@@ -159,11 +175,12 @@ require([
     {
         development,
         syncStates,
-        subPage
+        subPage,
+        accountPrivileges,
+        privilegeTypes
     }
 ) {
-    function setupSync () {
-        const $syncWorldList = document.querySelector('#sync-world-list');
+    function setupReloadlessActions () {
         const $worlds = document.querySelectorAll('#sync-worlds .world');
         const $worldButtons = Array.from($worlds).map(function ($world) {
             return [
@@ -175,6 +192,10 @@ require([
 
         for (const $buttons of $worldButtons) {
             for (const $button of $buttons) {
+                if (!$button) {
+                    continue;
+                }
+
                 $button.addEventListener('click', function (event) {
                     event.preventDefault();
 
@@ -189,7 +210,10 @@ require([
                 });
             }
         }
+    }
 
+    function setupWorldListSync () {
+        const $syncWorldList = document.querySelector('#sync-world-list');
         $syncWorldList.addEventListener('click', function (event) {
             event.preventDefault();
 
@@ -215,15 +239,21 @@ require([
                     break;
                 }
                 case syncStates.WORLDS_START: {
-                    updateWorldSyncStatus(true);
+                    if (accountPrivileges[privilegeTypes.START_SYNC]) {
+                        updateWorldSyncStatus(true);
+                    }
                     break;
                 }
                 case syncStates.WORLDS_FINISH: {
-                    updateWorldSyncStatus(false);
+                    if (accountPrivileges[privilegeTypes.START_SYNC]) {
+                        updateWorldSyncStatus(false);
+                    }
                     break;
                 }
                 case syncStates.TOGGLE_WORLD: {
-                    updateWorldSyncEnabled(value);
+                    if (accountPrivileges[privilegeTypes.CONTROL_SYNC]) {
+                        updateWorldSyncEnabled(value);
+                    }
                     break;
                 }
                 default: {
@@ -235,7 +265,14 @@ require([
     }
 
     if (subPage === 'sync') {
-        setupSync();
+        if (accountPrivileges[privilegeTypes.START_SYNC] || accountPrivileges[privilegeTypes.CONTROL_SYNC]) {
+            setupReloadlessActions();
+        }
+
+        if (accountPrivileges[privilegeTypes.START_SYNC]) {
+            setupWorldListSync();
+        }
+
         setupSocket();
     }
 });
