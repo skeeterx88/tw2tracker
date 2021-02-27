@@ -27,15 +27,17 @@
                 </div>
             </section>
 
-            <section id="sync-panel">
-                <h1>Sync Panel</h1>
+            <% if (user.privileges[privilegeTypes.START_SYNC]) { %>
+                <section id="sync-panel">
+                    <h1>Sync Panel</h1>
 
-                <div class="content-border">
-                    <div class="actions">
-                        <a id="sync-world-list" class="relax-button" data-active="no" href="/admin/sync/worlds">Sync world list</a>
+                    <div class="content-border">
+                        <div class="actions">
+                            <a id="sync-world-list" class="relax-button" data-active="no" href="/admin/sync/worlds">Sync world list</a>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            <% } %>
 
             <section id="sync-worlds">
                 <h1>Sync Worlds</h1>
