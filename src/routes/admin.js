@@ -380,7 +380,15 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
         await db.query(sql.updateModAccountKeepPass, {id, name, privileges, email});
     }
 
-    res.redirect(`/admin/mods#mod-${id}`);
+    if (id === req.user.id) {
+        req.logIn({id, name, privileges}, function (error) {
+            if (error) {
+                throw createError(500, error);
+            }
+
+            res.redirect(`/admin/mods#mod-${id}`);
+        });
+    }
 });
 
 const modsCreateRouter = utils.asyncRouter(async function (req, res) {

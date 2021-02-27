@@ -81,7 +81,7 @@ passport.use(new passportLocal.Strategy({
 }));
 
 passport.serializeUser(async function (account, callback) {
-    const parsedPrivileges = pgArray.create(account.privileges, String).parse();
+    const parsedPrivileges = typeof account.privileges === 'string' ? pgArray.create(account.privileges, String).parse() : account.privileges;
     const privilegeEntries = await db.map(sql.getModPrivilegeTypes, [], ({type}) => [type, parsedPrivileges.includes(type)]);
     const privilegeObject = Object.fromEntries(privilegeEntries);
 
