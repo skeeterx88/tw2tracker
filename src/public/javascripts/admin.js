@@ -64,7 +64,7 @@ define('updateWorldStatus', [
     }
 
     return function updateWorldStatus ({worldId, status, date}, action) {
-        const $world = document.querySelector('#' + worldId);
+        const $world = document.querySelector('#world-' + worldId);
 
         const $dataSync = $world.querySelector('.sync-data');
         const $dataDate = $world.querySelector('.last-data-sync-date');
@@ -131,7 +131,7 @@ define('updateWorldSyncEnabled', [
 ) {
     return function updateWorldSyncEnabled ({marketId, worldNumber, enabled}) {
         const worldId = marketId + worldNumber;
-        const $button = document.querySelector(`#${worldId} .sync-toggle`);
+        const $button = document.querySelector(`#world-${worldId} .sync-toggle`);
 
         if (enabled) {
             $button.classList.add('red');
