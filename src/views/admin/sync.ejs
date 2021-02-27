@@ -32,7 +32,7 @@
 
                 <div class="content-border">
                     <ul>
-                        <li><a id="sync-world-list" class="relax-button small" data-active="no" href="/admin/sync/worlds">Sync world list</a></li>
+                        <li><a id="sync-world-list" class="relax-button" data-active="no" href="/admin/sync/worlds">Sync world list</a></li>
                     </ul>
                 </div>
             </section>
@@ -61,9 +61,9 @@
 
                             <div class="actions">
                                 <% if (world.open) { -%>
-                                    <a class="sync-toggle relax-button small red right" href="/admin/sync/toggle/<%= world.market %>/<%= world.num %>">Disable sync</a>
-                                    <a class="sync-data relax-button small" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>">Sync data</a>
-                                    <a class="sync-achievements relax-button small" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>">Sync achievements</a>
+                                    <a class="sync-toggle relax-button red right" href="/admin/sync/toggle/<%= world.market %>/<%= world.num %>">Disable sync</a>
+                                    <a class="sync-data relax-button" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>">Sync data</a>
+                                    <a class="sync-achievements relax-button" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>">Sync achievements</a>
                                 <% } -%>
                             </div>
                         </div>
