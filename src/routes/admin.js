@@ -294,12 +294,24 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
 const modsEditRouter = utils.asyncRouter(async function (req, res) {
     let {id, name, pass, email, privileges} = req.body;
 
+    id = parseInt(id, 10);
+
     if (name.length < 3) {
         throw createError(400, 'Minimum username length is 3');
     }
 
     if (pass && pass.length < 4) {
         throw createError(400, 'Minimum password length is 4');
+    }
+
+    const [accountName] = await db.any(sql.getModAccountByName, {name});
+    if (accountName && accountName.id !== id) {
+        throw createError(400, 'A mod account with this name already exists');
+    }
+
+    const [accountEmail] = await db.any(sql.getModAccountByEmail, {email});
+    if (accountEmail && accountEmail.id !== id) {
+        throw createError(400, 'This email is already in use by another account');
     }
 
     if (!privileges) {
@@ -335,6 +347,16 @@ const modsCreateRouter = utils.asyncRouter(async function (req, res) {
 
     if (pass.length < 4) {
         throw createError(400, 'Minimum password length is 4');
+    }
+
+    const [accountName] = await db.any(sql.getModAccountByName, {name});
+    if (accountName) {
+        throw createError(400, 'A mod account with this name already exists');
+    }
+
+    const [accountEmail] = await db.any(sql.getModAccountByEmail, {email});
+    if (accountEmail) {
+        throw createError(400, 'This email is already in use by another account');
     }
 
     if (!privileges) {
