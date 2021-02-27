@@ -357,6 +357,19 @@ const modsCreateRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/mods#mod-${id}`);
 });
 
+const modsDeleteRouter = utils.asyncRouter(async function (req, res) {
+    let {id} = req.params;
+
+    const [mod] = await db.any(sql.getMod, {id});
+
+    if (!mod) {
+        throw createError(404, 'This mod account does not exist');
+    }
+
+    await db.query(sql.deleteModAccount, {id});
+    res.redirect('/admin/mods');
+});
+
 const router = Router();
 router.use(ensureLoggedIn());
 router.get('/', adminPanelRouter);
@@ -377,6 +390,6 @@ router.post('/accounts/create/', accountsCreateRouter);
 router.get('/mods', modsRouter);
 router.post('/mods/edit', modsEditRouter);
 router.post('/mods/create', modsCreateRouter);
-// router.get('/mods/delete/:modId', modsDeleteRouter);
+router.get('/mods/delete/:id', modsDeleteRouter);
 
 module.exports = router;
