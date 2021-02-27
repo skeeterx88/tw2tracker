@@ -12,6 +12,7 @@ const passportLocal = require('passport-local');
 const connectFlash = require('connect-flash');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const pgArray = require('pg').types.arrayParser;
 
 const db = require('./db.js');
 const sql = require('./sql.js');
@@ -76,15 +77,23 @@ passport.use(new passportLocal.Strategy({
         });
     }
 
-    done(null, name);
+    done(null, account);
 }));
 
-passport.serializeUser(function (username, callback) {
-    callback(null, username);
+passport.serializeUser(async function (account, callback) {
+    const parsedPrivileges = pgArray.create(account.privileges, String).parse();
+    const privilegeEntries = await db.map(sql.getModPrivilegeTypes, [], ({type}) => [type, parsedPrivileges.includes(type)]);
+    const privilegeObject = Object.fromEntries(privilegeEntries);
+
+    callback(null, {
+        id: account.id,
+        name: account.name,
+        privileges: privilegeObject
+    });
 });
 
-passport.deserializeUser(function (username, callback) {
-    callback(null, username);
+passport.deserializeUser(function (user, callback) {
+    callback(null, user);
 });
 
 app.use(passport.initialize());
