@@ -63,6 +63,8 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
         openWorlds,
         closedWorlds,
         markets,
+        privilegeTypes,
+        user: req.user,
         backendValues: {
             development,
             syncStates: enums.syncStates,
