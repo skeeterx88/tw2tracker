@@ -8,17 +8,13 @@
         <main class="content-border">
             <%- include('../navigation.ejs') %>
 
-            <ul class="sub-menu">
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements">
-                    <li <% __append(!selectedCategory ? ' class="selected"' : '') %>>Overview</li>
-                </a>
+            <div class="sub-menu">
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements" class="item <% __append(selectedCategory ? '':  'selected') %>">Overview</li></a>
 
-                <% for (let category of Object.keys(achievementByCategory)) { -%>
-                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>">
-                        <li <% __append(category === selectedCategory ? 'class="selected"' : '') %>><%= achievementCategoryTitles[category] %></li>
-                    </a>
-                <% } -%>
-            </ul>
+                <% for (let category of Object.keys(achievementByCategory)) { %>
+                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>" class="item <% __append(category === selectedCategory ? 'selected' : '') %>"><%= achievementCategoryTitles[category] %></a>
+                <% } %>
+            </div>
 
             <div class="content">
                 <%- include(`player-achievements-${categoryTemplate}.ejs`) %>

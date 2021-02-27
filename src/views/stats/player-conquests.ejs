@@ -8,12 +8,12 @@
         <main class="content-border">
             <%- include('../navigation.ejs') %>
 
-            <ul class="sub-menu">
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><li <% __append(category === 'all' ? ' class="selected"' : '') %>>All</li></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain"><li <% __append(category === 'gain' ? ' class="selected"' : '') %>>Gains</li></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss"><li <% __append(category === 'loss' ? ' class="selected"' : '') %>>Losses</li></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/self"><li <% __append(category === 'self' ? ' class="selected"' : '') %>>Self</li></a>
-            </ul>
+            <div class="sub-menu">
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests" class="item <% __append(category === 'all' ? ' selected' : '') %>">All</a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain" class="item <% __append(category === 'gain' ? ' selected' : '') %>">Gains</a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/loss" class="item <% __append(category === 'loss' ? ' selected' : '') %>">Losses</a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>">Self</a>
+            </div>
 
             <div class="content">
                 <div class="left-really-big">

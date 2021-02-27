@@ -6,13 +6,11 @@
         <%- include('./menu.ejs') %>
 
         <main class="content-border">
-            <%- include('./navigation.ejs') %>
-
-            <ul class="sub-menu">
+            <div class="sub-menu">
                 <% for (const [id, data] of menu) { -%>
-                    <a href="/admin/<%= id %>"><li class="<% __append(data.selected ? 'selected' : '') %>"><%= data.label %></li></a>
+                    <a href="/admin/<%= id %>" class="item <% __append(data.selected ? 'selected' : '') %>"><%= data.label %></a>
                 <% } -%>
-            </ul>
+            </div>
 
             <%- include('./admin/' + subPage + '.ejs') %>
         </main>

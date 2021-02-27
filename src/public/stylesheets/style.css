@@ -577,12 +577,13 @@ span.conquest-self {
     background: #e1d400 radial-gradient(circle at 70% 60%, #ffef00, #e1d400);
 }
 
-ul.sub-menu {
-    margin: 20px 0px 10px;
-    padding: 0;
+.sub-menu {
+    display: flex;
 }
 
-ul.sub-menu li {
+.sub-menu .item {
+    text-decoration: none;
+    color: #191410;
     margin: 5px 5px;
     padding: 3px;
     display: inline-block;
@@ -597,7 +598,9 @@ ul.sub-menu li {
                 1px 1px 2px 3px #00000070;
 }
 
-ul.sub-menu li.selected {
+.sub-menu .item.selected {
+    color: #1d1611;
+    text-shadow: 1px 1px 1px #00000020;
     background: url(/images/noise.webp), linear-gradient(#875515, #CB994D);
     box-shadow: 0px 0px 0px 1px #442810,
                 0px 0px 0px 2px #ec955b,
@@ -607,7 +610,7 @@ ul.sub-menu li.selected {
                 1px 1px 2px 3px #00000070;
 }
 
-ul.sub-menu li:hover {
+.sub-menu .item:hover {
     box-shadow: 0px 0px 0px 1px #442810,
                 0px 0px 0px 2px #ec955b,
                 0px 0px 0px 3px #201612,
@@ -616,14 +619,8 @@ ul.sub-menu li:hover {
                 1px 1px 2px 3px #00000070;
 }
 
-ul.sub-menu a {
-    text-decoration: none;
-    color: #191410;
-}
-
-ul.sub-menu a.selected {
-    color: #1d1611;
-    text-shadow: 1px 1px 1px #00000020;
+.sub-menu .item.right {
+    margin-left: auto;
 }
 
 a.achievement-subject:after {
