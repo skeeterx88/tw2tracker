@@ -1,2 +1,2 @@
 INSERT INTO public.markets (id)
-VALUES (${marketId}})
+VALUES (${marketId})
