@@ -10,6 +10,8 @@
                 <% for (const [id, data] of menu) { -%>
                     <a href="/admin/<%= id %>" class="item <% __append(data.selected ? 'selected' : '') %>"><%= data.label %></a>
                 <% } -%>
+
+                <a class="item right" href="/logout">Logout</a>
             </div>
 
             <%- include('./admin/' + subPage + '.ejs') %>
