@@ -81,13 +81,17 @@
     text-align: right;
 }
 
-#admin .relax-button {
-    margin: 0px 5px;
-    padding: 0px 5px;
+#admin .actions {
+    display: flex;
 }
 
-#admin .actions {
-     margin: 10px 0px; 
+#admin .actions .relax-button {
+    padding: 0px 5px;
+    margin: 10px 5px;
+}
+
+#admin .actions .relax-button.right {
+    margin-left: auto;
 }
 
 #admin section .content-border {

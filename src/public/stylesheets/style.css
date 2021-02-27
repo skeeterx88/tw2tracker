@@ -151,10 +151,6 @@ table.vertical td {
     text-align: left;
 }
 
-.right {
-    float: right;
-}
-
 table.vertical th {
     background: #ab804521;
 }
@@ -212,8 +208,8 @@ td, th {
     width: 100%;
 }
 
-.content .actions {
-    margin: 5px 0px;
+.section-actions {
+    margin: 8px 0px;
 }
 
 .content-border {
@@ -375,10 +371,6 @@ menu .icon-heart {
 
 .relax-button.green:hover {
     background: url(/images/noise.webp), linear-gradient(#46c134, #1a5b1b);
-}
-
-.relax-button.right {
-    float: right;
 }
 
 input[type="submit"].relax-button,
