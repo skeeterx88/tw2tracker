@@ -15,6 +15,11 @@ const saltRounds = 10;
 const createError = require('http-errors');
 
 const adminPanelRouter = utils.asyncRouter(async function (req, res) {
+    if (!req.user.privileges.control_sync && !req.user.privileges.start_sync) {
+        throw createError(401, 'You do not have permission to access this page');
+    }
+
+
     const openWorlds = await db.any(sql.getOpenWorlds);
     const closedWorlds = await db.any(sql.getClosedWorlds);
     const markets = await db.any(sql.getMarkets);
@@ -127,6 +132,10 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
 
 const accountsRouter = utils.asyncRouter(async function (req, res) {
     const subPage = 'accounts';
+    if (!req.user.privileges.modify_accounts) {
+        throw createError(401, 'You do not have permission to access this page');
+    }
+
     const markets = await db.map(sql.getMarkets, [], market => market.id);
     const accounts = await db.map(sql.getAccounts, [], function (account) {
         account.missingMarkets = getMissingMarkets(account.markets, markets);
@@ -272,6 +281,10 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
 
 const modsRouter = utils.asyncRouter(async function (req, res) {
     const subPage = 'mods';
+    if (!req.user.privileges.modify_mods) {
+        throw createError(401, 'You do not have permission to access this page');
+    }
+
     const modPrivilegeTypes = await db.map(sql.getModPrivilegeTypes, [], (privilege) => privilege.type);
     const mods = await db.map(sql.getMods, [], function (mod) {
         mod.privileges = pgArray.create(mod.privileges, String).parse();

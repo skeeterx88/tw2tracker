@@ -9,9 +9,9 @@
             <%- include('./navigation.ejs') %>
 
             <ul class="sub-menu">
-                <a href="/admin/sync"><li <% __append(subPage === 'sync' ? ' class="selected"' : '') %>>Sync</li></a>
-                <a href="/admin/accounts"><li <% __append(subPage === 'accounts' ? ' class="selected"' : '') %>>Sync Accounts</li></a>
-                <a href="/admin/mods"><li <% __append(subPage === 'mods' ? ' class="selected"' : '') %>>Mod Accounts</li></a>
+                <% for (const [id, data] of menu) { -%>
+                    <a href="/admin/<%= id %>"><li class="<% __append(data.selected ? 'selected' : '') %>"><%= data.label %></li></a>
+                <% } -%>
             </ul>
 
             <%- include('./admin/' + subPage + '.ejs') %>
