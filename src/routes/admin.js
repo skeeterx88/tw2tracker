@@ -18,7 +18,7 @@ function createAdminMenu (user, selected) {
     const adminMenu = [
         ['sync', {
             label: 'Sync',
-            enabled: user.privileges.start_sync || user.privileges.control_sync,
+            enabled: true,
             selected: selected === 'sync'
         }],
         ['accounts', {
@@ -38,12 +38,17 @@ function createAdminMenu (user, selected) {
     });
 }
 
-const adminPanelRouter = utils.asyncRouter(async function (req, res) {
-    if (!req.user.privileges.control_sync && !req.user.privileges.start_sync) {
-        throw createError(401, 'You do not have permission to access this page');
+function createPrivilegeChecker (privilege) {
+    return function (req, res, next) {
+        if (!req.user.privileges[privilege]) {
+            throw createError(401, 'You do not have permission to perform this action');
+        }
+
+        next();
     }
+}
 
-
+const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
     const closedWorlds = await db.any(sql.getClosedWorlds);
     const markets = await db.any(sql.getMarkets);
@@ -157,10 +162,6 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const accountsRouter = utils.asyncRouter(async function (req, res) {
-    if (!req.user.privileges.modify_accounts) {
-        throw createError(401, 'You do not have permission to access this page');
-    }
-
     const markets = await db.map(sql.getMarkets, [], market => market.id);
     const accounts = await db.map(sql.getAccounts, [], function (account) {
         account.missingMarkets = getMissingMarkets(account.markets, markets);
@@ -309,10 +310,6 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const modsRouter = utils.asyncRouter(async function (req, res) {
-    if (!req.user.privileges.modify_mods) {
-        throw createError(401, 'You do not have permission to access this page');
-    }
-
     const modPrivilegeTypes = await db.map(sql.getModPrivilegeTypes, [], (privilege) => privilege.type);
     const mods = await db.map(sql.getMods, [], function (mod) {
         mod.privileges = pgArray.create(mod.privileges, String).parse();
@@ -445,26 +442,32 @@ const modsDeleteRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/mods');
 });
 
+const privilegeControlSync = createPrivilegeChecker(enums.privileges.CONTROL_SYNC);
+const privilegeStartSync = createPrivilegeChecker(enums.privileges.START_SYNC);
+const privilegeModifyAccounts = createPrivilegeChecker(enums.privileges.MODIFY_ACCOUNTS);
+const privilegeModifyMods = createPrivilegeChecker(enums.privileges.MODIFY_MODS);
+// const privilegeModifySettings = createPrivilegeChecker(enums.privileges.MODIFY_SETTINGS);
+
 const router = Router();
 router.use(ensureLoggedIn());
 router.get('/', adminPanelRouter);
 router.get('/sync', adminPanelRouter);
-router.get('/sync/data/all', syncDataAllRouter);
-router.get('/sync/data/:marketId/:worldNumber', syncDataRouter);
-router.get('/sync/achievements/all', syncAchievementsAllRouter);
-router.get('/sync/achievements/:marketId/:worldNumber', syncAchievementsRouter);
-router.get('/sync/markets', scrapeMarketsRouter);
-router.get('/sync/worlds', scrapeWorldsRouter);
-router.get('/sync/toggle/:marketId/:worldNumber?', toggleSyncRouter);
-router.get('/accounts', accountsRouter);
-router.get('/accounts/markets/add/:accountId/:marketId', accountsAddMarketRouter);
-router.get('/accounts/markets/remove/:accountId/:marketId', accountsRemoveMarketRouter);
-router.get('/accounts/delete/:accountId', accountsDeleteRouter);
-router.post('/accounts/edit/', accountsEditRouter);
-router.post('/accounts/create/', accountsCreateRouter);
-router.get('/mods', modsRouter);
-router.post('/mods/edit', modsEditRouter);
-router.post('/mods/create', modsCreateRouter);
-router.get('/mods/delete/:id', modsDeleteRouter);
+router.get('/sync/data/all', privilegeStartSync, syncDataAllRouter);
+router.get('/sync/data/:marketId/:worldNumber', privilegeStartSync, syncDataRouter);
+router.get('/sync/achievements/all', privilegeStartSync, syncAchievementsAllRouter);
+router.get('/sync/achievements/:marketId/:worldNumber', privilegeStartSync, syncAchievementsRouter);
+router.get('/sync/markets', privilegeStartSync, scrapeMarketsRouter);
+router.get('/sync/worlds', privilegeStartSync, scrapeWorldsRouter);
+router.get('/sync/toggle/:marketId/:worldNumber?', privilegeControlSync, toggleSyncRouter);
+router.get('/accounts', privilegeModifyAccounts, accountsRouter);
+router.get('/accounts/markets/add/:accountId/:marketId', privilegeModifyAccounts, accountsAddMarketRouter);
+router.get('/accounts/markets/remove/:accountId/:marketId', privilegeModifyAccounts, accountsRemoveMarketRouter);
+router.get('/accounts/delete/:accountId', privilegeModifyAccounts, accountsDeleteRouter);
+router.post('/accounts/edit/', privilegeModifyAccounts, accountsEditRouter);
+router.post('/accounts/create/', privilegeModifyAccounts, accountsCreateRouter);
+router.get('/mods', privilegeModifyMods, modsRouter);
+router.post('/mods/edit', privilegeModifyMods, modsEditRouter);
+router.post('/mods/create', privilegeModifyMods, modsCreateRouter);
+router.get('/mods/delete/:id', privilegeModifyMods, modsDeleteRouter);
 
 module.exports = router;
