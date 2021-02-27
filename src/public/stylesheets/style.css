@@ -175,12 +175,12 @@ td, th {
 }
 
 .content > div.left {
-    width: 60%;
+    width: 50%;
     margin-right: 6px;
 }
 
 .content > div.right {
-    width: 40%;
+    width: 50%;
     margin-left: 6px;
 }
 
