@@ -292,8 +292,7 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const modsEditRouter = utils.asyncRouter(async function (req, res) {
-    const {id, name, pass, email} = req.body;
-    const rawPrivileges = req.body.privileges;
+    let {id, name, pass, email, privileges} = req.body;
 
     if (name.length < 3) {
         throw createError(400, 'Minimum username length is 3');
@@ -303,14 +302,10 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
         throw createError(400, 'Minimum password length is 4');
     }
 
-    let privileges;
-
-    if (!rawPrivileges) {
+    if (!privileges) {
         privileges = [];
-    } else if (typeof rawPrivileges === 'string') {
-        privileges = [rawPrivileges];
-    } else {
-        privileges = rawPrivileges;
+    } else if (typeof privileges === 'string') {
+        privileges = [privileges];
     }
 
     const privilegeTypes = await db.map(sql.getModPrivilegeTypes, [], ({type}) => type);
