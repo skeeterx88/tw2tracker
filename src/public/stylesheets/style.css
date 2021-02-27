@@ -305,6 +305,7 @@ menu .icon-heart {
 
 #search .relax-button {
     height: 26px;
+    vertical-align: top;
 }
 
 .relax-input {
@@ -334,7 +335,9 @@ menu .icon-heart {
 
 .relax-button {
     display: inline-block;
-    height: 20px;
+    vertical-align: middle;
+    height: 22px;
+    line-height: 22px;
     font-weight: bold;
     outline: none;
     cursor: pointer;
@@ -358,11 +361,6 @@ menu .icon-heart {
     text-decoration: none;
 }
 
-.relax-button.small {
-    height: 20px;
-    line-height: 18px;
-}
-
 .relax-button.red {
     background: url(/images/noise.webp), linear-gradient(#b33b3b, #843838);
 }
@@ -381,6 +379,11 @@ menu .icon-heart {
 
 .relax-button.right {
     float: right;
+}
+
+input[type="submit"].relax-button,
+input[type="button"].relax-button {
+    height: 24px;
 }
 
 form input[type="submit"]:hover,
