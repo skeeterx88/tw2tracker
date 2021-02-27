@@ -335,8 +335,8 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
 const modsCreateRouter = utils.asyncRouter(async function (req, res) {
     let {name, pass, email, privileges} = req.body;
 
-    if (name.length < 4) {
-        throw createError(400, 'Minimum username length is 4');
+    if (name.length < 3) {
+        throw createError(400, 'Minimum username length is 3');
     }
 
     if (pass.length < 4) {
