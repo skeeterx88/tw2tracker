@@ -328,8 +328,7 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
         await db.query(sql.updateModAccountKeepPass, {id, name, privileges, email});
     }
 
-    // TODO: redirect to #mod-${id}
-    res.redirect('/admin/mods');
+    res.redirect(`/admin/mods#mod-${id}`);
 });
 
 const modsCreateRouter = utils.asyncRouter(async function (req, res) {
