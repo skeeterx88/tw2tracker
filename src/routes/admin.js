@@ -295,6 +295,14 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
     const {id, name, pass, email} = req.body;
     const rawPrivileges = req.body.privileges;
 
+    if (name.length < 3) {
+        throw createError(400, 'Minimum username length is 3');
+    }
+
+    if (pass && pass.length < 4) {
+        throw createError(400, 'Minimum password length is 4');
+    }
+
     let privileges;
 
     if (!rawPrivileges) {
@@ -312,8 +320,6 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
             throw createError(400, 'Invalid privilege type');
         }
     }
-
-    // TODO: validate password length
 
     if (pass) {
         const hash = await bcrypt.hash(pass, saltRounds);
