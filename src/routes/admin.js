@@ -6,6 +6,7 @@ const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
 const enums = require('../enums.js');
+const privilegeTypes = require('../privileges.json');
 const syncSocket = require('../sync-socket.js');
 const debug = require('../debug.js');
 const development = process.env.NODE_ENV === 'development';
@@ -442,11 +443,11 @@ const modsDeleteRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/mods');
 });
 
-const privilegeControlSync = createPrivilegeChecker(enums.privileges.CONTROL_SYNC);
-const privilegeStartSync = createPrivilegeChecker(enums.privileges.START_SYNC);
-const privilegeModifyAccounts = createPrivilegeChecker(enums.privileges.MODIFY_ACCOUNTS);
-const privilegeModifyMods = createPrivilegeChecker(enums.privileges.MODIFY_MODS);
-// const privilegeModifySettings = createPrivilegeChecker(enums.privileges.MODIFY_SETTINGS);
+const privilegeControlSync = createPrivilegeChecker(privilegeTypes.CONTROL_SYNC);
+const privilegeStartSync = createPrivilegeChecker(privilegeTypes.START_SYNC);
+const privilegeModifyAccounts = createPrivilegeChecker(privilegeTypes.MODIFY_ACCOUNTS);
+const privilegeModifyMods = createPrivilegeChecker(privilegeTypes.MODIFY_MODS);
+// const privilegeModifySettings = createPrivilegeChecker(privilegeTypes.MODIFY_SETTINGS);
 
 const router = Router();
 router.use(ensureLoggedIn());
