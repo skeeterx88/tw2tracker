@@ -33,6 +33,9 @@ CREATE TABLE public.mods (
     enabled BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE INDEX ON public.mods ((LOWER(name)));
+CREATE INDEX ON public.mods ((LOWER(email)));
+
 CREATE TYPE public.map_sync_status AS ENUM ('success', 'fail');
 
 CREATE TABLE public.worlds (

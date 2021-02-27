@@ -1,2 +1,2 @@
 SELECT * FROM public.mods
-WHERE email = ${email}
+WHERE LOWER(email) = LOWER(${email})

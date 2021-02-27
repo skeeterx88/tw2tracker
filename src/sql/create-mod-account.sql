@@ -6,7 +6,7 @@ INSERT INTO public.mods (
 ) VALUES (
     ${name},
     ${pass},
-    ${email},
+    LOWER(${email}),
     ${privileges}::mod_privilege_types[]
 )
 RETURNING id;
