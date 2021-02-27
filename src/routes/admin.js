@@ -14,6 +14,30 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const createError = require('http-errors');
 
+function createAdminMenu (user, selected) {
+    const adminMenu = [
+        ['sync', {
+            label: 'Sync',
+            enabled: user.privileges.start_sync || user.privileges.control_sync,
+            selected: selected === 'sync'
+        }],
+        ['accounts', {
+            label: 'Sync Accounts',
+            enabled: user.privileges.modify_accounts,
+            selected: selected === 'accounts'
+        }],
+        ['mods', {
+            label: 'Mod Accounts',
+            enabled: user.privileges.modify_mods,
+            selected: selected === 'mods'
+        }]
+    ];
+
+    return adminMenu.filter(function ([id, data]) {
+        return data.enabled
+    });
+}
+
 const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     if (!req.user.privileges.control_sync && !req.user.privileges.start_sync) {
         throw createError(401, 'You do not have permission to access this page');
@@ -24,9 +48,11 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const closedWorlds = await db.any(sql.getClosedWorlds);
     const markets = await db.any(sql.getMarkets);
     const subPage = 'sync';
+    const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
         title: `Admin Panel - ${config.site_name}`,
+        menu,
         subPage,
         openWorlds,
         closedWorlds,
@@ -131,7 +157,6 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const accountsRouter = utils.asyncRouter(async function (req, res) {
-    const subPage = 'accounts';
     if (!req.user.privileges.modify_accounts) {
         throw createError(401, 'You do not have permission to access this page');
     }
@@ -148,8 +173,12 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
         });
     }
 
+    const subPage = 'accounts';
+    const menu = createAdminMenu(req.user, subPage);
+
     res.render('admin', {
         title: `Admin Panel - Accounts - ${config.site_name}`,
+        menu,
         subPage,
         accounts,
         markets,
@@ -280,7 +309,6 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
 });
 
 const modsRouter = utils.asyncRouter(async function (req, res) {
-    const subPage = 'mods';
     if (!req.user.privileges.modify_mods) {
         throw createError(401, 'You do not have permission to access this page');
     }
@@ -291,8 +319,12 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
         return mod;
     });
 
+    const subPage = 'mods';
+    const menu = createAdminMenu(req.user, subPage);
+
     res.render('admin', {
         title: `Admin Panel - Accounts - ${config.site_name}`,
+        menu,
         subPage,
         mods,
         modPrivilegeTypes,
