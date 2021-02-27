@@ -1,25 +1,23 @@
-<div class="content">
+<div class="content" id="mods">
     <div class="left">
-        <div id="mods">
-            <section>
-                <h1>Add Mod Account</h1>
+        <section id="mods-panel">
+            <h1>Mod Accounts</h1>
 
-                <div class="content-border">
-                    <div class="world-container">
-                        <form method="POST" action="/admin/mods/create">
+            <div class="content-border">
+                <% for (let mod of mods) { %>
+                    <div id="mod-<%= mod.id %>" class="mod world-container">
+                        <form method="POST" action="/admin/mods/edit">
                             <label class="input">
                                 <span>Name:</span>
-                                <input type="text" class="relax-input" name="name" minlength="3" required>
+                                <input type="text" class="relax-input" name="name" value="<%= mod.name %>" minlength="3" required>
                             </label>
-
                             <label class="input">
                                 <span>Pass:</span>
-                                <input type="text" class="relax-input" name="pass" minlength="4" required>
+                                <input type="text" class="relax-input" name="pass" minlength="4" placeholder="left empty to keep old password">
                             </label>
-
                             <label class="input">
                                 <span>Email:</span>
-                                <input type="email" class="relax-input" name="email">
+                                <input type="email" class="relax-input" name="email" value="<%= mod.email %>" required>
                             </label>
 
                             <fieldset class="align-checkbox">
@@ -27,63 +25,63 @@
 
                                 <% for (let privilege of modPrivilegeTypes) { %>
                                     <label>
-                                        <input type="checkbox" name="privileges" value="<%= privilege %>" />
+                                        <input type="checkbox" name="privileges" value="<%= privilege %>" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
                                         <span><%= privilege %></span>
                                     </label>
                                 <% } %>
                             </fieldset>
 
+                            <input type="hidden" name="id" value="<%= mod.id %>" />
+
                             <div class="actions">
-                                <input type="submit"  class="relax-button" value="Create"/>
+                                <input type="submit" class="relax-button" value="Save" />
+                                <a class="relax-button red right" href="/admin/mods/delete/<%= mod.id %>">Delete</a>
                             </div>
                         </form>
                     </div>
-                </div>
-            </section>
-
-            <section id="mods-panel">
-                <h1>Mod Accounts</h1>
-
-                <div class="content-border">
-                    <% for (let mod of mods) { %>
-                        <div id="mod-<%= mod.id %>" class="mod world-container">
-                            <form method="POST" action="/admin/mods/edit">
-                                <label class="input">
-                                    <span>Name:</span>
-                                    <input type="text" class="relax-input" name="name" value="<%= mod.name %>" minlength="3" required>
-                                </label>
-                                <label class="input">
-                                    <span>Pass:</span>
-                                    <input type="text" class="relax-input" name="pass" minlength="4" placeholder="left empty to keep old password">
-                                </label>
-                                <label class="input">
-                                    <span>Email:</span>
-                                    <input type="email" class="relax-input" name="email" value="<%= mod.email %>" required>
-                                </label>
-
-                                <fieldset class="align-checkbox">
-                                    <legend>Mod privileges:</legend>
-
-                                    <% for (let privilege of modPrivilegeTypes) { %>
-                                        <label>
-                                            <input type="checkbox" name="privileges" value="<%= privilege %>" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
-                                            <span><%= privilege %></span>
-                                        </label>
-                                    <% } %>
-                                </fieldset>
-
-                                <input type="hidden" name="id" value="<%= mod.id %>" />
-
-                                <div class="actions">
-                                    <input type="submit" class="relax-button" value="Save" />
-                                    <a class="relax-button red right" href="/admin/mods/delete/<%= mod.id %>">Delete</a>
-                                </div>
-                            </form>
-                        </div>
-                    <% } %>
-                </div>
-            </section>
-        </div>
+                <% } %>
+            </div>
+        </section>
     </div>
-    <div class="right"></div>
+    <div class="right">
+        <section>
+            <h1>Add Mod Account</h1>
+
+            <div class="content-border">
+                <div class="world-container">
+                    <form method="POST" action="/admin/mods/create">
+                        <label class="input">
+                            <span>Name:</span>
+                            <input type="text" class="relax-input" name="name" minlength="3" required>
+                        </label>
+
+                        <label class="input">
+                            <span>Pass:</span>
+                            <input type="text" class="relax-input" name="pass" minlength="4" required>
+                        </label>
+
+                        <label class="input">
+                            <span>Email:</span>
+                            <input type="email" class="relax-input" name="email">
+                        </label>
+
+                        <fieldset class="align-checkbox">
+                            <legend>Mod privileges:</legend>
+
+                            <% for (let privilege of modPrivilegeTypes) { %>
+                                <label>
+                                    <input type="checkbox" name="privileges" value="<%= privilege %>" />
+                                    <span><%= privilege %></span>
+                                </label>
+                            <% } %>
+                        </fieldset>
+
+                        <div class="actions">
+                            <input type="submit"  class="relax-button" value="Create"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>

@@ -1,82 +1,81 @@
-<div class="content">
+<div class="content" id="accounts">
     <div class="left">
-        <div id="accounts">
-            <section>
-                <h1>Add Sync Account</h1>
+        <section>
+            <h1>Sync Accounts</h1>
 
-                <div class="content-border">
-                    <div class="account world-container">
-                        <form method="POST" action="/admin/accounts/create">
+            <div class="content-border">
+                <% for (let account of accounts) { %>
+                    <div id="account-<%= account.id %>" class="account world-container">
+                        <form method="POST" action="/admin/accounts/edit">
                             <label class="input">
                                 <span>Name:</span>
-                                <input type="text" class="relax-input" name="name" minlength="4">
+                                <input type="text" class="relax-input" name="name" value="<%= account.name %>" minlength="4">
                             </label>
-
                             <label class="input">
                                 <span>Pass:</span>
-                                <input type="text" class="relax-input" name="pass" minlength="4">
+                                <input type="text" class="relax-input" name="pass" value="<%= account.pass %>" minlength="4">
                             </label>
 
-                            <div class="actions">
-                                <input type="submit"  class="relax-button" value="Add account"/>
-                            </div>
+                            <input type="hidden" name="id" value="<%= account.id %>" />
+                            <input type="submit" hidden />
                         </form>
-                    </div>
-                </div>
-            </section>
 
-            <section>
-                <h1>Sync Accounts</h1>
-
-                <div class="content-border">
-                    <% for (let account of accounts) { %>
-                        <div id="account-<%= account.id %>" class="account world-container">
-                            <form method="POST" action="/admin/accounts/edit">
-                                <label class="input">
-                                    <span>Name:</span>
-                                    <input type="text" class="relax-input" name="name" value="<%= account.name %>" minlength="4">
-                                </label>
-                                <label class="input">
-                                    <span>Pass:</span>
-                                    <input type="text" class="relax-input" name="pass" value="<%= account.pass %>" minlength="4">
-                                </label>
-
-                                <input type="hidden" name="id" value="<%= account.id %>" />
-                                <input type="submit" hidden />
-                            </form>
-
-                            <fieldset>
-                                <legend>Account markets:</legend>
-                                <% if (account.markets.length) { %>
-                                    <% for (let marketId of account.markets) { %>
-                                        <a href="/admin/accounts/markets/remove/<%= account.id %>/<%= marketId %>"><span title="Click to remove market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
-                                    <% } %>
-                                <% } else { %>
-                                    <span>No markets included.</span>
+                        <fieldset>
+                            <legend>Account markets:</legend>
+                            <% if (account.markets.length) { %>
+                                <% for (let marketId of account.markets) { %>
+                                    <a href="/admin/accounts/markets/remove/<%= account.id %>/<%= marketId %>"><span title="Click to remove market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
                                 <% } %>
-                            </fieldset>
+                            <% } else { %>
+                                <span>No markets included.</span>
+                            <% } %>
+                        </fieldset>
 
-                            <fieldset>
-                                <legend>Available markets:</legend>
-                                <% if (account.missingMarkets.length) { %>
-                                    <% for (let marketId of account.missingMarkets) { %>
-                                        <a href="/admin/accounts/markets/add/<%= account.id %>/<%= marketId %>"><span title="Click to add market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
-                                    <% } %>
-                                <% } else { %>
-                                    <span>All markets included.</span>
+                        <fieldset>
+                            <legend>Available markets:</legend>
+                            <% if (account.missingMarkets.length) { %>
+                                <% for (let marketId of account.missingMarkets) { %>
+                                    <a href="/admin/accounts/markets/add/<%= account.id %>/<%= marketId %>"><span title="Click to add market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
                                 <% } %>
-                            </fieldset>
+                            <% } else { %>
+                                <span>All markets included.</span>
+                            <% } %>
+                        </fieldset>
 
-                            <div class="actions">
-                                <a class="relax-button" href="/admin/accounts/markets/add/<%= account.id %>">Add markets</a>
-                                <a class="relax-button" href="/admin/accounts/markets/remove/<%= account.id %>">Test account</a>
-                                <a class="relax-button red right" href="/admin/accounts/delete/<%= account.id %>">Delete account</a>
-                            </div>
+                        <div class="actions">
+                            <a class="relax-button" href="/admin/accounts/markets/add/<%= account.id %>">Add markets</a>
+                            <a class="relax-button" href="/admin/accounts/markets/remove/<%= account.id %>">Test account</a>
+                            <a class="relax-button red right" href="/admin/accounts/delete/<%= account.id %>">Delete account</a>
                         </div>
-                    <% } %>
-                </div>
-            </section>
-        </div>
+                    </div>
+                <% } %>
+            </div>
+        </section>
     </div>
-    <div class="right"></div>
+
+    <div class="right">
+        <section>
+            <h1>Add Sync Account</h1>
+
+            <div class="content-border">
+                <div class="account world-container">
+                    <form method="POST" action="/admin/accounts/create">
+                        <label class="input">
+                            <span>Name:</span>
+                            <input type="text" class="relax-input" name="name" minlength="4">
+                        </label>
+
+                        <label class="input">
+                            <span>Pass:</span>
+                            <input type="text" class="relax-input" name="pass" minlength="4">
+                        </label>
+
+                        <div class="actions">
+                            <input type="submit"  class="relax-button" value="Add account"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
 </div>
