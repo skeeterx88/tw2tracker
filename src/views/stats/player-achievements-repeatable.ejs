@@ -1,6 +1,6 @@
 <div class="<% __append(subCategory === 'detailed' ? 'single' : 'left') %>">
     <section id="player-achievements-repeatable">
-        <h2><%= navigationTitle %><% __append(subCategory === 'detailed' ? ' (Detailed)' : '') %></h2>
+        <h2><%= navigationTitle %><% __append(subCategory === 'detailed' ? ` (${i18n.player_profile.achievements.detailed})` : '') %></h2>
 
         <table class="content-border">
             <colgroup>
@@ -9,8 +9,8 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th><% __append(subCategory === 'detailed' ? 'Earned on' : 'Last earned on') %></th>
+                    <th><%= i18n.player_profile.achievements.column_name %></th>
+                    <th><% __append(subCategory === 'detailed' ? i18n.player_profile.achievements.column_earned : i18n.player_profile.achievements.column_last_earned) %></th>
                 </tr>
             </thead>
             <tbody>
@@ -26,13 +26,13 @@
                         <% for (let [type, count] of Object.entries(achievementsRepeatableCount)) { %>
                             <tr>
                                 <td><%= achievementTitles[type] %> (<%= count %>x)</td>
-                                <td><%= achievementsRepeatableLastEarned[type] || 'Never' %></td>
+                                <td><%= achievementsRepeatableLastEarned[type] || i18n.player_profile.achievements.never %></td>
                             </tr>
                         <% } %>
                     <% } -%>
                 <% } else { -%>
                     <tr>
-                        <td colspan="2">No achievements on this category yet.</td>
+                        <td colspan="2"><%= i18n.player_profile.achievements.category_no_achievements %></td>
                     </tr>
                 <% } -%>
             </tbody>
@@ -40,9 +40,9 @@
 
         <div class="section-actions">
             <% if (subCategory === 'detailed') { -%>
-                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable">Simplified daily/weekly achievement's view</a>
+                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable"><%= i18n.player_profile.achievements.view_simple_achievements %></a>
             <% } else { -%>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable/detailed">Detailed daily/weekly achievement's view</a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable/detailed"><%= i18n.player_profile.achievements.view_detailed_achievements %></a>
             <% } -%>
         </div>
     </section>

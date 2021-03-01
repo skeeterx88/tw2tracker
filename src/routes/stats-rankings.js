@@ -5,6 +5,7 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
+const i18n = require('../i18n.js');
 
 const {
     paramWorld,
@@ -41,7 +42,7 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const category = req.params.category;
 
     if (!rankingCategories.includes(category)) {
-        throw createError(404, 'This ranking category does not exist');
+        throw createError(404, i18n.errors.router_missing_category);
     }
 
     const page = req.params.page && !isNaN(req.params.page)
@@ -56,6 +57,7 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const capitalizedCategory = utils.capitalize(category);
 
     res.render('stats/ranking', {
+        i18n,
         title: `${capitalizedCategory} Ranking - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,

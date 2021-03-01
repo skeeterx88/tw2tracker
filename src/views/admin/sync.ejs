@@ -1,36 +1,36 @@
 <div class="content" id="sync">
     <div class="left">
         <section id="sync-worlds">
-            <h1>Sync Worlds</h1>
+            <h1><%= i18n.admin.sync.header_worlds %></h1>
 
             <div class="content-border">
                 <% for (let world of openWorlds) { %>
                     <div class="world world-container" id="world-<%= world.world_id %>" data-market-id="<%= world.market %>" data-world-number="<%= world.num %>">
                         <div class="short-info">
                             <p class="world-id">
-                                <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(' (Closed)') } -%></span>
+                                <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(` (${i18n.admin.sync.closed})`) } -%></span>
                             </p>
                             <fieldset>
-                                <legend>Data sync:</legend>
-                                <p>Last time: <span class="last-data-sync-date"><% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date) : 'never') %></span></p>
-                                <p>Last status: <span class="last-data-sync-status"><% __append(world.last_data_sync_status || '-') %></span></p>
+                                <legend><%= i18n.admin.sync.data_info %></legend>
+                                <p><%= i18n.admin.sync.last_time %> <span class="last-data-sync-date"><% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date) : i18n.admin.sync.never) %></span></p>
+                                <p><%= i18n.admin.sync.last_status %> <span class="last-data-sync-status"><% __append(world.last_data_sync_status || '-') %></span></p>
                             </fieldset>
                             <fieldset>
-                                <legend>Achievements sync:</legend>
-                                <p>Last time: <span class="last-achievements-sync-date"><% __append(world.last_achievements_sync_date ? formatDate(world.last_achievements_sync_date) : 'never') %></span></p>
-                                <p>Last status: <span class="last-achievements-sync-status"><% __append(world.last_achievements_sync_status || '-') %></span></p>
+                                <legend><%= i18n.admin.sync.achievements_info %></legend>
+                                <p><%= i18n.admin.sync.last_time %> <span class="last-achievements-sync-date"><% __append(world.last_achievements_sync_date ? formatDate(world.last_achievements_sync_date) : i18n.admin.sync.never) %></span></p>
+                                <p><%= i18n.admin.sync.last_status %> <span class="last-achievements-sync-status"><% __append(world.last_achievements_sync_status || '-') %></span></p>
                             </fieldset>
                         </div>
 
                         <div class="actions">
                             <% if (world.open) { -%>
                                 <% if (user.privileges[privilegeTypes.START_SYNC]) { %>
-                                    <a class="sync-data relax-button" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>">Sync data</a>
-                                    <a class="sync-achievements relax-button" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>">Sync achievements</a>
+                                    <a class="sync-data relax-button" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>"><%= i18n.admin.sync.button_sync_world_data %></a>
+                                    <a class="sync-achievements relax-button" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>"><%= i18n.admin.sync.button_sync_world_achievements %></a>
                                 <% } %>
 
                                 <% if (user.privileges[privilegeTypes.CONTROL_SYNC]) { %>
-                                    <a class="sync-toggle relax-button red right" href="/admin/sync/toggle/<%= world.market %>/<%= world.num %>">Disable sync</a>
+                                    <a class="sync-toggle relax-button red right" href="/admin/sync/toggle/<%= world.market %>/<%= world.num %>"><%= i18n.admin.sync.button_disable_sync %></a>
                                 <% } %>
                             <% } -%>
                         </div>
@@ -41,38 +41,38 @@
     </div>
     <div class="right">
         <section id="sync-summary">
-            <h1>Sync Summary</h1>
+            <h1><%= i18n.admin.sync.header_summary %></h1>
 
             <div class="content-border">
                 <p>
-                    <label>Sync data all worlds active:</label>
-                    <span id="sync-data-all-active">No</span>
+                    <label><%= i18n.admin.sync.sync_all_data_active %></label>
+                    <span id="sync-data-all-active"><%= i18n.admin.sync.no %></span>
                 </p>
 
                 <p>
-                    <label>Currently active sync data worlds:</label>
-                    <span id="sync-active-data-worlds"><span class="empty">None</span></span>
+                    <label><%= i18n.admin.sync.sync_data_active_worlds %></label>
+                    <span id="sync-active-data-worlds"><span class="empty"><%= i18n.admin.sync.none %></span></span>
                 </p>
 
                 <p>
-                    <label>Sync achievements all worlds active:</label>
-                    <span id="sync-achievements-all-active">No</span>
+                    <label><%= i18n.admin.sync.sync_all_achievements_active %></label>
+                    <span id="sync-achievements-all-active"><%= i18n.admin.sync.no %></span>
                 </p>
 
                 <p>
-                    <label>Currently active sync achievement worlds:</label>
-                    <span id="sync-active-achievement-worlds"><span class="empty">None</span></span>
+                    <label><%= i18n.admin.sync.sync_achievements_active_worlds %></label>
+                    <span id="sync-active-achievement-worlds"><span class="empty"><%= i18n.admin.sync.none %></span></span>
                 </p>
             </div>
         </section>
 
         <% if (user.privileges[privilegeTypes.START_SYNC]) { %>
             <section id="sync-panel">
-                <h1>Sync Panel</h1>
+                <h1><%= i18n.admin.sync.header_panel %></h1>
 
                 <div class="content-border">
                     <div class="actions">
-                        <a id="sync-world-list" class="relax-button" data-active="no" href="/admin/sync/worlds">Sync world list</a>
+                        <a id="sync-world-list" class="relax-button" data-active="no" href="/admin/sync/worlds"><%= i18n.admin.sync.button_sync_world_list %></a>
                     </div>
                 </div>
             </section>

@@ -11,14 +11,14 @@
     </colgroup>
     <thead>
         <tr>
-            <th>Rank</th>
-            <th>Tribe</th>
-            <th>Members</th>
-            <th>Points</th>
+            <th><%= i18n.world_ranking.column_rank %></th>
+            <th><%= i18n.world_ranking.column_tribe %></th>
+            <th><%= i18n.world_ranking.column_members %></th>
+            <th><%= i18n.world_ranking.column_points %></th>
             <% if (world.config.victory_points) { -%>
-                <th title="Victory Points">VP</th>
+                <th title="Victory Points"><%= i18n.world_ranking.column_victory_points %></th>
             <% } -%>
-            <th>Villages</th>
+            <th><%= i18n.world_ranking.column_villages %></th>
         </tr>
     </thead>
     <tbody>

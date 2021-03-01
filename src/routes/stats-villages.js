@@ -4,6 +4,7 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
+const i18n = require('../i18n.js');
 
 const {
     paramWorld,
@@ -32,6 +33,7 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
     const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
 
     res.render('stats/village', {
+        i18n,
         title: `Village ${village.name} (${village.x}|${village.y}) - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,

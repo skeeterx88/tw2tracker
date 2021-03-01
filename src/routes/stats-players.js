@@ -7,6 +7,7 @@ const utils = require('../utils.js');
 const config = require('../config.js');
 const enums = require('../enums.js');
 const achievementTitles = require('../achievement-titles.json');
+const i18n = require('../i18n.js');
 
 const {
     paramWorld,
@@ -63,6 +64,7 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
 
     res.render('stats/player', {
+        i18n,
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -116,6 +118,7 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const villages = await getPlayerVillages(worldId, playerId);
 
     res.render('stats/player-villages', {
+        i18n,
         title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -166,29 +169,29 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
         all: {
             sqlConquests: sql.getPlayerConquests,
             sqlCount: sql.getPlayerConquestsCount,
-            navigationTitle: 'Conquests'
+            navigationTitle: i18n.player_profile.achievements.sub_title_all
         },
         gain: {
             sqlConquests: sql.getPlayerConquestsGain,
             sqlCount: sql.getPlayerConquestsGainCount,
-            navigationTitle: 'Conquest Gains'
+            navigationTitle: i18n.player_profile.achievements.sub_title_gain
         },
         loss: {
             sqlConquests: sql.getPlayerConquestsLoss,
             sqlCount: sql.getPlayerConquestsLossCount,
-            navigationTitle: 'Conquest Losses'
+            navigationTitle: i18n.player_profile.achievements.sub_title_loss
         },
         self: {
             sqlConquests: sql.getPlayerConquestsSelf,
             sqlCount: sql.getPlayerConquestsSelfCount,
-            navigationTitle: 'Conquest Self'
+            navigationTitle: i18n.player_profile.achievements.sub_title_self
         }
     };
 
     const category = req.params.category ?? 'all';
 
     if (!conquestCategories.includes(category)) {
-        throw createError(404, 'This conquests sub page does not exist');
+        throw createError(404, i18n.errors.router_missing_sub_category);
     }
 
     const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, playerId, offset, limit}, function (conquest) {
@@ -207,6 +210,7 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/player-conquests', {
+        i18n,
         title: `Player ${player.name} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -267,6 +271,7 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/player-tribe-changes', {
+        i18n,
         title: `Player ${player.name} - Tribe Changes - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -317,28 +322,17 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
     const achievementCategoriesUnique = ['battle', 'points', 'tribe', 'special', 'friends', 'milestone', 'ruler'];
 
     if (selectedCategory && !achievementCategories.includes(selectedCategory)) {
-        throw createError(404, 'This achievement category does not exist');
+        throw createError(404, i18n.errors.router_missing_category);
     }
 
     if (selectedCategory === 'repeatable') {
         if (!(subCategory === 'detailed' || !subCategory)) {
-            throw createError(404, 'This achievement sub-category does not exist');
+            throw createError(404, i18n.errors.router_missing_sub_page);
         }
     } else if (subCategory) {
-        throw createError(404, 'This achievement sub-category does not exist');
+        throw createError(404, i18n.errors.router_missing_sub_page);
     }
 
-    const achievementCategoryTitles = {
-        overall: 'Overall',
-        battle: 'Battle',
-        points: 'Points',
-        tribe: 'Tribe',
-        repeatable: 'Daily / Weekly',
-        special: 'Special',
-        friends: 'Friends',
-        milestone: 'Milestone',
-        ruler: 'Ruler'
-    };
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]));
     const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId});
     const achievementByCategory = {};
@@ -378,7 +372,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
 
     if (!selectedCategory) {
         categoryTemplate = 'overview';
-        navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements';
+        navigationTitle = i18n.achievements[selectedCategory] + ' Achievements';
         
         const categoriesMaxPoints = {};
 
@@ -419,7 +413,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         }]);
     } else if (selectedCategory === 'repeatable') {
         categoryTemplate = 'repeatable';
-        navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements';
+        navigationTitle = i18n.achievements[selectedCategory] + ' Achievements';
 
         for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
@@ -436,10 +430,11 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         }
     } else {
         categoryTemplate = 'generic';
-        navigationTitle = achievementCategoryTitles[selectedCategory] + ' Achievements';
+        navigationTitle = i18n.achievements[selectedCategory] + ' Achievements';
     }
 
     res.render('stats/player-achievements', {
+        i18n,
         title: `Player ${player.name} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -457,7 +452,6 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         achievementsRepeatableLastEarned,
         achievementsRepeatableCount,
         achievementsRepeatableDetailed,
-        achievementCategoryTitles,
         achievementTitles,
         achievementTypes,
         navigationTitle,

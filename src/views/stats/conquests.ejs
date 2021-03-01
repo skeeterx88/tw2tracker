@@ -11,7 +11,7 @@
             <div class="content">
                 <div class="left-really-big">
                     <section id="players">
-                        <h2>World Conquests</h2>
+                        <h2><%= i18n.world_conquests.header_world_conquests %></h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
@@ -24,17 +24,17 @@
                                 </colgroup>
 
                                 <thead>
-                                    <th>Village</th>
-                                    <th>Points</th>
-                                    <th>Old owner</th>
-                                    <th>New owner</th>
-                                    <th>Date/Hour</th>
+                                    <th><%= i18n.world_conquests.conquest_village %></th>
+                                    <th><%= i18n.world_conquests.conquest_points %></th>
+                                    <th><%= i18n.world_conquests.conquest_old_owner %></th>
+                                    <th><%= i18n.world_conquests.conquest_new_owner %></th>
+                                    <th><%= i18n.world_conquests.conquest_date_hour %></th>
                                 </thead>
 
                                 <tbody>
                                     <% if (!conquests.length) { -%>
                                         <tr>
-                                            <td colspan="6">No results</td>
+                                            <td colspan="6"><%= i18n.world_conquests.no_conquests %></td>
                                         </tr>
                                     <% } else { -%>
                                         <% for (let conquest of conquests) { %>
@@ -57,7 +57,7 @@
                                                         <% } -%>
                                                     </td>
                                                 <% } else { -%>
-                                                    <td>Abandoned</td>
+                                                    <td><%= i18n.world_conquests.abandoned_village %></td>
                                                 <% } -%>
 
                                                 <td>
@@ -85,12 +85,12 @@
 
                 <div class="right-really-small">
                     <section class="world-map">
-                        <h2>World map</h2>
+                        <h2><%= i18n.stats_map.header_map %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= world.num %>"><%= i18n.stats_map.view_world_map %></a>
                         </div>
                     </section>
                 </div>

@@ -5,6 +5,7 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
+const i18n = require('../i18n.js');
 const enums = require('../enums.js');
 const privilegeTypes = require('../privileges.json');
 const syncSocket = require('../sync-socket.js');
@@ -18,17 +19,14 @@ const createError = require('http-errors');
 function createAdminMenu (user, selected) {
     const adminMenu = [
         ['sync', {
-            label: 'Sync',
             enabled: true,
             selected: selected === 'sync'
         }],
         ['accounts', {
-            label: 'Sync Accounts',
             enabled: user.privileges.modify_accounts,
             selected: selected === 'accounts'
         }],
         ['mods', {
-            label: 'Mod Accounts',
             enabled: user.privileges.modify_mods,
             selected: selected === 'mods'
         }]
@@ -57,6 +55,7 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
+        i18n,
         title: `Admin Panel - ${config.site_name}`,
         menu,
         subPage,
@@ -183,6 +182,7 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
+        i18n,
         title: `Admin Panel - Accounts - ${config.site_name}`,
         menu,
         subPage,
@@ -325,6 +325,7 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
+        i18n,
         title: `Admin Panel - Accounts - ${config.site_name}`,
         menu,
         subPage,

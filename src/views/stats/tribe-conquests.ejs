@@ -9,10 +9,10 @@
             <%- include('../navigation.ejs') %>
 
             <div class="sub-menu">
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests" class="item <% __append(category === 'all' ? ' selected' : '') %>">All</a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain" class="item <% __append(category === 'gain' ? ' selected' : '') %>">Gains</a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss" class="item <% __append(category === 'loss' ? ' selected' : '') %>">Losses</a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>">Self</a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests" class="item <% __append(category === 'all' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_all %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain" class="item <% __append(category === 'gain' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_gains %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss" class="item <% __append(category === 'loss' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_losses %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_self %></a>
             </div>
 
             <div class="content">
@@ -33,17 +33,17 @@
 
                                 <thead>
                                     <th></th>
-                                    <th>Village</th>
-                                    <th>Points</th>
-                                    <th>Old owner</th>
-                                    <th>New owner</th>
-                                    <th>Date/Hour</th>
+                                    <th><%= i18n.tribe_profile.conquests.column_village %></th>
+                                    <th><%= i18n.tribe_profile.conquests.column_points %></th>
+                                    <th><%= i18n.tribe_profile.conquests.column_old_owner %></th>
+                                    <th><%= i18n.tribe_profile.conquests.column_new_owner %></th>
+                                    <th><%= i18n.tribe_profile.conquests.column_date_hour %></th>
                                 </thead>
 
                                 <tbody>
                                     <% if (!conquests.length) { -%>
                                         <tr>
-                                            <td colspan="6">No conquests yet.</td>
+                                            <td colspan="6"><%= i18n.tribe_profile.conquests.no_conquests %></td>
                                         </tr>
                                     <% } else { -%>
                                         <% for (let conquest of conquests) { %>
@@ -67,7 +67,7 @@
                                                         <% } -%>
                                                     </td>
                                                 <% } else { -%>
-                                                    <td>Abandoned</td>
+                                                    <td><%= i18n.tribe_profile.abandoned_village %></td>
                                                 <% } -%>
 
                                                 <td>
@@ -95,12 +95,12 @@
 
                 <div class="right-really-small">
                     <section class="world-map">
-                        <h2>World map</h2>
+                        <h2><%= i18n.stats_map.header_map %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= world.num %>"><%= i18n.stats_map.view_world_map %></a>
                         </div>
                     </section>
                 </div>

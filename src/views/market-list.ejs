@@ -21,20 +21,20 @@
                                     <div class="info">
                                         <div class="stats">
                                             <fieldset>
-                                                <legend>Statistics:</legend>
+                                                <legend><%= i18n.market_list.stats %></legend>
                                                 <ul>
-                                                    <li><%= formatNumbers(market.players) %> players</li>
-                                                    <li><%= formatNumbers(market.tribes) %> tribes</li>
-                                                    <li><%= formatNumbers(market.villages) %> villages</li>
+                                                    <li><%= formatNumbers(market.players) %> <%= i18n.market_list.players %></li>
+                                                    <li><%= formatNumbers(market.tribes) %> <%= i18n.market_list.tribes %></li>
+                                                    <li><%= formatNumbers(market.villages) %> <%= i18n.market_list.villages %></li>
                                                 </ul>
                                             </fieldset>
                                         </div>
                                         <div class="worlds">
                                             <fieldset>
-                                                <legend>Worlds:</legend>
+                                                <legend><%= i18n.market_list.worlds %></legend>
                                                 <ul>
-                                                    <li>Open: <%= formatNumbers(market.openWorld) %></li>
-                                                    <li>Closed: <%= formatNumbers(market.closedWorld) %></li>
+                                                    <li><%= i18n.market_list.open %> <%= formatNumbers(market.openWorld) %></li>
+                                                    <li><%= i18n.market_list.closed %> <%= formatNumbers(market.closedWorld) %></li>
                                                 </ul>
                                             </fieldset>
                                         </div>

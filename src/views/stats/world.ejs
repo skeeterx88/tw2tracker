@@ -9,24 +9,24 @@
             <%- include('../navigation.ejs') %>
 
             <% if (world.incomplete_data) { -%>
-                <p class="error">This world has incomplete data and may be missing conquests and some accurate dates.</p>
+                <p class="error"><%= i18n.world.missing_data_warning %></p>
             <% } -%>
 
             <div class="content">
                 <div class="left">
                     <section id="search">
-                        <h2>Search</h2>
+                        <h2><%= i18n.world.header_search %></h2>
 
                         <div class="content-border">
                             <ul class="content-menu" id="search-categories">
-                               <li data-search-category="players" class="selected">Players</li>
-                               <li data-search-category="tribes">Tribes</li>
-                               <li data-search-category="villages">Villages</li>
+                               <li data-search-category="players" class="selected"><%= i18n.world.search_players %></li>
+                               <li data-search-category="tribes"><%= i18n.world.search_tribes %></li>
+                               <li data-search-category="villages"><%= i18n.world.search_villages %></li>
                             </ul>
                             <div class="wrapper">
                                 <form method="POST" action="/stats/<%= marketId %>/<%= world.num %>/search/">
                                     <input type="text" id="search-input" class="relax-input" name="query" autocomplete="off" maxlength="20" minlength="3">
-                                    <input type="submit" value="Search" class="relax-button">
+                                    <input type="submit" value="<%= i18n.world.search_search %>" class="relax-button">
                                     <input type="hidden" id="search-category" name="category" value="players">
                                 </form>
                             </div>
@@ -34,7 +34,7 @@
                     </section>
 
                     <section id="tribes">
-                        <h2>Tribes</h2>
+                        <h2><%= i18n.world.header_tribes %></h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
@@ -50,14 +50,14 @@
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>Rank</th>
-                                        <th>Tribe</th>
-                                        <th>Members</th>
-                                        <th>Points</th>
+                                        <th><%= i18n.world.column_rank %></th>
+                                        <th><%= i18n.world.column_tribe %></th>
+                                        <th><%= i18n.world.column_members %></th>
+                                        <th><%= i18n.world.column_points %></th>
                                         <% if (world.config && world.config.victory_points) { -%>
-                                            <th title="Victory Points">VP</th>
+                                            <th title="Victory Points"><%= i18n.world.column_victory_points %></th>
                                         <% } -%>
-                                        <th>Villages</th>
+                                        <th><%= i18n.world.column_villages %></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -85,12 +85,12 @@
                         </div>
 
                         <div class="section-actions">
-                            <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/tribes/">View complete tribes ranking</a>
+                            <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/tribes/"><%= i18n.world.view_tribes_ranking %></a>
                         </div>
                     </section>
 
                     <section id="players">
-                        <h2>Players</h2>
+                        <h2><%= i18n.world.header_players %></h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
@@ -106,12 +106,12 @@
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>Rank</th>
-                                        <th>Player</th>
-                                        <th>Tribe</th>
-                                        <th>Points</th>
+                                        <th><%= i18n.world.column_rank %></th>
+                                        <th><%= i18n.world.column_player %></th>
+                                        <th><%= i18n.world.column_tribe %></th>
+                                        <th><%= i18n.world.column_points %></th>
                                         <% if (world.config && world.config.victory_points) { -%>
-                                            <th title="Victory Points">VP</th>
+                                            <th title="Victory Points"><%= i18n.world.column_victory_points %></th>
                                         <% } -%>
                                         <th>Villages</th>
                                     </tr>
@@ -121,7 +121,7 @@
                                         <tr data-id="<%= player.id %>" data-highlight-type="players">
                                             <td><%= player.rank %></td>
                                             <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
-                                            
+
                                             <% if (player.tribe_id) { -%>
                                                 <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
                                             <% } else { -%>
@@ -142,12 +142,12 @@
                         </div>
 
                         <div class="section-actions">
-                            <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/players/">View complete players ranking</a>
+                            <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/players/"><%= i18n.world.view_players_ranking %></a>
                         </div>
                     </section>
 
                     <section id="last-conquests">
-                        <h2>World's last conquests</h2>
+                        <h2><%= i18n.world.header_conquests %></h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
@@ -159,16 +159,16 @@
                                 </colgroup>
 
                                 <thead>
-                                    <th>Village</th>
-                                    <th>Points</th>
-                                    <th>Old owner</th>
-                                    <th>New owner</th>
+                                    <th><%= i18n.world.column_village %></th>
+                                    <th><%= i18n.world.column_points %></th>
+                                    <th><%= i18n.world.column_old_owner %></th>
+                                    <th><%= i18n.world.column_new_owner %></th>
                                 </thead>
 
                                 <tbody>
                                     <% if (!lastConquests.length) { -%>
                                         <tr>
-                                            <td colspan="5">No conquests yet.</td>
+                                            <td colspan="5"><%= i18n.world.no_conquests %></td>
                                         </tr>
                                     <% } else { -%>
                                         <% for (let conquest of lastConquests) { %>
@@ -191,7 +191,7 @@
                                                         <% } -%>
                                                     </td>
                                                 <% } else { -%>
-                                                    <td>Abandoned</td>
+                                                    <td><%= i18n.world.abandoned_village %></td>
                                                 <% } -%>
 
                                                 <td>
@@ -213,12 +213,12 @@
                         </div>
 
                         <div class="section-actions">
-                            <a href="/stats/<%= marketId %>/<%= world.num %>/conquests/">View all world's conquests</a>
+                            <a href="/stats/<%= marketId %>/<%= world.num %>/conquests/"><%= i18n.world.view_world_conquests %></a>
                         </div>
                     </section>
 
                     <section id="daily-players-achievements">
-                        <h2>Daily player's achievements</h2>
+                        <h2><%= i18n.world.header_daily_players_achievements %></h2>
 
                         <div class="content-border">
                             <table class="vertical">
@@ -241,7 +241,7 @@
                                         <% } -%>
                                     <% } else { -%>
                                         <tr>
-                                            <td colspan="2">No daily achievements today.</td>
+                                            <td colspan="2"><%= i18n.world.no_daily_achievements %></td>
                                         </tr>
                                     <% } -%>
                                 </tbody>
@@ -250,7 +250,7 @@
                     </section>
 
                     <section id="weekly-players-achievements">
-                        <h2>Weekly player's achievements</h2>
+                        <h2><%= i18n.world.header_weekly_players_achievements %></h2>
 
                         <div class="content-border">
                             <table class="vertical">
@@ -273,7 +273,7 @@
                                         <% } -%>
                                     <% } else { -%>
                                         <tr>
-                                            <td colspan="2">No weekly achievements.</td>
+                                            <td colspan="2"><%= i18n.world.no_weekly_achievements %></td>
                                         </tr>
                                     <% } -%>
                                 </tbody>
@@ -282,7 +282,7 @@
                     </section>
 
                     <section id="daily-tribes-achievements">
-                        <h2>Daily tribe's achievements</h2>
+                        <h2><%= i18n.world.header_daily_tribes_achievements %></h2>
 
                         <div class="content-border">
                             <table class="vertical">
@@ -305,7 +305,7 @@
                                         <% } -%>
                                     <% } else { -%>
                                         <tr>
-                                            <td colspan="2">No daily achievements today.</td>
+                                            <td colspan="2"><%= i18n.world.no_daily_achievements %></td>
                                         </tr>
                                     <% } -%>
                                 </tbody>
@@ -314,7 +314,7 @@
                     </section>
 
                     <section id="weekly-tribes-achievements">
-                        <h2>Weekly tribe's achievements</h2>
+                        <h2><%= i18n.world.header_weekly_tribes_achievements %></h2>
 
                         <div class="content-border">
                             <table class="vertical">
@@ -337,7 +337,7 @@
                                         <% } -%>
                                     <% } else { -%>
                                         <tr>
-                                            <td colspan="2">No weekly achievements.</td>
+                                            <td colspan="2"><%= i18n.world.no_weekly_achievements %></td>
                                         </tr>
                                     <% } -%>
                                 </tbody>
@@ -346,18 +346,18 @@
                     </section>
 
                     <section>
-                        <h2>World statistics</h2>
+                        <h2><%= i18n.world.header_stats %></h2>
 
                         <div class="content-border">
                             <table>
                                 <tr>
-                                    <td><%= formatNumbers(world.player_count) %> players</td>
+                                    <td><%= formatNumbers(world.player_count) %> <%= i18n.world.stats_players %></td>
                                 </tr>
                                 <tr>
-                                    <td><%= formatNumbers(world.village_count) %> Villages</td>
+                                    <td><%= formatNumbers(world.village_count) %> <%= i18n.world.stats_villages %></td>
                                 </tr>
                                 <tr>
-                                    <td><%= formatNumbers(world.tribe_count) %> Tribes</td>
+                                    <td><%= formatNumbers(world.tribe_count) %> <%= i18n.world.stats_tribes %></td>
                                 </tr>
                             </table>
                         </div>
@@ -366,14 +366,14 @@
 
                 <div class="right">
                     <section class="world-map">
-                        <h2>World map</h2>
+                        <h2><%= i18n.stats_map.header_map %></h2>
 
                         <div id="map-container" class="content-border">
                             <div id="map"></div>
                         </div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= world.num %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= world.num %>"><%= i18n.stats_map.view_world_map %></a>
                         </div>
                     </section>
                 </div>

@@ -10,7 +10,7 @@
 
             <div class="content">
                 <div class="left">
-                    <h2>Player tribe changes</h2>
+                    <h2><%= i18n.player_profile.tribe_changes.header %></h2>
                     <table class="content-border">
                         <colgroup>
                             <col width="200px">
@@ -19,9 +19,9 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th>Date/Hour</th>
-                                <th>Old tribe</th>
-                                <th>New tribe</th>
+                                <th><%= i18n.player_profile.tribe_changes.column_date_hour %></th>
+                                <th><%= i18n.player_profile.tribe_changes.column_old_tribe %></th>
+                                <th><%= i18n.player_profile.tribe_changes.column_new_tribe %></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,19 +33,19 @@
                                         <% if (change.old_tribe) { -%>
                                             <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
                                         <% } else { -%>
-                                            <td>None</td>
+                                            <td><%= i18n.player_profile.tribe_changes.none %></td>
                                         <% } -%>
 
                                         <% if (change.new_tribe) { -%>
                                             <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
                                         <% } else { -%>
-                                            <td>None</td>
+                                            <td><%= i18n.player_profile.tribe_changes.none %></td>
                                         <% } -%>
                                     </tr>
                                 <% } %>
                             <% } else { -%>
                                 <tr>
-                                    <td colspan="4">No tribe changes yet</td>
+                                    <td colspan="4"><%= i18n.player_profile.tribe_changes.no_tribe_changes %></td>
                                 </tr>
                             <% } -%>
                         </tbody>

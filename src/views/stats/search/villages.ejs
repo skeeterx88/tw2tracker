@@ -7,10 +7,10 @@
     </colgroup>
     <thead>
         <tr>
-            <th>Village</th>
-            <th>Points</th>
-            <th>Owner</th>
-            <th>Tribe</th>
+            <th><%= i18n.world_search.column_villages %></th>
+            <th><%= i18n.world_search.column_points %></th>
+            <th><%= i18n.world_search.column_owner %></th>
+            <th><%= i18n.world_search.column_tribe %></th>
         </tr>
     </thead>
     <tbody>
@@ -22,7 +22,7 @@
                 <% if (village.player_id) { %>
                     <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
                 <% } else { %>
-                    <td>Abandoned</td>
+                    <td><%= i18n.world_search.abandoned_village %></td>
                 <% } %>
 
                 <% if (village.tribe_id) { %>

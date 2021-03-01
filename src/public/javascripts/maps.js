@@ -16,7 +16,8 @@ require([
         worldNumber,
         mapShare,
         lastDataSyncDate,
-        staticMapExpireTime
+        staticMapExpireTime,
+        i18n
     }
 ) {
     let colorPicker;
@@ -131,7 +132,7 @@ require([
                 },
                 noResults: () => {
                     const $item = document.createElement('li');
-                    $item.innerHTML = 'no results';
+                    $item.innerHTML = i18n.maps.search_no_results;
                     autoComplete.resultsList.view.appendChild($item);
                 },
                 highlight: true,
@@ -217,7 +218,7 @@ require([
             }
 
             $villages.classList.add('villages');
-            $villages.innerHTML = villages > 1 ? `${villages} villages` : `${villages} village`;
+            $villages.innerHTML = villages > 1 ? `${villages} ${i18n.maps.villages}` : `${villages} ${i18n.maps.village}`;
 
             $item.appendChild($icon);
             $item.appendChild($name);
@@ -505,7 +506,7 @@ require([
             } else {
                 const message = await response.text();
                 notif({
-                    title: 'Failed to load shared map highlights',
+                    title: i18n.errors.failed_load_map_share,
                     content: message,
                     timeout: 0
                 });
@@ -546,13 +547,13 @@ require([
                 const result = await map.shareMap(TW2Map.mapShareTypes.DYNAMIC);
 
                 notif({
-                    title: 'Dynamic map',
+                    title: i18n.maps.dynamic_map,
                     link: location.origin + result,
                     timeout: 0
                 });
             } catch (error) {
                 notif({
-                    title: 'Error generating map',
+                    title: i18n.errors.failed_gen_share_map,
                     content: error.message
                 });
             }
@@ -575,14 +576,14 @@ require([
                 const result = await map.shareMap(TW2Map.mapShareTypes.STATIC);
 
                 notif({
-                    title: 'Static map',
-                    content: `Static maps expires in ${staticMapExpireTime} after the last link access.`,
+                    title: i18n.maps.static_map,
+                    content: i18n.maps.notif_static_share_expire,
                     link: location.origin + result,
                     timeout: 0
                 });
             } catch (error) {
                 notif({
-                    title: 'Error generating map',
+                    title: i18n.errors.failed_gen_share_map,
                     content: error.message
                 });
             }

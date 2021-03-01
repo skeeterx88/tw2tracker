@@ -10,10 +10,10 @@
         </colgroup>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Points</th>
-                <th>Milestone</th>
-                <th>Unlocked on</th>
+                <th><%= i18n.player_profile.achievements.column_name %></th>
+                <th><%= i18n.player_profile.achievements.column_points %></th>
+                <th><%= i18n.player_profile.achievements.column_milestone %></th>
+                <th><%= i18n.player_profile.achievements.column_unlocked_on %></th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
                 <% } %>
             <% } else { -%>
                 <tr>
-                    <td colspan="4">No achievements on this category yet.</td>
+                    <td colspan="4"><%= i18n.player_profile.achievements.category_no_achievements %></td>
                 </tr>
             <% } -%>
         </tbody>

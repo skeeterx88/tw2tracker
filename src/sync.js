@@ -152,7 +152,6 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
                 return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate]);
             }
 
-            
             page = await createPuppeteerPage();
             await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
 

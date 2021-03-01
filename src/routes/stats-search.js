@@ -5,6 +5,7 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
+const i18n = require('../i18n.js');
 
 const {
     paramWorld,
@@ -28,7 +29,7 @@ const searchPostRedirectRouter = utils.asyncRouter(async function (req, res, nex
     const category = (req.body.category || '').toLowerCase();
 
     if (!searchCategories.includes(category)) {
-        throw createError(404, 'This search category does not exist');
+        throw createError(404, i18n.errors.router_missing_category);
     }
 
     return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
@@ -69,15 +70,15 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
     const rawQuery = decodeURIComponent(req.params.query);
 
     if (!rawQuery) {
-        throw createError(500, 'No search specified');
+        throw createError(500, i18n.world_search.error_no_search);
     }
 
     if (rawQuery.length < 3) {
-        throw createError(500, 'Minimum search characters is 3');
+        throw createError(500, i18n.world_search.error_min_chars);
     }
 
     if (rawQuery.length > 20) {
-        throw createError(500, 'Maximum search characters is 20');
+        throw createError(500, i18n.world_search.error_max_chars);
     }
 
     const query = '%' + rawQuery + '%';
@@ -86,6 +87,7 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
     const total = allResults.length;
 
     return res.render('stats/search', {
+        i18n,
         title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,

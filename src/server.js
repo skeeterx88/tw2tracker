@@ -18,6 +18,7 @@ const db = require('./db.js');
 const sql = require('./sql.js');
 const config = require('./config.js');
 const enums = require('./enums.js');
+const i18n = require('./i18n.js');
 
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT;
 const app = express();
@@ -59,13 +60,13 @@ passport.use(new passportLocal.Strategy({
 
     if (!account) {
         return done(null, false, {
-            message: enums.AUTH_ERROR_ACCOUNT_NOT_EXIST
+            message: i18n.admin[enums.AUTH_ERROR_ACCOUNT_NOT_EXIST]
         });
     }
 
     if (!account.enabled) {
         return done(null, false, {
-            message: enums.AUTH_ERROR_ACCOUNT_NOT_ENABLED
+            message: i18n.admin[enums.AUTH_ERROR_ACCOUNT_NOT_ENABLED]
         });
     }
 
@@ -73,7 +74,7 @@ passport.use(new passportLocal.Strategy({
 
     if (!match) {
         return done(null, false, {
-            message: enums.AUTH_ERROR_INVALID_PASSWORD
+            message: i18n.admin[enums.AUTH_ERROR_INVALID_PASSWORD]
         });
     }
 
@@ -123,6 +124,7 @@ app.use(function (err, req, res, next) {
     res.locals.error = req.app.get('env') === 'development' ? err.stack : err.message;
     res.locals.status = status;
     res.locals.title = 'Tw2-Tracker Error';
+    res.locals.i18n = i18n;
 
     res.status(status);
     res.render('error');

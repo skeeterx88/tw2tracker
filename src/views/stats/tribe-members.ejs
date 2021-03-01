@@ -11,7 +11,7 @@
             <div class="content">
                 <div class="left">
                     <section id="players">
-                        <h2>Tribe Members</h2>
+                        <h2><%= i18n.tribe_profile.members.header_tribe_members %></h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
@@ -23,16 +23,16 @@
                                 </colgroup>
 
                                 <thead>
-                                    <th>Rank</th>
-                                    <th>Name</th>
-                                    <th>Points</th>
-                                    <th>Villages</th>
+                                    <th><%= i18n.tribe_profile.members.column_rank %></th>
+                                    <th><%= i18n.tribe_profile.members.column_name %></th>
+                                    <th><%= i18n.tribe_profile.members.column_points %></th>
+                                    <th><%= i18n.tribe_profile.members.column_villages %></th>
                                 </thead>
 
                                 <tbody>
                                     <% if (!members.length) { %>
                                         <tr>
-                                            <td colspan="4">This tribe does not have any members.</td>
+                                            <td colspan="4"><%= i18n.tribe_profile.members.no_members %></td>
                                         </tr>
                                     <% } %>
 
@@ -52,12 +52,12 @@
 
                 <div class="right">
                     <section class="world-map">
-                        <h2>World map</h2>
+                        <h2><%= i18n.stats_map.header_map %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n.stats_map.view_world_map %></a>
                         </div>
                     </section>
                 </div>

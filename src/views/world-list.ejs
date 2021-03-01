@@ -26,11 +26,11 @@
                                                     <div class="info">
                                                         <div class="stats">
                                                             <fieldset>
-                                                                <legend>Statistics:</legend>
+                                                                <legend><%= i18n.world_list.stats %></legend>
                                                                 <ul>
-                                                                    <li><%= formatNumbers(world.player_count) %> players</li>
-                                                                    <li><%= formatNumbers(world.tribe_count) %> tribes</li>
-                                                                    <li><%= formatNumbers(world.village_count) %> villages</li>
+                                                                    <li><%= formatNumbers(world.player_count) %> <%= i18n.world_list.players %></li>
+                                                                    <li><%= formatNumbers(world.tribe_count) %> <%= i18n.world_list.tribes %></li>
+                                                                    <li><%= formatNumbers(world.village_count) %> <%= i18n.world_list.villages %></li>
                                                                 </ul>
                                                             </fieldset>
                                                         </div>
@@ -38,10 +38,10 @@
                                                         <% if (world.config) { -%>
                                                             <div class="settings">
                                                                 <fieldset>
-                                                                    <legend>Settings:</legend>
+                                                                    <legend><%= i18n.world_list.settings %></legend>
                                                                     <ul>
-                                                                        <li>World Type: <% __append(world.config.victory_points ? 'Victory Points' : 'Domination') %></li>
-                                                                        <li>Troop relocation: <% __append(world.config.relocate_units ? 'Enabled' : 'Disabled') %></li>
+                                                                        <li><%= i18n.world_list.setting_world_type %> <% __append(world.config.victory_points ? i18n.world_list.world_type_victory_points : i18n.world_list.world_type_domination) %></li>
+                                                                        <li><%= i18n.world_list.setting_troop_relocation %> <% __append(world.config.relocate_units ? i18n.world_list.setting_enabled : i18n.world_list.setting_disabled) %></li>
                                                                     </ul>
                                                                 </fieldset>
                                                             </div>
@@ -50,8 +50,8 @@
 
                                                     <% if (world.open_date || world.close_date) { -%>
                                                         <div class="world-dates">
-                                                            <% if (world.open_date) __append('Opened: ', formatDate(world.open_date, 'day-only')) -%>
-                                                            <% if (world.close_date) __append('- Closed: ', formatDate(world.close_date, 'day-only')) -%>
+                                                            <% if (world.open_date) __append(i18n.world_list.opened, ' ', formatDate(world.open_date, 'day-only')) -%>
+                                                            <% if (world.close_date) __append('- ', i18n.world_list.closed, ' ', formatDate(world.close_date, 'day-only')) -%>
                                                         </div>
                                                     <% } -%>
                                                 </div>

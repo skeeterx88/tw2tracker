@@ -7,6 +7,7 @@ const utils = require('../utils.js');
 const enums = require('../enums.js');
 const config = require('../config.js');
 const achievementTitles = require('../achievement-titles.json');
+const i18n = require('../i18n.js');
 
 const {
     paramWorld,
@@ -47,6 +48,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count;
 
     res.render('stats/tribe', {
+        i18n,
         title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -104,29 +106,29 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
         all: {
             sqlConquests: sql.getTribeConquests,
             sqlCount: sql.getTribeConquestsCount,
-            navigationTitle: 'Conquests'
+            navigationTitle: i18n.tribe_profile.achievements.sub_title_all
         },
         gain: {
             sqlConquests: sql.getTribeConquestsGain,
             sqlCount: sql.getTribeConquestsGainCount,
-            navigationTitle: 'Conquest Gains'
+            navigationTitle: i18n.tribe_profile.achievements.sub_title_gain
         },
         loss: {
             sqlConquests: sql.getTribeConquestsLoss,
             sqlCount: sql.getTribeConquestsLossCount,
-            navigationTitle: 'Conquest Losses'
+            navigationTitle: i18n.tribe_profile.achievements.sub_title_loss
         },
         self: {
             sqlConquests: sql.getTribeConquestsSelf,
             sqlCount: sql.getTribeConquestsSelfCount,
-            navigationTitle: 'Conquest Self'
+            navigationTitle: i18n.tribe_profile.achievements.sub_title_self
         }
     };
 
     const category = req.params.category ?? 'all';
 
     if (!conquestCategories.includes(category)) {
-        throw createError(404, 'This conquests sub page does not exist');
+        throw createError(404, i18n.errors.router_missing_sub_page);
     }
 
     const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
@@ -145,6 +147,7 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/tribe-conquests', {
+        i18n,
         title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -193,6 +196,7 @@ const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
     const members = await db.any(sql.getTribeMembers, {worldId, tribeId});
 
     res.render('stats/tribe-members', {
+        i18n,
         title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -242,6 +246,7 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const total = allVillages.length;
 
     res.render('stats/tribe-villages', {
+        i18n,
         title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -304,6 +309,7 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/tribe-member-changes', {
+        i18n,
         title: `Tribe ${tribe.tag} - Member Changes - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -347,7 +353,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
     const subCategory = req.params.subCategory;
 
     if (subCategory && subCategory !== 'detailed') {
-        throw createError(404, 'This achievement sub-category does not exist');
+        throw createError(404, i18n.errors.router_missing_sub_page);
     }
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId});
@@ -378,6 +384,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
     }
 
     res.render('stats/tribe-achievements', {
+        i18n,
         title: `Tribe ${tribe.tag} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,

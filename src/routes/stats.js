@@ -6,6 +6,7 @@ const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
 const achievementTitles = require('../achievement-titles.json');
+const i18n = require('../i18n.js');
 
 const {
     paramWorld,
@@ -37,6 +38,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     });
 
     res.render('market-list', {
+        i18n,
         title: config.site_name,
         pageType: 'stats',
         marketStats,
@@ -58,7 +60,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     const marketWorlds = syncedWorlds.filter((world) => world.market === marketId);
 
     if (!marketWorlds.length) {
-        throw createError(404, 'This server does not exist or does not have any available world');
+        throw createError(404, i18n.errors.missing_world);
     }
 
     const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num);
@@ -68,6 +70,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     ];
 
     res.render('world-list', {
+        i18n,
         title: `${marketId.toUpperCase()} - ${config.site_name}`,
         marketId,
         worlds,
@@ -139,6 +142,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     };
 
     res.render('stats/world', {
+        i18n,
         title: `${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,

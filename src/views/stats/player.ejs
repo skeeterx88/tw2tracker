@@ -11,7 +11,7 @@
             <div class="content">
                 <div class="left">
                     <section id="player">
-                        <h2>Player profile</h2>
+                        <h2><%= i18n.player_profile.header_player_profile %></h2>
 
                         <div class="content-border">
                             <table class="vertical">
@@ -21,49 +21,49 @@
                                 </colgroup>
                                 <tbody>
                                     <tr>
-                                        <th>Rank:</th>
+                                        <th><%= i18n.player_profile.player_rank %></th>
                                         <td><%= formatNumbers(player.rank) %></td>
                                     </tr>
                                     <tr>
-                                        <th>Name:</th>
+                                        <th><%= i18n.player_profile.player_name %></th>
                                         <td><%= player.name %></td>
                                     </tr>
                                     <tr>
-                                        <th>Tribe:</th>
+                                        <th><%= i18n.player_profile.player_tribe %></th>
                                         <td>
                                             <% if (tribe) { %>
                                                 <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>"><%= tribe.name %> (<%= tribe.tag %>)</a>
                                             <% } else { %>
-                                                No tribe
+                                                <%= i18n.player_profile.no_tribe %>
                                             <% } %>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>Villages:</th>
+                                        <th><%= i18n.player_profile.player_villages %></th>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/villages"><%= formatNumbers(player.villages) %></a></td>
                                     </tr>
                                     <tr>
-                                        <th>Points:</th>
+                                        <th><%= i18n.player_profile.player_points %></th>
                                         <td><%= formatNumbers(player.points) %></td>
                                     </tr>
                                     <tr>
-                                        <th>Bash Attack:</th>
+                                        <th><%= i18n.player_profile.player_bash_attack %></th>
                                         <td><%= formatNumbers(player.bash_points_off) %></td>
                                     </tr>
                                     <tr>
-                                        <th>Bash Defense:</th>
+                                        <th><%= i18n.player_profile.player_bash_defense %></th>
                                         <td><%= formatNumbers(player.bash_points_def) %></td>
                                     </tr>
                                     <tr>
-                                        <th>Average Points/Village:</th>
+                                        <th><%= i18n.player_profile.player_avg_points_village %></th>
                                         <td><%= formatNumbers(player.points_per_villages) %></td>
                                     </tr>
                                     <tr>
-                                        <th>Tribe Changes:</th>
+                                        <th><%= i18n.player_profile.player_tribe_changes %></th>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/tribe-changes"><%= formatNumbers(tribeChangesCount) %></a></td>
                                     </tr>
                                     <tr>
-                                        <th>Village Conquers:</th>
+                                        <th><%= i18n.player_profile.player_conquests %></th>
                                         <td>
                                             <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= formatNumbers(conquestCount) %></a>
                                             (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests/gain"><%= formatNumbers(conquestGainCount) %></a>
@@ -72,19 +72,19 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>Achievement Points:</th>
+                                        <th><%= i18n.player_profile.player_achievement_points %></th>
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements"><%= formatNumbers(achievementPoints) %></a></td>
                                     </tr>
                                     <tr>
-                                        <th>Best Rank:</th>
+                                        <th><%= i18n.player_profile.player_record_rank %></th>
                                         <td><%= formatNumbers(player.best_rank) %> <small class="right"><%= formatDate(player.best_rank_date, world.time_offset, 'hours-only') %></small></td>
                                     </tr>
                                     <tr>
-                                        <th>Most Points:</th>
+                                        <th><%= i18n.player_profile.player_record_points %></th>
                                         <td><%= formatNumbers(player.best_points) %> <small class="right"><%= formatDate(player.best_points_date, world.time_offset, 'hours-only') %></small></td>
                                     </tr>
                                     <tr>
-                                        <th>Most Villages:</th>
+                                        <th><%= i18n.player_profile.player_record_villages %></th>
                                         <td><%= formatNumbers(player.best_villages) %> <small class="right"><%= formatDate(player.best_villages_date, world.time_offset, 'hours-only') %></small></td>
                                     </tr>
                                 </tbody>
@@ -93,7 +93,7 @@
                     </section>
 
                     <section id="player-latest-achievements">
-                        <h2>Latest achievements</h2>
+                        <h2><%= i18n.player_profile.header_last_achievements %></h2>
 
                         <div class="content-border">
                             <table>
@@ -103,8 +103,8 @@
                                 </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Date/Hour</th>
+                                        <th><%= i18n.player_profile.achievement_name %></th>
+                                        <th><%= i18n.player_profile.achievement_date_time %></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -122,7 +122,7 @@
                                         <% } -%>
                                     <% } else { -%>
                                         <tr>
-                                            <td colspan="2">No recent achievements.</td>
+                                            <td colspan="2"><%= i18n.player_profile.no_recent_achievements %></td>
                                         </tr>
                                     <% } -%>
                                 </tbody>
@@ -130,19 +130,19 @@
                         </div>
 
                         <div class="section-actions">
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements">View player's achievements</a>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements"><%= i18n.player_profile.view_player_achievements %></a>
                         </div>
                     </section>
                 </div>
 
                 <div class="right">
                     <section class="world-map">
-                        <h2>World map</h2>
+                        <h2><%= i18n.stats_map.header_map %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n.stats_map.view_world_map %></a>
                         </div>
                     </section>
                 </div>

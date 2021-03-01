@@ -8,8 +8,8 @@
         </colgroup>
         <thead>
             <tr>
-                <th>Category</th>
-                <th>Progress</th>
+                <th><%= i18n.player_profile.achievements.column_category %></th>
+                <th><%= i18n.player_profile.achievements.column_progress %></th>
             </tr>
         </thead>
         <tbody>
@@ -18,7 +18,7 @@
 
                 <tr>
                     <td>
-                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= achievementCategoryTitles[category] %></a>
+                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= i18n.achievements[category] %></a>
                     </td>
                     <td>
                         <div class="progress-bar-wrapper">

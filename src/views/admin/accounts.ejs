@@ -1,18 +1,18 @@
 <div class="content" id="accounts">
     <div class="left">
         <section>
-            <h1>Sync Accounts</h1>
+            <h1><%= i18n.admin.sync_accounts.header_accounts %></h1>
 
             <div class="content-border">
                 <% for (let account of accounts) { %>
                     <div id="account-<%= account.id %>" class="account world-container">
                         <form method="POST" action="/admin/accounts/edit">
                             <label class="input">
-                                <span>Name:</span>
+                                <span><%= i18n.admin.username_label %></span>
                                 <input type="text" class="relax-input" name="name" value="<%= account.name %>" minlength="4">
                             </label>
                             <label class="input">
-                                <span>Pass:</span>
+                                <span><%= i18n.admin.password_label %></span>
                                 <input type="text" class="relax-input" name="pass" value="<%= account.pass %>" minlength="4">
                             </label>
 
@@ -21,31 +21,31 @@
                         </form>
 
                         <fieldset>
-                            <legend>Account markets:</legend>
+                            <legend><%= i18n.admin.sync_accounts.account_markets %></legend>
                             <% if (account.markets.length) { %>
                                 <% for (let marketId of account.markets) { %>
-                                    <a href="/admin/accounts/markets/remove/<%= account.id %>/<%= marketId %>"><span title="Click to remove market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
+                                    <a href="/admin/accounts/markets/remove/<%= account.id %>/<%= marketId %>"><span title="<%= i18n.admin.sync_accounts.click_to_remove %>:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
                                 <% } %>
                             <% } else { %>
-                                <span>No markets included.</span>
+                                <span><%= i18n.admin.sync_accounts.no_markets %></span>
                             <% } %>
                         </fieldset>
 
                         <fieldset>
-                            <legend>Available markets:</legend>
+                            <legend><%= i18n.admin.sync_accounts.available_markets %></legend>
                             <% if (account.missingMarkets.length) { %>
                                 <% for (let marketId of account.missingMarkets) { %>
-                                    <a href="/admin/accounts/markets/add/<%= account.id %>/<%= marketId %>"><span title="Click to add market:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
+                                    <a href="/admin/accounts/markets/add/<%= account.id %>/<%= marketId %>"><span title="<%= i18n.admin.sync_accounts.click_to_add %>:<%= marketId %>" class="flag-<%= marketId %>"></span></a>
                                 <% } %>
                             <% } else { %>
-                                <span>All markets included.</span>
+                                <span><%= i18n.admin.sync_accounts.all_markets %></span>
                             <% } %>
                         </fieldset>
 
                         <div class="actions">
-                            <a class="relax-button" href="/admin/accounts/markets/add/<%= account.id %>">Add markets</a>
-                            <a class="relax-button" href="/admin/accounts/markets/remove/<%= account.id %>">Test account</a>
-                            <a class="relax-button red right" href="/admin/accounts/delete/<%= account.id %>">Delete account</a>
+                            <a class="relax-button" href="/admin/accounts/markets/add/<%= account.id %>"><%= i18n.admin.sync_accounts.add_account %></a>
+                            <a class="relax-button" href="/admin/accounts/markets/remove/<%= account.id %>"><%= i18n.admin.sync_accounts.test_account %></a>
+                            <a class="relax-button red right" href="/admin/accounts/delete/<%= account.id %>"><%= i18n.admin.sync_accounts.delete_account %></a>
                         </div>
                     </div>
                 <% } %>
@@ -55,23 +55,23 @@
 
     <div class="right">
         <section>
-            <h1>Add Sync Account</h1>
+            <h1><%= i18n.admin.sync_accounts.header_add_account %></h1>
 
             <div class="content-border">
                 <div class="account world-container">
                     <form method="POST" action="/admin/accounts/create">
                         <label class="input">
-                            <span>Name:</span>
+                            <span><%= i18n.admin.username_label %></span>
                             <input type="text" class="relax-input" name="name" minlength="4">
                         </label>
 
                         <label class="input">
-                            <span>Pass:</span>
+                            <span><%= i18n.admin.password_label %></span>
                             <input type="text" class="relax-input" name="pass" minlength="4">
                         </label>
 
                         <div class="actions">
-                            <input type="submit"  class="relax-button" value="Add account"/>
+                            <input type="submit"  class="relax-button" value="<%= i18n.admin.sync_accounts.add_account %>"/>
                         </div>
                     </form>
                 </div>

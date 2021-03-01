@@ -7,6 +7,7 @@ const utils = require('../utils.js');
 const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
+const i18n = require('../i18n.js');
 
 const mapsAPIRouter = require('./maps-api.js');
 
@@ -26,6 +27,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     });
 
     res.render('market-list', {
+        i18n,
         title: `Maps - Server List - ${config.site_name}`,
         pageType: 'stats',
         marketStats,
@@ -48,15 +50,16 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num);
 
     if (!marketWorlds.length) {
-        throw createError(404, 'This server does not exist or does not have any available world');
+        throw createError(404, i18n.errors.missing_world);
     }
 
     const worlds = [
-        ['Open Worlds', sortedWorlds.filter(world => world.open)],
-        ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
+        [i18n.world_list.open_worlds, sortedWorlds.filter(world => world.open)],
+        [i18n.world_list.closed_worlds, sortedWorlds.filter(world => !world.open)]
     ];
 
     res.render('world-list', {
+        i18n,
         title: `Maps ${marketId.toUpperCase()} - World List - ${config.site_name}`,
         marketId,
         worlds,
@@ -85,21 +88,23 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     try {
         await fs.promises.access(path.join('.', 'data', worldId, 'info'));
     } catch (error) {
-        throw createError(404, 'This world does not exist');
+        throw createError(404, i18n.errors.missing_world);
     }
 
     if (!await utils.schemaExists(worldId)) {
-        throw createError(404, 'This world does not exist');
+        throw createError(404, i18n.errors.missing_world);
     }
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber]);
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
 
     res.render('maps/map', {
+        i18n,
         title: `Map ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         world,
         backendValues: {
+            i18n,
             marketId,
             worldNumber,
             worldName: world.name,
@@ -123,7 +128,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     const worldExists = await utils.schemaExists(marketId + worldNumber);
 
     if (!worldExists) {
-        throw createError(404, 'This world does not exist');
+        throw createError(404, i18n.errors.missing_world);
     }
 
     const world = await db.one(sql.getWorld, [marketId, worldNumber]);
@@ -132,7 +137,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     try {
         mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber]);
     } catch (error) {
-        throw createError(404, 'This map share does not exist');
+        throw createError(404, i18n.errors.missing_map_share);
     }
 
     mapShare.creation_date = new Date(mapShare.creation_date).getTime();
@@ -141,6 +146,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     db.query(sql.maps.updateShareAccess, [mapShareId]);
 
     res.render('maps/map', {
+        i18n,
         title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${config.site_name}`,
         marketId,
         world,

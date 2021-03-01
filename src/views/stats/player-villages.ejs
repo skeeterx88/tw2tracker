@@ -10,7 +10,7 @@
 
             <div class="content">
                 <div class="left">
-                    <h2>Player villages</h2>
+                    <h2><%= i18n.player_profile.villages.header %></h2>
                     <table class="content-border quick-highlight">
                         <colgroup>
                             <col width="*">
@@ -19,9 +19,9 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Coords</th>
-                                <th>Points</th>
+                                <th><%= i18n.player_profile.villages.column_name %></th>
+                                <th><%= i18n.player_profile.villages.column_coords %></th>
+                                <th><%= i18n.player_profile.villages.column_points %></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -37,12 +37,12 @@
                 </div>
                 <div class="right">
                     <section class="world-map">
-                        <h2>World map</h2>
+                        <h2><%= i18n.stats_map.header_map %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>">View complete world map</a>
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n.stats_map.view_world_map %></a>
                         </div>
                     </section>
                 </div>

@@ -8,6 +8,7 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const enums = require('../enums.js');
+const i18n = require('../i18n.js');
 const {paramWorldParse} = require('../router-helpers.js');
 
 const GZIP_EMPTY_CONTINENT = Buffer.from([31, 139, 8, 0, 0, 0, 0, 0, 0, 3, 171, 174, 5, 0, 67, 191, 166, 163, 2, 0, 0, 0]);
@@ -32,7 +33,7 @@ const getWorldInfoRouter = utils.asyncRouter(async function (req, res) {
     try {
         await fs.promises.access(dataPath);
     } catch (error) {
-        throw createError(500, 'Share data not found');
+        throw createError(500, i18n.errors.map_share_not_found);
     }
 
     const ifNoneMatchValue = req.headers['if-none-match'];
@@ -75,7 +76,7 @@ const getContinentRouter = utils.asyncRouter(async function (req, res) {
     const continentId = req.params.continentId;
 
     if (continentId < 0 || continentId > 99 || isNaN(continentId)) {
-        throw createError(400, 'Invalid continent');
+        throw createError(400, i18n.maps.error_invalid_continent);
     }
 
     let dataPath;
@@ -133,7 +134,7 @@ const getStructRouter = utils.asyncRouter(async function (req, res) {
     try {
         await fs.promises.access(structPath);
     } catch (error) {
-        throw createError(500, 'Struct data not found');
+        throw createError(500, i18n.maps.error_struct_not_found);
     }
 
     const ifNoneMatchValue = req.headers['if-none-match'];
@@ -168,19 +169,19 @@ const crateShareRouter = utils.asyncRouter(async function (req, res) {
 
     if (!worldExists) {
         res.status(404);
-        res.end('World does not exist');
+        res.end(i18n.maps.error_world_not_found);
         return;
     }
 
     if (!highlights || !Array.isArray(highlights)) {
         res.status(400);
-        res.end('Invalid highlights data');
+        res.end(i18n.maps.error_invalid_highlights);
         return;
     }
 
     if (!highlights.length) {
         res.status(400);
-        res.end('No highlights specified');
+        res.end(i18n.maps.error_no_highlights_input);
         return;
     }
 
@@ -228,7 +229,7 @@ const getShareRouter = utils.asyncRouter(async function (req, res) {
 
     if (!worldExists) {
         res.status(404);
-        res.end('World does not exist');
+        res.end(i18n.errors.map_share_not_found);
         return;
     }
 
@@ -240,7 +241,7 @@ const getShareRouter = utils.asyncRouter(async function (req, res) {
         res.end(JSON.stringify(mapShare));
     } catch (error) {
         res.status(404);
-        res.end('Map share does not exist');
+        res.end(i18n.errors.map_share_not_found);
     }
 });
 

@@ -10,7 +10,7 @@
 
             <div class="content">
                 <div class="left">
-                    <h2>Tribe member changes</h2>
+                    <h2><%= i18n.tribe_profile.member_changes.header_tribe_member_changes %></h2>
                     <table class="content-border">
                         <colgroup>
                             <col width="200px">
@@ -19,9 +19,9 @@
                         </colgroup>
                         <thead>
                             <tr>
-                                <th>Date/Hour</th>
-                                <th>Player</th>
-                                <th>Action</th>
+                                <th><%= i18n.tribe_profile.member_changes.column_date_hour %></th>
+                                <th><%= i18n.tribe_profile.member_changes.column_player %></th>
+                                <th><%= i18n.tribe_profile.member_changes.column_action %></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -32,15 +32,15 @@
                                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
                                         <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
-                                            <td>Left</td>
+                                            <td><%= i18n.tribe_profile.member_changes.left %></td>
                                         <% } else { -%>
-                                            <td>Join</td>
+                                            <td><%= i18n.tribe_profile.member_changes.join %></td>
                                         <% } -%>
                                     </tr>
                                 <% } %>
                             <% } else { -%>
                                 <tr>
-                                    <td colspan="4">No member changes yet</td>
+                                    <td colspan="4"><%= i18n.tribe_profile.member_changes.no_changes %></td>
                                 </tr>
                             <% } -%>
                         </tbody>
