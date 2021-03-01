@@ -248,7 +248,6 @@ no_conquests = "No conquests yet."
 
 [player_profile.achievements]
 achievements = "Achievements"
-overview = "lol"
 column_name = "Name"
 column_unlocked_on = "Unlocked on"
 column_last_earned = "Last earned on"
