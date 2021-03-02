@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const config = require('../config.js');
+const i18n = require('../i18n.js');
+const {createPageTitle} = require('../router-helpers.js');
 
 router.get('/', async function (req, res, next) {
     const [error] = req.flash('error');
 
     res.render('login', {
-        title: i18n.page_titles.admin_panel_login,
+        title: createPageTitle(i18n.page_titles.admin_panel_login, [config.site_name]),
         error
     });
 });

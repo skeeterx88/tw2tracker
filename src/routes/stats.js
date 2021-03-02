@@ -13,7 +13,8 @@ const {
     paramWorldParse,
     paramMarket,
     groupAchievements,
-    createNavigation
+    createNavigation,
+    createPageTitle
 } = require('../router-helpers.js');
 
 const rankingsRouter = require('./stats-rankings.js');
@@ -39,7 +40,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     });
 
     res.render('market-list', {
-        title: i18n.page_titles.stats_servers,
+        title: createPageTitle(i18n.page_titles.stats_servers, [config.site_name]),
         pageType: 'stats',
         marketStats,
         navigation: createNavigation([
@@ -69,7 +70,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     ];
 
     res.render('world-list', {
-        title: i18n.page_titles.stats_worlds,
+        title: createPageTitle(i18n.page_titles.stats_worlds, [marketId.toUpperCase(), config.site_name]),
         marketId,
         worlds,
         pageType: 'stats',
@@ -139,7 +140,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     };
 
     res.render('stats/world', {
-        title: i18n.page_titles.stats_world,
+        title: createPageTitle(i18n.page_titles.stats_world, [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         players,

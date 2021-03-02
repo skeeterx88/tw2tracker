@@ -10,7 +10,8 @@ const {
     paramWorld,
     paramWorldParse,
     createPagination,
-    createNavigation
+    createNavigation,
+    createPageTitle
 } = require('../router-helpers.js');
 
 const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
@@ -36,7 +37,7 @@ const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const total = parseInt((await db.one(sql.getWorldConquestsCount, {worldId})).count, 10);
 
     res.render('stats/conquests', {
-        title: i18n.page_titles.stats_world_conquests,
+        title: createPageTitle(i18n.page_titles.stats_world_conquests, [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,

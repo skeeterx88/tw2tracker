@@ -138,6 +138,10 @@ function createNavigation (items) {
     }).join(config.ui.navigation_separator);
 }
 
+function createPageTitle (title, replaces = []) {
+    return utils.sprintf.call(null, title, ...replaces);
+}
+
 function groupAchievements (achievements) {
     const group = {};
 
@@ -161,5 +165,6 @@ module.exports = {
     paramVillageParse,
     createPagination,
     groupAchievements,
-    createNavigation
+    createNavigation,
+    createPageTitle
 };

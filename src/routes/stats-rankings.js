@@ -11,7 +11,8 @@ const {
     paramWorld,
     paramWorldParse,
     createPagination,
-    createNavigation
+    createNavigation,
+    createPageTitle
 } = require('../router-helpers.js');
 
 const rankingCategories = ['players', 'tribes'];
@@ -58,7 +59,7 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const capitalizedCategory = utils.capitalize(category);
 
     res.render('stats/ranking', {
-        title: i18n.page_titles.stats_ranking,
+        title: createPageTitle(i18n.page_titles.stats_ranking, [capitalizedCategory, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         worldName: world.name,

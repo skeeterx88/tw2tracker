@@ -15,6 +15,7 @@ const pgArray = require('pg').types.arrayParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const createError = require('http-errors');
+const {createPageTitle} = require('../router-helpers.js');
 
 function createAdminMenu (user, selected) {
     const adminMenu = [
@@ -55,7 +56,7 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        title: i18n.page_titles.admin_panel,
+        title: createPageTitle(i18n.page_titles.admin_panel, [config.site_name]),
         menu,
         subPage,
         openWorlds,
@@ -179,7 +180,7 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        title: i18n.page_titles.admin_panel_sync_accounts,
+        title: createPageTitle(i18n.page_titles.admin_panel_sync_accounts, [config.site_name]),
         menu,
         subPage,
         accounts,
@@ -320,7 +321,7 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        title: i18n.page_titles.admin_panel_mod_accounts,
+        title: createPageTitle(i18n.page_titles.admin_panel_mod_accounts, [config.site_name]),
         menu,
         subPage,
         mods,

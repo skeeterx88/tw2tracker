@@ -133,7 +133,6 @@ app.use(function (err, req, res, next) {
     res.locals.error = req.app.get('env') === 'development' ? err.stack : err.message;
     res.locals.status = status;
     res.locals.title = 'Tw2-Tracker Error';
-    res.locals.i18n = i18n;
 
     res.status(status);
     res.render('error');
