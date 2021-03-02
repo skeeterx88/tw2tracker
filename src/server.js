@@ -19,6 +19,7 @@ const sql = require('./sql.js');
 const config = require('./config.js');
 const enums = require('./enums.js');
 const i18n = require('./i18n.js');
+const utils = require('./utils.js');
 
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT;
 const app = express();
@@ -109,6 +110,9 @@ const mapsRouter = require('./routes/maps.js');
 
 app.use(function (req, res, next) {
     res.locals.i18n = i18n;
+    res.locals.formatNumbers = utils.ejsHelpers.formatNumbers;
+    res.locals.formatDate = utils.ejsHelpers.formatDate;
+    res.locals.capitalize = utils.ejsHelpers.capitalize;
     next();
 });
 

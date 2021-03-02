@@ -33,8 +33,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n.navigation.maps, url: '/maps'},
             {label: i18n.navigation.servers}
-        ]),
-        ...utils.ejsHelpers
+        ])
     });
 });
 
@@ -69,8 +68,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
         ]),
         backendValues: {
             marketId
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 

@@ -93,8 +93,7 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
             player,
             mapHighlights: [player],
             mapHighlightsType: 'players'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -137,8 +136,7 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
             player,
             mapHighlights: [player],
             mapHighlightsType: 'players'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -232,8 +230,7 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
             player,
             mapHighlights: [player],
             mapHighlightsType: 'players'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -289,8 +286,7 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
             player,
             mapHighlights: [player],
             mapHighlightsType: 'players'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -462,8 +458,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
             marketId,
             worldNumber,
             player
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 

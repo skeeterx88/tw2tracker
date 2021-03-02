@@ -69,8 +69,7 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
             subPage,
             accountPrivileges: req.user.privileges,
             privilegeTypes
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -189,8 +188,7 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
             development,
             syncStates: enums.syncStates,
             subPage
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -330,8 +328,7 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
         backendValues: {
             development,
             subPage
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 

@@ -52,8 +52,7 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
             village,
             mapHighlights: [village],
             mapHighlightsType: 'villages'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 

@@ -45,8 +45,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n.navigation.stats, url: '/'},
             {label: i18n.navigation.servers}
-        ]),
-        ...utils.ejsHelpers
+        ])
     });
 });
 
@@ -81,8 +80,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
         ]),
         backendValues: {
             marketId
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -162,8 +160,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
             tribes,
             mapHighlights: tribes.slice(0, 3),
             mapHighlightsType: 'tribes'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 

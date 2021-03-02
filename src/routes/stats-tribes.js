@@ -75,8 +75,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
             tribe,
             mapHighlights: [tribe],
             mapHighlightsType: 'tribes'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -170,8 +169,7 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
             tribe,
             mapHighlights: [tribe],
             mapHighlightsType: 'tribes'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -213,8 +211,7 @@ const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
             tribe,
             mapHighlights: [tribe],
             mapHighlightsType: 'tribes'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -263,8 +260,7 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
             tribe,
             mapHighlights: [tribe],
             mapHighlightsType: 'tribes'
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -323,8 +319,7 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
         backendValues: {
             marketId,
             worldNumber
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
@@ -401,8 +396,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
         backendValues: {
             marketId,
             worldNumber
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 

@@ -51,8 +51,7 @@ const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
         backendValues: {
             marketId,
             worldNumber
-        },
-        ...utils.ejsHelpers
+        }
     });
 });
 
