@@ -134,6 +134,11 @@ const capitalize = function (value) {
         : value;
 };
 
+function sprintf () {
+    let i = 0;
+    return arguments[i++].replace(/%{[^}]*}/g, () => arguments[i++]);
+}
+
 const ejsHelpers = {
     formatNumbers: function (value) {
         return typeof value === 'number'
@@ -189,5 +194,6 @@ module.exports = {
     timeout,
     hasOwn,
     ejsHelpers,
-    capitalize
+    capitalize,
+    sprintf
 };

@@ -12,7 +12,8 @@ const {
     paramWorld,
     paramWorldParse,
     paramMarket,
-    groupAchievements
+    groupAchievements,
+    createNavigation
 } = require('../router-helpers.js');
 
 const rankingsRouter = require('./stats-rankings.js');
@@ -41,10 +42,10 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         title: i18n.page_titles.stats_servers,
         pageType: 'stats',
         marketStats,
-        navigation: [
-            `<a href="/stats">Stats</a>`,
-            'Server List'
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.servers}
+        ]),
         ...utils.ejsHelpers
     });
 });
@@ -73,11 +74,11 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
         marketId,
         worlds,
         pageType: 'stats',
-        navigation: [
-            `<a href="/stats">Stats</a>`,
-            `Server <a href="/stats/${marketId}">${marketId.toUpperCase()}</a>`,
-            `World List`
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.worlds}
+        ]),
         backendValues: {
             marketId
         },
@@ -149,11 +150,11 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         lastConquests,
         achievements,
         achievementTitles,
-        navigation: [
-            `<a href="/">Stats</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>${world.open ? '' : ` (${i18n.navigation.world_closed})`}`
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: world.open ? i18n.navigation.world : i18n.navigation.world_closed, url: `/stats/${marketId}/${world.num}/`, replaces: [world.name]},
+        ]),
         backendValues: {
             marketId,
             worldNumber,

@@ -799,6 +799,14 @@ a.achievement-subject:last-child:after {
     border-radius: 1px;
 }
 
+.navigation a {
+    text-decoration: none;
+}
+
+.keep-color {
+    color: #50311d;
+}
+
 span[class^="flag-"] {
     height: 12px;
     background-image: url(/images/flags.png);

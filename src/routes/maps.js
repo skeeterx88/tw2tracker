@@ -8,7 +8,7 @@ const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
 const i18n = require('../i18n.js');
-
+const {createNavigation} = require('../router-helpers.js');
 const mapsAPIRouter = require('./maps-api.js');
 
 const marketsRouter = utils.asyncRouter(async function (req, res, next) {
@@ -30,10 +30,10 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         title: i18n.page_titles.stats_maps_servers,
         pageType: 'stats',
         marketStats,
-        navigation: [
-            `<a href="/maps">Maps</a>`,
-            `Server List`
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.maps, url: '/maps'},
+            {label: i18n.navigation.servers}
+        ]),
         ...utils.ejsHelpers
     });
 });
@@ -62,11 +62,11 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
         marketId,
         worlds,
         pageType: 'maps',
-        navigation: [
-            `<a href="/maps">Maps</a>`,
-            `Server <a href="/maps/${marketId}/">${marketId.toUpperCase()}</a>`,
-            'World List'
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.maps, url: '/maps'},
+            {label: i18n.navigation.server, url: `/maps/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.worlds}
+        ]),
         backendValues: {
             marketId
         },

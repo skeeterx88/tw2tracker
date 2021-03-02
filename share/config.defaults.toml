@@ -5,6 +5,7 @@ admin_password = "admin"
 ranking_page_items_per_page = 20
 world_page_maximum_ranking_items = 10
 world_page_maximum_last_conquests = 10
+navigation_separator = " / "
 
 [sync]
 static_share_expire_time = "90 days"

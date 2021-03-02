@@ -9,7 +9,8 @@ const i18n = require('../i18n.js');
 const {
     paramWorld,
     paramWorldParse,
-    createPagination
+    createPagination,
+    createNavigation
 } = require('../router-helpers.js');
 
 const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
@@ -41,12 +42,12 @@ const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
         world,
         conquests,
         pagination: createPagination(page, total, limit, req.path),
-        navigation: [
-            `<a href="/">Stats</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            'Conquests'
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n.navigation.conquests}
+        ]),
         backendValues: {
             marketId,
             worldNumber

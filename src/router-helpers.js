@@ -3,6 +3,7 @@ const utils = require('./utils.js');
 const db = require('./db.js');
 const sql = require('./sql.js');
 const i18n = require('./i18n.js');
+const config = require('./config.js');
 
 async function getPlayer (worldId, playerId) {
     const player = await db.any(sql.getPlayer, {worldId, playerId});
@@ -127,6 +128,16 @@ function createPagination (current, total, limit, path) {
     };
 }
 
+function createNavigation (items) {
+    return items.map(function ({label = '', url, replaces = []}) {
+        label = label
+            .replace('%{style}', '<span class="keep-color">')
+            .replace('%{style_end}', '</span>')
+        label = utils.sprintf.call(null, label, ...replaces);
+        return url ? `<a href="${url}">${label}</a>` : label;
+    }).join(config.ui.navigation_separator);
+}
+
 function groupAchievements (achievements) {
     const group = {};
 
@@ -149,5 +160,6 @@ module.exports = {
     paramPlayerParse,
     paramVillageParse,
     createPagination,
-    groupAchievements
+    groupAchievements,
+    createNavigation
 };

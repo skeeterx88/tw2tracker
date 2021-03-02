@@ -15,7 +15,8 @@ const {
     paramPlayerParse,
     getTribe,
     getPlayerVillages,
-    createPagination
+    createPagination,
+    createNavigation
 } = require('../router-helpers.js');
 
 const conquestCategories = ['gain', 'loss', 'all', 'self'];
@@ -80,12 +81,12 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
         achievementsLatest,
         achievementTypes,
         tribeChangesCount,
-        navigation: [
-            `<a href="/">Stats</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+        ]),
         backendValues: {
             marketId,
             worldNumber,
@@ -123,13 +124,13 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
         world,
         player,
         villages,
-        navigation: [
-            `<a href="/">Stats</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
-            'Villages'
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n.navigation.villages},
+        ]),
         backendValues: {
             marketId,
             worldNumber,
@@ -167,22 +168,22 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
         all: {
             sqlConquests: sql.getPlayerConquests,
             sqlCount: sql.getPlayerConquestsCount,
-            navigationTitle: i18n.player_profile.achievements.sub_title_all
+            navigationTitle: i18n.player_profile.conquests.sub_title_all
         },
         gain: {
             sqlConquests: sql.getPlayerConquestsGain,
             sqlCount: sql.getPlayerConquestsGainCount,
-            navigationTitle: i18n.player_profile.achievements.sub_title_gain
+            navigationTitle: i18n.player_profile.conquests.sub_title_gain
         },
         loss: {
             sqlConquests: sql.getPlayerConquestsLoss,
             sqlCount: sql.getPlayerConquestsLossCount,
-            navigationTitle: i18n.player_profile.achievements.sub_title_loss
+            navigationTitle: i18n.player_profile.conquests.sub_title_loss
         },
         self: {
             sqlConquests: sql.getPlayerConquestsSelf,
             sqlCount: sql.getPlayerConquestsSelfCount,
-            navigationTitle: i18n.player_profile.achievements.sub_title_self
+            navigationTitle: i18n.player_profile.conquests.sub_title_self
         }
     };
 
@@ -218,13 +219,13 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
         category,
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),
-        navigation: [
-            `<a href="/">Stats</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
-            navigationTitle
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: navigationTitle},
+        ]),
         backendValues: {
             marketId,
             worldNumber,
@@ -275,13 +276,13 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
         player,
         tribeChanges,
         tribeTags,
-        navigation: [
-            `<a href="/">Stats</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${world.num}/players/${player.id}">${player.name}</a>`,
-            'Tribe Changes'
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n.navigation.tribe_changes},
+        ]),
         backendValues: {
             marketId,
             worldNumber,
@@ -450,13 +451,13 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         achievementTitles,
         achievementTypes,
         navigationTitle,
-        navigation: [
-            `<a href="/">Stats</a>`,
-            `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${worldNumber}/">${world.name}</a>`,
-            `Player <a href="/stats/${marketId}/${worldNumber}/players/${player.id}">${player.name}</a>`,
-            'Achievements'
-        ],
+        navigation: createNavigation([
+            {label: i18n.navigation.stats, url: '/'},
+            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n.navigation.achievements},
+        ]),
         backendValues: {
             marketId,
             worldNumber,
