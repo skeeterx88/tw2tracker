@@ -64,7 +64,6 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
 
     res.render('stats/player', {
-        i18n,
         title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -118,7 +117,6 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const villages = await getPlayerVillages(worldId, playerId);
 
     res.render('stats/player-villages', {
-        i18n,
         title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -210,7 +208,6 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/player-conquests', {
-        i18n,
         title: `Player ${player.name} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -271,7 +268,6 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/player-tribe-changes', {
-        i18n,
         title: `Player ${player.name} - Tribe Changes - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -434,7 +430,6 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/player-achievements', {
-        i18n,
         title: `Player ${player.name} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,

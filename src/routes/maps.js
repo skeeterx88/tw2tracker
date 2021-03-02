@@ -27,7 +27,6 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     });
 
     res.render('market-list', {
-        i18n,
         title: `Maps - Server List - ${config.site_name}`,
         pageType: 'stats',
         marketStats,
@@ -59,7 +58,6 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     ];
 
     res.render('world-list', {
-        i18n,
         title: `Maps ${marketId.toUpperCase()} - World List - ${config.site_name}`,
         marketId,
         worlds,
@@ -99,12 +97,10 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
 
     res.render('maps/map', {
-        i18n,
         title: `Map ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         world,
         backendValues: {
-            i18n,
             marketId,
             worldNumber,
             worldName: world.name,
@@ -146,7 +142,6 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     db.query(sql.maps.updateShareAccess, [mapShareId]);
 
     res.render('maps/map', {
-        i18n,
         title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${config.site_name}`,
         marketId,
         world,

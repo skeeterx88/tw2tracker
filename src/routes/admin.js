@@ -55,7 +55,6 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        i18n,
         title: `Admin Panel - ${config.site_name}`,
         menu,
         subPage,
@@ -182,7 +181,6 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        i18n,
         title: `Admin Panel - Accounts - ${config.site_name}`,
         menu,
         subPage,
@@ -325,7 +323,6 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        i18n,
         title: `Admin Panel - Accounts - ${config.site_name}`,
         menu,
         subPage,

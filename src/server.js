@@ -107,6 +107,11 @@ const loginRouter = require('./routes/login.js');
 const logoutRouter = require('./routes/logout.js');
 const mapsRouter = require('./routes/maps.js');
 
+app.use(function (req, res, next) {
+    res.locals.i18n = i18n;
+    next();
+});
+
 app.use('/', statsRouter);
 app.use('/admin', adminRouter);
 app.use('/login', loginRouter);

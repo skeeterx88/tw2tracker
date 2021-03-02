@@ -48,7 +48,6 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count;
 
     res.render('stats/tribe', {
-        i18n,
         title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -147,7 +146,6 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/tribe-conquests', {
-        i18n,
         title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -196,7 +194,6 @@ const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
     const members = await db.any(sql.getTribeMembers, {worldId, tribeId});
 
     res.render('stats/tribe-members', {
-        i18n,
         title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -246,7 +243,6 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const total = allVillages.length;
 
     res.render('stats/tribe-villages', {
-        i18n,
         title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -309,7 +305,6 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/tribe-member-changes', {
-        i18n,
         title: `Tribe ${tribe.tag} - Member Changes - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
@@ -384,7 +379,6 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
     }
 
     res.render('stats/tribe-achievements', {
-        i18n,
         title: `Tribe ${tribe.tag} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,

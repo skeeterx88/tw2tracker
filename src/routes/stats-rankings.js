@@ -57,7 +57,6 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const capitalizedCategory = utils.capitalize(category);
 
     res.render('stats/ranking', {
-        i18n,
         title: `${capitalizedCategory} Ranking - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
         marketId,
         worldNumber,
