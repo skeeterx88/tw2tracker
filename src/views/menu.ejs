@@ -1,8 +1,12 @@
-<menu>
-    <a href="/"><li><%= i18n.main_menu.home %></li></a>
-    <a href="/stats"><li><%= i18n.main_menu.stats %></li></a>
-    <a href="/maps"><li><%= i18n.main_menu.maps %></li></a>
+<div id="main-menu">
+    <div class="left">
+        <a href="/"><%= i18n.main_menu.home %></a>
+        <a href="/stats"><%= i18n.main_menu.stats %></a>
+        <a href="/maps"><%= i18n.main_menu.maps %></a>
+    </div>
 
-    <a href="https://www.paypal.com/donate/?hosted_button_id=6R95QYGKFNLCE"><li class="donate"><span class="icon icon-heart"></span> <%= i18n.main_menu.donate %></li></a>
-    <a href="https://discord.gg/UwQ32D3t5p"><li class="discord"><span class="icon icon-discord"></span> <%= i18n.main_menu.discord %></li></a>
-</menu>
+    <div class="right">
+        <a href="https://www.paypal.com/donate/?hosted_button_id=6R95QYGKFNLCE"><span class="icon icon-heart"></span> <%= i18n.main_menu.donate %></a>
+        <a href="https://discord.gg/UwQ32D3t5p"><span class="icon icon-discord"></span> <%= i18n.main_menu.discord %></a>
+    </div>
+</div>

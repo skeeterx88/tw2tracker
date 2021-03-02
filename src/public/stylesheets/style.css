@@ -83,25 +83,20 @@ header {
     filter: drop-shadow(10px 10px 12px #00000090);
 }
 
-menu {
+#main-menu {
+    display: flex;
     position: relative;
-    padding: 0px;
-    margin-left: 10px;
-    margin-bottom: -3px;
+    padding: 0px 10px;
+    margin-bottom: 4px;
     font-size: 0.9em;
 }
 
-menu a,
-menu a:hover {
+#main-menu a {
     color: white;
-}
-
-menu li {
-    width: 90px;
-    display: inline-block;
+    text-decoration: none;
     background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 0%, #3f5361 70%, #4c6271 70%);
-    padding: 4px 4px 8px 4px;
-    margin: 0 4px;
+    padding: 6px 10px;
+    margin: 0px 4px 0px 4px;
     text-align: center;
     border-radius: 1px 1px 0px 0px;
     font-weight: bold;
@@ -115,12 +110,33 @@ menu li {
                 inset -1px -1px 1px #00000040;
 }
 
-menu li:hover {
+#main-menu a:hover {
     background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 20%, #3f5361 70%, #4c6271 70%);
 }
 
-menu li.donate {
-    margin-left: 50px;
+#main-menu .left {
+    margin-right: auto;
+}
+
+#main-menu .right {
+    margin-left: auto;
+}
+
+#main-menu .icon {
+    width: 15px;
+    height: 17px;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: 15px;
+    vertical-align: middle;
+}
+
+#main-menu .icon-discord {
+    background-image: url(/images/icons/discord.svg);
+}
+
+#main-menu .icon-heart {
+    background-image: url(/images/icons/heart.svg);
 }
 
 main, footer {
@@ -270,23 +286,6 @@ div.modal {
     text-shadow: 1px 1px 0px #00000090;
     z-index: 7;
     transition: visibility 0.02s linear, opacity 0.02s linear;
-}
-
-menu .icon {
-    width: 15px;
-    height: 16px;
-    display: inline-block;
-    background-repeat: no-repeat;
-    background-size: 15px;
-    vertical-align: middle;
-}
-
-menu .icon-discord {
-    background-image: url(/images/icons/discord.svg);
-}
-
-menu .icon-heart {
-    background-image: url(/images/icons/heart.svg);
 }
 
 #search .wrapper {
@@ -889,25 +888,18 @@ span[class^="flag-"] {
         margin: 0px;
     }
 
-    menu {
-        margin-bottom: 0px;
+    #main-menu {
+        margin-bottom: 8px;
+        padding-left: 0px;
+        padding-right: 0px;
     }
 
-    menu li {
-        width: 80px;
-        padding: 1px 0px;
-        text-align: center;
+    #main-menu a {
+        padding: 1px 3px;
         border-radius: 1px;
-        margin-left: 3px;
-        margin-right: 3px;
-        margin-bottom: 10px;
     }
 
-    menu li.donate {
-        margin-left: 3px;
-    }
-
-    menu .icon {
+    #main-menu .icon {
         height: 13px;
         background-size: 12px;
     }
