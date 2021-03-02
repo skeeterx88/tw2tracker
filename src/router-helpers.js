@@ -130,9 +130,8 @@ function createPagination (current, total, limit, path) {
 
 function createNavigation (items) {
     return items.map(function ({label = '', url, replaces = []}) {
-        label = label
-            .replace('%{style}', '<span class="keep-color">')
-            .replace('%{style_end}', '</span>')
+        label = label.replace(/%{style}/g, '<span class="keep-color">');
+        label = label.replace(/%{style_end}/g, '</span>');
         label = utils.sprintf.call(null, label, ...replaces);
         return url ? `<a href="${url}">${label}</a>` : label;
     }).join(config.ui.navigation_separator);
