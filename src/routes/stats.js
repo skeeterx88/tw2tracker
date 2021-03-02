@@ -64,8 +64,8 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
 
     const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num);
     const worlds = [
-        ['Open Worlds', sortedWorlds.filter(world => world.open)],
-        ['Closed Worlds', sortedWorlds.filter(world => !world.open)]
+        [i18n.world_list.open_worlds, sortedWorlds.filter(world => world.open)],
+        [i18n.world_list.closed_worlds, sortedWorlds.filter(world => !world.open)]
     ];
 
     res.render('world-list', {
@@ -152,7 +152,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         navigation: [
             `<a href="/">Stats</a>`,
             `Server <a href="/stats/${marketId}/">${marketId.toUpperCase()}</a>`,
-            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>${!world.open ? ' (Closed)' : ''}`
+            `World <a href="/stats/${marketId}/${world.num}/">${world.name}</a>${world.open ? '' : ` (${i18n.navigation.world_closed})`}`
         ],
         backendValues: {
             marketId,

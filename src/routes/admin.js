@@ -40,7 +40,7 @@ function createAdminMenu (user, selected) {
 function createPrivilegeChecker (privilege) {
     return function (req, res, next) {
         if (!req.user.privileges[privilege]) {
-            throw createError(401, 'You do not have permission to perform this action');
+            throw createError(401, i18n.admin.error_not_authorized);
         }
 
         next();
@@ -149,9 +149,8 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
     const code = worldNumber ? enums.SYNC_TOGGLE_WORLD : enums.SYNC_TOGGLE_MARKET;
 
     if (!worldNumber) {
-        const msg = 'Sync toggle is available for worlds only not markets.';
-        debug.sync(msg);
-        res.end(msg);
+        debug.sync(i18n.admin.error_sync_toggle_world_only);
+        res.end(i18n.admin.error_sync_toggle_world_only);
         return false;
     }
 
@@ -202,15 +201,15 @@ const accountsAddMarketRouter = utils.asyncRouter(async function (req, res) {
     const market = await db.any(sql.getMarket, {marketId});
 
     if (!account.length) {
-        return res.end(`Account "${accountId}" does not exist.`);
+        return res.end(i18n.admin.error_sync_account_not_exist);
     }
 
     if (!market.length) {
-        return res.end(`Market "${marketId}" does not exist.`);
+        return res.end(i18n.admin.error_sync_market_not_exist);
     }
 
     if (account[0].markets.includes(marketId)) {
-        return res.end('Account already has market included.');
+        return res.end(i18n.admin.error_sync_account_market_included);
     }
 
     await db.query(sql.addAccountMarket, {
@@ -228,15 +227,15 @@ const accountsRemoveMarketRouter = utils.asyncRouter(async function (req, res) {
     const market = await db.any(sql.getMarket, {marketId});
 
     if (!account.length) {
-        return res.end(`Account "${accountId}" does not exist.`);
+        return res.end(i18n.admin.error_sync_account_not_exist);
     }
 
     if (!market.length) {
-        return res.end(`Market "${marketId}" does not exist.`);
+        return res.end(i18n.admin.error_sync_market_not_exist);
     }
 
     if (!account[0].markets.includes(marketId)) {
-        return res.end('Account already does not have market included.');
+        return res.end(i18n.admin.error_sync_account_market_included);
     }
 
     await db.query(sql.removeAccountMarket, {
@@ -252,7 +251,7 @@ const accountsDeleteRouter = utils.asyncRouter(async function (req, res) {
     const account = await db.any(sql.getAccount, {accountId});
 
     if (!account.length) {
-        return res.end(`Account "${accountId}" does not exist.`);
+        return res.end(i18n.admin.error_sync_account_not_exist);
     }
 
     await db.query(sql.deleteAccount, {
@@ -267,15 +266,15 @@ const accountsEditRouter = utils.asyncRouter(async function (req, res) {
     const account = await db.any(sql.getAccount, {accountId});
 
     if (!account.length) {
-        return res.end(`Account "${id}" does not exist.`);
+        return res.end(i18n.admin.error_sync_account_not_exist);
     }
 
     if (pass.length < 4) {
-        return res.end(`Password minimum length is 4.`);
+        return res.end(i18n.admin.error_password_minimum_length);
     }
 
     if (name.length < 4) {
-        return res.end(`Account name minimum length is 4.`);
+        return res.end(i18n.admin.error_username_minimum_length);
     }
 
     await db.query(sql.editAccount, {
@@ -291,17 +290,17 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
     const {name, pass, id: accountId} = req.body;
 
     if (pass.length < 4) {
-        return res.end(`Password minimum length is 4.`);
+        return res.end(i18n.admin.error_password_minimum_length);
     }
 
     if (name.length < 4) {
-        return res.end(`Account name minimum length is 4.`);
+        return res.end(i18n.admin.error_username_minimum_length);
     }
 
     const accountExists = await db.any(sql.getAccountByName, {name});
 
     if (accountExists.length) {
-        return res.end(`Account with name "${name}" already exists.`);
+        return res.end(i18n.admin.error_sync_username_already_exists);
     }
 
     await db.query(sql.addAccount, {
@@ -342,21 +341,21 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
     id = parseInt(id, 10);
 
     if (name.length < 3) {
-        throw createError(400, 'Minimum username length is 3');
+        throw createError(400, i18n.admin.error_username_minimum_length);
     }
 
     if (pass && pass.length < 4) {
-        throw createError(400, 'Minimum password length is 4');
+        throw createError(400, i18n.admin.error_password_minimum_length);
     }
 
     const [accountName] = await db.any(sql.getModAccountByName, {name});
     if (accountName && accountName.id !== id) {
-        throw createError(400, 'A mod account with this name already exists');
+        throw createError(400, i18n.admin.error_mod_username_already_exists);
     }
 
     const [accountEmail] = await db.any(sql.getModAccountByEmail, {email});
     if (accountEmail && accountEmail.id !== id) {
-        throw createError(400, 'This email is already in use by another account');
+        throw createError(400, i18n.admin.error_mod_account_email_already_exists);
     }
 
     if (!privileges) {
@@ -369,7 +368,7 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
 
     for (const type of privileges) {
         if (!privilegeTypes.includes(type)) {
-            throw createError(400, 'Invalid privilege type');
+            throw createError(400, i18n.admin.error_invalid_privilege);
         }
     }
 
@@ -395,21 +394,21 @@ const modsCreateRouter = utils.asyncRouter(async function (req, res) {
     let {name, pass, email, privileges} = req.body;
 
     if (name.length < 3) {
-        throw createError(400, 'Minimum username length is 3');
+        throw createError(400, i18n.admin.error_username_minimum_length);
     }
 
     if (pass.length < 4) {
-        throw createError(400, 'Minimum password length is 4');
+        throw createError(400, i18n.admin.error_password_minimum_length);
     }
 
     const [accountName] = await db.any(sql.getModAccountByName, {name});
     if (accountName) {
-        throw createError(400, 'A mod account with this name already exists');
+        throw createError(400, i18n.admin.error_mod_username_already_exists);
     }
 
     const [accountEmail] = await db.any(sql.getModAccountByEmail, {email});
     if (accountEmail) {
-        throw createError(400, 'This email is already in use by another account');
+        throw createError(400, i18n.admin.error_mod_account_email_already_exists);
     }
 
     if (!privileges) {
@@ -422,7 +421,7 @@ const modsCreateRouter = utils.asyncRouter(async function (req, res) {
 
     for (const type of privileges) {
         if (!privilegeTypes.includes(type)) {
-            throw createError(400, 'Invalid privilege type');
+            throw createError(400, i18n.admin.error_invalid_privilege);
         }
     }
 
@@ -438,7 +437,7 @@ const modsDeleteRouter = utils.asyncRouter(async function (req, res) {
     const [mod] = await db.any(sql.getMod, {id});
 
     if (!mod) {
-        throw createError(404, 'This mod account does not exist');
+        throw createError(404, i18n.admin.error_mod_account_not_exists);
     }
 
     await db.query(sql.deleteModAccount, {id});
