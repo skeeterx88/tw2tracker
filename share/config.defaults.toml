@@ -21,7 +21,6 @@ parallel_data_sync = 3
 user = "postgres"
 host = "127.0.0.1"
 database = "tw2tracker"
-password = "DATABASE_PASSWORD_HERE" # the password cannot be empty!
 port = 5432
 
 [puppeteer]
