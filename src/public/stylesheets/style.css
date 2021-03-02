@@ -329,6 +329,7 @@ div.modal {
 }
 
 .relax-button {
+    text-align: center;
     display: inline-block;
     vertical-align: middle;
     height: 22px;
@@ -404,6 +405,34 @@ div.world-title {
     justify-content: space-between;
 }
 
+#market-list .relax-container.world {
+    background-color: #f3e4c3;
+    border-radius: 5px;
+    border-style: inset;
+    border-width: 1px;
+    border-color: #b18e7675;
+    padding: 2px 4px;
+    align-items: center;
+
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#market-list .relax-container.world .title {
+    font-size: 1.2em;
+}
+
+#market-list .relax-container.world .relax-button {
+    border-radius: 1px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #794929;
+    background: url(/images/noise.webp), linear-gradient(#8d5b39, #583f2d);
+    box-shadow: 0 0 0 1px #47240e,
+                inset 0 0 0 1px #47240e;
+    padding: 0px 8px;
+    margin: 3px 0px;
+}
+
 .relax-container.vertical {
     flex-wrap: wrap;
 }
@@ -444,13 +473,20 @@ div.world-title {
 
 .relax-container .actions {
     text-align: right;
-    /*margin-left: auto;*/
 }
 
 .relax-container .title {
     font-size: 1.3em;
     font-weight: bold;
     text-align: center;
+}
+
+.relax-container .world-list {
+    width: 100%;
+}
+
+.world-list.hidden {
+    display: none;
 }
 
 .relax-container .relax-button {
@@ -464,7 +500,6 @@ fieldset {
 }
 
 fieldset legend {
-    /*margin-left: -10px;*/
     font-weight: bold;
     color: #100a07;
 }
@@ -884,6 +919,14 @@ span[class^="flag-"] {
 
     .relax-container .title {
         width: 100%;
+    }
+
+    #market-list .relax-container.world .title {
+        width: 100%;
+    }
+
+    #market-list .relax-button {
+        display: block;
     }
 
     .relax-container .label,

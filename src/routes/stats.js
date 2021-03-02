@@ -27,6 +27,12 @@ const conquestsRouter = require('./stats-conquests.js');
 const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     const worlds = await db.any(sql.getWorlds);
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)));
+    const worldsByMarket = {};
+
+    for (const world of worlds) {
+        worldsByMarket[world.market] = worldsByMarket[world.market] || [];
+        worldsByMarket[world.market].push([world.num, world]);
+    }
 
     const marketStats = marketsIds.map(function (id) {
         return {
@@ -43,10 +49,15 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         title: createPageTitle(i18n.page_titles.stats_servers, [config.site_name]),
         pageType: 'stats',
         marketStats,
+        worldsByMarket,
         navigation: createNavigation([
             {label: i18n.navigation.stats, url: '/'},
             {label: i18n.navigation.servers}
-        ])
+        ]),
+        backendValues: {
+            worldsByMarket,
+            marketStats
+        }
     });
 });
 

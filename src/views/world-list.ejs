@@ -10,7 +10,7 @@
 
             <div class="content">
                 <div class="single">
-                    <section>
+                    <section id="world-list">
                         <% for (let [label, data] of worlds) { -%>
                             <% if (data.length) { -%>
                                 <div>
@@ -39,11 +39,11 @@
                                                 <% if (world.open_date || world.close_date) { %>
                                                     <div class="dates">
                                                         <% if (world.open_date) { %>
-                                                            <p><span class="label"><%= i18n.world_list.opened %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
+                                                            <p><span class="label"><%= i18n.world_list.open_date %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
                                                         <% } %>
 
                                                         <% if (world.close_date) { %>
-                                                            <p><span class="label"><%= i18n.world_list.closed %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
+                                                            <p><span class="label"><%= i18n.world_list.close_date %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
                                                         <% } %>
                                                     </div>
                                                 <% } %>
