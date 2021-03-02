@@ -48,7 +48,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count;
 
     res.render('stats/tribe', {
-        title: `Tribe ${tribe.tag} - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_tribe,
         marketId,
         worldNumber,
         world,
@@ -146,7 +146,7 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/tribe-conquests', {
-        title: `Tribe ${tribe.tag} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_tribe_conquests,
         marketId,
         worldNumber,
         world,
@@ -194,7 +194,7 @@ const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
     const members = await db.any(sql.getTribeMembers, {worldId, tribeId});
 
     res.render('stats/tribe-members', {
-        title: `Tribe ${tribe.tag} - Members - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_tribe_members,
         marketId,
         worldNumber,
         tribe,
@@ -243,7 +243,7 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const total = allVillages.length;
 
     res.render('stats/tribe-villages', {
-        title: `Tribe ${tribe.tag} - Villages - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_tribe_villages,
         marketId,
         worldNumber,
         tribe,
@@ -305,7 +305,7 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/tribe-member-changes', {
-        title: `Tribe ${tribe.tag} - Member Changes - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_tribe_member_changes,
         marketId,
         worldNumber,
         tribe,
@@ -379,7 +379,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
     }
 
     res.render('stats/tribe-achievements', {
-        title: `Tribe ${tribe.tag} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_tribe_achievements,
         marketId,
         worldNumber,
         tribe,

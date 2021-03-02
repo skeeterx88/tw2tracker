@@ -27,7 +27,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     });
 
     res.render('market-list', {
-        title: `Maps - Server List - ${config.site_name}`,
+        title: i18n.page_titles.stats_maps_servers,
         pageType: 'stats',
         marketStats,
         navigation: [
@@ -58,7 +58,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     ];
 
     res.render('world-list', {
-        title: `Maps ${marketId.toUpperCase()} - World List - ${config.site_name}`,
+        title: i18n.page_titles.stats_maps_server_worlds,
         marketId,
         worlds,
         pageType: 'maps',
@@ -97,7 +97,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
 
     res.render('maps/map', {
-        title: `Map ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.maps_world_map,
         marketId,
         world,
         backendValues: {
@@ -142,7 +142,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     db.query(sql.maps.updateShareAccess, [mapShareId]);
 
     res.render('maps/map', {
-        title: `Map ${marketId.toUpperCase()}/${world.name} - Shared - ${config.site_name}`,
+        title: i18n.page_titles.maps_world_map_shared,
         marketId,
         world,
         backendValues: {

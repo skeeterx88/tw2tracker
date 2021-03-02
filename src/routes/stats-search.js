@@ -87,7 +87,7 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
     const total = allResults.length;
 
     return res.render('stats/search', {
-        title: `Search "${rawQuery}" - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_search,
         marketId,
         worldNumber,
         category,

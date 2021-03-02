@@ -33,7 +33,7 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
     const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
 
     res.render('stats/village', {
-        title: `Village ${village.name} (${village.x}|${village.y}) - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_village,
         marketId,
         worldNumber,
         world,

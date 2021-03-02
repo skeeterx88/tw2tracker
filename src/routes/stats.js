@@ -38,7 +38,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     });
 
     res.render('market-list', {
-        title: config.site_name,
+        title: i18n.page_titles.stats_servers,
         pageType: 'stats',
         marketStats,
         navigation: [
@@ -69,7 +69,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     ];
 
     res.render('world-list', {
-        title: `${marketId.toUpperCase()} - ${config.site_name}`,
+        title: i18n.page_titles.stats_worlds,
         marketId,
         worlds,
         pageType: 'stats',
@@ -140,7 +140,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     };
 
     res.render('stats/world', {
-        title: `${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_world,
         marketId,
         worldNumber,
         players,

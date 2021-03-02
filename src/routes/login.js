@@ -7,7 +7,7 @@ router.get('/', async function (req, res, next) {
     const [error] = req.flash('error');
 
     res.render('login', {
-        title: `Admin login - ${config.site_name}`,
+        title: i18n.page_titles.admin_panel_login,
         error
     });
 });

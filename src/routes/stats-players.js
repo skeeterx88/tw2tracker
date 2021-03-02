@@ -64,7 +64,7 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
 
     res.render('stats/player', {
-        title: `Player ${player.name} - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_player,
         marketId,
         worldNumber,
         world,
@@ -117,7 +117,7 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const villages = await getPlayerVillages(worldId, playerId);
 
     res.render('stats/player-villages', {
-        title: `Player ${player.name} - Villages - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_player_villages,
         marketId,
         worldNumber,
         world,
@@ -208,7 +208,7 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/player-conquests', {
-        title: `Player ${player.name} - Conquests - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_player_conquests,
         marketId,
         worldNumber,
         world,
@@ -268,7 +268,7 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/player-tribe-changes', {
-        title: `Player ${player.name} - Tribe Changes - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_player_tribe_changes,
         marketId,
         worldNumber,
         world,
@@ -430,7 +430,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/player-achievements', {
-        title: `Player ${player.name} - Achievements - ${marketId.toUpperCase()}/${world.name} - ${config.site_name}`,
+        title: i18n.page_titles.stats_player_achievements,
         marketId,
         worldNumber,
         world,

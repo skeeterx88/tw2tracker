@@ -55,7 +55,7 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        title: `Admin Panel - ${config.site_name}`,
+        title: i18n.page_titles.admin_panel,
         menu,
         subPage,
         openWorlds,
@@ -180,7 +180,7 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        title: `Admin Panel - Accounts - ${config.site_name}`,
+        title: i18n.page_titles.admin_panel_sync_accounts,
         menu,
         subPage,
         accounts,
@@ -322,7 +322,7 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     res.render('admin', {
-        title: `Admin Panel - Accounts - ${config.site_name}`,
+        title: i18n.page_titles.admin_panel_mod_accounts,
         menu,
         subPage,
         mods,
