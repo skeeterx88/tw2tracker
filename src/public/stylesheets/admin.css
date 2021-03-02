@@ -68,7 +68,7 @@
 
 #sync-worlds fieldset {
     border: 1px solid #b77b56;
-    display: inline-block;
+    display: block;
     min-width: 150px;
     border-left: none;
     border-bottom: none;

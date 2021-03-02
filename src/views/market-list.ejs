@@ -10,37 +10,31 @@
 
             <div class="content">
                 <div class="single">
-                    <section id="markets">
+                    <section>
                         <% for (let market of marketStats) { -%>
-                            <a href="/<%= pageType %>/<%= market.id %>">
-                                <div class="market market-container">
-                                    <div class="market-title">
-                                        <span class="flag-<%= market.id %>"></span>
-                                        <%= market.id.toUpperCase() %>
-                                    </div>
-                                    <div class="info">
-                                        <div class="stats">
-                                            <fieldset>
-                                                <legend><%= i18n.market_list.stats %></legend>
-                                                <ul>
-                                                    <li><%= formatNumbers(market.players) %> <%= i18n.market_list.players %></li>
-                                                    <li><%= formatNumbers(market.tribes) %> <%= i18n.market_list.tribes %></li>
-                                                    <li><%= formatNumbers(market.villages) %> <%= i18n.market_list.villages %></li>
-                                                </ul>
-                                            </fieldset>
-                                        </div>
-                                        <div class="worlds">
-                                            <fieldset>
-                                                <legend><%= i18n.market_list.worlds %></legend>
-                                                <ul>
-                                                    <li><%= i18n.market_list.open %> <%= formatNumbers(market.openWorld) %></li>
-                                                    <li><%= i18n.market_list.closed %> <%= formatNumbers(market.closedWorld) %></li>
-                                                </ul>
-                                            </fieldset>
-                                        </div>
-                                    </div>
+                            <div class="relax-container market">
+                                <h2 class="title">
+                                    <span class="flag-<%= market.id %>"></span>
+                                    <%= market.id.toUpperCase() %>
+                                </h2>
+                                <div class="stats">
+                                    <ul>
+                                        <li><%= formatNumbers(market.players) %> <%= i18n.market_list.players %></li>
+                                        <li><%= formatNumbers(market.tribes) %> <%= i18n.market_list.tribes %></li>
+                                        <li><%= formatNumbers(market.villages) %> <%= i18n.market_list.villages %></li>
+                                    </ul>
                                 </div>
-                            </a>
+                                <div class="worlds">
+                                    <ul>
+                                        <li><%= sprintf(i18n.market_list.open_worlds, market.openWorld) %></li>
+                                        <li><%= sprintf(i18n.market_list.closed_worlds, market.closedWorld) %></li>
+                                    </ul>
+                                </div>
+
+                                <div class="actions">
+                                    <a class="relax-button" href="/stats/<%= market.id %>">World List</a>
+                                </div>
+                            </div>
                         <% } -%>
                     </section>
                 </div>

@@ -113,6 +113,7 @@ app.use(function (req, res, next) {
     res.locals.formatNumbers = utils.ejsHelpers.formatNumbers;
     res.locals.formatDate = utils.ejsHelpers.formatDate;
     res.locals.capitalize = utils.ejsHelpers.capitalize;
+    res.locals.sprintf = utils.sprintf;
     next();
 });
 

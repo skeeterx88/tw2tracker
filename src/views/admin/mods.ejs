@@ -5,7 +5,7 @@
 
             <div class="content-border">
                 <% for (let mod of mods) { %>
-                    <div id="mod-<%= mod.id %>" class="mod world-container">
+                    <div id="mod-<%= mod.id %>" class="mod relax-container">
                         <form method="POST" action="/admin/mods/edit">
                             <label class="input">
                                 <span><%= i18n.admin.username_label %></span>
@@ -48,7 +48,7 @@
             <h1><%= i18n.admin.mod_accounts.header_add_account %></h1>
 
             <div class="content-border">
-                <div class="world-container">
+                <div class="relax-container">
                     <form method="POST" action="/admin/mods/create">
                         <label class="input">
                             <span><%= i18n.admin.username_label %></span>

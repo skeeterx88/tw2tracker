@@ -95,7 +95,7 @@ header {
     color: white;
     text-decoration: none;
     background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 0%, #3f5361 70%, #4c6271 70%);
-    padding: 6px 10px;
+    padding: 6px 20px;
     margin: 0px 4px 0px 4px;
     text-align: center;
     border-radius: 1px 1px 0px 0px;
@@ -387,116 +387,86 @@ div.world-title {
     margin-bottom: 10px;
 }
 
-#worlds a {
-    display: inline-block;
-}
-
-#worlds a:hover,
-#markets a:hover {
-    text-decoration: none;
-}
-
-#worlds .world {
-    width: 250px;
-    vertical-align: top;
-}
-
-#markets .market {
-    width: 170px;
-}
-
-#markets .world-container,
-#markets .market-container,
-#worlds .world-container,
-#worlds .market-container {
-    font-size: 0.8em;
-}
-
-.world-container,
-.market-container {
-    color: #311a11;
+.relax-container {
+    background: url(/images/noise.webp) #f9eed166;
     border-color: #b18e76;
     border-radius: 1px;
-    background: url(/images/noise.webp) #f9eed166;
-    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e, 2px 2px 2px #000;
-    padding: 5px 0px;
     border-style: outset;
     border-width: 2px;
-    display: inline-block;
-    margin: 5px;
+    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e, 2px 2px 2px #000;
+    box-sizing: border-box;
+    color: #311a11;
+    margin: 10px 0px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
-#worlds .world,
-#markets .market {
-    cursor: pointer;
+.relax-container.vertical {
+    flex-wrap: wrap;
 }
 
-#worlds .world:hover,
-#markets .market:hover {
-    border-color: #dc9750;
-    background: url(/images/noise.webp) #ffe49d40;
+.relax-container.vertical > * {
+    width: 100%;
 }
 
-#worlds .world a,
-#markets .market a {
-    color: inherit;
-    font-weight: normal;
+.relax-container > * {
+    margin: 0px 5px;
 }
 
-#worlds .world-title,
-#markets .market-title {
+.relax-container ul {
+    margin: 0px;
+    padding: 0px;
+}
+
+.relax-container .title {
+    width: 150px;
+}
+
+.relax-container.market .title {
+    width: 100px;
+}
+
+.relax-container p {
+    margin: 0px;
+}
+
+.relax-container .label {
+    white-space: nowrap;
+}
+
+.relax-container .value {
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.relax-container .actions {
+    text-align: right;
+    /*margin-left: auto;*/
+}
+
+.relax-container .title {
     font-size: 1.3em;
     font-weight: bold;
-    color: #693a00;
     text-align: center;
-    cursor: pointer;
-    line-height: 18px;
-    margin-bottom: 9px;
 }
 
-#worlds .info,
-#markets .info {
-    display: inline-block;
-    vertical-align: middle;
-    margin-top: -4px;
+.relax-container .relax-button {
+    padding: 3px 8px;
+    margin: 2px 0px;
 }
 
 fieldset {
     border: none;
     padding: 0px;
-    margin-left: 15px;
 }
 
 fieldset legend {
-    margin-left: -10px;
+    /*margin-left: -10px;*/
     font-weight: bold;
     color: #100a07;
-}
-
-#markets .stats,
-#markets .worlds,
-#worlds .stats,
-#worlds .settings {
-    float: left;
-}
-
-#worlds .stats ul,
-#worlds .settings ul,
-
-#markets .stats ul,
-#markets .worlds ul {
-    margin: 0px;
-    padding: 0px;
-}
-
-.world-dates {
-    margin-top: 5px;
-    padding-left: 7px;
-}
-
-#worlds .flag {
-    height: 14px;
-    line-height: 6px;
 }
 
 .pagination {
@@ -889,13 +859,13 @@ span[class^="flag-"] {
     }
 
     #main-menu {
-        margin-bottom: 8px;
+        margin-bottom: 12px;
         padding-left: 0px;
         padding-right: 0px;
     }
 
     #main-menu a {
-        padding: 1px 3px;
+        padding: 5px 15px;
         border-radius: 1px;
     }
 
@@ -910,5 +880,18 @@ span[class^="flag-"] {
 
     #admin .world .world-id {
         display: block;
+    }
+
+    .relax-container .title {
+        width: 100%;
+    }
+
+    .relax-container .label,
+    .relax-container .value {
+        display: block;
+    }
+
+    .relax-container > * {
+        margin: 0px 1px;
     }
 }
