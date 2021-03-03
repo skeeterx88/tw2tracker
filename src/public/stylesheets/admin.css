@@ -75,6 +75,14 @@
     padding: 0 3px;
 }
 
+#sync-worlds .world {
+    flex-wrap: wrap;
+}
+
+#sync-worlds .world > * {
+    width: 100%;
+}
+
 #accounts p span {
     display: inline-block;
     width: 10%;

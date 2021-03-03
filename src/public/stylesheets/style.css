@@ -332,6 +332,7 @@ div.modal {
     text-align: center;
     display: inline-block;
     vertical-align: middle;
+    white-space: nowrap;
     height: 22px;
     line-height: 22px;
     font-weight: bold;
@@ -355,6 +356,11 @@ div.modal {
     background: url(/images/noise.webp), linear-gradient(#af7046, #583f2d);
     color: #e0bfbf;
     text-decoration: none;
+}
+
+.relax-button.disabled {
+    filter: contrast(70%);
+    background: url(/images/noise.webp), linear-gradient(#8d5b39, #583f2d);
 }
 
 .relax-button.red {
@@ -441,14 +447,6 @@ div.world-title {
                 inset 0 0 0 1px #47240e;
     padding: 0px 8px;
     margin: 3px 0px;
-}
-
-.relax-container.vertical {
-    flex-wrap: wrap;
-}
-
-.relax-container.vertical > * {
-    width: 100%;
 }
 
 .relax-container > * {

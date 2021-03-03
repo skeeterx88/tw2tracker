@@ -85,7 +85,7 @@ define('updateWorldStatus', [
         switch (action) {
             case syncStates.START: {
                 if ($dataSync) {
-                    $dataSync.innerHTML = 'Sync data in progress...';
+                    $dataSync.classList.add('disabled');
                     $dataSync.dataset.active = 'yes';
                 }
                 addActiveWorld($syncActiveDataWorlds, worldId);
@@ -93,7 +93,7 @@ define('updateWorldStatus', [
             }
             case syncStates.FINISH: {
                 if ($dataSync) {
-                    $dataSync.innerHTML = 'Sync data';
+                    $dataSync.classList.remove('disabled');
                     $dataSync.dataset.active = 'no';
                 }
                 $dataDate.innerHTML = date;
@@ -103,7 +103,7 @@ define('updateWorldStatus', [
             }
             case syncStates.ACHIEVEMENT_START: {
                 if ($achievementsSync) {
-                    $achievementsSync.innerHTML = 'Sync achievements in progress...';
+                    $dataSync.classList.add('disabled');
                     $achievementsSync.dataset.active = 'yes';
                 }
                 addActiveWorld($syncActiveAchievementWorlds, worldId);
@@ -111,7 +111,7 @@ define('updateWorldStatus', [
             }
             case syncStates.ACHIEVEMENT_FINISH: {
                 if ($achievementsSync) {
-                    $achievementsSync.innerHTML = 'Sync achievements';
+                    $dataSync.classList.remove('disabled');
                     $achievementsSync.dataset.active = 'no';
                 }
                 $achievementsDate.innerHTML = date;
