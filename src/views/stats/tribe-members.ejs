@@ -11,7 +11,7 @@
             <div class="content">
                 <div class="left">
                     <section id="players">
-                        <h2><%= i18n.tribe_profile.members.header_tribe_members %></h2>
+                        <h2><%= i18n('header_tribe_members', 'tribe_profile_members', lang) %></h2>
 
                         <div class="content-border">
                             <table class="quick-highlight">
@@ -23,16 +23,16 @@
                                 </colgroup>
 
                                 <thead>
-                                    <th><%= i18n.tribe_profile.members.column_rank %></th>
-                                    <th><%= i18n.tribe_profile.members.column_name %></th>
-                                    <th><%= i18n.tribe_profile.members.column_points %></th>
-                                    <th><%= i18n.tribe_profile.members.column_villages %></th>
+                                    <th><%= i18n('column_rank', 'tribe_profile_members', lang) %></th>
+                                    <th><%= i18n('column_name', 'tribe_profile_members', lang) %></th>
+                                    <th><%= i18n('column_points', 'tribe_profile_members', lang) %></th>
+                                    <th><%= i18n('column_villages', 'tribe_profile_members', lang) %></th>
                                 </thead>
 
                                 <tbody>
                                     <% if (!members.length) { %>
                                         <tr>
-                                            <td colspan="4"><%= i18n.tribe_profile.members.no_members %></td>
+                                            <td colspan="4"><%= i18n('no_members', 'tribe_profile_members', lang) %></td>
                                         </tr>
                                     <% } %>
 
@@ -52,12 +52,12 @@
 
                 <div class="right">
                     <section class="world-map">
-                        <h2><%= i18n.stats_map.header_map %></h2>
+                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n.stats_map.view_world_map %></a>
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
                         </div>
                     </section>
                 </div>

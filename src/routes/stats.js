@@ -51,17 +51,19 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     });
 
     res.render('market-list', {
-        title: createPageTitle(i18n.page_titles.stats_servers, [config.site_name]),
+        title: createPageTitle(i18n('stats_servers', 'page_titles', res.locals.lang), [config.site_name]),
         pageType: 'stats',
         marketStats,
         worldsByMarket,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.servers}
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('servers', 'navigation', res.locals.lang)}
         ]),
         backendValues: {
             worldsByMarket,
-            marketStats
+            marketStats,
+            languages: res.locals.languages,
+            selectedLanguage: req.session.lang
         }
     });
 });
@@ -76,24 +78,24 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
     const marketWorlds = syncedWorlds.filter((world) => world.market === marketId);
 
     if (!marketWorlds.length) {
-        throw createError(404, i18n.errors.missing_world);
+        throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
     }
 
     const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num);
     const worlds = [
-        [i18n.world_list.open_worlds, sortedWorlds.filter(world => world.open)],
-        [i18n.world_list.closed_worlds, sortedWorlds.filter(world => !world.open)]
+        [i18n('open_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => world.open)],
+        [i18n('closed_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => !world.open)]
     ];
 
     res.render('world-list', {
-        title: createPageTitle(i18n.page_titles.stats_worlds, [marketId.toUpperCase(), config.site_name]),
+        title: createPageTitle(i18n('stats_worlds', 'page_titles', res.locals.lang), [marketId.toUpperCase(), config.site_name]),
         marketId,
         worlds,
         pageType: 'stats',
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.worlds}
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('worlds', 'navigation', res.locals.lang)}
         ]),
         backendValues: {
             marketId
@@ -156,7 +158,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     };
 
     res.render('stats/world', {
-        title: createPageTitle(i18n.page_titles.stats_world, [marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_world', 'page_titles', res.locals.lang), [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         players,
@@ -166,9 +168,9 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         achievements,
         achievementTitles,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: world.open ? i18n.navigation.world : i18n.navigation.world_closed, url: `/stats/${marketId}/${world.num}/`, replaces: [world.name]},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: world.open ? i18n('world', 'navigation', res.locals.lang) : i18n('world_closed', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/`, replaces: [world.name]},
         ]),
         backendValues: {
             marketId,

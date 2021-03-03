@@ -33,7 +33,7 @@ const getWorldInfoRouter = utils.asyncRouter(async function (req, res) {
     try {
         await fs.promises.access(dataPath);
     } catch (error) {
-        throw createError(500, i18n.errors.map_share_not_found);
+        throw createError(500, i18n('map_share_not_found', 'errors', res.locals.lang));
     }
 
     const ifNoneMatchValue = req.headers['if-none-match'];
@@ -76,7 +76,7 @@ const getContinentRouter = utils.asyncRouter(async function (req, res) {
     const continentId = req.params.continentId;
 
     if (continentId < 0 || continentId > 99 || isNaN(continentId)) {
-        throw createError(400, i18n.maps.error_invalid_continent);
+        throw createError(400, i18n('error_invalid_continent', 'maps', res.locals.lang));
     }
 
     let dataPath;
@@ -134,7 +134,7 @@ const getStructRouter = utils.asyncRouter(async function (req, res) {
     try {
         await fs.promises.access(structPath);
     } catch (error) {
-        throw createError(500, i18n.maps.error_struct_not_found);
+        throw createError(500, i18n('error_struct_not_found', 'maps', res.locals.lang));
     }
 
     const ifNoneMatchValue = req.headers['if-none-match'];
@@ -169,19 +169,19 @@ const crateShareRouter = utils.asyncRouter(async function (req, res) {
 
     if (!worldExists) {
         res.status(404);
-        res.end(i18n.maps.error_world_not_found);
+        res.end(i18n('error_world_not_found', 'maps', res.locals.lang));
         return;
     }
 
     if (!highlights || !Array.isArray(highlights)) {
         res.status(400);
-        res.end(i18n.maps.error_invalid_highlights);
+        res.end(i18n('error_invalid_highlights', 'maps', res.locals.lang));
         return;
     }
 
     if (!highlights.length) {
         res.status(400);
-        res.end(i18n.maps.error_no_highlights_input);
+        res.end(i18n('error_no_highlights_input', 'maps', res.locals.lang));
         return;
     }
 
@@ -229,7 +229,7 @@ const getShareRouter = utils.asyncRouter(async function (req, res) {
 
     if (!worldExists) {
         res.status(404);
-        res.end(i18n.errors.map_share_not_found);
+        res.end(i18n('map_share_not_found', 'errors', res.locals.lang));
         return;
     }
 
@@ -241,7 +241,7 @@ const getShareRouter = utils.asyncRouter(async function (req, res) {
         res.end(JSON.stringify(mapShare));
     } catch (error) {
         res.status(404);
-        res.end(i18n.errors.map_share_not_found);
+        res.end(i18n('map_share_not_found', 'errors', res.locals.lang));
     }
 });
 

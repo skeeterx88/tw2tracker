@@ -10,10 +10,10 @@
         </colgroup>
         <thead>
             <tr>
-                <th><%= i18n.player_profile.achievements.column_name %></th>
-                <th><%= i18n.player_profile.achievements.column_points %></th>
-                <th><%= i18n.player_profile.achievements.column_milestone %></th>
-                <th><%= i18n.player_profile.achievements.column_unlocked_on %></th>
+                <th><%= i18n('column_name', 'player_profile_achievements', lang) %></th>
+                <th><%= i18n('column_points', 'player_profile_achievements', lang) %></th>
+                <th><%= i18n('column_milestone', 'player_profile_achievements', lang) %></th>
+                <th><%= i18n('column_unlocked_on', 'player_profile_achievements', lang) %></th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
                 <% } %>
             <% } else { -%>
                 <tr>
-                    <td colspan="4"><%= i18n.player_profile.achievements.category_no_achievements %></td>
+                    <td colspan="4"><%= i18n('category_no_achievements', 'player_profile_achievements', lang) %></td>
                 </tr>
             <% } -%>
         </tbody>

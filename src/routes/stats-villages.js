@@ -35,17 +35,17 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
     const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
 
     res.render('stats/village', {
-        title: createPageTitle(i18n.page_titles.stats_village, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_village', 'page_titles', res.locals.lang), [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
         village,
         conquests,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.village, url: `/stats/${marketId}/${world.num}/villages/${village.id}`, replaces: [village.name]}
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('village', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/villages/${village.id}`, replaces: [village.name]}
         ]),
         backendValues: {
             marketId,

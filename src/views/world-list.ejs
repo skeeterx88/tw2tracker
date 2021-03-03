@@ -24,26 +24,26 @@
                                                 </h2>
 
                                                 <div class="stats">
-                                                    <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n.world_list.players %></span></p>
-                                                    <p><span class="label"><%= formatNumbers(world.tribe_count) %> <%= i18n.world_list.tribes %></span></p>
-                                                    <p><span class="label"><%= formatNumbers(world.village_count) %> <%= i18n.world_list.villages %></span></p>
+                                                    <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n('players', 'world_list', lang) %></span></p>
+                                                    <p><span class="label"><%= formatNumbers(world.tribe_count) %> <%= i18n('tribes', 'world_list', lang) %></span></p>
+                                                    <p><span class="label"><%= formatNumbers(world.village_count) %> <%= i18n('villages', 'world_list', lang) %></span></p>
                                                 </div>
 
                                                 <% if (world.config) { -%>
                                                     <div class="settings">
-                                                        <p><span class="label"><%= i18n.world_list.setting_world_type %></span> <span class="value"><% __append(world.config.victory_points ? i18n.world_list.world_type_victory_points : i18n.world_list.world_type_domination) %></span></p>
-                                                        <p><span class="label"><%= i18n.world_list.setting_troop_relocation %></span> <span class="value"><% __append(world.config.relocate_units ? i18n.world_list.setting_enabled : i18n.world_list.setting_disabled) %></span></p>
+                                                        <p><span class="label"><%= i18n('setting_world_type', 'world_list', lang) %></span> <span class="value"><% __append(world.config.victory_points ? i18n('world_type_victory_points', 'world_list', lang) : i18n('world_type_domination', 'world_list', lang)) %></span></p>
+                                                        <p><span class="label"><%= i18n('setting_troop_relocation', 'world_list', lang) %></span> <span class="value"><% __append(world.config.relocate_units ? i18n('setting_enabled', 'world_list', lang) : i18n('setting_disabled', 'world_list', lang)) %></span></p>
                                                     </div>
                                                 <% } -%>
 
                                                 <% if (world.open_date || world.close_date) { %>
                                                     <div class="dates">
                                                         <% if (world.open_date) { %>
-                                                            <p><span class="label"><%= i18n.world_list.open_date %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
+                                                            <p><span class="label"><%= i18n('open_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
                                                         <% } %>
 
                                                         <% if (world.close_date) { %>
-                                                            <p><span class="label"><%= i18n.world_list.close_date %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
+                                                            <p><span class="label"><%= i18n('close_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
                                                         <% } %>
                                                     </div>
                                                 <% } %>

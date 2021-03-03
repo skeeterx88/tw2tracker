@@ -66,7 +66,7 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
 
     res.render('stats/player', {
-        title: createPageTitle(i18n.page_titles.stats_player, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_player', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -83,10 +83,10 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
         achievementTypes,
         tribeChangesCount,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
         ]),
         backendValues: {
             marketId,
@@ -118,18 +118,18 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const villages = await getPlayerVillages(worldId, playerId);
 
     res.render('stats/player-villages', {
-        title: createPageTitle(i18n.page_titles.stats_player_villages, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_player_villages', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
         player,
         villages,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n.navigation.villages},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('villages', 'navigation', res.locals.lang)},
         ]),
         backendValues: {
             marketId,
@@ -167,29 +167,29 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
         all: {
             sqlConquests: sql.getPlayerConquests,
             sqlCount: sql.getPlayerConquestsCount,
-            navigationTitle: i18n.player_profile.conquests.sub_title_all
+            navigationTitle: i18n('sub_title_all', 'player_profile_conquests', res.locals.lang)
         },
         gain: {
             sqlConquests: sql.getPlayerConquestsGain,
             sqlCount: sql.getPlayerConquestsGainCount,
-            navigationTitle: i18n.player_profile.conquests.sub_title_gain
+            navigationTitle: i18n('sub_title_gain', 'player_profile_conquests', res.locals.lang)
         },
         loss: {
             sqlConquests: sql.getPlayerConquestsLoss,
             sqlCount: sql.getPlayerConquestsLossCount,
-            navigationTitle: i18n.player_profile.conquests.sub_title_loss
+            navigationTitle: i18n('sub_title_loss', 'player_profile_conquests', res.locals.lang)
         },
         self: {
             sqlConquests: sql.getPlayerConquestsSelf,
             sqlCount: sql.getPlayerConquestsSelfCount,
-            navigationTitle: i18n.player_profile.conquests.sub_title_self
+            navigationTitle: i18n('sub_title_self', 'player_profile_conquests', res.locals.lang)
         }
     };
 
     const category = req.params.category ?? 'all';
 
     if (!conquestCategories.includes(category)) {
-        throw createError(404, i18n.errors.router_missing_sub_category);
+        throw createError(404, i18n('router_missing_sub_category', 'errors', res.locals.lang));
     }
 
     const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, playerId, offset, limit}, function (conquest) {
@@ -208,7 +208,7 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/player-conquests', {
-        title: createPageTitle(i18n.page_titles.stats_player_conquests, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_player_conquests', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -219,10 +219,10 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
             {label: navigationTitle},
         ]),
         backendValues: {
@@ -267,7 +267,7 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/player-tribe-changes', {
-        title: createPageTitle(i18n.page_titles.stats_player_tribe_changes, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -275,11 +275,11 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
         tribeChanges,
         tribeTags,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n.navigation.tribe_changes},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('tribe_changes', 'navigation', res.locals.lang)},
         ]),
         backendValues: {
             marketId,
@@ -316,15 +316,15 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
     const achievementCategoriesUnique = ['battle', 'points', 'tribe', 'special', 'friends', 'milestone', 'ruler'];
 
     if (selectedCategory && !achievementCategories.includes(selectedCategory)) {
-        throw createError(404, i18n.errors.router_missing_category);
+        throw createError(404, i18n('router_missing_category', 'errors', res.locals.lang));
     }
 
     if (selectedCategory === 'repeatable') {
         if (!(subCategory === 'detailed' || !subCategory)) {
-            throw createError(404, i18n.errors.router_missing_sub_page);
+            throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
         }
     } else if (subCategory) {
-        throw createError(404, i18n.errors.router_missing_sub_page);
+        throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
     }
 
     const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]));
@@ -428,7 +428,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/player-achievements', {
-        title: createPageTitle(i18n.page_titles.stats_player_achievements, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_player_achievements', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -449,11 +449,11 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         achievementTypes,
         navigationTitle,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.player, url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n.navigation.achievements},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('achievements', 'navigation', res.locals.lang)},
         ]),
         backendValues: {
             marketId,

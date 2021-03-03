@@ -12,8 +12,8 @@
                 <div class="single">
                     <section id="search" class="content-border">
                         <% if (!resultsCount) { %>
-                            <h3><%= i18n.world_search.no_results %></h3>
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= i18n.world_search.go_back %></a>
+                            <h3><%= i18n('no_results', 'world_search', lang) %></h3>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/"><%= i18n('go_back', 'world_search', lang) %></a>
                         <% } else { %>
                             <%- include('search/' + category + '.ejs') %>
                             <%- include('../pagination.ejs') %>

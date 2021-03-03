@@ -123,7 +123,7 @@ require([
                 },
                 noResults: () => {
                     const $item = document.createElement('li');
-                    $item.innerHTML = i18n.maps.search_no_results;
+                    $item.innerHTML = i18n('search_no_results', 'maps', lang);
                     autoComplete.resultsList.view.appendChild($item);
                 },
                 highlight: true,
@@ -209,7 +209,7 @@ require([
             }
 
             $villages.classList.add('villages');
-            $villages.innerHTML = villages > 1 ? `${villages} ${i18n.maps.villages}` : `${villages} ${i18n.maps.village}`;
+            $villages.innerHTML = villages > 1 ? `${villages} ${i18n('villages', 'maps', lang)}` : `${villages} ${i18n('village', 'maps', lang)}`;
 
             $item.appendChild($icon);
             $item.appendChild($name);
@@ -497,7 +497,7 @@ require([
             } else {
                 const message = await response.text();
                 notif({
-                    title: i18n.errors.failed_load_map_share,
+                    title: i18n('failed_load_map_share', 'errors', lang),
                     content: message,
                     timeout: 0
                 });
@@ -538,13 +538,13 @@ require([
                 const result = await map.shareMap(TW2Map.mapShareTypes.DYNAMIC);
 
                 notif({
-                    title: i18n.maps.dynamic_map,
+                    title: i18n('dynamic_map', 'maps', lang),
                     link: location.origin + result,
                     timeout: 0
                 });
             } catch (error) {
                 notif({
-                    title: i18n.errors.failed_gen_share_map,
+                    title: i18n('failed_gen_share_map', 'errors', lang),
                     content: error.message
                 });
             }
@@ -567,14 +567,14 @@ require([
                 const result = await map.shareMap(TW2Map.mapShareTypes.STATIC);
 
                 notif({
-                    title: i18n.maps.static_map,
-                    content: i18n.maps.notif_static_share_expire,
+                    title: i18n('static_map', 'maps', lang),
+                    content: i18n('notif_static_share_expire', 'maps', lang),
                     link: location.origin + result,
                     timeout: 0
                 });
             } catch (error) {
                 notif({
-                    title: i18n.errors.failed_gen_share_map,
+                    title: i18n('failed_gen_share_map', 'errors', lang),
                     content: error.message
                 });
             }

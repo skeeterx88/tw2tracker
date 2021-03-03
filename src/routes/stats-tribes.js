@@ -50,7 +50,7 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count;
 
     res.render('stats/tribe', {
-        title: createPageTitle(i18n.page_titles.stats_tribe, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_tribe', 'page_titles', res.locals.lang), [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -65,10 +65,10 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
         achievementsLatest,
         memberChangesCount,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.tribe, url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
         ]),
         backendValues: {
             marketId,
@@ -106,29 +106,29 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
         all: {
             sqlConquests: sql.getTribeConquests,
             sqlCount: sql.getTribeConquestsCount,
-            navigationTitle: i18n.tribe_profile.achievements.sub_title_all
+            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_all
         },
         gain: {
             sqlConquests: sql.getTribeConquestsGain,
             sqlCount: sql.getTribeConquestsGainCount,
-            navigationTitle: i18n.tribe_profile.achievements.sub_title_gain
+            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_gain
         },
         loss: {
             sqlConquests: sql.getTribeConquestsLoss,
             sqlCount: sql.getTribeConquestsLossCount,
-            navigationTitle: i18n.tribe_profile.achievements.sub_title_loss
+            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_loss
         },
         self: {
             sqlConquests: sql.getTribeConquestsSelf,
             sqlCount: sql.getTribeConquestsSelfCount,
-            navigationTitle: i18n.tribe_profile.achievements.sub_title_self
+            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_self
         }
     };
 
     const category = req.params.category ?? 'all';
 
     if (!conquestCategories.includes(category)) {
-        throw createError(404, i18n.errors.router_missing_sub_page);
+        throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
     }
 
     const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
@@ -147,7 +147,7 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
     res.render('stats/tribe-conquests', {
-        title: createPageTitle(i18n.page_titles.stats_tribe_conquests, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_tribe_conquests', 'page_titles', res.locals.lang), [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -158,10 +158,10 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.tribe, url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: navigationTitle}
         ]),
         backendValues: {
@@ -194,17 +194,17 @@ const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
     const members = await db.any(sql.getTribeMembers, {worldId, tribeId});
 
     res.render('stats/tribe-members', {
-        title: createPageTitle(i18n.page_titles.stats_tribe_members, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_tribe_members', 'page_titles', res.locals.lang), [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         tribe,
         members,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.tribe, url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n.navigation.members},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('members', 'navigation', res.locals.lang)},
         ]),
         backendValues: {
             marketId,
@@ -242,18 +242,18 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const total = allVillages.length;
 
     res.render('stats/tribe-villages', {
-        title: createPageTitle(i18n.page_titles.stats_tribe_villages, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_tribe_villages', 'page_titles', res.locals.lang), [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         tribe,
         villages,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.tribe, url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n.navigation.villages},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('villages', 'navigation', res.locals.lang)},
         ]),
         backendValues: {
             marketId,
@@ -303,7 +303,7 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
     }
 
     res.render('stats/tribe-member-changes', {
-        title: createPageTitle(i18n.page_titles.stats_tribe_member_changes, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_tribe_member_changes', 'page_titles', res.locals.lang), [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         tribe,
@@ -311,11 +311,11 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
         memberChanges,
         tribeMemberChangeTypes: enums.tribeMemberChangeTypes,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.tribe, url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n.navigation.member_changes},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('member_changes', 'navigation', res.locals.lang)},
         ]),
         backendValues: {
             marketId,
@@ -345,7 +345,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
     const subCategory = req.params.subCategory;
 
     if (subCategory && subCategory !== 'detailed') {
-        throw createError(404, i18n.errors.router_missing_sub_page);
+        throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
     }
 
     const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId});
@@ -376,7 +376,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
     }
 
     res.render('stats/tribe-achievements', {
-        title: createPageTitle(i18n.page_titles.stats_tribe_achievements, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_tribe_achievements', 'page_titles', res.locals.lang), [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         tribe,
@@ -388,11 +388,11 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
         subCategory,
         achievementTitles,
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.tribe, url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n.navigation.achievements},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('achievements', 'navigation', res.locals.lang)},
         ]),
         backendValues: {
             marketId,

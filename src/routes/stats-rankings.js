@@ -44,7 +44,7 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const category = req.params.category;
 
     if (!rankingCategories.includes(category)) {
-        throw createError(404, i18n.errors.router_missing_category);
+        throw createError(404, i18n('router_missing_category', 'errors', res.locals.lang));
     }
 
     const page = req.params.page && !isNaN(req.params.page)
@@ -59,7 +59,7 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const capitalizedCategory = utils.capitalize(category);
 
     res.render('stats/ranking', {
-        title: createPageTitle(i18n.page_titles.stats_ranking, [capitalizedCategory, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_ranking', 'page_titles', res.locals.lang), [capitalizedCategory, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         worldName: world.name,
@@ -68,10 +68,10 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
         category,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.ranking, replaces: [capitalizedCategory]},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('ranking', 'navigation', res.locals.lang), replaces: [capitalizedCategory]},
         ]),
         backendValues: {
             marketId,

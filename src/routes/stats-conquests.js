@@ -37,17 +37,17 @@ const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const total = parseInt((await db.one(sql.getWorldConquestsCount, {worldId})).count, 10);
 
     res.render('stats/conquests', {
-        title: createPageTitle(i18n.page_titles.stats_world_conquests, [marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_world_conquests', 'page_titles', res.locals.lang), [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
         conquests,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.conquests}
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('conquests', 'navigation', res.locals.lang)}
         ]),
         backendValues: {
             marketId,

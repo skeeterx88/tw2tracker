@@ -1,6 +1,6 @@
 <div class="<% __append(subCategory === 'detailed' ? 'single' : 'left') %>">
     <section id="player-achievements-repeatable">
-        <h2><%= navigationTitle %><% __append(subCategory === 'detailed' ? ` (${i18n.player_profile.achievements.detailed})` : '') %></h2>
+        <h2><%= navigationTitle %><% __append(subCategory === 'detailed' ? ` (${i18n('detailed', 'player_profile_achievements', lang)})` : '') %></h2>
 
         <table class="content-border">
             <colgroup>
@@ -9,8 +9,8 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th><%= i18n.player_profile.achievements.column_name %></th>
-                    <th><% __append(subCategory === 'detailed' ? i18n.player_profile.achievements.column_earned : i18n.player_profile.achievements.column_last_earned) %></th>
+                    <th><%= i18n('column_name', 'player_profile_achievements', lang) %></th>
+                    <th><% __append(subCategory === 'detailed' ? i18n('column_earned', 'player_profile_achievements', lang) : i18n('column_last_earned', 'player_profile_achievements', lang)) %></th>
                 </tr>
             </thead>
             <tbody>
@@ -26,13 +26,13 @@
                         <% for (let [type, count] of Object.entries(achievementsRepeatableCount)) { %>
                             <tr>
                                 <td><%= achievementTitles[type] %> (<%= count %>x)</td>
-                                <td><%= achievementsRepeatableLastEarned[type] || i18n.player_profile.achievements.never %></td>
+                                <td><%= achievementsRepeatableLastEarned[type] || i18n('never', 'player_profile_achievements', lang) %></td>
                             </tr>
                         <% } %>
                     <% } -%>
                 <% } else { -%>
                     <tr>
-                        <td colspan="2"><%= i18n.player_profile.achievements.category_no_achievements %></td>
+                        <td colspan="2"><%= i18n('category_no_achievements', 'player_profile_achievements', lang) %></td>
                     </tr>
                 <% } -%>
             </tbody>
@@ -40,9 +40,9 @@
 
         <div class="section-actions">
             <% if (subCategory === 'detailed') { -%>
-                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable"><%= i18n.player_profile.achievements.view_simple_achievements %></a>
+                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable"><%= i18n('view_simple_achievements', 'player_profile_achievements', lang) %></a>
             <% } else { -%>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable/detailed"><%= i18n.player_profile.achievements.view_detailed_achievements %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/repeatable/detailed"><%= i18n('view_detailed_achievements', 'player_profile_achievements', lang) %></a>
             <% } -%>
         </div>
     </section>

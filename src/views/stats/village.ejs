@@ -11,7 +11,7 @@
             <div class="content">
                 <div class="left">
                     <section id="village">
-                        <h2><%= i18n.village_profile.header_village_profile %></h2>
+                        <h2><%= i18n('header_village_profile', 'village_profile', lang) %></h2>
 
                         <div class="content-border">
                             <table class="vertical">
@@ -21,27 +21,27 @@
                                 </colgroup>
                                 <tbody>
                                     <tr>
-                                        <th><%= i18n.village_profile.village_name %></th>
+                                        <th><%= i18n('village_name', 'village_profile', lang) %></th>
                                         <td><%= village.name %></td>
                                     </tr>
                                     <tr>
-                                        <th><%= i18n.village_profile.village_location %></th>
+                                        <th><%= i18n('village_location', 'village_profile', lang) %></th>
                                         <td><%= village.x %>|<%= village.y %></td>
                                     </tr>
                                     <tr>
-                                        <th><%= i18n.village_profile.village_points %></th>
+                                        <th><%= i18n('village_points', 'village_profile', lang) %></th>
                                         <td><%= formatNumbers(village.points) %></td>
                                     </tr>
                                     <tr>
-                                        <th><%= i18n.village_profile.village_owner %></th>
+                                        <th><%= i18n('village_owner', 'village_profile', lang) %></th>
                                         <% if (village.character_id) { -%>
                                             <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.character_id %>"><%= village.player_name %></a></td>
                                         <% } else { -%>
-                                            <td><%= i18n.village_profile.abandoned %></td>
+                                            <td><%= i18n('abandoned', 'village_profile', lang) %></td>
                                         <% } -%>
                                     </tr>
                                     <tr>
-                                        <th><%= i18n.village_profile.village_owner_tribe %></th>
+                                        <th><%= i18n('village_owner_tribe', 'village_profile', lang) %></th>
                                         <% if (village.character_id && village.tribe_id) { -%>
                                             <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= village.tribe_id %>"><%= village.tribe_tag %></a></td>
                                         <% } else { -%>
@@ -52,7 +52,7 @@
                             </table>
                         </div>
 
-                        <h3><%= i18n.village_profile.header_conquest_history %></h3>
+                        <h3><%= i18n('header_conquest_history', 'village_profile', lang) %></h3>
                         <div class="content-border">
                             <table>
                                 <colgroup>
@@ -63,16 +63,16 @@
                                 </colgroup>
 
                                 <thead>
-                                    <th><%= i18n.village_profile.conquest_date_hour %></th>
-                                    <th><%= i18n.village_profile.conquest_points %></th>
-                                    <th><%= i18n.village_profile.conquest_old_owner %></th>
-                                    <th><%= i18n.village_profile.conquest_new_owner %></th>
+                                    <th><%= i18n('conquest_date_hour', 'village_profile', lang) %></th>
+                                    <th><%= i18n('conquest_points', 'village_profile', lang) %></th>
+                                    <th><%= i18n('conquest_old_owner', 'village_profile', lang) %></th>
+                                    <th><%= i18n('conquest_new_owner', 'village_profile', lang) %></th>
                                 </thead>
 
                                 <tbody>
                                     <% if (!conquests.length) { -%>
                                         <tr>
-                                            <td colspan="4"><%= i18n.village_profile.no_conquests %></td>
+                                            <td colspan="4"><%= i18n('no_conquests', 'village_profile', lang) %></td>
                                         </tr>
                                     <% } else { -%>
                                         <% for (let conquest of conquests) { %>
@@ -93,7 +93,7 @@
                                                         <% } -%>
                                                     </td>
                                                 <% } else { -%>
-                                                    <td><%= i18n.village_profile.abandoned %></td>
+                                                    <td><%= i18n('abandoned', 'village_profile', lang) %></td>
                                                 <% } -%>
 
                                                 <td>
@@ -118,12 +118,12 @@
 
                 <div class="right">
                     <section class="world-map">
-                        <h2><%= i18n.stats_map.header_map %></h2>
+                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n.stats_map.view_world_map %></a>
+                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
                         </div>
                     </section>
                 </div>

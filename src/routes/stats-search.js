@@ -31,7 +31,7 @@ const searchPostRedirectRouter = utils.asyncRouter(async function (req, res, nex
     const category = (req.body.category || '').toLowerCase();
 
     if (!searchCategories.includes(category)) {
-        throw createError(404, i18n.errors.router_missing_category);
+        throw createError(404, i18n('router_missing_category', 'errors', res.locals.lang));
     }
 
     return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
@@ -72,15 +72,15 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
     const rawQuery = decodeURIComponent(req.params.query);
 
     if (!rawQuery) {
-        throw createError(500, i18n.world_search.error_no_search);
+        throw createError(500, i18n('error_no_search', 'world_search', res.locals.lang));
     }
 
     if (rawQuery.length < 3) {
-        throw createError(500, i18n.world_search.error_min_chars);
+        throw createError(500, i18n('error_min_chars', 'world_search', res.locals.lang));
     }
 
     if (rawQuery.length > 20) {
-        throw createError(500, i18n.world_search.error_max_chars);
+        throw createError(500, i18n('error_max_chars', 'world_search', res.locals.lang));
     }
 
     const query = '%' + rawQuery + '%';
@@ -89,7 +89,7 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
     const total = allResults.length;
 
     return res.render('stats/search', {
-        title: createPageTitle(i18n.page_titles.stats_search, [rawQuery, marketId.toUpperCase(), world.name, config.site_name]),
+        title: createPageTitle(i18n('stats_search', 'page_titles', res.locals.lang), [rawQuery, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         category,
@@ -97,10 +97,10 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
         resultsCount: results.length,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
-            {label: i18n.navigation.stats, url: '/'},
-            {label: i18n.navigation.server, url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n.navigation.world, url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n.navigation.search, replaces: [rawQuery]},
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('search', 'navigation', res.locals.lang), replaces: [rawQuery]},
         ]),
         backendValues: {
             marketId,

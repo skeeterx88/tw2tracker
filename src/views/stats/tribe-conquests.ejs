@@ -9,10 +9,10 @@
             <%- include('../navigation.ejs') %>
 
             <div class="sub-menu">
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests" class="item <% __append(category === 'all' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_all %></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain" class="item <% __append(category === 'gain' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_gains %></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss" class="item <% __append(category === 'loss' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_losses %></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>"><%= i18n.tribe_profile.conquests.menu_self %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests" class="item <% __append(category === 'all' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_all %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain" class="item <% __append(category === 'gain' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_gains %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss" class="item <% __append(category === 'loss' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_losses %></a>
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_self %></a>
             </div>
 
             <div class="content">
@@ -33,17 +33,17 @@
 
                                 <thead>
                                     <th></th>
-                                    <th><%= i18n.tribe_profile.conquests.column_village %></th>
-                                    <th><%= i18n.tribe_profile.conquests.column_points %></th>
-                                    <th><%= i18n.tribe_profile.conquests.column_old_owner %></th>
-                                    <th><%= i18n.tribe_profile.conquests.column_new_owner %></th>
-                                    <th><%= i18n.tribe_profile.conquests.column_date_hour %></th>
+                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_village %></th>
+                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_points %></th>
+                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_old_owner %></th>
+                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_new_owner %></th>
+                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_date_hour %></th>
                                 </thead>
 
                                 <tbody>
                                     <% if (!conquests.length) { -%>
                                         <tr>
-                                            <td colspan="6"><%= i18n.tribe_profile.conquests.no_conquests %></td>
+                                            <td colspan="6"><%= i18n('conquests', 'tribe_profile', lang).no_conquests %></td>
                                         </tr>
                                     <% } else { -%>
                                         <% for (let conquest of conquests) { %>
@@ -67,7 +67,7 @@
                                                         <% } -%>
                                                     </td>
                                                 <% } else { -%>
-                                                    <td><%= i18n.tribe_profile.abandoned_village %></td>
+                                                    <td><%= i18n('abandoned_village', 'tribe_profile', lang) %></td>
                                                 <% } -%>
 
                                                 <td>
@@ -95,12 +95,12 @@
 
                 <div class="right-really-small">
                     <section class="world-map">
-                        <h2><%= i18n.stats_map.header_map %></h2>
+                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
 
                         <div id="map" class="content-border"></div>
 
                         <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= world.num %>"><%= i18n.stats_map.view_world_map %></a>
+                            <a href="/maps/<%= marketId %>/<%= world.num %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
                         </div>
                     </section>
                 </div>

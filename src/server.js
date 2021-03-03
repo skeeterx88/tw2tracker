@@ -62,13 +62,13 @@ passport.use(new passportLocal.Strategy({
 
     if (!account) {
         return done(null, false, {
-            message: i18n.admin[enums.AUTH_ERROR_ACCOUNT_NOT_EXIST]
+            message: i18n(enums.AUTH_ERROR_ACCOUNT_NOT_EXIST, 'admin')
         });
     }
 
     if (!account.enabled) {
         return done(null, false, {
-            message: i18n.admin[enums.AUTH_ERROR_ACCOUNT_NOT_ENABLED]
+            message: i18n(enums.AUTH_ERROR_ACCOUNT_NOT_ENABLED, 'admin')
         });
     }
 
@@ -76,7 +76,7 @@ passport.use(new passportLocal.Strategy({
 
     if (!match) {
         return done(null, false, {
-            message: i18n.admin[enums.AUTH_ERROR_INVALID_PASSWORD]
+            message: i18n(enums.AUTH_ERROR_INVALID_PASSWORD, 'admin')
         });
     }
 

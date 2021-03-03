@@ -9,7 +9,7 @@ router.get('/', async function (req, res, next) {
     const [error] = req.flash('error');
 
     res.render('login', {
-        title: createPageTitle(i18n.page_titles.admin_panel_login, [config.site_name]),
+        title: createPageTitle(i18n('admin_panel_login', 'page_titles', res.locals.lang), [config.site_name]),
         error
     });
 });

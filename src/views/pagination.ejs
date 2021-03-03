@@ -2,10 +2,10 @@
     <tr>
         <td>
             <% if (pagination.showGotoFirst) { -%>
-                <a class="page first" href="<%= pagination.path %>/">&lt;&lt;&lt; <%= i18n.pagination.first %></a>
+                <a class="page first" href="<%= pagination.path %>/">&lt;&lt;&lt; <%= i18n('first', 'pagination', lang) %></a>
             <% } -%>
             <% if (pagination.showGotoPrev) { -%>
-                <a class="page prev" href="<%= pagination.path %>/page/<%= (pagination.current - 1) %>">&lt; <%= i18n.pagination.previous %></a>
+                <a class="page prev" href="<%= pagination.path %>/page/<%= (pagination.current - 1) %>">&lt; <%= i18n('previous', 'pagination', lang) %></a>
             <% } -%>
             <% for (let i = pagination.start; i <= pagination.end; i++) { -%>
                 <% if (i === pagination.current) { -%>
@@ -15,10 +15,10 @@
                 <% } -%>
             <% } -%>
             <% if (pagination.showGotoLast) { -%>
-                <a class="page last" href="<%= pagination.path %>/page/<%= pagination.last %>"><%= i18n.pagination.last %> &gt;&gt;&gt;</a>
+                <a class="page last" href="<%= pagination.path %>/page/<%= pagination.last %>"><%= i18n('last', 'pagination', lang) %> &gt;&gt;&gt;</a>
             <% } -%>
             <% if (pagination.showGotoNext) { -%>
-                <a class="page next" href="<%= pagination.path %>/page/<%= (pagination.current + 1) %>"><%= i18n.pagination.next %> &gt;</a>
+                <a class="page next" href="<%= pagination.path %>/page/<%= (pagination.current + 1) %>"><%= i18n('next', 'pagination', lang) %> &gt;</a>
             <% } -%>
         </td>
     </tr>

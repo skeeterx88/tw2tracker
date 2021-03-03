@@ -11,7 +11,7 @@
                     <button id="current-world">
                         <span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span>
                     </button>
-                    <button id="change-settings"><%= i18n.maps.button_settings %></button>
+                    <button id="change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
                 </header>
 
                 <div id="quick-jump">
@@ -24,8 +24,8 @@
 
                 <div id="highlights">
                     <label>
-                        <h2 id="highlights-title"><%= i18n.maps.header_highlights %></h2>
-                        <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="<%= i18n.maps.search_placeholder %>">
+                        <h2 id="highlights-title"><%= i18n('header_highlights', 'maps', lang) %></h2>
+                        <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
                     </label>
                     <ul id="highlight-items"></ul>
                 </div>
@@ -33,11 +33,11 @@
                 <footer>
                     <div id="map-share-wrapper">
                         <button id="map-share">
-                            <span><%= i18n.maps.button_gen_dynamic_map %></span>
+                            <span><%= i18n('button_gen_dynamic_map', 'maps', lang) %></span>
                             <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
                         </button>
                         <button id="map-save">
-                            <span><%= i18n.maps.button_gen_static_map %></span>
+                            <span><%= i18n('button_gen_static_map', 'maps', lang) %></span>
                             <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
                         </button>
                     </div>
@@ -56,12 +56,12 @@
                     </div>
 
                     <div id="last-sync" class="text-container hidden">
-                        <span><%= i18n.maps.last_update %></span>
+                        <span><%= i18n('last_update', 'maps', lang) %></span>
                         <span id="last-sync-date"></span>
                     </div>
 
                     <div id="share-date" class="text-container hidden">
-                        <span><%= i18n.maps.share_date %></span>
+                        <span><%= i18n('share_date', 'maps', lang) %></span>
                         <span id="share-date-date"></span>
                     </div>
                 </div>
@@ -85,18 +85,18 @@
         </div>
 
         <div id="all-worlds" class="hidden">
-            <h2><%= i18n.maps.open_worlds %></h2>
+            <h2><%= i18n('open_worlds', 'maps', lang) %></h2>
             <div class="loading"><div class="b1"></div><div class="b2"></div><div></div></div>
             <ul id="all-markets"></ul>
             <ul id="all-market-worlds"></ul>
         </div>
 
         <div id="settings" class="hidden">
-            <div class="color-option" data-setting-id="backgroundColor"><label><%= i18n.maps.settings_bg_color %></label></div>
-            <div class="color-option" data-setting-id="neutralColor"><label><%= i18n.maps.settings_neutral_color %></label></div>
-            <div class="color-option" data-setting-id="barbarianColor"><label><%= i18n.maps.settings_barbarian_color %></label></div>
-            <div class="color-option" data-setting-id="highlightPlayerColor"><label><%= i18n.maps.settings_highlight_player_color %></label></div>
-            <div class="color-option" data-setting-id="demarcationsColor"><label><%= i18n.maps.settings_demarcations_color %></label></div>
+            <div class="color-option" data-setting-id="backgroundColor"><label><%= i18n('settings_bg_color', 'maps', lang) %></label></div>
+            <div class="color-option" data-setting-id="neutralColor"><label><%= i18n('settings_neutral_color', 'maps', lang) %></label></div>
+            <div class="color-option" data-setting-id="barbarianColor"><label><%= i18n('settings_barbarian_color', 'maps', lang) %></label></div>
+            <div class="color-option" data-setting-id="highlightPlayerColor"><label><%= i18n('settings_highlight_player_color', 'maps', lang) %></label></div>
+            <div class="color-option" data-setting-id="demarcationsColor"><label><%= i18n('settings_demarcations_color', 'maps', lang) %></label></div>
         </div>
 
         <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
