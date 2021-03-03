@@ -24,15 +24,6 @@ require([
     let notif;
     const KEEP_COLORPICKER_OPEN = 'keep_colorpicker_open';
 
-    const getElemPosition = function ($ref) {
-        const {x, y, width, height} = $ref.getBoundingClientRect();
-
-        return {
-            x: Math.floor(x + width + 5),
-            y: Math.floor(y + height + 5)
-        };
-    };
-
     const setupQuickJump = () => {
         const $quickJumpX = document.querySelector('#quick-jump-x');
         const $quickJumpY = document.querySelector('#quick-jump-y');
@@ -302,7 +293,7 @@ require([
 
             clearActiveColor();
 
-            const {x, y} = getElemPosition($reference);
+            const {x, y} = utils.getElemPosition($reference);
 
             $colorPicker.style.visibility = 'visible';
             $colorPicker.style.opacity = 1;
@@ -443,7 +434,7 @@ require([
             visible = !visible;
 
             if (visible) {
-                const {x, y} = getElemPosition($changeSettings);
+                const {x, y} = utils.getElemPosition($changeSettings);
                 $settings.style.left = `${x}px`;
                 $settings.style.top = `${y}px`;
 
@@ -765,7 +756,7 @@ require([
             visible = !visible;
 
             if (visible) {
-                const {x, y} = getElemPosition($currentWorld);
+                const {x, y} = utils.getElemPosition($currentWorld);
                 $allWorlds.style.left = `${x}px`;
                 $allWorlds.style.top = `${y}px`;
 

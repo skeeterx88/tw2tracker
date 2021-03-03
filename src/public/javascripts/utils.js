@@ -102,6 +102,17 @@ define('utils', function () {
         return [averageX, averageY];
     };
 
+    const getElemPosition = function ($ref) {
+        const {x, y, width, height} = $ref.getBoundingClientRect();
+
+        return {
+            x: Math.floor(x + width + 5),
+            y: Math.floor(y + height + 5),
+            width,
+            height
+        };
+    };
+
     return {
         hasOwn,
         ajaxPost,
@@ -111,6 +122,7 @@ define('utils', function () {
         normalizeString,
         querySelectorFrom,
         formatSince,
-        averageCoords
+        averageCoords,
+        getElemPosition
     };
 });
