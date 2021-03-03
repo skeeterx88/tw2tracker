@@ -9,3 +9,14 @@
         <a href="/lang" class="language-change red"><span class="flag-en"><%= i18n.main_menu.lang %></span></a>
     </div>
 </nav>
+
+<div id="language-list" class="modal-container hidden">
+    <header>
+        <h2>Languages</h2>
+        <div class="close-wrapper"><span class="close">x</span></div>
+    </header>
+
+    <% for (const langId of languages) { -%>
+        <a href="/change-language/<%= langId %>"><span class="flag-<%= langId %>"><%= i18n('language', 'meta', langId) %></span></a>
+    <% } -%>
+</div>

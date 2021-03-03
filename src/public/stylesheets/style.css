@@ -51,6 +51,11 @@ a:hover {
     text-decoration: underline;
 }
 
+ul {
+    margin: 0px;
+    padding: 0px;
+}
+
 li {
     list-style: none;
 }
@@ -154,6 +159,10 @@ header {
 
 #main-menu .icon-heart {
     background-image: url(/images/icons/heart.svg);
+}
+
+#main-menu span[class^="flag-"] {
+    padding-left: 23px;
 }
 
 main, footer {
@@ -432,11 +441,6 @@ div.world-title {
     margin: 0px 5px;
 }
 
-.relax-container ul {
-    margin: 0px;
-    padding: 0px;
-}
-
 .relax-container .title {
     width: 150px;
 }
@@ -515,6 +519,69 @@ div.world-title {
 
 .world-list.hidden {
     display: none;
+}
+
+.modal-container {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    background: url(/images/noise.png) #6f4327;
+    color: #e0bfbf;
+    padding: 3px;
+    text-shadow: 1px 1px 0px #00000090;
+    transition: visibility 0.02s linear, opacity 0.02s linear;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
+    border: 1px solid #5e351b;
+    border-radius: 1px;
+    z-index: 10;
+}
+
+.modal-container.hidden {
+    display: none;
+}
+
+.modal-container header {
+    height: 25px;
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.modal-container header .close-wrapper {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.modal-container header .close-wrapper:hover {
+    color: red;
+}
+
+.modal-container header .close-wrapper .close {
+    vertical-align: middle;
+}
+
+.floating-container {
+    position: absolute;
+    background: url(/images/noise.png) #6f4327;
+    color: #e0bfbf;
+    padding: 3px;
+    text-shadow: 1px 1px 0px #00000090;
+    z-index: 7;
+    transition: visibility 0.02s linear, opacity 0.02s linear;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
+    border: 1px solid #5e351b;
+    border-radius: 1px;
+}
+
+.floating-container.hidden {
+    visibility: hidden;
+    opacity: 0;
 }
 
 fieldset {
@@ -832,6 +899,36 @@ a.achievement-subject:last-child:after {
 
 .keep-color {
     color: #50311d;
+}
+
+#language-list {
+    width: 200px;
+}
+
+#language-list a {
+    border-bottom-width: 2px;
+    border-bottom-color: #00000025;
+    border-bottom-style: dotted;
+    padding: 5px 10px;
+    color: #edd1c5;
+    display: block;
+}
+
+#language-list a:hover {
+    color: #ffffff;
+    background: #ffffff08;
+}
+
+#language-list a:last-child {
+    border-bottom: none;
+}
+
+#language-list span[class^="flag-"] {
+    padding-left: 30px;
+}
+
+#language-list h2 {
+    margin: 0px;
 }
 
 span[class^="flag-"] {
