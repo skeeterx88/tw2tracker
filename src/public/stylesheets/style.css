@@ -405,27 +405,33 @@ div.world-title {
     justify-content: space-between;
 }
 
-#market-list .relax-container.world {
-    background-color: #f3e4c3;
+.relax-sub-container.world {
+    box-sizing: border-box;
+    color: #311a11;
+    margin: 10px 0px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background: url(/images/noise.webp) #f3e4c3;
     border-radius: 5px;
     border-style: inset;
     border-width: 1px;
     border-color: #b18e7675;
     padding: 2px 4px;
     align-items: center;
-
     box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-#market-list .relax-container.world.closed {
+.relax-sub-container.world.closed {
     background-color: #d9cbac;
 }
 
-#market-list .relax-container.world .title {
+.relax-sub-container.world .title {
     font-size: 1.0em;
 }
 
-#market-list .relax-container.world .relax-button {
+.relax-sub-container.world .relax-button {
     border-radius: 1px;
     border-width: 1px;
     border-style: solid;
@@ -925,7 +931,7 @@ span[class^="flag-"] {
         width: 100%;
     }
 
-    #market-list .relax-container.world .title {
+    .relax-sub-container.world .title {
         width: 100%;
     }
 
