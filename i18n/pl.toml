@@ -1,3 +1,4 @@
+[meta]
 language = "Polski"
 
 [main_menu]
@@ -6,6 +7,7 @@ stats = "Statystyki"
 maps = "Mapy"
 donate = "Wesprzyj"
 discord = "Discord"
+lang = "Język"
 
 [market_list]
 stats = "Statystyki:"
@@ -15,6 +17,9 @@ villages = "Wioski"
 worlds = "Światy"
 open = "Otwarte:"
 closed = "Zamknięte:"
+open_worlds = "%{open_worlds} otwarte światy"
+closed_worlds = "%{closed_worlds} zamknięte światy"
+world_list = "Lista Światów"
 
 [world_list]
 stats = "Statystyki:"
@@ -32,6 +37,8 @@ opened = "Otwarte:"
 closed = "Zamknięte:"
 open_worlds = "Otwarte Światy"
 closed_worlds = "Zamknięte Światy"
+open_date = "Data otwarcia:"
+close_date = "Data zamknięcia:"
 
 [stats_map]
 header_map = "Mapa Świata"
@@ -138,14 +145,14 @@ achievement_date_time = "Data/Godzina"
 view_tribe_achievements = "Widok osiągnięć Plemienia"
 no_recent_achievements = "Brak niedawnych osiagnięć."
 
-[tribe_profile.villages]
+[tribe_profile_villages]
 header_tribe_villages = "Wioski plemienne"
 column_village = "Wioski"
 column_coords = "Koordynaty"
 column_points = "Punkty"
 column_owner = "Właściciel"
 
-[tribe_profile.members]
+[tribe_profile_members]
 header_tribe_members = "Członkowie Plemienia"
 column_rank = "Ranga"
 column_name = "Nazwa"
@@ -215,13 +222,13 @@ view_player_achievements = "Podgląd Osiągnięć Gracza"
 no_tribe = "Brak Plemienia"
 no_recent_achievements = "Brak najnowszych osiągnięc."
 
-[player_profile.villages]
+[player_profile_villages]
 header = "Wioski Gracza"
 column_name = "Wioska"
 column_coords = "Koordynaty"
 column_points = "Punkty"
 
-[player_profile.tribe_changes]
+[player_profile_tribe_changes]
 header = "Zmiany Plemienia Gracza"
 column_date_hour = "Data/Godzina"
 column_old_tribe = "Poprzednie Plemię"
@@ -229,7 +236,7 @@ column_new_tribe = "Nowe plemię"
 none = "Żaden"
 no_tribe_changes = "Brak zmiany plemienia."
 
-[player_profile.conquests]
+[player_profile_conquests]
 header_conquests = "Podboje"
 menu_all = "Wszystkie"
 menu_gains = "Zyski"
@@ -246,7 +253,7 @@ column_new_owner = "Nowy Właściciel"
 column_date_hour = "Data/Godzina"
 no_conquests = "Brak aktualnych podbojów."
 
-[player_profile.achievements]
+[player_profile_achievements]
 achievements = "Osiągnięcia"
 column_name = "Nazwa"
 column_unlocked_on = "Odblokowane Dnia"
@@ -305,14 +312,14 @@ error_mod_account_email_already_exists = "ten email przypisany jest juz do inneg
 error_invalid_privilege = "Nieprawidlowy typ przywileju"
 error_mod_account_not_exists = "Konto moderatora nie istnieje"
 
-[admin.menu]
+[admin_menu]
 sync = "Sync"
 accounts = "Synchronizacja Konta"
 mods = "Mod Konta"
 settings = "Ustawienia"
 logout = "Wyloguj"
 
-[admin.sync]
+[admin_sync]
 header_worlds = "Sync Światów"
 header_summary = "Sync Sumarycznie"
 header_panel = "Sync Panel"
@@ -337,14 +344,14 @@ last_status = "Ostatni status:"
 closed = "Zamknięte"
 never = "Nigdy"
 
-[admin.sync.status]
+[admin_sync_status]
 success = "Sukces"
 fail = "Porażka"
 already_synced = "Juz zsynchronizowane"
 world_closed = "Świat Zamknięty"
 sync_no_accounts = "Brak synchro kont"
 
-[admin.sync_accounts]
+[admin_sync_accounts]
 header_accounts = "Synchronizacja Kont"
 header_add_account = "Dodaj synchronizację kont"
 account_markets = "Serwery kont:"
@@ -358,7 +365,7 @@ click_to_add = "Kliknij by dodać serwer:"
 no_markets = "Brak serwerów."
 all_markets = "Dostępne wszystkie serwery."
  
-[admin.mod_accounts]
+[admin_mod_accounts]
 header_mod_accounts = "Konta Moderatorów"
 header_add_account = "Dodaj Konto Moderatora"
 privilege_list = "Uprawnienia Moderatora:"
@@ -366,7 +373,7 @@ save = "Zapisz"
 delete = "Usuń"
 create = "Stwórz"
 
-[admin.mod_accounts.privileges]
+[admin_mod_accounts_privileges]
 start_sync = "Startuj Synchronizację"
 control_sync = "Kontroluj Synchronizację"
 modify_accounts = "Modyfikuj Konta"
@@ -399,7 +406,7 @@ error_world_not_found = "Świat nie istnieje"
 error_invalid_highlights = "Nieprawidłowe najważniejsze dane"
 error_no_highlights_input = "Nie określono najważniejszych danych"
 
-[maps.tooltip]
+[maps_tooltip]
 village = "Wioska"
 village_points = "punkty wioski"
 player_name = "Nazwa Gracza"

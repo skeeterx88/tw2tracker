@@ -1,3 +1,4 @@
+[meta]
 language = "Français"
 
 [main_menu]
@@ -6,6 +7,7 @@ stats = "Statistiques"
 maps = "Cartographies"
 donate = "Donation"
 discord = "Discord"
+lang = "Langue"
 
 [market_list]
 stats = "Statistiques:"
@@ -15,6 +17,9 @@ villages = "villages"
 worlds = "Mondes:"
 open = "Ouvert:"
 closed = "Fermé:"
+open_worlds = "%{open_worlds} mondes ouverts"
+closed_worlds = "%{closed_worlds} mondes fermés"
+world_list = "Liste des Mondes"
 
 [world_list]
 stats = "Statistiques:"
@@ -32,6 +37,8 @@ opened = "Ouvert:"
 closed = "Fermé:"
 open_worlds = "Mondes ouverts"
 closed_worlds = "Mondes fermés"
+open_date = "Date d'ouverture:"
+close_date = "Date de fermeture:"
 
 [stats_map]
 header_map = "Carte du monde"
@@ -138,14 +145,14 @@ achievement_date_time = "Date/Heure"
 view_tribe_achievements = "Voir les succès de la tribu"
 no_recent_achievements = "Pas de succès récent."
 
-[tribe_profile.villages]
+[tribe_profile_villages]
 header_tribe_villages = "Villages de la Tribu"
 column_village = "Village"
 column_coords = "Coords"
 column_points = "Points"
 column_owner = "Propriétaire"
 
-[tribe_profile.members]
+[tribe_profile_members]
 header_tribe_members = "Membres de la Tribu"
 column_rank = "Rang"
 column_name = "Nom"
@@ -215,13 +222,13 @@ view_player_achievements = "Voir les succès du joueur"
 no_tribe = "Pas de tribu"
 no_recent_achievements = "Pas de succès récent."
 
-[player_profile.villages]
+[player_profile_villages]
 header = "Villages du Joueur"
 column_name = "Village"
 column_coords = "Coords"
 column_points = "Points"
 
-[player_profile.tribe_changes]
+[player_profile_tribe_changes]
 header = "Changements de Tribu du Joueur"
 column_date_hour = "Date/Heure"
 column_old_tribe = "Ancienne tribu"
@@ -229,7 +236,7 @@ column_new_tribe = "Nouvelle tribu"
 none = "Aucune"
 no_tribe_changes = "Aucun changement de tribu."
 
-[player_profile.conquests]
+[player_profile_conquests]
 header_conquests = "Conquêtes"
 menu_all = "Tout"
 menu_gains = "Gagné"
@@ -246,7 +253,7 @@ column_new_owner = "Nouveau propriétaire"
 column_date_hour = "Date/Heure"
 no_conquests = "Aucune conquête pour l'instant."
 
-[player_profile.achievements]
+[player_profile_achievements]
 achievements = "Succès"
 column_name = "Nom"
 column_unlocked_on = "Débloqué le"
@@ -305,14 +312,14 @@ error_mod_account_email_already_exists = "Cet email est déjà utilisé par un a
 error_invalid_privilege = "Type de droit invalide"
 error_mod_account_not_exists = "Ce compte Mod n'existe pas"
 
-[admin.menu]
+[admin_menu]
 sync = "Sync"
 accounts = "Comptes Sync"
 mods = "Comptes Mods"
 settings = "Paramètres"
 logout = "Déconnexion"
 
-[admin.sync]
+[admin_sync]
 header_worlds = "Sync Mondes"
 header_summary = "Sommaire Sync"
 header_panel = "Panneau Sync"
@@ -337,14 +344,14 @@ last_status = "Dernier statut:"
 closed = "Fermé"
 never = "Jamais"
 
-[admin.sync.status]
+[admin_sync_status]
 success = "OK"
 fail = "Echec"
 already_synced = "Déjà synchronisé"
 world_closed = "Monde fermé"
 sync_no_accounts = "Pas de compte de synchronisation"
 
-[admin.sync_accounts]
+[admin_sync_accounts]
 header_accounts = "Comptes Sync"
 header_add_account = "Ajouter un compte de Sync"
 account_markets = "Compte Serveurs:"
@@ -358,7 +365,7 @@ click_to_add = "Cliquer pour ajouter serveur:"
 no_markets = "Pas de serveurs inclus."
 all_markets = "Tous les serveurs sont inclus."
 
-[admin.mod_accounts]
+[admin_mod_accounts]
 header_mod_accounts = "Comptes Mods"
 header_add_account = "Ajouter compte Mod"
 privilege_list = "Droits:"
@@ -366,7 +373,7 @@ save = "Enregistrer"
 delete = "Supprimer"
 create = "Créer"
 
-[admin.mod_accounts.privileges]
+[admin_mod_accounts_privileges]
 start_sync = "Démarrer Sync"
 control_sync = "Contrôler Sync"
 modify_accounts = "Modifier Comptes"
@@ -399,7 +406,7 @@ error_world_not_found = "Le monde n'existe pas"
 error_invalid_highlights = "Informations de légendes invalide"
 error_no_highlights_input = "Pas de légende specificée"
 
-[maps.tooltip]
+[maps_tooltip]
 village = "Village"
 village_points = "Points du village"
 player_name = "Nom du joueur"

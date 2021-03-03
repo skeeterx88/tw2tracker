@@ -1,3 +1,4 @@
+[meta]
 language = "English"
 
 [main_menu]
@@ -14,8 +15,11 @@ players = "players"
 tribes = "tribes"
 villages = "villages"
 worlds = "Worlds:"
+open = "Open:"
+closed = "Closed:"
 open_worlds = "%{open_worlds} open worlds"
 closed_worlds = "%{closed_worlds} closed worlds"
+world_list = "World List"
 
 [world_list]
 stats = "Statistics:"
@@ -139,14 +143,14 @@ achievement_date_time = "Date/Hour"
 view_tribe_achievements = "View tribe's achievements"
 no_recent_achievements = "No recent achievements."
 
-[tribe_profile.villages]
+[tribe_profile_villages]
 header_tribe_villages = "Tribe Villages"
 column_village = "Village"
 column_coords = "Coords"
 column_points = "Points"
 column_owner = "Owner"
 
-[tribe_profile.members]
+[tribe_profile_members]
 header_tribe_members = "Tribe Members"
 column_rank = "Rank"
 column_name = "Name"
@@ -216,13 +220,13 @@ view_player_achievements = "View player's achievements"
 no_tribe = "No tribe"
 no_recent_achievements = "No recent achievements."
 
-[player_profile.villages]
+[player_profile_villages]
 header = "Player Villages"
 column_name = "Village"
 column_coords = "Coords"
 column_points = "Points"
 
-[player_profile.tribe_changes]
+[player_profile_tribe_changes]
 header = "Player Tribe Changes"
 column_date_hour = "Date/Hour"
 column_old_tribe = "Old tribe"
@@ -230,7 +234,7 @@ column_new_tribe = "New tribe"
 none = "None"
 no_tribe_changes = "No tribe changes yet."
 
-[player_profile.conquests]
+[player_profile_conquests]
 header_conquests = "Conquests"
 menu_all = "All"
 menu_gains = "Gains"
@@ -247,7 +251,7 @@ column_new_owner = "New owner"
 column_date_hour = "Date/Hour"
 no_conquests = "No conquests yet."
 
-[player_profile.achievements]
+[player_profile_achievements]
 achievements = "Achievements"
 column_name = "Name"
 column_unlocked_on = "Unlocked on"
@@ -306,14 +310,14 @@ error_mod_account_email_already_exists = "This email is already in use by anothe
 error_invalid_privilege = "Invalid privilege type"
 error_mod_account_not_exists = "This mod account does not exist"
 
-[admin.menu]
+[admin_menu]
 sync = "Sync"
 accounts = "Sync Accounts"
 mods = "Mod Accounts"
 settings = "Settings"
 logout = "Logout"
 
-[admin.sync]
+[admin_sync]
 header_worlds = "Sync Worlds"
 header_summary = "Sync Summary"
 header_panel = "Sync Panel"
@@ -338,14 +342,14 @@ last_status = "Last status:"
 closed = "Closed"
 never = "never"
 
-[admin.sync.status]
+[admin_sync_status]
 success = "Success"
 fail = "Fail"
 already_synced = "Already synced"
 world_closed = "World Closed"
 sync_no_accounts = "No sync accounts"
 
-[admin.sync_accounts]
+[admin_sync_accounts]
 header_accounts = "Sync Accounts"
 header_add_account = "Add Sync Account"
 account_markets = "Account markets:"
@@ -359,7 +363,7 @@ click_to_add = "Click to remove market:"
 no_markets = "No markets included."
 all_markets = "All markets included."
 
-[admin.mod_accounts]
+[admin_mod_accounts]
 header_mod_accounts = "Mod Accounts"
 header_add_account = "Add Mod Account"
 privilege_list = "Mod privileges:"
@@ -367,7 +371,7 @@ save = "Save"
 delete = "Delete"
 create = "Create"
 
-[admin.mod_accounts.privileges]
+[admin_mod_accounts_privileges]
 start_sync = "Start Sync"
 control_sync = "Control Sync"
 modify_accounts = "Modify Accounts"
@@ -400,7 +404,7 @@ error_world_not_found = "World does not exist"
 error_invalid_highlights = "Invalid highlights data"
 error_no_highlights_input = "No highlights specified"
 
-[maps.tooltip]
+[maps_tooltip]
 village = "Village"
 village_points = "Village Points"
 player_name = "Player Name"
