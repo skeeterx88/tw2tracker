@@ -6,6 +6,7 @@ stats = "Stats"
 maps = "Maps"
 donate = "Donate"
 discord = "Discord"
+lang = "Language"
 
 [market_list]
 stats = "Statistics:"

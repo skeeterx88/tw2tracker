@@ -119,6 +119,18 @@ header {
     background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #7eafd0 20%, #3f5361 70%, #4c6271 70%);
 }
 
+#main-menu a.red {
+    background: url(/images/noise.webp), url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #D07E7E 0%, #613F3F 70%, #714C4C 70%);
+}
+
+#main-menu a.red:hover {
+    background: url(/images/noise.webp), url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, #D07E7E 20%, #613F3F 70%, #714C4C 70%);
+}
+
+#main-menu a[class^="flag-"] {
+    margin
+}
+
 #main-menu .left {
     margin-right: auto;
 }
