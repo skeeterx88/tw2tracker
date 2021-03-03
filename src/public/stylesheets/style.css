@@ -405,7 +405,7 @@ div.world-title {
     justify-content: space-between;
 }
 
-.relax-sub-container.world {
+.relax-sub-container {
     box-sizing: border-box;
     color: #311a11;
     margin: 10px 0px;
@@ -423,15 +423,15 @@ div.world-title {
     box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.relax-sub-container.world.closed {
+.relax-sub-container.closed {
     background-color: #d9cbac;
 }
 
-.relax-sub-container.world .title {
+.relax-sub-container .title {
     font-size: 1.0em;
 }
 
-.relax-sub-container.world .relax-button {
+.relax-sub-container .relax-button {
     border-radius: 1px;
     border-width: 1px;
     border-style: solid;
@@ -931,7 +931,7 @@ span[class^="flag-"] {
         width: 100%;
     }
 
-    .relax-sub-container.world .title {
+    .relax-sub-container .title {
         width: 100%;
     }
 

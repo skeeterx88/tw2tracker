@@ -5,8 +5,8 @@
 
             <div class="content-border">
                 <% for (let account of accounts) { %>
-                    <div id="account-<%= account.id %>" class="account relax-container vertical">
-                        <form method="POST" action="/admin/accounts/edit">
+                    <div id="account-<%= account.id %>" class="account relax-container">
+                        <form method="POST" action="/admin/accounts/edit" class="form">
                             <label class="input">
                                 <span><%= i18n.admin.username_label %></span>
                                 <input type="text" class="relax-input" name="name" value="<%= account.name %>" minlength="4">
@@ -58,8 +58,8 @@
             <h1><%= i18n.admin.sync_accounts.header_add_account %></h1>
 
             <div class="content-border">
-                <div class="account relax-container vertical">
-                    <form method="POST" action="/admin/accounts/create">
+                <div class="account relax-container">
+                    <form method="POST" action="/admin/accounts/create" class="form">
                         <label class="input">
                             <span><%= i18n.admin.username_label %></span>
                             <input type="text" class="relax-input" name="name" minlength="4">
