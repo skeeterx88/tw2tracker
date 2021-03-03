@@ -13,6 +13,7 @@ const connectFlash = require('connect-flash');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const pgArray = require('pg').types.arrayParser;
+const fs = require('fs');
 
 const db = require('./db.js');
 const sql = require('./sql.js');
@@ -102,21 +103,27 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(connectFlash());
 
+const languagesRouter = require('./routes/lang.js');
 const statsRouter = require('./routes/stats.js');
 const adminRouter = require('./routes/admin.js');
 const loginRouter = require('./routes/login.js');
 const logoutRouter = require('./routes/logout.js');
 const mapsRouter = require('./routes/maps.js');
 
+const languages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
+
 app.use(function (req, res, next) {
     res.locals.i18n = i18n;
+    res.locals.languages = languages;
     res.locals.formatNumbers = utils.ejsHelpers.formatNumbers;
     res.locals.formatDate = utils.ejsHelpers.formatDate;
     res.locals.capitalize = utils.ejsHelpers.capitalize;
     res.locals.sprintf = utils.sprintf;
+    res.locals.lang = req.session.lang;
     next();
 });
 
+app.use('/change-language', languagesRouter);
 app.use('/', statsRouter);
 app.use('/admin', adminRouter);
 app.use('/login', loginRouter);
