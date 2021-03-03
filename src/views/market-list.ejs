@@ -36,44 +36,50 @@
                                 </div>
 
                                 <div class="world-list hidden">
-                                    <% for (const [worldNumber, world] of worldsByMarket[market.id]) { -%>
-                                        <div class="relax-container world">
-                                            <h3 class="title">
-                                                <span class="flag-<%= world.market %>"></span>
-                                                <%= world.name %><sup><%= world.num %></sup>
-                                            </h2>
+                                    <% for (const worldState of ['open', 'closed']) { %>
+                                        <% if (worldState === 'closed' && worldsByMarket[market.id].closed.length) { %>
+                                            <h3>Closed Worlds</h3>
+                                        <% } %>
 
-                                            <div class="stats">
-                                                <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n.world_list.players %></span></p>
-                                                <p><span class="label"><%= formatNumbers(world.tribe_count) %> <%= i18n.world_list.tribes %></span></p>
-                                                <p><span class="label"><%= formatNumbers(world.village_count) %> <%= i18n.world_list.villages %></span></p>
-                                            </div>
+                                        <% for (const [worldNumber, world] of worldsByMarket[market.id][worldState]) { -%>
+                                            <div class="relax-container world <%= worldState %>">
+                                                <h3 class="title">
+                                                    <span class="flag-<%= world.market %>"></span>
+                                                    <%= world.name %><sup><%= world.num %></sup>
+                                                </h3>
 
-                                            <% if (world.config) { -%>
-                                                <div class="settings">
-                                                    <p><span class="label"><%= i18n.world_list.setting_world_type %></span> <span class="value"><% __append(world.config.victory_points ? i18n.world_list.world_type_victory_points : i18n.world_list.world_type_domination) %></span></p>
-                                                    <p><span class="label"><%= i18n.world_list.setting_troop_relocation %></span> <span class="value"><% __append(world.config.relocate_units ? i18n.world_list.setting_enabled : i18n.world_list.setting_disabled) %></span></p>
+                                                <div class="stats">
+                                                    <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n.world_list.players %></span></p>
+                                                    <p><span class="label"><%= formatNumbers(world.tribe_count) %> <%= i18n.world_list.tribes %></span></p>
+                                                    <p><span class="label"><%= formatNumbers(world.village_count) %> <%= i18n.world_list.villages %></span></p>
                                                 </div>
-                                            <% } -%>
 
-                                            <% if (world.open_date || world.close_date) { %>
-                                                <div class="dates">
-                                                    <% if (world.open_date) { %>
-                                                        <p><span class="label"><%= i18n.world_list.open_date %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
-                                                    <% } %>
+                                                <% if (world.config) { -%>
+                                                    <div class="settings">
+                                                        <p><span class="label"><%= i18n.world_list.setting_world_type %></span> <span class="value"><% __append(world.config.victory_points ? i18n.world_list.world_type_victory_points : i18n.world_list.world_type_domination) %></span></p>
+                                                        <p><span class="label"><%= i18n.world_list.setting_troop_relocation %></span> <span class="value"><% __append(world.config.relocate_units ? i18n.world_list.setting_enabled : i18n.world_list.setting_disabled) %></span></p>
+                                                    </div>
+                                                <% } -%>
 
-                                                    <% if (world.close_date) { %>
-                                                        <p><span class="label"><%= i18n.world_list.close_date %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
-                                                    <% } %>
+                                                <% if (world.open_date || world.close_date) { %>
+                                                    <div class="dates">
+                                                        <% if (world.open_date) { %>
+                                                            <p><span class="label"><%= i18n.world_list.open_date %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
+                                                        <% } %>
+
+                                                        <% if (world.close_date) { %>
+                                                            <p><span class="label"><%= i18n.world_list.close_date %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
+                                                        <% } %>
+                                                    </div>
+                                                <% } %>
+
+                                                <div class="actions">
+                                                    <a class="relax-button" href="/stats/<%= world.market %>/<%= world.num %>">Stats</a>
+                                                    <a class="relax-button" href="/maps/<%= world.market %>/<%= world.num %>">Map</a>
                                                 </div>
-                                            <% } %>
-
-                                            <div class="actions">
-                                                <a class="relax-button" href="/stats/<%= world.market %>/<%= world.num %>">Stats</a>
-                                                <a class="relax-button" href="/maps/<%= world.market %>/<%= world.num %>">Map</a>
                                             </div>
-                                        </div>
-                                    <% } -%>
+                                        <% } -%>
+                                    <% } %>
                                 </div>
                             </div>
                         <% } -%>

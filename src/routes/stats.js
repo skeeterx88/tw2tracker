@@ -30,8 +30,13 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
     const worldsByMarket = {};
 
     for (const world of worlds) {
-        worldsByMarket[world.market] = worldsByMarket[world.market] || [];
-        worldsByMarket[world.market].push([world.num, world]);
+        worldsByMarket[world.market] = worldsByMarket[world.market] || {closed: [], open: []};
+
+        if (world.open) {
+            worldsByMarket[world.market].open.push([world.num, world]);
+        } else {
+            worldsByMarket[world.market].closed.push([world.num, world]);
+        }
     }
 
     const marketStats = marketsIds.map(function (id) {
