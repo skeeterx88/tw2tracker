@@ -107,22 +107,22 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
         all: {
             sqlConquests: sql.getTribeConquests,
             sqlCount: sql.getTribeConquestsCount,
-            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_all
+            navigationTitle: i18n('sub_title_all', 'tribe_profile_achievements', res.locals.lang)
         },
         gain: {
             sqlConquests: sql.getTribeConquestsGain,
             sqlCount: sql.getTribeConquestsGainCount,
-            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_gain
+            navigationTitle: i18n('sub_title_gain', 'tribe_profile_achievements', res.locals.lang)
         },
         loss: {
             sqlConquests: sql.getTribeConquestsLoss,
             sqlCount: sql.getTribeConquestsLossCount,
-            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_loss
+            navigationTitle: i18n('sub_title_loss', 'tribe_profile_achievements', res.locals.lang)
         },
         self: {
             sqlConquests: sql.getTribeConquestsSelf,
             sqlCount: sql.getTribeConquestsSelfCount,
-            navigationTitle: i18n('achievements', 'tribe_profile', res.locals.lang).sub_title_self
+            navigationTitle: i18n('sub_title_self', 'tribe_profile_achievements', res.locals.lang)
         }
     };
 
