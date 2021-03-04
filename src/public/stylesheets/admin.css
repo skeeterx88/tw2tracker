@@ -52,7 +52,7 @@
     margin: 5px;
 }
 
-#sync-worlds .world .in-progress .relax-button {
+#sync-worlds .relax-button.disabled {
     cursor: wait;
 }
 
