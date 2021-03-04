@@ -213,37 +213,37 @@ td, th {
 
 .content {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .content > div.left {
-    width: 50%;
     margin-right: 6px;
+    flex-grow: 1;
 }
 
 .content > div.right {
-    width: 50%;
     margin-left: 6px;
+    flex-grow: 1;
 }
 
 .content > div.left-big {
-    width: 70%;
     margin-right: 6px;
+    flex-grow: 2;
 }
 
 .content > div.right-small {
-    width: 30%;
     margin-left: 6px;
+    flex-grow: 1;
 }
 
 .content > div.left-really-big {
-    width: 80%;
     margin-right: 6px;
+    flex-grow: 3;
 }
 
 .content > div.right-really-small {
-    width: 20%;
     margin-left: 6px;
+    flex-grow: 1;
 }
 
 .content > div.single {
@@ -673,6 +673,7 @@ span.conquest-self {
 
 .sub-menu {
     display: flex;
+    width: 100%;
 }
 
 .sub-menu .item {
@@ -757,6 +758,7 @@ a.achievement-subject:last-child:after {
 }
 
 .error {
+    width: 100%;
     padding: 10px;
     border: 2px solid #e73333;
     background: #ff00002b;
