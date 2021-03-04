@@ -2,11 +2,13 @@ define('updateAllWorldsStatus', [
     'updateWorldStatus',
     'updateWorldSyncStatus',
     'updateWorldSyncEnabled',
+    'i18n',
     'backendValues'
 ], function (
     updateWorldStatus,
     updateWorldSyncStatus,
     updateWorldSyncEnabled,
+    i18n,
     {
         syncStates,
         accountPrivileges,
@@ -39,17 +41,19 @@ define('updateAllWorldsStatus', [
 });
 
 define('updateWorldStatus', [
+    'i18n',
     'backendValues'
 ], function (
+    i18n,
     {
         syncStates,
         accountPrivileges,
         privilegeTypes
     }
 ) {
-    const $syncDataAllActive = document.querySelector('#sync-data-all-active');
+    // const $syncDataAllActive = document.querySelector('#sync-data-all-active');
     const $syncActiveDataWorlds = document.querySelector('#sync-active-data-worlds');
-    const $syncAchievementsAllActive = document.querySelector('#sync-achievements-all-active');
+    // const $syncAchievementsAllActive = document.querySelector('#sync-achievements-all-active');
     const $syncActiveAchievementWorlds = document.querySelector('#sync-active-achievement-worlds');
 
     function addActiveWorld ($container, worldId) {
@@ -86,7 +90,7 @@ define('updateWorldStatus', [
             case syncStates.START: {
                 if ($dataSync) {
                     $dataSync.classList.add('disabled');
-                    $dataSync.dataset.active = 'yes';
+                    $dataSync.dataset.active = i18n('yes', 'admin_sync');
                 }
                 addActiveWorld($syncActiveDataWorlds, worldId);
                 break;
@@ -94,17 +98,17 @@ define('updateWorldStatus', [
             case syncStates.FINISH: {
                 if ($dataSync) {
                     $dataSync.classList.remove('disabled');
-                    $dataSync.dataset.active = 'no';
+                    $dataSync.dataset.active = i18n('no', 'admin_sync');
                 }
                 $dataDate.innerHTML = date;
-                $dataStatus.innerHTML = status;
+                $dataStatus.innerHTML = i18n(status, 'admin_sync_status');
                 removeActiveWorld($syncActiveDataWorlds, worldId);
                 break;
             }
             case syncStates.ACHIEVEMENT_START: {
                 if ($achievementsSync) {
                     $dataSync.classList.add('disabled');
-                    $achievementsSync.dataset.active = 'yes';
+                    $achievementsSync.dataset.active = i18n('yes', 'admin_sync');
                 }
                 addActiveWorld($syncActiveAchievementWorlds, worldId);
                 break;
@@ -112,10 +116,10 @@ define('updateWorldStatus', [
             case syncStates.ACHIEVEMENT_FINISH: {
                 if ($achievementsSync) {
                     $dataSync.classList.remove('disabled');
-                    $achievementsSync.dataset.active = 'no';
+                    $achievementsSync.dataset.active = i18n('no', 'admin_sync');
                 }
                 $achievementsDate.innerHTML = date;
-                $achievementsStatus.innerHTML = status;
+                $achievementsStatus.innerHTML = i18n(status, 'admin_sync_status');
                 removeActiveWorld($syncActiveAchievementWorlds, worldId);
                 break;
             }
@@ -124,23 +128,31 @@ define('updateWorldStatus', [
 });
 
 define('updateWorldSyncStatus', [
+    'i18n',
     'backendValues'
 ], function (
+    i18n,
     {
         syncStates
     }
 ) {
     return function updateWorldSyncStatus (running) {
         const $button = document.querySelector('#sync-world-list');
-        $button.innerHTML = running
-            ? 'Syncing world list...'
-            : 'Sync world list';
+        $button.innerHTML = i18n('button_sync_world_list', 'admin_sync');
+
+        if (running) {
+            $button.classList.add('disabled');
+        } else {
+            $button.classList.remove('disabled');
+        }
     };
 });
 
 define('updateWorldSyncEnabled', [
+    'i18n',
     'backendValues'
 ], function (
+    i18n,
     {
         syncStates
     }
@@ -152,11 +164,11 @@ define('updateWorldSyncEnabled', [
         if (enabled) {
             $button.classList.add('red');
             $button.classList.remove('green');
-            $button.innerHTML = 'Disable sync';
+            $button.innerHTML = i18n('button_disable_sync', 'admin_sync');
         } else {
             $button.classList.add('green');
             $button.classList.remove('red');
-            $button.innerHTML = 'Enable sync';
+            $button.innerHTML = i18n('button_enable_sync', 'admin_sync');
         }
     };
 });

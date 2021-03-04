@@ -13,12 +13,12 @@
                             <fieldset>
                                 <legend><%= i18n('data_info', 'admin_sync', lang) %></legend>
                                 <p><%= i18n('last_time', 'admin_sync', lang) %> <span class="last-data-sync-date"><% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date) : i18n('never', 'admin_sync', lang)) %></span></p>
-                                <p><%= i18n('last_status', 'admin_sync', lang) %> <span class="last-data-sync-status"><% __append(world.last_data_sync_status || '-') %></span></p>
+                                <p><%= i18n('last_status', 'admin_sync', lang) %> <span class="last-data-sync-status"><% __append(i18n(world.last_achievements_sync_status, 'admin_sync_status', lang) || '-') %></span></p>
                             </fieldset>
                             <fieldset>
                                 <legend><%= i18n('achievements_info', 'admin_sync', lang) %></legend>
                                 <p><%= i18n('last_time', 'admin_sync', lang) %> <span class="last-achievements-sync-date"><% __append(world.last_achievements_sync_date ? formatDate(world.last_achievements_sync_date) : i18n('never', 'admin_sync', lang)) %></span></p>
-                                <p><%= i18n('last_status', 'admin_sync', lang) %> <span class="last-achievements-sync-status"><% __append(world.last_achievements_sync_status || '-') %></span></p>
+                                <p><%= i18n('last_status', 'admin_sync', lang) %> <span class="last-achievements-sync-status"><% __append(i18n(world.last_achievements_sync_status, 'admin_sync_status', lang) || '-') %></span></p>
                             </fieldset>
                         </div>
 

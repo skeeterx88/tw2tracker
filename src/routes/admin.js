@@ -5,6 +5,7 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
+const languages = require('../languages.js');
 const i18n = require('../i18n.js');
 const enums = require('../enums.js');
 const privilegeTypes = require('../privileges.json');
@@ -65,6 +66,7 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
         privilegeTypes,
         user: req.user,
         backendValues: {
+            language: languages[res.locals.lang],
             development,
             syncStates: enums.syncStates,
             subPage,
