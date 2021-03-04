@@ -201,6 +201,10 @@ table.vertical th {
     background: #ab804521;
 }
 
+table.vertical .right {
+    float: right;
+}
+
 th {
     background: #ab80455e;
 }
