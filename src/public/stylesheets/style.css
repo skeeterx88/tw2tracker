@@ -101,7 +101,6 @@ header#main-header {
     display: flex;
     position: relative;
     padding: 0px 10px;
-    margin-bottom: 4px;
     font-size: 0.9em;
 }
 
@@ -122,6 +121,8 @@ header#main-header {
                 0px 0px 0px 4px #201612,
                 inset 1px 1px 3px #ffffff40,
                 inset -1px -1px 1px #00000040;
+    display: inline-block;
+    min-width: 100px;
 }
 
 #main-menu a:hover {
@@ -345,8 +346,10 @@ div.modal {
     display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
-    height: 22px;
-    line-height: 22px;
+    height: 25px;
+    line-height: 25px;
+    padding: 0px 5px;
+    margin: 0px 5px;
     font-weight: bold;
     outline: none;
     cursor: pointer;
@@ -434,6 +437,15 @@ div.world-title {
     width: 100px;
 }
 
+#market-list .toggle-list-worlds {
+    height: 30px;
+    line-height: 30px;
+}
+
+.relax-container.world .relax-button {
+    margin: 0px;
+}
+
 .relax-container p {
     margin: 0px;
 }
@@ -454,11 +466,6 @@ div.world-title {
 .relax-container .title {
     font-weight: bold;
     text-align: center;
-}
-
-.relax-container .relax-button {
-    height: 25px;
-    padding: 0 5px;
 }
 
 .relax-container .world-list {
@@ -993,14 +1000,15 @@ span[class^="flag-"] {
     }
 
     #main-menu {
-        margin-bottom: 12px;
+        margin-bottom: 5px;
         padding-left: 0px;
         padding-right: 0px;
     }
 
     #main-menu a {
-        padding: 5px 15px;
+        padding: 5px 0px;
         border-radius: 1px;
+        margin: 5px 5px;
     }
 
     #main-menu .icon {
@@ -1027,6 +1035,7 @@ span[class^="flag-"] {
     #market-list .relax-button,
     #world-list .relax-button {
         display: block;
+        margin: 5px 0px;
     }
 
     .relax-container .label,

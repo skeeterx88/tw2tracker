@@ -48,6 +48,10 @@
     border-color: #88bb7b;
 }
 
+#sync-worlds .relax-button {
+    cursor: wait;
+}
+
 #sync-worlds .world .in-progress .relax-button {
     cursor: wait;
 }
@@ -95,10 +99,6 @@
     display: flex;
 }
 
-#admin .actions .relax-button {
-    padding: 0px 5px;
-    margin: 10px 5px;
-}
 
 #admin .actions .relax-button.right {
     margin-left: auto;
