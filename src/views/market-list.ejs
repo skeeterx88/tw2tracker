@@ -27,7 +27,7 @@
                 <div class="world-list hidden">
                     <% for (const worldState of ['open', 'closed']) { %>
                         <% if (worldState === 'closed' && worldsByMarket[market.id].closed.length) { %>
-                            <h3>Closed Worlds</h3>
+                            <h3><%= i18n('header_closed_worlds', 'market_list', lang) %></h3>
                         <% } %>
 
                         <% for (const [worldNumber, world] of worldsByMarket[market.id][worldState]) { -%>

@@ -20,6 +20,7 @@ closed = "Fermé:"
 open_worlds = "%{open_worlds} mondes ouverts"
 closed_worlds = "%{closed_worlds} mondes fermés"
 world_list = "Liste des Mondes"
+header_closed_worlds = "Mondes Fermés"
 
 [world_list]
 stats = "Statistiques:"
