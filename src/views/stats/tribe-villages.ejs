@@ -37,14 +37,6 @@
     </div>
 
     <div class="right">
-        <section class="world-map">
-            <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
-
-            <div id="map" class="content-border"></div>
-
-            <div class="section-actions">
-                <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
-            </div>
-        </section>
+        <%- include('./map.ejs') %>
     </div>
 </div>
