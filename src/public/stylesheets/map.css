@@ -205,8 +205,8 @@ button.red:focus {
 #quick-jump-coords {
     margin-left: 4px;
     color: #6d4f32;
-    width: 86px;
-    height: 18px;
+    width: 88px;
+    height: 22px;
     padding-top: 2px;
     padding-bottom: 0px;
     font-weight: bold;
@@ -244,8 +244,8 @@ button.red:focus {
 
 #highlight-id {
     margin-left: 4px;
-    width: 117px;
-    height: 18px;
+    width: 135px;
+    height: 22px;
     padding-left: 8px;
     padding-right: 8px;
     position: relative;
@@ -549,7 +549,7 @@ div.text-container {
 
 #settings {
     position: absolute;
-    width: 160px;
+    width: 200px;
     background: url(/images/noise.png) #6f4327;
     color: #e0bfbf;
     padding: 3px;
