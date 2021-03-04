@@ -44,25 +44,10 @@
             <h1><%= i18n('header_summary', 'admin_sync', lang) %></h1>
 
             <div class="content-border">
-                <p>
-                    <label><%= i18n('sync_all_data_active', 'admin_sync', lang) %></label>
-                    <span id="sync-data-all-active"><%= i18n('no', 'admin_sync', lang) %></span>
-                </p>
-
-                <p>
-                    <label><%= i18n('sync_data_active_worlds', 'admin_sync', lang) %></label>
-                    <span id="sync-active-data-worlds"><span class="empty"><%= i18n('none', 'admin_sync', lang) %></span></span>
-                </p>
-
-                <p>
-                    <label><%= i18n('sync_all_achievements_active', 'admin_sync', lang) %></label>
-                    <span id="sync-achievements-all-active"><%= i18n('no', 'admin_sync', lang) %></span>
-                </p>
-
-                <p>
-                    <label><%= i18n('sync_achievements_active_worlds', 'admin_sync', lang) %></label>
-                    <span id="sync-active-achievement-worlds"><span class="empty"><%= i18n('none', 'admin_sync', lang) %></span></span>
-                </p>
+                <p><%= i18n('sync_all_data_active', 'admin_sync', lang) %> <span class="value" id="sync-data-all-active"><%= i18n('no', 'admin_sync', lang) %></span></p>
+                <p><%= i18n('sync_data_active_worlds', 'admin_sync', lang) %> <span class="value" id="sync-active-data-worlds"><%= i18n('none', 'admin_sync', lang) %></span></p>
+                <p><%= i18n('sync_all_achievements_active', 'admin_sync', lang) %> <span class="value" id="sync-achievements-all-active"><%= i18n('no', 'admin_sync', lang) %></span></p>
+                <p><%= i18n('sync_achievements_active_worlds', 'admin_sync', lang) %> <span class="value" id="sync-active-achievement-worlds"><%= i18n('none', 'admin_sync', lang) %></span></p>
             </div>
         </section>
 

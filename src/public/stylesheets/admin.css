@@ -2,10 +2,8 @@
     margin: 0px;
 }
 
-#sync-summary label {
-    width: 280px;
-    display: inline-block;
-    text-align: right;
+#sync-summary .value {
+    font-weight: bold;
 }
 
 .world-label {
