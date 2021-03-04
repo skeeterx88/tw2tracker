@@ -1,36 +1,38 @@
-<div class="left">
-    <h2><%= navigationTitle %></h2>
+<div class="content">
+    <div class="left">
+        <h2><%= navigationTitle %></h2>
 
-    <table class="content-border">
-        <colgroup>
-            <col width="*">
-            <col width="60px">
-            <col width="70px">
-            <col width="150px">
-        </colgroup>
-        <thead>
-            <tr>
-                <th><%= i18n('column_name', 'player_profile_achievements', lang) %></th>
-                <th><%= i18n('column_points', 'player_profile_achievements', lang) %></th>
-                <th><%= i18n('column_milestone', 'player_profile_achievements', lang) %></th>
-                <th><%= i18n('column_unlocked_on', 'player_profile_achievements', lang) %></th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if (achievementByCategory[selectedCategory].length) { -%>
-                <% for (let achievement of achievementByCategory[selectedCategory]) { %>
-                    <tr>
-                        <td><%= achievementTitles[achievement.type] %></td>
-                        <td><%= formatNumbers(achievement.points) %></td>
-                        <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
-                        <td><%= formatDate(achievement.time_last_level, world.time_offset) %></td>
-                    </tr>
-                <% } %>
-            <% } else { -%>
+        <table class="content-border">
+            <colgroup>
+                <col width="*">
+                <col width="60px">
+                <col width="70px">
+                <col width="150px">
+            </colgroup>
+            <thead>
                 <tr>
-                    <td colspan="4"><%= i18n('category_no_achievements', 'player_profile_achievements', lang) %></td>
+                    <th><%= i18n('column_name', 'player_profile_achievements', lang) %></th>
+                    <th><%= i18n('column_points', 'player_profile_achievements', lang) %></th>
+                    <th><%= i18n('column_milestone', 'player_profile_achievements', lang) %></th>
+                    <th><%= i18n('column_unlocked_on', 'player_profile_achievements', lang) %></th>
                 </tr>
-            <% } -%>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <% if (achievementByCategory[selectedCategory].length) { -%>
+                    <% for (let achievement of achievementByCategory[selectedCategory]) { %>
+                        <tr>
+                            <td><%= achievementTitles[achievement.type] %></td>
+                            <td><%= formatNumbers(achievement.points) %></td>
+                            <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
+                            <td><%= formatDate(achievement.time_last_level, world.time_offset) %></td>
+                        </tr>
+                    <% } %>
+                <% } else { -%>
+                    <tr>
+                        <td colspan="4"><%= i18n('category_no_achievements', 'player_profile_achievements', lang) %></td>
+                    </tr>
+                <% } -%>
+            </tbody>
+        </table>
+    </div>
 </div>

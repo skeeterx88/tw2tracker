@@ -1,41 +1,43 @@
-<div class="left">
-    <h2><%= i18n('header_tribe_member_changes', 'tribe_profile_member_changes', lang) %></h2>
-    <table class="content-border quick-highlight">
-        <colgroup>
-            <col width="200px">
-            <col width="*">
-            <col width="100px">
-        </colgroup>
-        <thead>
-            <tr>
-                <th><%= i18n('column_date_hour', 'tribe_profile_member_changes', lang) %></th>
-                <th><%= i18n('column_player', 'tribe_profile_member_changes', lang) %></th>
-                <th><%= i18n('column_action', 'tribe_profile_member_changes', lang) %></th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if (memberChanges.length) { -%>
-                <% for (let change of memberChanges) { %>
-                    <tr data-id="<%= change.player.id %>" data-highlight-type="players">
-                        <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
-                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
-
-                        <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
-                            <td><%= i18n('left', 'tribe_profile_member_changes', lang) %></td>
-                        <% } else { -%>
-                            <td><%= i18n('join', 'tribe_profile_member_changes', lang) %></td>
-                        <% } -%>
-                    </tr>
-                <% } %>
-            <% } else { -%>
+<div class="content">
+    <div class="left">
+        <h2><%= i18n('header_tribe_member_changes', 'tribe_profile_member_changes', lang) %></h2>
+        <table class="content-border quick-highlight">
+            <colgroup>
+                <col width="200px">
+                <col width="*">
+                <col width="100px">
+            </colgroup>
+            <thead>
                 <tr>
-                    <td colspan="4"><%= i18n('no_changes', 'tribe_profile_member_changes', lang) %></td>
+                    <th><%= i18n('column_date_hour', 'tribe_profile_member_changes', lang) %></th>
+                    <th><%= i18n('column_player', 'tribe_profile_member_changes', lang) %></th>
+                    <th><%= i18n('column_action', 'tribe_profile_member_changes', lang) %></th>
                 </tr>
-            <% } -%>
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                <% if (memberChanges.length) { -%>
+                    <% for (let change of memberChanges) { %>
+                        <tr data-id="<%= change.player.id %>" data-highlight-type="players">
+                            <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
+                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
-<div class="right">
-    <%- include('./map.ejs') %>
+                            <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
+                                <td><%= i18n('left', 'tribe_profile_member_changes', lang) %></td>
+                            <% } else { -%>
+                                <td><%= i18n('join', 'tribe_profile_member_changes', lang) %></td>
+                            <% } -%>
+                        </tr>
+                    <% } %>
+                <% } else { -%>
+                    <tr>
+                        <td colspan="4"><%= i18n('no_changes', 'tribe_profile_member_changes', lang) %></td>
+                    </tr>
+                <% } -%>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="right">
+        <%- include('./map.ejs') %>
+    </div>
 </div>

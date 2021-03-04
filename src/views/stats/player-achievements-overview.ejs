@@ -1,35 +1,37 @@
-<div class="left">
-    <h2>Overview</h2>
+<div class="content">
+    <div class="left">
+        <h2>Overview</h2>
 
-    <table class="content-border">
-        <colgroup>
-            <col width="100px">
-            <col width="*">
-        </colgroup>
-        <thead>
-            <tr>
-                <th><%= i18n('column_category', 'player_profile_achievements', lang) %></th>
-                <th><%= i18n('column_progress', 'player_profile_achievements', lang) %></th>
-            </tr>
-        </thead>
-        <tbody>
-            <% for (let [category, data] of overviewData) { %>
-                <% let categorySubpage = category === 'overall' ? '' : category %>
-
+        <table class="content-border">
+            <colgroup>
+                <col width="100px">
+                <col width="*">
+            </colgroup>
+            <thead>
                 <tr>
-                    <td>
-                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= i18n(category, 'achievements', lang) %></a>
-                    </td>
-                    <td>
-                        <div class="progress-bar-wrapper">
-                            <div class="progress-bar" style="width:<%= data.percent %>%"></div>
-                            <div class="progress-text">
-                                <span><%= formatNumbers(data.current) %>/<%= formatNumbers(data.max) %> (<%= data.percent %>%)</span>
-                            </div>
-                        </div>
-                    </td>
+                    <th><%= i18n('column_category', 'player_profile_achievements', lang) %></th>
+                    <th><%= i18n('column_progress', 'player_profile_achievements', lang) %></th>
                 </tr>
-            <% } %>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <% for (let [category, data] of overviewData) { %>
+                    <% let categorySubpage = category === 'overall' ? '' : category %>
+
+                    <tr>
+                        <td>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= i18n(category, 'achievements', lang) %></a>
+                        </td>
+                        <td>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar" style="width:<%= data.percent %>%"></div>
+                                <div class="progress-text">
+                                    <span><%= formatNumbers(data.current) %>/<%= formatNumbers(data.max) %> (<%= data.percent %>%)</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
 </div>

@@ -2,359 +2,361 @@
     <p class="error"><%= i18n('missing_data_warning', 'world', lang) %></p>
 <% } -%>
 
-<div class="left">
-    <section id="search">
-        <h2><%= i18n('header_search', 'world', lang) %></h2>
+<div class="content">
+    <div class="left">
+        <section id="search">
+            <h2><%= i18n('header_search', 'world', lang) %></h2>
 
-        <div class="content-border">
-            <ul class="content-menu" id="search-categories">
-               <li data-search-category="players" class="selected"><%= i18n('search_players', 'world', lang) %></li>
-               <li data-search-category="tribes"><%= i18n('search_tribes', 'world', lang) %></li>
-               <li data-search-category="villages"><%= i18n('search_villages', 'world', lang) %></li>
-            </ul>
-            <div class="wrapper">
-                <form method="POST" action="/stats/<%= marketId %>/<%= world.num %>/search/">
-                    <input type="text" id="search-input" class="relax-input" name="query" autocomplete="off" maxlength="20" minlength="3">
-                    <input type="submit" value="<%= i18n('search_search', 'world', lang) %>" class="relax-button">
-                    <input type="hidden" id="search-category" name="category" value="players">
-                </form>
+            <div class="content-border">
+                <ul class="content-menu" id="search-categories">
+                   <li data-search-category="players" class="selected"><%= i18n('search_players', 'world', lang) %></li>
+                   <li data-search-category="tribes"><%= i18n('search_tribes', 'world', lang) %></li>
+                   <li data-search-category="villages"><%= i18n('search_villages', 'world', lang) %></li>
+                </ul>
+                <div class="wrapper">
+                    <form method="POST" action="/stats/<%= marketId %>/<%= world.num %>/search/">
+                        <input type="text" id="search-input" class="relax-input" name="query" autocomplete="off" maxlength="20" minlength="3">
+                        <input type="submit" value="<%= i18n('search_search', 'world', lang) %>" class="relax-button">
+                        <input type="hidden" id="search-category" name="category" value="players">
+                    </form>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="tribes">
-        <h2><%= i18n('header_tribes', 'world', lang) %></h2>
+        <section id="tribes">
+            <h2><%= i18n('header_tribes', 'world', lang) %></h2>
 
-        <div class="content-border">
-            <table class="quick-highlight">
-                <colgroup>
-                    <col width="50px">
-                    <col width="*">
-                    <col width="50px">
-                    <col width="50px">
-                    <% if (world.config && world.config.victory_points) { -%>
-                        <col width="40px">
-                    <% } -%>
-                    <col width="50px">
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th><%= i18n('column_rank', 'world', lang) %></th>
-                        <th><%= i18n('column_tribe', 'world', lang) %></th>
-                        <th><%= i18n('column_members', 'world', lang) %></th>
-                        <th><%= i18n('column_points', 'world', lang) %></th>
+            <div class="content-border">
+                <table class="quick-highlight">
+                    <colgroup>
+                        <col width="50px">
+                        <col width="*">
+                        <col width="50px">
+                        <col width="50px">
                         <% if (world.config && world.config.victory_points) { -%>
-                            <th title="Victory Points"><%= i18n('column_victory_points', 'world', lang) %></th>
+                            <col width="40px">
                         <% } -%>
-                        <th><%= i18n('column_villages', 'world', lang) %></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for (let tribe of tribes) { %>
-                        <tr data-id="<%= tribe.id %>" data-highlight-type="tribes">
-                            <td><%= tribe.rank %></td>
-                            <td>
-                                <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
-                                <% if (tribe.rank < 4) { %>
-                                    <div class="top-colors"></div>
-                                <% } %>
-                            </td>
-                            <td><%= formatNumbers(tribe.members) %></td>
-                            <td><%= formatNumbers(tribe.points) %></td>
-
-                            <% if (world.config && world.config.victory_points) { -%>
-                                <td><%= formatNumbers(tribe.victory_points) %></td>
-                            <% } -%>
-
-                            <td><%= formatNumbers(tribe.villages) %></td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="section-actions">
-            <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/tribes/"><%= i18n('view_tribes_ranking', 'world', lang) %></a>
-        </div>
-    </section>
-
-    <section id="players">
-        <h2><%= i18n('header_players', 'world', lang) %></h2>
-
-        <div class="content-border">
-            <table class="quick-highlight">
-                <colgroup>
-                    <col width="50px">
-                    <col width="*">
-                    <col width="50px">
-                    <col width="50px">
-                    <% if (world.config && world.config.victory_points) { -%>
-                        <col width="40px">
-                    <% } -%>
-                    <col width="50px">
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th><%= i18n('column_rank', 'world', lang) %></th>
-                        <th><%= i18n('column_player', 'world', lang) %></th>
-                        <th><%= i18n('column_tribe', 'world', lang) %></th>
-                        <th><%= i18n('column_points', 'world', lang) %></th>
-                        <% if (world.config && world.config.victory_points) { -%>
-                            <th title="Victory Points"><%= i18n('column_victory_points', 'world', lang) %></th>
-                        <% } -%>
-                        <th>Villages</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for (let player of players) { %>
-                        <tr data-id="<%= player.id %>" data-highlight-type="players">
-                            <td><%= player.rank %></td>
-                            <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
-
-                            <% if (player.tribe_id) { -%>
-                                <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
-                            <% } else { -%>
-                                <td>-</td>
-                            <% } -%>
-
-                            <td><%= formatNumbers(player.points) %></td>
-
-                            <% if (world.config && world.config.victory_points) { -%>
-                                <td><%= formatNumbers(player.victory_points) %></td>
-                            <% } -%>
-
-                            <td><%= formatNumbers(player.villages) %></td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="section-actions">
-            <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/players/"><%= i18n('view_players_ranking', 'world', lang) %></a>
-        </div>
-    </section>
-
-    <section id="last-conquests">
-        <h2><%= i18n('header_conquests', 'world', lang) %></h2>
-
-        <div class="content-border">
-            <table class="quick-highlight">
-                <colgroup>
-                    <col width="*">
-                    <col width="5%">
-                    <col width="*">
-                    <col width="*">
-                </colgroup>
-
-                <thead>
-                    <th><%= i18n('column_village', 'world', lang) %></th>
-                    <th><%= i18n('column_points', 'world', lang) %></th>
-                    <th><%= i18n('column_old_owner', 'world', lang) %></th>
-                    <th><%= i18n('column_new_owner', 'world', lang) %></th>
-                </thead>
-
-                <tbody>
-                    <% if (!lastConquests.length) { -%>
+                        <col width="50px">
+                    </colgroup>
+                    <thead>
                         <tr>
-                            <td colspan="5"><%= i18n('no_conquests', 'world', lang) %></td>
+                            <th><%= i18n('column_rank', 'world', lang) %></th>
+                            <th><%= i18n('column_tribe', 'world', lang) %></th>
+                            <th><%= i18n('column_members', 'world', lang) %></th>
+                            <th><%= i18n('column_points', 'world', lang) %></th>
+                            <% if (world.config && world.config.victory_points) { -%>
+                                <th title="Victory Points"><%= i18n('column_victory_points', 'world', lang) %></th>
+                            <% } -%>
+                            <th><%= i18n('column_villages', 'world', lang) %></th>
                         </tr>
-                    <% } else { -%>
-                        <% for (let conquest of lastConquests) { %>
-                            <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
+                    </thead>
+                    <tbody>
+                        <% for (let tribe of tribes) { %>
+                            <tr data-id="<%= tribe.id %>" data-highlight-type="tribes">
+                                <td><%= tribe.rank %></td>
                                 <td>
-                                    <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
+                                    <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
+                                    <% if (tribe.rank < 4) { %>
+                                        <div class="top-colors"></div>
+                                    <% } %>
                                 </td>
-                                <td><%= formatNumbers(conquest.village_points_then) %></td>
+                                <td><%= formatNumbers(tribe.members) %></td>
+                                <td><%= formatNumbers(tribe.points) %></td>
 
-                                <% if (conquest.old_owner) { -%>
+                                <% if (world.config && world.config.victory_points) { -%>
+                                    <td><%= formatNumbers(tribe.victory_points) %></td>
+                                <% } -%>
+
+                                <td><%= formatNumbers(tribe.villages) %></td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-actions">
+                <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/tribes/"><%= i18n('view_tribes_ranking', 'world', lang) %></a>
+            </div>
+        </section>
+
+        <section id="players">
+            <h2><%= i18n('header_players', 'world', lang) %></h2>
+
+            <div class="content-border">
+                <table class="quick-highlight">
+                    <colgroup>
+                        <col width="50px">
+                        <col width="*">
+                        <col width="50px">
+                        <col width="50px">
+                        <% if (world.config && world.config.victory_points) { -%>
+                            <col width="40px">
+                        <% } -%>
+                        <col width="50px">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th><%= i18n('column_rank', 'world', lang) %></th>
+                            <th><%= i18n('column_player', 'world', lang) %></th>
+                            <th><%= i18n('column_tribe', 'world', lang) %></th>
+                            <th><%= i18n('column_points', 'world', lang) %></th>
+                            <% if (world.config && world.config.victory_points) { -%>
+                                <th title="Victory Points"><%= i18n('column_victory_points', 'world', lang) %></th>
+                            <% } -%>
+                            <th>Villages</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let player of players) { %>
+                            <tr data-id="<%= player.id %>" data-highlight-type="players">
+                                <td><%= player.rank %></td>
+                                <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
+
+                                <% if (player.tribe_id) { -%>
+                                    <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
+                                <% } else { -%>
+                                    <td>-</td>
+                                <% } -%>
+
+                                <td><%= formatNumbers(player.points) %></td>
+
+                                <% if (world.config && world.config.victory_points) { -%>
+                                    <td><%= formatNumbers(player.victory_points) %></td>
+                                <% } -%>
+
+                                <td><%= formatNumbers(player.villages) %></td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-actions">
+                <a href="/stats/<%= marketId %>/<%= world.num %>/ranking/players/"><%= i18n('view_players_ranking', 'world', lang) %></a>
+            </div>
+        </section>
+
+        <section id="last-conquests">
+            <h2><%= i18n('header_conquests', 'world', lang) %></h2>
+
+            <div class="content-border">
+                <table class="quick-highlight">
+                    <colgroup>
+                        <col width="*">
+                        <col width="5%">
+                        <col width="*">
+                        <col width="*">
+                    </colgroup>
+
+                    <thead>
+                        <th><%= i18n('column_village', 'world', lang) %></th>
+                        <th><%= i18n('column_points', 'world', lang) %></th>
+                        <th><%= i18n('column_old_owner', 'world', lang) %></th>
+                        <th><%= i18n('column_new_owner', 'world', lang) %></th>
+                    </thead>
+
+                    <tbody>
+                        <% if (!lastConquests.length) { -%>
+                            <tr>
+                                <td colspan="5"><%= i18n('no_conquests', 'world', lang) %></td>
+                            </tr>
+                        <% } else { -%>
+                            <% for (let conquest of lastConquests) { %>
+                                <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
                                     <td>
-                                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
+                                        <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
+                                    </td>
+                                    <td><%= formatNumbers(conquest.village_points_then) %></td>
 
-                                        <% if (conquest.old_owner_tribe_id) { -%>
-                                            <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
-                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
+                                    <% if (conquest.old_owner) { -%>
+                                        <td>
+                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
+
+                                            <% if (conquest.old_owner_tribe_id) { -%>
+                                                <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
+                                                    [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
+                                                <% } else { -%>
+                                                    [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
+                                                <% } -%>
+                                            <% } -%>
+                                        </td>
+                                    <% } else { -%>
+                                        <td><%= i18n('abandoned_village', 'world', lang) %></td>
+                                    <% } -%>
+
+                                    <td>
+                                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
+
+                                        <% if (conquest.new_owner_tribe_id) { -%>
+                                            <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
+                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>]
                                             <% } else { -%>
-                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
+                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>]
                                             <% } -%>
                                         <% } -%>
                                     </td>
-                                <% } else { -%>
-                                    <td><%= i18n('abandoned_village', 'world', lang) %></td>
-                                <% } -%>
+                                </tr>
+                            <% } %>
+                        <% } -%>
+                    </tbody>
+                </table>
+            </div>
 
-                                <td>
-                                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
+            <div class="section-actions">
+                <a href="/stats/<%= marketId %>/<%= world.num %>/conquests/"><%= i18n('view_world_conquests', 'world', lang) %></a>
+            </div>
+        </section>
 
-                                    <% if (conquest.new_owner_tribe_id) { -%>
-                                        <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
-                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>]
-                                        <% } else { -%>
-                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>]
+        <section id="daily-players-achievements">
+            <h2><%= i18n('header_daily_players_achievements', 'world', lang) %></h2>
+
+            <div class="content-border">
+                <table class="vertical">
+                    <colgroup>
+                        <col width="25%">
+                        <col width="*">
+                    </colgroup>
+
+                    <tbody>
+                        <% if (achievements.counts.players.daily) { -%>
+                            <% for (let [type, players] of achievements.groups.players.daily) { -%>
+                                <tr>
+                                    <th><%= achievementTitles[type] %>:</th>
+                                    <td>
+                                        <% for (let player of players) { -%>
+                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
                                         <% } -%>
-                                    <% } -%>
-                                </td>
-                            </tr>
-                        <% } %>
-                    <% } -%>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="section-actions">
-            <a href="/stats/<%= marketId %>/<%= world.num %>/conquests/"><%= i18n('view_world_conquests', 'world', lang) %></a>
-        </div>
-    </section>
-
-    <section id="daily-players-achievements">
-        <h2><%= i18n('header_daily_players_achievements', 'world', lang) %></h2>
-
-        <div class="content-border">
-            <table class="vertical">
-                <colgroup>
-                    <col width="25%">
-                    <col width="*">
-                </colgroup>
-
-                <tbody>
-                    <% if (achievements.counts.players.daily) { -%>
-                        <% for (let [type, players] of achievements.groups.players.daily) { -%>
+                                    </td>
+                                </tr>
+                            <% } -%>
+                        <% } else { -%>
                             <tr>
-                                <th><%= achievementTitles[type] %>:</th>
-                                <td>
-                                    <% for (let player of players) { -%>
-                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
-                                    <% } -%>
-                                </td>
+                                <td colspan="2"><%= i18n('no_daily_achievements', 'world', lang) %></td>
                             </tr>
                         <% } -%>
-                    <% } else { -%>
-                        <tr>
-                            <td colspan="2"><%= i18n('no_daily_achievements', 'world', lang) %></td>
-                        </tr>
-                    <% } -%>
-                </tbody>
-            </table>
-        </div>
-    </section>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <section id="weekly-players-achievements">
-        <h2><%= i18n('header_weekly_players_achievements', 'world', lang) %></h2>
+        <section id="weekly-players-achievements">
+            <h2><%= i18n('header_weekly_players_achievements', 'world', lang) %></h2>
 
-        <div class="content-border">
-            <table class="vertical">
-                <colgroup>
-                    <col width="25%">
-                    <col width="*">
-                </colgroup>
+            <div class="content-border">
+                <table class="vertical">
+                    <colgroup>
+                        <col width="25%">
+                        <col width="*">
+                    </colgroup>
 
-                <tbody>
-                    <% if (achievements.counts.players.weekly) { -%>
-                        <% for (let [type, players] of achievements.groups.players.weekly) { -%>
+                    <tbody>
+                        <% if (achievements.counts.players.weekly) { -%>
+                            <% for (let [type, players] of achievements.groups.players.weekly) { -%>
+                                <tr>
+                                    <th><%= achievementTitles[type] %>:</th>
+                                    <td>
+                                        <% for (let player of players) { -%>
+                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
+                                        <% } -%>
+                                    </td>
+                                </tr>
+                            <% } -%>
+                        <% } else { -%>
                             <tr>
-                                <th><%= achievementTitles[type] %>:</th>
-                                <td>
-                                    <% for (let player of players) { -%>
-                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
-                                    <% } -%>
-                                </td>
+                                <td colspan="2"><%= i18n('no_weekly_achievements', 'world', lang) %></td>
                             </tr>
                         <% } -%>
-                    <% } else { -%>
-                        <tr>
-                            <td colspan="2"><%= i18n('no_weekly_achievements', 'world', lang) %></td>
-                        </tr>
-                    <% } -%>
-                </tbody>
-            </table>
-        </div>
-    </section>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <section id="daily-tribes-achievements">
-        <h2><%= i18n('header_daily_tribes_achievements', 'world', lang) %></h2>
+        <section id="daily-tribes-achievements">
+            <h2><%= i18n('header_daily_tribes_achievements', 'world', lang) %></h2>
 
-        <div class="content-border">
-            <table class="vertical">
-                <colgroup>
-                    <col width="25%">
-                    <col width="*">
-                </colgroup>
+            <div class="content-border">
+                <table class="vertical">
+                    <colgroup>
+                        <col width="25%">
+                        <col width="*">
+                    </colgroup>
 
-                <tbody>
-                    <% if (achievements.counts.tribes.daily) { -%>
-                        <% for (let [type, tribes] of achievements.groups.tribes.daily) { -%>
+                    <tbody>
+                        <% if (achievements.counts.tribes.daily) { -%>
+                            <% for (let [type, tribes] of achievements.groups.tribes.daily) { -%>
+                                <tr>
+                                    <th><%= achievementTitles[type] %>:</th>
+                                    <td>
+                                        <% for (let tribe of tribes) { -%>
+                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
+                                        <% } -%>
+                                    </td>
+                                </tr>
+                            <% } -%>
+                        <% } else { -%>
                             <tr>
-                                <th><%= achievementTitles[type] %>:</th>
-                                <td>
-                                    <% for (let tribe of tribes) { -%>
-                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
-                                    <% } -%>
-                                </td>
+                                <td colspan="2"><%= i18n('no_daily_achievements', 'world', lang) %></td>
                             </tr>
                         <% } -%>
-                    <% } else { -%>
-                        <tr>
-                            <td colspan="2"><%= i18n('no_daily_achievements', 'world', lang) %></td>
-                        </tr>
-                    <% } -%>
-                </tbody>
-            </table>
-        </div>
-    </section>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <section id="weekly-tribes-achievements">
-        <h2><%= i18n('header_weekly_tribes_achievements', 'world', lang) %></h2>
+        <section id="weekly-tribes-achievements">
+            <h2><%= i18n('header_weekly_tribes_achievements', 'world', lang) %></h2>
 
-        <div class="content-border">
-            <table class="vertical">
-                <colgroup>
-                    <col width="25%">
-                    <col width="*">
-                </colgroup>
+            <div class="content-border">
+                <table class="vertical">
+                    <colgroup>
+                        <col width="25%">
+                        <col width="*">
+                    </colgroup>
 
-                <tbody>
-                    <% if (achievements.counts.tribes.weekly) { -%>
-                        <% for (let [type, tribes] of achievements.groups.tribes.weekly) { -%>
+                    <tbody>
+                        <% if (achievements.counts.tribes.weekly) { -%>
+                            <% for (let [type, tribes] of achievements.groups.tribes.weekly) { -%>
+                                <tr>
+                                    <th><%= achievementTitles[type] %>:</th>
+                                    <td>
+                                        <% for (let tribe of tribes) { -%>
+                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
+                                        <% } -%>
+                                    </td>
+                                </tr>
+                            <% } -%>
+                        <% } else { -%>
                             <tr>
-                                <th><%= achievementTitles[type] %>:</th>
-                                <td>
-                                    <% for (let tribe of tribes) { -%>
-                                        <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
-                                    <% } -%>
-                                </td>
+                                <td colspan="2"><%= i18n('no_weekly_achievements', 'world', lang) %></td>
                             </tr>
                         <% } -%>
-                    <% } else { -%>
-                        <tr>
-                            <td colspan="2"><%= i18n('no_weekly_achievements', 'world', lang) %></td>
-                        </tr>
-                    <% } -%>
-                </tbody>
-            </table>
-        </div>
-    </section>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <section>
-        <h2><%= i18n('header_stats', 'world', lang) %></h2>
+        <section>
+            <h2><%= i18n('header_stats', 'world', lang) %></h2>
 
-        <div class="content-border">
-            <table>
-                <tr>
-                    <td><%= formatNumbers(world.player_count) %> <%= i18n('stats_players', 'world', lang) %></td>
-                </tr>
-                <tr>
-                    <td><%= formatNumbers(world.village_count) %> <%= i18n('stats_villages', 'world', lang) %></td>
-                </tr>
-                <tr>
-                    <td><%= formatNumbers(world.tribe_count) %> <%= i18n('stats_tribes', 'world', lang) %></td>
-                </tr>
-            </table>
-        </div>
-    </section>
+            <div class="content-border">
+                <table>
+                    <tr>
+                        <td><%= formatNumbers(world.player_count) %> <%= i18n('stats_players', 'world', lang) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= formatNumbers(world.village_count) %> <%= i18n('stats_villages', 'world', lang) %></td>
+                    </tr>
+                    <tr>
+                        <td><%= formatNumbers(world.tribe_count) %> <%= i18n('stats_tribes', 'world', lang) %></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div class="right">
+        <%- include('./map.ejs') %>
+    </div>
+
+    <script defer type="text/javascript" src="/javascripts/search.js"></script>
 </div>
-
-<div class="right">
-    <%- include('./map.ejs') %>
-</div>
-
-<script defer type="text/javascript" src="/javascripts/search.js"></script>

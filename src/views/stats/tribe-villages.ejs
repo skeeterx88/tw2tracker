@@ -1,48 +1,50 @@
-<div class="left">
-    <section id="players">
-        <h2><%= i18n('header_tribe_villages', 'tribe_profile_villages', lang) %></h2>
+<div class="content">
+    <div class="left">
+        <section id="players">
+            <h2><%= i18n('header_tribe_villages', 'tribe_profile_villages', lang) %></h2>
 
-        <div class="content-border">
-            <table class="quick-highlight">
-                <colgroup>
-                    <col width="*">
-                    <col width="70px">
-                    <col width="60px">
-                    <col width="*">
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th><%= i18n('column_village', 'tribe_profile_villages', lang) %></th>
-                        <th><%= i18n('column_coords', 'tribe_profile_villages', lang) %></th>
-                        <th><%= i18n('column_points', 'tribe_profile_villages', lang) %></th>
-                        <th><%= i18n('column_owner', 'tribe_profile_villages', lang) %></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% for (let village of villages) { %>
-                        <tr data-id="<%= village.village_id %>" data-highlight-type="villages">
-                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>/"><%= village.village_name %></a></td>
-                            <td><%= village.village_x %>|<%= village.village_y %></td>
-                            <td><%= formatNumbers(village.village_points) %></td>
-                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
+            <div class="content-border">
+                <table class="quick-highlight">
+                    <colgroup>
+                        <col width="*">
+                        <col width="70px">
+                        <col width="60px">
+                        <col width="*">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th><%= i18n('column_village', 'tribe_profile_villages', lang) %></th>
+                            <th><%= i18n('column_coords', 'tribe_profile_villages', lang) %></th>
+                            <th><%= i18n('column_points', 'tribe_profile_villages', lang) %></th>
+                            <th><%= i18n('column_owner', 'tribe_profile_villages', lang) %></th>
                         </tr>
-                    <% } %>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <% for (let village of villages) { %>
+                            <tr data-id="<%= village.village_id %>" data-highlight-type="villages">
+                                <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>/"><%= village.village_name %></a></td>
+                                <td><%= village.village_x %>|<%= village.village_y %></td>
+                                <td><%= formatNumbers(village.village_points) %></td>
+                                <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
 
-            <%- include('../pagination.ejs') %>
-        </div>
-    </section>
-</div>
+                <%- include('../pagination.ejs') %>
+            </div>
+        </section>
+    </div>
 
-<div class="right">
-    <section class="world-map">
-        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
+    <div class="right">
+        <section class="world-map">
+            <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
 
-        <div id="map" class="content-border"></div>
+            <div id="map" class="content-border"></div>
 
-        <div class="section-actions">
-            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
-        </div>
-    </section>
+            <div class="section-actions">
+                <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
+            </div>
+        </section>
+    </div>
 </div>

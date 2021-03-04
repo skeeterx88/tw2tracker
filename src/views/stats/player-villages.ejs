@@ -1,29 +1,32 @@
-<div class="left">
-    <h2><%= i18n('header', 'player_profile_villages', lang) %></h2>
-    <table class="content-border quick-highlight">
-        <colgroup>
-            <col width="*">
-            <col width="100px">
-            <col width="100px">
-        </colgroup>
-        <thead>
-            <tr>
-                <th><%= i18n('column_name', 'player_profile_villages', lang) %></th>
-                <th><%= i18n('column_coords', 'player_profile_villages', lang) %></th>
-                <th><%= i18n('column_points', 'player_profile_villages', lang) %></th>
-            </tr>
-        </thead>
-        <tbody>
-            <% for (let village of villages) { %>
-                <tr data-id="<%= village.id %>" data-highlight-type="villages">
-                    <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
-                    <td><%= village.x + '|' + village.y %></td>
-                    <td><%= formatNumbers(village.points) %></td>
+<div class="content">
+    <div class="left">
+        <h2><%= i18n('header', 'player_profile_villages', lang) %></h2>
+        <table class="content-border quick-highlight">
+            <colgroup>
+                <col width="*">
+                <col width="100px">
+                <col width="100px">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th><%= i18n('column_name', 'player_profile_villages', lang) %></th>
+                    <th><%= i18n('column_coords', 'player_profile_villages', lang) %></th>
+                    <th><%= i18n('column_points', 'player_profile_villages', lang) %></th>
                 </tr>
-            <% } %>
-        </tbody>
-    </table>
-</div>
-<div class="right">
-    <%- include('./map.ejs') %>
+            </thead>
+            <tbody>
+                <% for (let village of villages) { %>
+                    <tr data-id="<%= village.id %>" data-highlight-type="villages">
+                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
+                        <td><%= village.x + '|' + village.y %></td>
+                        <td><%= formatNumbers(village.points) %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="right">
+        <%- include('./map.ejs') %>
+    </div>
 </div>
