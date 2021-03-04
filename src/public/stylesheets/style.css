@@ -122,7 +122,6 @@ header#main-header {
                 inset 1px 1px 3px #ffffff40,
                 inset -1px -1px 1px #00000040;
     display: inline-block;
-    min-width: 100px;
 }
 
 #main-menu a:hover {
@@ -1006,7 +1005,7 @@ span[class^="flag-"] {
     }
 
     #main-menu a {
-        padding: 5px 0px;
+        padding: 5px 3px;
         border-radius: 1px;
         margin: 5px 5px;
     }
