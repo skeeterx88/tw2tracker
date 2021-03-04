@@ -1,0 +1,41 @@
+{
+    "site_name": "TW2-Tracker",
+    "lang": "en",
+    "ui": {
+        "ranking_page_items_per_page": 20,
+        "world_page_maximum_ranking_items": 10,
+        "world_page_maximum_last_conquests": 10,
+        "navigation_separator": " / "
+    },
+    "sync": {
+        "static_share_expire_time": "90 days",
+        "parallel_achievements_sync": 3,
+        "parallel_data_sync": 3,
+        "task_check_interval": "5 minutes",
+        "max_sync_attempts": 3,
+        "max_login_attempts": 3
+    },
+    "sync_intervals": {
+        "data_all": "60 minutes",
+        "achievements_all": "6 hours",
+        "worlds": "3 hours",
+        "clean_shares": "24 hours"
+    },
+    "database": {
+        "user": "postgres",
+        "host": "127.0.0.1",
+        "database": "tw2tracker",
+        "port": 5432
+    },
+    "puppeteer": {
+        "chromium_path": "/usr/bin/chromium",
+        "headless": true
+    },
+    "email_notification": {
+        "warn_sync_mods_on_fails": 3
+    },
+    "email_notification_auth": {
+        "user": "relaxeaza@tw2-tracker.com",
+        "pass": "|(7:3|+o.U%n08);KQE_&:6_\"cg9.C"
+    }
+}

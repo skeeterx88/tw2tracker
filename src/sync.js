@@ -581,7 +581,7 @@ Sync.tasks = async function () {
     debug.tasks('initializing task system');
 
     const taskHandlers = new Map();
-    const intervalKeys = Object.keys(config.sync.intervals);
+    const intervalKeys = Object.keys(config.sync_intervals);
     const presentTasks = await db.any(sql.getTasks);
     const interval = humanInterval(config.sync.task_check_interval);
 
@@ -599,7 +599,7 @@ Sync.tasks = async function () {
         initChecker: function () {
             debug.tasks('start task checker (interval: %s)', config.sync.task_check_interval);
 
-            const intervalEntries = Object.entries(config.sync.intervals);
+            const intervalEntries = Object.entries(config.sync_intervals);
             const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
             const mappedIntervals = new Map(parsedIntervals);
 

@@ -10,9 +10,7 @@
     "eslint": "eslint src/*.js src/routes/*.js src/public/javascripts/*.js"
   },
   "dependencies": {
-    "@iarna/toml": "^2.2.5",
     "bcrypt": "^5.0.1",
-    "colors": "^1.4.0",
     "compression": "^1.7.4",
     "connect-ensure-login": "^0.1.1",
     "connect-flash": "^0.1.1",
@@ -32,8 +30,6 @@
     "pg": "^8.3.3",
     "pg-promise": "^10.6.1",
     "puppeteer-core": "^5.2.1",
-    "toml": "^3.0.0",
-    "toml-require": "^1.2.0",
     "ws": "^7.4.2",
     "xdg-basedir": "^4.0.0"
   },

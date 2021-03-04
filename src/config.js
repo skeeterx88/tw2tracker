@@ -1,15 +1,10 @@
-const TOML = require('@iarna/toml');
 const fs = require('fs');
-const defaults = TOML.parse(fs.readFileSync('./share/config.defaults.toml', 'utf-8'));
-const defaultsRaw = fs.readFileSync('./share/config.defaults.toml', 'utf-8');
+const defaults = require('../share/default-config.json');
 
-if (!fs.existsSync('./config.toml')) {
-    fs.writeFileSync('./config.toml', defaultsRaw);
+if (fs.existsSync('../config.json')) {
+    const config = require('../config.json');
+    module.exports = {...defaults, ...config};
+} else {
+    fs.promises.writeFile('../config.json', JSON.stringify(defaults));
+    module.exports = defaults;
 }
-
-const userDefined = TOML.parse(fs.readFileSync('./config.toml', 'utf-8'));
-
-module.exports = {
-    ...defaults,
-    ...userDefined
-};
