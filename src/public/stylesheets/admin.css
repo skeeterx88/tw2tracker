@@ -49,7 +49,7 @@
 }
 
 #sync-worlds .relax-button {
-    cursor: wait;
+    margin: 5px;
 }
 
 #sync-worlds .world .in-progress .relax-button {
