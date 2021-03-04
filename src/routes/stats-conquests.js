@@ -36,7 +36,8 @@ const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const conquests = await db.any(sql.getWorldConquests, {worldId, offset, limit});
     const total = parseInt((await db.one(sql.getWorldConquestsCount, {worldId})).count, 10);
 
-    res.render('stats/conquests', {
+    res.render('stats', {
+        page: 'stats/conquests',
         title: createPageTitle(i18n('stats_world_conquests', 'page_titles', res.locals.lang), [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,

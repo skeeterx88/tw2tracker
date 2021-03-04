@@ -1,54 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('../menu.ejs') %>
+<div class="left">
+    <h2><%= i18n('member_changes', 'tribe_profile', lang).header_tribe_member_changes %></h2>
+    <table class="content-border quick-highlight">
+        <colgroup>
+            <col width="200px">
+            <col width="*">
+            <col width="100px">
+        </colgroup>
+        <thead>
+            <tr>
+                <th><%= i18n('member_changes', 'tribe_profile', lang).column_date_hour %></th>
+                <th><%= i18n('member_changes', 'tribe_profile', lang).column_player %></th>
+                <th><%= i18n('member_changes', 'tribe_profile', lang).column_action %></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (memberChanges.length) { -%>
+                <% for (let change of memberChanges) { %>
+                    <tr data-id="<%= change.player.id %>" data-highlight-type="players">
+                        <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
+                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
-        <main class="content-border">
-            <%- include('../navigation.ejs') %>
+                        <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
+                            <td><%= i18n('member_changes', 'tribe_profile', lang).left %></td>
+                        <% } else { -%>
+                            <td><%= i18n('member_changes', 'tribe_profile', lang).join %></td>
+                        <% } -%>
+                    </tr>
+                <% } %>
+            <% } else { -%>
+                <tr>
+                    <td colspan="4"><%= i18n('member_changes', 'tribe_profile', lang).no_changes %></td>
+                </tr>
+            <% } -%>
+        </tbody>
+    </table>
+</div>
 
-            <div class="content">
-                <div class="left">
-                    <h2><%= i18n('member_changes', 'tribe_profile', lang).header_tribe_member_changes %></h2>
-                    <table class="content-border">
-                        <colgroup>
-                            <col width="200px">
-                            <col width="*">
-                            <col width="100px">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th><%= i18n('member_changes', 'tribe_profile', lang).column_date_hour %></th>
-                                <th><%= i18n('member_changes', 'tribe_profile', lang).column_player %></th>
-                                <th><%= i18n('member_changes', 'tribe_profile', lang).column_action %></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (memberChanges.length) { -%>
-                                <% for (let change of memberChanges) { %>
-                                    <tr>
-                                        <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
-
-                                        <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
-                                            <td><%= i18n('member_changes', 'tribe_profile', lang).left %></td>
-                                        <% } else { -%>
-                                            <td><%= i18n('member_changes', 'tribe_profile', lang).join %></td>
-                                        <% } -%>
-                                    </tr>
-                                <% } %>
-                            <% } else { -%>
-                                <tr>
-                                    <td colspan="4"><%= i18n('member_changes', 'tribe_profile', lang).no_changes %></td>
-                                </tr>
-                            <% } -%>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../footer.ejs') %>
-    </body>
-</html>
+<div class="right">
+    <%- include('./map.ejs') %>
+</div>

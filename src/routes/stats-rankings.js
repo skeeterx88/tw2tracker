@@ -58,7 +58,8 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const total = parseInt(count, 10);
     const capitalizedCategory = utils.capitalize(category);
 
-    res.render('stats/ranking', {
+    res.render('stats', {
+        page: 'stats/ranking',
         title: createPageTitle(i18n('stats_ranking', 'page_titles', res.locals.lang), [capitalizedCategory, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,

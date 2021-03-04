@@ -1,44 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('../menu.ejs') %>
+<div class="left">
+    <h2><%= i18n('header_' + category, 'world_ranking', lang) %></h2>
 
-        <main class="content-border">
-            <%- include('../navigation.ejs') %>
+    <div class="content-border">
+        <%- include('ranking/' + category + '.ejs') %>
+        <%- include('../pagination.ejs') %>
+    </div>
+</div>
 
-            <div class="content">
-                <div class="left">
-                    <h2><% __append(i18n.world_ranking['header_' + category]) %></h2>
-
-                    <div class="content-border">
-                        <%- include('ranking/' + category + '.ejs') %>
-                        <%- include('../pagination.ejs') %>
-                    </div>
-                </div>
-
-                <div class="right">
-                    <section class="world-map">
-                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
-
-                        <div id="map" class="content-border"></div>
-
-                        <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../maps/tooltip.ejs') %>
-        <%- include('../footer.ejs') %>
-
-        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
-        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
-        <script defer type="text/javascript" src="/javascripts/utils.js"></script>
-        <script defer type="text/javascript" src="/javascripts/map.js"></script>
-        <script defer type="text/javascript" src="/javascripts/stats.js"></script>
-    </body>
-</html>
+<div class="right">
+    <%- include('./map.ejs') %>
+</div>

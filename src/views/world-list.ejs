@@ -1,68 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('./head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('./menu.ejs') %>
+<div class="single">
+    <section id="world-list">
+        <% for (let [label, data] of worlds) { -%>
+            <% if (data.length) { -%>
+                <div>
+                    <h2><%= label %></h2>
+                    <div>
+                        <% for (let world of data) { -%>
+                            <div class="relax-container world">
+                                <h3 class="title">
+                                    <span class="flag-<%= marketId %>"></span>
+                                    <%= world.name %><sup><%= world.num %></sup>
+                                </h2>
 
-        <main class="content-border">
-            <%- include('./navigation.ejs') %>
-
-            <div class="content">
-                <div class="single">
-                    <section id="world-list">
-                        <% for (let [label, data] of worlds) { -%>
-                            <% if (data.length) { -%>
-                                <div>
-                                    <h2><%= label %></h2>
-                                    <div>
-                                        <% for (let world of data) { -%>
-                                            <div class="relax-container world">
-                                                <h3 class="title">
-                                                    <span class="flag-<%= marketId %>"></span>
-                                                    <%= world.name %><sup><%= world.num %></sup>
-                                                </h2>
-
-                                                <div class="stats">
-                                                    <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n('players', 'world_list', lang) %></span></p>
-                                                    <p><span class="label"><%= formatNumbers(world.tribe_count) %> <%= i18n('tribes', 'world_list', lang) %></span></p>
-                                                    <p><span class="label"><%= formatNumbers(world.village_count) %> <%= i18n('villages', 'world_list', lang) %></span></p>
-                                                </div>
-
-                                                <% if (world.config) { -%>
-                                                    <div class="settings">
-                                                        <p><span class="label"><%= i18n('setting_world_type', 'world_list', lang) %></span> <span class="value"><% __append(world.config.victory_points ? i18n('world_type_victory_points', 'world_list', lang) : i18n('world_type_domination', 'world_list', lang)) %></span></p>
-                                                        <p><span class="label"><%= i18n('setting_troop_relocation', 'world_list', lang) %></span> <span class="value"><% __append(world.config.relocate_units ? i18n('setting_enabled', 'world_list', lang) : i18n('setting_disabled', 'world_list', lang)) %></span></p>
-                                                    </div>
-                                                <% } -%>
-
-                                                <% if (world.open_date || world.close_date) { %>
-                                                    <div class="dates">
-                                                        <% if (world.open_date) { %>
-                                                            <p><span class="label"><%= i18n('open_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
-                                                        <% } %>
-
-                                                        <% if (world.close_date) { %>
-                                                            <p><span class="label"><%= i18n('close_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
-                                                        <% } %>
-                                                    </div>
-                                                <% } %>
-
-                                                <div class="actions">
-                                                    <a class="relax-button" href="/stats/<%= world.market %>/<%= world.num %>">Stats</a>
-                                                    <a class="relax-button" href="/maps/<%= world.market %>/<%= world.num %>">Map</a>
-                                                </div>
-                                            </div>
-                                        <% } -%>
-                                    </div>
+                                <div class="stats">
+                                    <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n('players', 'world_list', lang) %></span></p>
+                                    <p><span class="label"><%= formatNumbers(world.tribe_count) %> <%= i18n('tribes', 'world_list', lang) %></span></p>
+                                    <p><span class="label"><%= formatNumbers(world.village_count) %> <%= i18n('villages', 'world_list', lang) %></span></p>
                                 </div>
-                            <% } -%>
-                        <% } -%>
-                    </section>
-                </div>
-            </div>
-        </main>
 
-        <%- include('./footer.ejs') %>
-    </body>
-</html>
+                                <% if (world.config) { -%>
+                                    <div class="settings">
+                                        <p><span class="label"><%= i18n('setting_world_type', 'world_list', lang) %></span> <span class="value"><% __append(world.config.victory_points ? i18n('world_type_victory_points', 'world_list', lang) : i18n('world_type_domination', 'world_list', lang)) %></span></p>
+                                        <p><span class="label"><%= i18n('setting_troop_relocation', 'world_list', lang) %></span> <span class="value"><% __append(world.config.relocate_units ? i18n('setting_enabled', 'world_list', lang) : i18n('setting_disabled', 'world_list', lang)) %></span></p>
+                                    </div>
+                                <% } -%>
+
+                                <% if (world.open_date || world.close_date) { %>
+                                    <div class="dates">
+                                        <% if (world.open_date) { %>
+                                            <p><span class="label"><%= i18n('open_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
+                                        <% } %>
+
+                                        <% if (world.close_date) { %>
+                                            <p><span class="label"><%= i18n('close_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+
+                                <div class="actions">
+                                    <a class="relax-button" href="/stats/<%= world.market %>/<%= world.num %>">Stats</a>
+                                    <a class="relax-button" href="/maps/<%= world.market %>/<%= world.num %>">Map</a>
+                                </div>
+                            </div>
+                        <% } -%>
+                    </div>
+                </div>
+            <% } -%>
+        <% } -%>
+    </section>
+</div>

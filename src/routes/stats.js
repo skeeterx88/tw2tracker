@@ -50,7 +50,8 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         };
     });
 
-    res.render('market-list', {
+    res.render('stats', {
+        page: 'market-list',
         title: createPageTitle(i18n('stats_servers', 'page_titles', res.locals.lang), [config.site_name]),
         pageType: 'stats',
         marketStats,
@@ -87,7 +88,8 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
         [i18n('closed_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => !world.open)]
     ];
 
-    res.render('world-list', {
+    res.render('stats', {
+        page: 'world-list',
         title: createPageTitle(i18n('stats_worlds', 'page_titles', res.locals.lang), [marketId.toUpperCase(), config.site_name]),
         marketId,
         worlds,
@@ -157,7 +159,8 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         }
     };
 
-    res.render('stats/world', {
+    res.render('stats', {
+        page: 'stats/world',
         title: createPageTitle(i18n('stats_world', 'page_titles', res.locals.lang), [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,

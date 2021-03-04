@@ -1,61 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('../menu.ejs') %>
-
-        <main class="content-border">
-            <%- include('../navigation.ejs') %>
-
-            <div class="content">
-                <div class="left">
-                    <h2><%= i18n('header', 'player_profile_villages', lang) %></h2>
-                    <table class="content-border quick-highlight">
-                        <colgroup>
-                            <col width="*">
-                            <col width="100px">
-                            <col width="100px">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th><%= i18n('column_name', 'player_profile_villages', lang) %></th>
-                                <th><%= i18n('column_coords', 'player_profile_villages', lang) %></th>
-                                <th><%= i18n('column_points', 'player_profile_villages', lang) %></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (let village of villages) { %>
-                                <tr data-id="<%= village.id %>" data-highlight-type="villages">
-                                    <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
-                                    <td><%= village.x + '|' + village.y %></td>
-                                    <td><%= formatNumbers(village.points) %></td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="right">
-                    <section class="world-map">
-                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
-
-                        <div id="map" class="content-border"></div>
-
-                        <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../maps/tooltip.ejs') %>
-        <%- include('../footer.ejs') %>
-
-        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
-        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
-        <script defer type="text/javascript" src="/javascripts/utils.js"></script>
-        <script defer type="text/javascript" src="/javascripts/map.js"></script>
-        <script defer type="text/javascript" src="/javascripts/stats.js"></script>
-    </body>
-</html>
+<div class="left">
+    <h2><%= i18n('header', 'player_profile_villages', lang) %></h2>
+    <table class="content-border quick-highlight">
+        <colgroup>
+            <col width="*">
+            <col width="100px">
+            <col width="100px">
+        </colgroup>
+        <thead>
+            <tr>
+                <th><%= i18n('column_name', 'player_profile_villages', lang) %></th>
+                <th><%= i18n('column_coords', 'player_profile_villages', lang) %></th>
+                <th><%= i18n('column_points', 'player_profile_villages', lang) %></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for (let village of villages) { %>
+                <tr data-id="<%= village.id %>" data-highlight-type="villages">
+                    <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
+                    <td><%= village.x + '|' + village.y %></td>
+                    <td><%= formatNumbers(village.points) %></td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+<div class="right">
+    <%- include('./map.ejs') %>
+</div>

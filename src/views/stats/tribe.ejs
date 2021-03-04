@@ -1,171 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('../menu.ejs') %>
+<div class="left">
+    <section id="tribe">
+        <h2><%= i18n('header_tribe_profile', 'tribe_profile', lang) %></h2>
 
-        <main class="content-border">
-            <%- include('../navigation.ejs') %>
+        <div class="content-border">
+            <table class="vertical">
+                <colgroup>
+                    <col width="50%">
+                    <col width="50%">
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th><%= i18n('tribe_rank', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.rank) %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_name', 'tribe_profile', lang) %></th>
+                        <td><%= tribe.name %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_tag', 'tribe_profile', lang) %></th>
+                        <td><%= tribe.tag %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_level', 'tribe_profile', lang) %></th>
+                        <td><%= tribe.level %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_villages', 'tribe_profile', lang) %></th>
+                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/villages"><%= formatNumbers(tribe.villages) %></a></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_points', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.points) %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_members', 'tribe_profile', lang) %></th>
+                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/members"><%= formatNumbers(tribe.members) %></a></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_bash_attack', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.bash_points_off) %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_bash_defense', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.bash_points_def) %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_avg_points_member', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.points_per_member) %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_avg_points_village', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.points_per_villages) %></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_member_changes', 'tribe_profile', lang) %></th>
+                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/member-changes"><%= formatNumbers(memberChangesCount) %></a></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_conquests', 'tribe_profile', lang) %></th>
+                        <td>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests"><%= formatNumbers(conquestCount) %></a>
+                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain"><%= formatNumbers(conquestGainCount) %></a>
+                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss"><%= formatNumbers(conquestLossCount) %></a>
+                            =<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self"><%= formatNumbers(conquestSelfCount) %></a>)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_achievements', 'tribe_profile', lang) %></th>
+                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= achievementsRepeatableCount %>x</a></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_record_rank', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.best_rank) %> <small class="right"><%= formatDate(tribe.best_rank_date, world.time_offset, 'hours-only') %></small></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_record_points', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.best_points) %> <small class="right"><%= formatDate(tribe.best_points_date, world.time_offset, 'hours-only') %></small></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_record_villages', 'tribe_profile', lang) %></th>
+                        <td><%= formatNumbers(tribe.best_villages) %> <small class="right"><%= formatDate(tribe.best_villages_date, world.time_offset, 'hours-only') %></small></td>
+                    </tr>
+                    <tr>
+                        <th><%= i18n('tribe_first_seen', 'tribe_profile', lang) %></th>
+                        <td><%= formatDate(tribe.first_seen) %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-            <div class="content">
-                <div class="left">
-                    <section id="tribe">
-                        <h2><%= i18n('header_tribe_profile', 'tribe_profile', lang) %></h2>
+    <section id="tribe-latest-achievements">
+        <h2><%= i18n('header_last_achievements', 'tribe_profile', lang) %></h2>
 
-                        <div class="content-border">
-                            <table class="vertical">
-                                <colgroup>
-                                    <col width="50%">
-                                    <col width="50%">
-                                </colgroup>
-                                <tbody>
-                                    <tr>
-                                        <th><%= i18n('tribe_rank', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.rank) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_name', 'tribe_profile', lang) %></th>
-                                        <td><%= tribe.name %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_tag', 'tribe_profile', lang) %></th>
-                                        <td><%= tribe.tag %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_level', 'tribe_profile', lang) %></th>
-                                        <td><%= tribe.level %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_villages', 'tribe_profile', lang) %></th>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/villages"><%= formatNumbers(tribe.villages) %></a></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_points', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.points) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_members', 'tribe_profile', lang) %></th>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/members"><%= formatNumbers(tribe.members) %></a></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_bash_attack', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.bash_points_off) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_bash_defense', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.bash_points_def) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_avg_points_member', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.points_per_member) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_avg_points_village', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.points_per_villages) %></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_member_changes', 'tribe_profile', lang) %></th>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/member-changes"><%= formatNumbers(memberChangesCount) %></a></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_conquests', 'tribe_profile', lang) %></th>
-                                        <td>
-                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests"><%= formatNumbers(conquestCount) %></a>
-                                            (+<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain"><%= formatNumbers(conquestGainCount) %></a>
-                                            -<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss"><%= formatNumbers(conquestLossCount) %></a>
-                                            =<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self"><%= formatNumbers(conquestSelfCount) %></a>)
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_achievements', 'tribe_profile', lang) %></th>
-                                        <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= achievementsRepeatableCount %>x</a></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_record_rank', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.best_rank) %> <small class="right"><%= formatDate(tribe.best_rank_date, world.time_offset, 'hours-only') %></small></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_record_points', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.best_points) %> <small class="right"><%= formatDate(tribe.best_points_date, world.time_offset, 'hours-only') %></small></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_record_villages', 'tribe_profile', lang) %></th>
-                                        <td><%= formatNumbers(tribe.best_villages) %> <small class="right"><%= formatDate(tribe.best_villages_date, world.time_offset, 'hours-only') %></small></td>
-                                    </tr>
-                                    <tr>
-                                        <th><%= i18n('tribe_first_seen', 'tribe_profile', lang) %></th>
-                                        <td><%= formatDate(tribe.first_seen) %></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
+        <div class="content-border">
+            <table>
+                <colgroup>
+                    <col width="*">
+                    <col width="130px">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th><%= i18n('achievement_name', 'tribe_profile', lang) %></th>
+                        <th><%= i18n('achievement_date_time', 'tribe_profile', lang) %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (achievementsLatest.length) { -%>
+                        <% for (let achievement of achievementsLatest) { -%>
+                            <tr>
+                                <% if (achievement.category === 'repeatable') { -%>
+                                    <td><%= achievementTitles[achievement.type] %></td>
+                                    <td><%= formatDate(achievement.time_last_level, world.time_offset, 'day-only') %></td>
+                                <% } else { -%>
+                                    <td><%= achievementTitles[achievement.type] %></td>
+                                    <td><%= formatDate(achievement.time_last_level, world.time_offset, 'hours-only') %></td>
+                                <% } -%>
+                            </tr>
+                        <% } -%>
+                    <% } else { -%>
+                        <tr>
+                            <td colspan="2"><%= i18n('no_recent_achievements', 'tribe_profile', lang) %></td>
+                        </tr>
+                    <% } -%>
+                </tbody>
+            </table>
+        </div>
 
-                    <section id="tribe-latest-achievements">
-                        <h2><%= i18n('header_last_achievements', 'tribe_profile', lang) %></h2>
+        <div class="section-actions">
+            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= i18n('view_tribe_achievements', 'tribe_profile', lang) %></a>
+        </div>
+    </section>
+</div>
 
-                        <div class="content-border">
-                            <table>
-                                <colgroup>
-                                    <col width="*">
-                                    <col width="130px">
-                                </colgroup>
-                                <thead>
-                                    <tr>
-                                        <th><%= i18n('achievement_name', 'tribe_profile', lang) %></th>
-                                        <th><%= i18n('achievement_date_time', 'tribe_profile', lang) %></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if (achievementsLatest.length) { -%>
-                                        <% for (let achievement of achievementsLatest) { -%>
-                                            <tr>
-                                                <% if (achievement.category === 'repeatable') { -%>
-                                                    <td><%= achievementTitles[achievement.type] %></td>
-                                                    <td><%= formatDate(achievement.time_last_level, world.time_offset, 'day-only') %></td>
-                                                <% } else { -%>
-                                                    <td><%= achievementTitles[achievement.type] %></td>
-                                                    <td><%= formatDate(achievement.time_last_level, world.time_offset, 'hours-only') %></td>
-                                                <% } -%>
-                                            </tr>
-                                        <% } -%>
-                                    <% } else { -%>
-                                        <tr>
-                                            <td colspan="2"><%= i18n('no_recent_achievements', 'tribe_profile', lang) %></td>
-                                        </tr>
-                                    <% } -%>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="section-actions">
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= i18n('view_tribe_achievements', 'tribe_profile', lang) %></a>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="right">
-                    <section class="world-map">
-                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
-
-                        <div id="map" class="content-border"></div>
-
-                        <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../maps/tooltip.ejs') %>
-        <%- include('../footer.ejs') %>
-
-        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
-        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
-        <script defer type="text/javascript" src="/javascripts/utils.js"></script>
-        <script defer type="text/javascript" src="/javascripts/map.js"></script>
-        <script defer type="text/javascript" src="/javascripts/stats.js"></script>
-    </body>
-</html>
+<div class="right">
+    <%- include('./map.ejs') %>
+</div>

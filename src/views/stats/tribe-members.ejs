@@ -1,76 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('../menu.ejs') %>
+<div class="left">
+    <section id="players">
+        <h2><%= i18n('header_tribe_members', 'tribe_profile_members', lang) %></h2>
 
-        <main class="content-border">
-            <%- include('../navigation.ejs') %>
+        <div class="content-border">
+            <table class="quick-highlight">
+                <colgroup>
+                    <col width="5%">
+                    <col width="*">
+                    <col width="10%">
+                    <col width="10%">
+                </colgroup>
 
-            <div class="content">
-                <div class="left">
-                    <section id="players">
-                        <h2><%= i18n('header_tribe_members', 'tribe_profile_members', lang) %></h2>
+                <thead>
+                    <th><%= i18n('column_rank', 'tribe_profile_members', lang) %></th>
+                    <th><%= i18n('column_name', 'tribe_profile_members', lang) %></th>
+                    <th><%= i18n('column_points', 'tribe_profile_members', lang) %></th>
+                    <th><%= i18n('column_villages', 'tribe_profile_members', lang) %></th>
+                </thead>
 
-                        <div class="content-border">
-                            <table class="quick-highlight">
-                                <colgroup>
-                                    <col width="5%">
-                                    <col width="*">
-                                    <col width="10%">
-                                    <col width="10%">
-                                </colgroup>
+                <tbody>
+                    <% if (!members.length) { %>
+                        <tr>
+                            <td colspan="4"><%= i18n('no_members', 'tribe_profile_members', lang) %></td>
+                        </tr>
+                    <% } %>
 
-                                <thead>
-                                    <th><%= i18n('column_rank', 'tribe_profile_members', lang) %></th>
-                                    <th><%= i18n('column_name', 'tribe_profile_members', lang) %></th>
-                                    <th><%= i18n('column_points', 'tribe_profile_members', lang) %></th>
-                                    <th><%= i18n('column_villages', 'tribe_profile_members', lang) %></th>
-                                </thead>
+                    <% for (let member of members) { %>
+                        <tr data-id="<%= member.id %>" data-highlight-type="players">
+                            <td><%= formatNumbers(member.rank) %></td>
+                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
+                            <td><%= formatNumbers(member.points) %></td>
+                            <td><%= formatNumbers(member.villages) %></td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
 
-                                <tbody>
-                                    <% if (!members.length) { %>
-                                        <tr>
-                                            <td colspan="4"><%= i18n('no_members', 'tribe_profile_members', lang) %></td>
-                                        </tr>
-                                    <% } %>
-
-                                    <% for (let member of members) { %>
-                                        <tr data-id="<%= member.id %>" data-highlight-type="players">
-                                            <td><%= formatNumbers(member.rank) %></td>
-                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
-                                            <td><%= formatNumbers(member.points) %></td>
-                                            <td><%= formatNumbers(member.villages) %></td>
-                                        </tr>
-                                    <% } %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="right">
-                    <section class="world-map">
-                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
-
-                        <div id="map" class="content-border"></div>
-
-                        <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= worldNumber %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../maps/tooltip.ejs') %>
-        <%- include('../footer.ejs') %>
-
-        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
-        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
-        <script defer type="text/javascript" src="/javascripts/utils.js"></script>
-        <script defer type="text/javascript" src="/javascripts/map.js"></script>
-        <script defer type="text/javascript" src="/javascripts/stats.js"></script>
-    </body>
-</html>
+<div class="right">
+    <%- include('./map.ejs') %>
+</div>

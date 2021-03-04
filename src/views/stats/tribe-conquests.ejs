@@ -1,119 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('../menu.ejs') %>
+<div class="sub-menu">
+    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests" class="item <% __append(category === 'all' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_all %></a>
+    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain" class="item <% __append(category === 'gain' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_gains %></a>
+    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss" class="item <% __append(category === 'loss' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_losses %></a>
+    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_self %></a>
+</div>
 
-        <main class="content-border">
-            <%- include('../navigation.ejs') %>
+<div class="left-really-big">
+    <section id="players">
+        <h2><%= navigationTitle %></h2>
 
-            <div class="sub-menu">
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests" class="item <% __append(category === 'all' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_all %></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/gain" class="item <% __append(category === 'gain' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_gains %></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/loss" class="item <% __append(category === 'loss' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_losses %></a>
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_self %></a>
-            </div>
+        <div class="content-border">
+            <table class="quick-highlight">
+                <colgroup>
+                    <col width="1%">
+                    <col width="*">
+                    <col width="5%">
+                    <col width="*">
+                    <col width="*">
+                    <col width="14%">
+                </colgroup>
 
-            <div class="content">
-                <div class="left-really-big">
-                    <section id="players">
-                        <h2><%= navigationTitle %></h2>
+                <thead>
+                    <th></th>
+                    <th><%= i18n('conquests', 'tribe_profile', lang).column_village %></th>
+                    <th><%= i18n('conquests', 'tribe_profile', lang).column_points %></th>
+                    <th><%= i18n('conquests', 'tribe_profile', lang).column_old_owner %></th>
+                    <th><%= i18n('conquests', 'tribe_profile', lang).column_new_owner %></th>
+                    <th><%= i18n('conquests', 'tribe_profile', lang).column_date_hour %></th>
+                </thead>
 
-                        <div class="content-border">
-                            <table class="quick-highlight">
-                                <colgroup>
-                                    <col width="1%">
-                                    <col width="*">
-                                    <col width="5%">
-                                    <col width="*">
-                                    <col width="*">
-                                    <col width="14%">
-                                </colgroup>
+                <tbody>
+                    <% if (!conquests.length) { -%>
+                        <tr>
+                            <td colspan="6"><%= i18n('conquests', 'tribe_profile', lang).no_conquests %></td>
+                        </tr>
+                    <% } else { -%>
+                        <% for (let conquest of conquests) { %>
+                            <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
+                                <td><span class="conquest-<%= conquest.type %>"></span></td>
+                                <td>
+                                    <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
+                                </td>
+                                <td><%= formatNumbers(conquest.village_points_then) %></td>
 
-                                <thead>
-                                    <th></th>
-                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_village %></th>
-                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_points %></th>
-                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_old_owner %></th>
-                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_new_owner %></th>
-                                    <th><%= i18n('conquests', 'tribe_profile', lang).column_date_hour %></th>
-                                </thead>
+                                <% if (conquest.old_owner) { -%>
+                                    <td>
+                                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
 
-                                <tbody>
-                                    <% if (!conquests.length) { -%>
-                                        <tr>
-                                            <td colspan="6"><%= i18n('conquests', 'tribe_profile', lang).no_conquests %></td>
-                                        </tr>
-                                    <% } else { -%>
-                                        <% for (let conquest of conquests) { %>
-                                            <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
-                                                <td><span class="conquest-<%= conquest.type %>"></span></td>
-                                                <td>
-                                                    <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
-                                                </td>
-                                                <td><%= formatNumbers(conquest.village_points_then) %></td>
+                                        <% if (conquest.old_owner_tribe_id) { -%>
+                                            <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
+                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
+                                            <% } else { -%>
+                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
+                                            <% } -%>
+                                        <% } -%>
+                                    </td>
+                                <% } else { -%>
+                                    <td><%= i18n('abandoned_village', 'tribe_profile', lang) %></td>
+                                <% } -%>
 
-                                                <% if (conquest.old_owner) { -%>
-                                                    <td>
-                                                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
+                                <td>
+                                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
 
-                                                        <% if (conquest.old_owner_tribe_id) { -%>
-                                                            <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
-                                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
-                                                            <% } else { -%>
-                                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
-                                                            <% } -%>
-                                                        <% } -%>
-                                                    </td>
-                                                <% } else { -%>
-                                                    <td><%= i18n('abandoned_village', 'tribe_profile', lang) %></td>
-                                                <% } -%>
-
-                                                <td>
-                                                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
-
-                                                    <% if (conquest.new_owner_tribe_id) { -%>
-                                                        <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
-                                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>]
-                                                        <% } else { -%>
-                                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>]
-                                                        <% } -%>
-                                                    <% } -%>
-                                                </td>
-                                                <td><%= formatDate(conquest.date, world.time_offset, 'hours-only') %></td>
-                                            </tr>
-                                        <% } %>
+                                    <% if (conquest.new_owner_tribe_id) { -%>
+                                        <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
+                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>]
+                                        <% } else { -%>
+                                            [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>]
+                                        <% } -%>
                                     <% } -%>
-                                </tbody>
-                            </table>
+                                </td>
+                                <td><%= formatDate(conquest.date, world.time_offset, 'hours-only') %></td>
+                            </tr>
+                        <% } %>
+                    <% } -%>
+                </tbody>
+            </table>
 
-                            <%- include('../pagination.ejs') %>
-                        </div>
-                    </section>
-                </div>
+            <%- include('../pagination.ejs') %>
+        </div>
+    </section>
+</div>
 
-                <div class="right-really-small">
-                    <section class="world-map">
-                        <h2><%= i18n('header_map', 'stats_map', lang) %></h2>
-
-                        <div id="map" class="content-border"></div>
-
-                        <div class="section-actions">
-                            <a href="/maps/<%= marketId %>/<%= world.num %>"><%= i18n('view_world_map', 'stats_map', lang) %></a>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../maps/tooltip.ejs') %>
-        <%- include('../footer.ejs') %>
-
-        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
-        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
-        <script defer type="text/javascript" src="/javascripts/utils.js"></script>
-        <script defer type="text/javascript" src="/javascripts/map.js"></script>
-        <script defer type="text/javascript" src="/javascripts/stats.js"></script>
-    </body>
-</html>
+<div class="right-really-small">
+    <%- include('./map.ejs') %>
+</div>

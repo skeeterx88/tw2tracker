@@ -65,7 +65,8 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
     const tribeChangesCount = (await db.one(sql.getPlayerTribeChangesCount, {worldId, id: playerId})).count;
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
 
-    res.render('stats/player', {
+    res.render('stats', {
+        page: 'stats/player',
         title: createPageTitle(i18n('stats_player', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
@@ -117,7 +118,8 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, [marketId, worldNumber]);
     const villages = await getPlayerVillages(worldId, playerId);
 
-    res.render('stats/player-villages', {
+    res.render('stats', {
+        page: 'stats/player-villages',
         title: createPageTitle(i18n('stats_player_villages', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
@@ -207,7 +209,8 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
     const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, playerId})).count;
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
-    res.render('stats/player-conquests', {
+    res.render('stats', {
+        page: 'stats/player-conquests',
         title: createPageTitle(i18n('stats_player_conquests', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
@@ -266,7 +269,8 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
         }
     }
 
-    res.render('stats/player-tribe-changes', {
+    res.render('stats', {
+        page: 'stats/player-tribe-changes',
         title: createPageTitle(i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
@@ -366,7 +370,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
 
     if (!selectedCategory) {
         categoryTemplate = 'overview';
-        navigationTitle = i18n.achievements[selectedCategory] + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievements', res.locals.lang) + ' Achievements';
         
         const categoriesMaxPoints = {};
 
@@ -407,7 +411,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         }]);
     } else if (selectedCategory === 'repeatable') {
         categoryTemplate = 'repeatable';
-        navigationTitle = i18n.achievements[selectedCategory] + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievements', res.locals.lang) + ' Achievements';
 
         for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
@@ -424,10 +428,11 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         }
     } else {
         categoryTemplate = 'generic';
-        navigationTitle = i18n.achievements[selectedCategory] + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievements', res.locals.lang) + ' Achievements';
     }
 
-    res.render('stats/player-achievements', {
+    res.render('stats', {
+        page: 'stats/player-achievements',
         title: createPageTitle(i18n('stats_player_achievements', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,

@@ -15,67 +15,6 @@ const {
     createPageTitle
 } = require('../router-helpers.js');
 
-const marketsRouter = utils.asyncRouter(async function (req, res, next) {
-    const worlds = await db.any(sql.getWorlds);
-    const marketsIds = Array.from(new Set(worlds.map(world => world.market)));
-
-    const marketStats = marketsIds.map(function (id) {
-        return {
-            id,
-            players: worlds.reduce((base, next) => next.market === id ? base + next.player_count : base, 0),
-            tribes: worlds.reduce((base, next) => next.market === id ? base + next.tribe_count : base, 0),
-            villages: worlds.reduce((base, next) => next.market === id ? base + next.village_count : base, 0),
-            openWorld: worlds.filter((world) => world.market === id && world.open).length,
-            closedWorld: worlds.filter((world) => world.market === id && !world.open).length
-        };
-    });
-
-    res.render('market-list', {
-        title: createPageTitle(i18n('stats_maps_servers', 'page_titles', res.locals.lang), [config.site_name]),
-        pageType: 'stats',
-        marketStats,
-        navigation: createNavigation([
-            {label: i18n('maps', 'navigation', res.locals.lang), url: '/maps'},
-            {label: i18n('servers', 'navigation', res.locals.lang)}
-        ])
-    });
-});
-
-const worldsRouter = utils.asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2) {
-        return next();
-    }
-
-    const marketId = req.params.marketId;
-    const syncedWorlds = await db.any(sql.getSyncedWorlds);
-    const marketWorlds = syncedWorlds.filter((world) => world.market === marketId);
-    const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num);
-
-    if (!marketWorlds.length) {
-        throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
-    }
-
-    const worlds = [
-        [i18n('open_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => world.open)],
-        [i18n('closed_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => !world.open)]
-    ];
-
-    res.render('world-list', {
-        title: createPageTitle(i18n('stats_maps_server_worlds', 'page_titles', res.locals.lang), [marketId.toUpperCase(), config.site_name]),
-        marketId,
-        worlds,
-        pageType: 'maps',
-        navigation: createNavigation([
-            {label: i18n('maps', 'navigation', res.locals.lang), url: '/maps'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/maps/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('worlds', 'navigation', res.locals.lang)}
-        ]),
-        backendValues: {
-            marketId
-        }
-    });
-});
-
 const worldRouter = utils.asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next();
@@ -158,8 +97,6 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     });
 });
 
-router.get('/', marketsRouter);
-router.get('/:marketId', worldsRouter);
 router.get('/:marketId/:worldNumber', worldRouter);
 router.get('/:marketId/:worldNumber/share/:mapShareId', mapShareRouter);
 router.use(mapsAPIRouter);

@@ -1,63 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-    <%- include('../head.ejs') %>
-    <body>
-        <header id="main-header"></header>
-        <%- include('../menu.ejs') %>
+<div class="left">
+    <h2><%= i18n('header', 'player_profile_tribe_changes', lang) %></h2>
+    <table class="content-border">
+        <colgroup>
+            <col width="200px">
+            <col width="*">
+            <col width="*">
+        </colgroup>
+        <thead>
+            <tr>
+                <th><%= i18n('column_date_hour', 'player_profile_tribe_changes', lang) %></th>
+                <th><%= i18n('column_old_tribe', 'player_profile_tribe_changes', lang) %></th>
+                <th><%= i18n('column_new_tribe', 'player_profile_tribe_changes', lang) %></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (tribeChanges.length) { -%>
+                <% for (let change of tribeChanges) { %>
+                    <tr>
+                        <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
 
-        <main class="content-border">
-            <%- include('../navigation.ejs') %>
+                        <% if (change.old_tribe) { -%>
+                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
+                        <% } else { -%>
+                            <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
+                        <% } -%>
 
-            <div class="content">
-                <div class="left">
-                    <h2><%= i18n('header', 'player_profile_tribe_changes', lang) %></h2>
-                    <table class="content-border">
-                        <colgroup>
-                            <col width="200px">
-                            <col width="*">
-                            <col width="*">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th><%= i18n('column_date_hour', 'player_profile_tribe_changes', lang) %></th>
-                                <th><%= i18n('column_old_tribe', 'player_profile_tribe_changes', lang) %></th>
-                                <th><%= i18n('column_new_tribe', 'player_profile_tribe_changes', lang) %></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (tribeChanges.length) { -%>
-                                <% for (let change of tribeChanges) { %>
-                                    <tr>
-                                        <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
-
-                                        <% if (change.old_tribe) { -%>
-                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
-                                        <% } else { -%>
-                                            <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
-                                        <% } -%>
-
-                                        <% if (change.new_tribe) { -%>
-                                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
-                                        <% } else { -%>
-                                            <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
-                                        <% } -%>
-                                    </tr>
-                                <% } %>
-                            <% } else { -%>
-                                <tr>
-                                    <td colspan="4"><%= i18n('no_tribe_changes', 'player_profile_tribe_changes', lang) %></td>
-                                </tr>
-                            <% } -%>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-
-        <%- include('../footer.ejs') %>
-
-        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
-        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
-        <script defer type="text/javascript" src="/javascripts/stats.js"></script>
-    </body>
-</html>
+                        <% if (change.new_tribe) { -%>
+                            <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
+                        <% } else { -%>
+                            <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
+                        <% } -%>
+                    </tr>
+                <% } %>
+            <% } else { -%>
+                <tr>
+                    <td colspan="4"><%= i18n('no_tribe_changes', 'player_profile_tribe_changes', lang) %></td>
+                </tr>
+            <% } -%>
+        </tbody>
+    </table>
+</div>
