@@ -119,7 +119,7 @@ app.use(function (req, res, next) {
     res.locals.formatDate = utils.ejsHelpers.formatDate;
     res.locals.capitalize = utils.ejsHelpers.capitalize;
     res.locals.sprintf = utils.sprintf;
-    res.locals.lang = req.session.lang;
+    res.locals.lang = req.session.lang || config.lang;
     next();
 });
 
