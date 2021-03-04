@@ -144,6 +144,7 @@ achievement_name = "Nazwa"
 achievement_date_time = "Data/Godzina"
 view_tribe_achievements = "Widok osiągnięć Plemienia"
 no_recent_achievements = "Brak niedawnych osiagnięć."
+abandoned_village = "Opuszczone"
 
 [tribe_profile_villages]
 header_tribe_villages = "Wioski plemienne"

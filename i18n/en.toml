@@ -142,6 +142,7 @@ achievement_name = "Name"
 achievement_date_time = "Date/Hour"
 view_tribe_achievements = "View tribe's achievements"
 no_recent_achievements = "No recent achievements."
+abandoned_village = "Abandoned"
 
 [tribe_profile_villages]
 header_tribe_villages = "Tribe Villages"
