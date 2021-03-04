@@ -1,18 +1,10 @@
 <div class="content">
-    <div class="left-really-big">
+    <div class="conquests-map">
         <section id="players">
             <h2><%= i18n('header_world_conquests', 'world_conquests', lang) %></h2>
 
             <div class="content-border">
                 <table class="quick-highlight">
-                    <colgroup>
-                        <col width="*">
-                        <col width="5%">
-                        <col width="*">
-                        <col width="*">
-                        <col width="14%">
-                    </colgroup>
-
                     <thead>
                         <th><%= i18n('conquest_village', 'world_conquests', lang) %></th>
                         <th><%= i18n('conquest_points', 'world_conquests', lang) %></th>
@@ -73,7 +65,7 @@
         </section>
     </div>
 
-    <div class="right-really-small">
+    <div>
         <%- include('./map.ejs') %>
     </div>
 </div>

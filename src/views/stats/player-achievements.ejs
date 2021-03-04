@@ -1,11 +1,11 @@
+<div class="sub-menu">
+    <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements" class="item <% __append(selectedCategory ? '':  'selected') %>">Overview</li></a>
+
+    <% for (let category of Object.keys(achievementByCategory)) { %>
+        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>" class="item <% __append(category === selectedCategory ? 'selected' : '') %>"><%= i18n(category, 'achievements', lang) %></a>
+    <% } %>
+</div>
+
 <div class="content">
-    <div class="sub-menu">
-        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements" class="item <% __append(selectedCategory ? '':  'selected') %>">Overview</li></a>
-
-        <% for (let category of Object.keys(achievementByCategory)) { %>
-            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>" class="item <% __append(category === selectedCategory ? 'selected' : '') %>"><%= i18n(category, 'achievements', lang) %></a>
-        <% } %>
-    </div>
-
     <%- include(`player-achievements-${categoryTemplate}.ejs`) %>
 </div>

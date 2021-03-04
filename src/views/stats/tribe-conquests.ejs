@@ -6,21 +6,13 @@
         <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>"><%= i18n('conquests', 'tribe_profile', lang).menu_self %></a>
     </div>
 
-    <div class="left-really-big">
+<div class="content">
+    <div class="conquests-map">
         <section id="players">
             <h2><%= navigationTitle %></h2>
 
             <div class="content-border">
                 <table class="quick-highlight">
-                    <colgroup>
-                        <col width="1%">
-                        <col width="*">
-                        <col width="5%">
-                        <col width="*">
-                        <col width="*">
-                        <col width="14%">
-                    </colgroup>
-
                     <thead>
                         <th></th>
                         <th><%= i18n('conquests', 'tribe_profile', lang).column_village %></th>
