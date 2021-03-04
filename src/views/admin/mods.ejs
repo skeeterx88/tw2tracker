@@ -71,7 +71,7 @@
                             <% for (let privilege of modPrivilegeTypes) { %>
                                 <label>
                                     <input type="checkbox" name="privileges" value="<%= privilege %>" />
-                                    <span>what:<%= i18n(privilege, 'admin_mod_accounts_privileges', lang) %></span>
+                                    <span><%= i18n(privilege, 'admin_mod_accounts_privileges', lang) %></span>
                                 </label>
                             <% } %>
                         </fieldset>
