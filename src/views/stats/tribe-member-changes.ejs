@@ -1,5 +1,5 @@
 <div class="left">
-    <h2><%= i18n('member_changes', 'tribe_profile', lang).header_tribe_member_changes %></h2>
+    <h2><%= i18n('header_tribe_member_changes', 'tribe_profile_member_changes', lang) %></h2>
     <table class="content-border quick-highlight">
         <colgroup>
             <col width="200px">
@@ -8,9 +8,9 @@
         </colgroup>
         <thead>
             <tr>
-                <th><%= i18n('member_changes', 'tribe_profile', lang).column_date_hour %></th>
-                <th><%= i18n('member_changes', 'tribe_profile', lang).column_player %></th>
-                <th><%= i18n('member_changes', 'tribe_profile', lang).column_action %></th>
+                <th><%= i18n('column_date_hour', 'tribe_profile_member_changes', lang) %></th>
+                <th><%= i18n('column_player', 'tribe_profile_member_changes', lang) %></th>
+                <th><%= i18n('column_action', 'tribe_profile_member_changes', lang) %></th>
             </tr>
         </thead>
         <tbody>
@@ -21,15 +21,15 @@
                         <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
                         <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
-                            <td><%= i18n('member_changes', 'tribe_profile', lang).left %></td>
+                            <td><%= i18n('left', 'tribe_profile_member_changes', lang) %></td>
                         <% } else { -%>
-                            <td><%= i18n('member_changes', 'tribe_profile', lang).join %></td>
+                            <td><%= i18n('join', 'tribe_profile_member_changes', lang) %></td>
                         <% } -%>
                     </tr>
                 <% } %>
             <% } else { -%>
                 <tr>
-                    <td colspan="4"><%= i18n('member_changes', 'tribe_profile', lang).no_changes %></td>
+                    <td colspan="4"><%= i18n('no_changes', 'tribe_profile_member_changes', lang) %></td>
                 </tr>
             <% } -%>
         </tbody>

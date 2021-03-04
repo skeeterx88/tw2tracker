@@ -162,7 +162,7 @@ column_points = "Points"
 column_villages = "Villages"
 no_members = "Cette tribu n'a pas de membres."
 
-[tribe_profile.member_changes]
+[tribe_profile_member_changes]
 header_tribe_member_changes = "Changements de membre"
 column_date_hour = "Date/Heure"
 column_player = "Joueur"
@@ -171,7 +171,7 @@ left = "Parti(e)"
 join = "Arrivé(e)"
 no_changes = "Pas de changement."
 
-[tribe_profile.conquests]
+[tribe_profile_conquests]
 header_conquests = "Conquêtes"
 menu_all = "Tout"
 menu_gains = "Conquis"
@@ -185,7 +185,7 @@ column_date_hour = "Date/Heure"
 no_conquests = "Pas encore de conquêtes."
 abandoned_village = "Abandonné"
 
-[tribe_profile.achievements]
+[tribe_profile_achievements]
 header_achievements = "Succès Jour/Semaine"
 column_name = "Nom"
 column_last_earned = "Gagné la dernière fois le"

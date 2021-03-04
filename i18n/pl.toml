@@ -162,7 +162,7 @@ column_points = "Punkty"
 column_villages = "Wioski"
 no_members = "Brak Członków Plemienia."
 
-[tribe_profile.member_changes]
+[tribe_profile_member_changes]
 header_tribe_member_changes = "Zmiany członków Plemienia"
 column_date_hour = "Data/Godzina"
 column_player = "Gracz"
@@ -171,7 +171,7 @@ left = "Opuścił"
 join = "Dołącz"
 no_changes = "Brak zmian Członków."
 
-[tribe_profile.conquests]
+[tribe_profile_conquests]
 header_conquests = "Podboje"
 menu_all = "Wszystkie"
 menu_gains = "Zdobyte"
@@ -185,7 +185,7 @@ column_date_hour = "Data/Godzina"
 no_conquests = "Brak Podbojów."
 abandoned_village = "Opuszczone"
 
-[tribe_profile.achievements]
+[tribe_profile_achievements]
 header_achievements = "Dzienne/Tygodniowe Osiągnięcia"
 column_name = "Nazwa"
 column_last_earned = "Ostatnio osiagnięte dnia"
