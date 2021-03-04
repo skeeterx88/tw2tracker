@@ -134,9 +134,9 @@ const capitalize = function (value) {
         : value;
 };
 
-function sprintf () {
+function sprintf (string, tokens = []) {
     let i = 0;
-    return arguments[i++].replace(/%{[^}]*}/g, () => arguments[i++]);
+    return string.replace(/%{[^}]*}/g, () => tokens[i++]);
 }
 
 const ejsHelpers = {

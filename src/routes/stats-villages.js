@@ -10,8 +10,7 @@ const {
     paramWorld,
     paramWorldParse,
     paramVillageParse,
-    createNavigation,
-    createPageTitle
+    createNavigation
 } = require('../router-helpers.js');
 
 const villageRouter = utils.asyncRouter(async function (req, res, next) {
@@ -36,7 +35,7 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/village',
-        title: createPageTitle(i18n('stats_village', 'page_titles', res.locals.lang), [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_village', 'page_titles', res.locals.lang, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,

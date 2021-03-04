@@ -11,8 +11,7 @@ const {
     paramWorld,
     paramWorldParse,
     createPagination,
-    createNavigation,
-    createPageTitle
+    createNavigation
 } = require('../router-helpers.js');
 
 const searchCategories = ['players', 'tribes', 'villages'];
@@ -90,7 +89,7 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
 
     return res.render('stats', {
         page: 'stats/search',
-        title: createPageTitle(i18n('stats_search', 'page_titles', res.locals.lang), [rawQuery, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_search', 'page_titles', res.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         category,

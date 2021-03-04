@@ -132,13 +132,9 @@ function createNavigation (items) {
     return items.map(function ({label = '', url, replaces = []}) {
         label = label.replace(/%{style}/g, '<span class="keep-color">');
         label = label.replace(/%{style_end}/g, '</span>');
-        label = utils.sprintf.call(null, label, ...replaces);
+        label = utils.sprintf(label, replaces);
         return url ? `<a href="${url}">${label}</a>` : label;
     }).join(config.ui.navigation_separator);
-}
-
-function createPageTitle (title, replaces = []) {
-    return utils.sprintf.call(null, title, ...replaces);
 }
 
 function groupAchievements (achievements) {
@@ -164,6 +160,5 @@ module.exports = {
     paramVillageParse,
     createPagination,
     groupAchievements,
-    createNavigation,
-    createPageTitle
+    createNavigation
 };

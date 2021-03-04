@@ -12,8 +12,7 @@ const {
     paramWorldParse,
     paramMarket,
     groupAchievements,
-    createNavigation,
-    createPageTitle
+    createNavigation
 } = require('../router-helpers.js');
 
 const rankingsRouter = require('./stats-rankings.js');
@@ -51,7 +50,7 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'market-list',
-        title: createPageTitle(i18n('stats_servers', 'page_titles', res.locals.lang), [config.site_name]),
+        title: i18n('stats_servers', 'page_titles', res.locals.lang, [config.site_name]),
         pageType: 'stats',
         marketStats,
         worldsByMarket,
@@ -89,7 +88,7 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'world-list',
-        title: createPageTitle(i18n('stats_worlds', 'page_titles', res.locals.lang), [marketId.toUpperCase(), config.site_name]),
+        title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config.site_name]),
         marketId,
         worlds,
         pageType: 'stats',
@@ -160,7 +159,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/world',
-        title: createPageTitle(i18n('stats_world', 'page_titles', res.locals.lang), [marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_world', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         players,

@@ -15,8 +15,7 @@ const {
     getTribe,
     getPlayerVillages,
     createPagination,
-    createNavigation,
-    createPageTitle
+    createNavigation
 } = require('../router-helpers.js');
 
 const conquestCategories = ['gain', 'loss', 'all', 'self'];
@@ -66,7 +65,7 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player',
-        title: createPageTitle(i18n('stats_player', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_player', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -118,7 +117,7 @@ const playerVillagesRouter = utils.asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player-villages',
-        title: createPageTitle(i18n('stats_player_villages', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_player_villages', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -209,7 +208,7 @@ const playerConquestsRouter = utils.asyncRouter(async function (req, res, next) 
 
     res.render('stats', {
         page: 'stats/player-conquests',
-        title: createPageTitle(i18n('stats_player_conquests', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_player_conquests', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -269,7 +268,7 @@ const playerTribeChangesRouter = utils.asyncRouter(async function (req, res, nex
 
     res.render('stats', {
         page: 'stats/player-tribe-changes',
-        title: createPageTitle(i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,
@@ -431,7 +430,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
 
     res.render('stats', {
         page: 'stats/player-achievements',
-        title: createPageTitle(i18n('stats_player_achievements', 'page_titles', res.locals.lang), [player.name, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_player_achievements', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         worldNumber,
         world,

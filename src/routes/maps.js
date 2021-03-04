@@ -9,11 +9,7 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const i18n = require('../i18n.js');
 const mapsAPIRouter = require('./maps-api.js');
-
-const {
-    createNavigation,
-    createPageTitle
-} = require('../router-helpers.js');
+const {createNavigation} = require('../router-helpers.js');
 
 const worldRouter = utils.asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
@@ -38,8 +34,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
 
     res.render('maps/map', {
-        title: i18n('maps_world_map', 'page_titles', res.locals.lang),
-        title: createPageTitle(i18n('maps_world_map', 'page_titles', res.locals.lang), [marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('maps_world_map', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         world,
         backendValues: {
@@ -84,7 +79,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
     db.query(sql.maps.updateShareAccess, [mapShareId]);
 
     res.render('maps/map', {
-        title: createPageTitle(i18n('maps_world_map_shared', 'page_titles', res.locals.lang), [marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('maps_world_map_shared', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
         world,
         backendValues: {
