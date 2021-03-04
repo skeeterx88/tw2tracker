@@ -1,6 +1,10 @@
 <div class="<% __append(subCategory === 'detailed' ? 'single' : 'left') %>">
     <section id="player-achievements-repeatable">
-        <h2><%= navigationTitle %><% __append(subCategory === 'detailed' ? ` (${i18n('detailed', 'player_profile_achievements', lang)})` : '') %></h2>
+        <h2>
+            <%= i18n(selectedCategory, 'achievement_categories', lang) %>
+            <%= i18n('achievements', 'player_profile_achievements', lang) %>
+            <% __append(subCategory === 'detailed' ? ` (${i18n('detailed', 'player_profile_achievements', lang)})` : '') %>
+        </h2>
 
         <table class="content-border">
             <colgroup>
@@ -18,14 +22,14 @@
                     <% if (subCategory === 'detailed') { -%>
                         <% for (let [type, achievementDates] of Object.entries(achievementsRepeatableDetailed)) { %>
                             <tr>
-                                <td><%= achievementTitles[type] %> (<%= achievementDates.length %>x)</td>
+                                <td><%= i18n(type, 'achievements', lang) %> (<%= achievementDates.length %>x)</td>
                                 <td><%= achievementDates.join(', ') %></td>
                             </tr>
                         <% } %>
                     <% } else { -%>
                         <% for (let [type, count] of Object.entries(achievementsRepeatableCount)) { %>
                             <tr>
-                                <td><%= achievementTitles[type] %> (<%= count %>x)</td>
+                                <td><%= i18n(type, 'achievements', lang) %> (<%= count %>x)</td>
                                 <td><%= achievementsRepeatableLastEarned[type] || i18n('never', 'player_profile_achievements', lang) %></td>
                             </tr>
                         <% } %>

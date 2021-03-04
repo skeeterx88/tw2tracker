@@ -1,6 +1,6 @@
 <div class="content">
     <div class="left">
-        <h2>Overview</h2>
+        <h2><%= i18n('overview', 'achievement_categories', lang) %></h2>
 
         <table class="content-border">
             <colgroup>
@@ -19,7 +19,7 @@
 
                     <tr>
                         <td>
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= i18n(category, 'achievements', lang) %></a>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= i18n(category, 'achievement_categories', lang) %></a>
                         </td>
                         <td>
                             <div class="progress-bar-wrapper">

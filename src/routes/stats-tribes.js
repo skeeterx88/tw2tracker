@@ -6,7 +6,6 @@ const sql = require('../sql.js');
 const utils = require('../utils.js');
 const enums = require('../enums.js');
 const config = require('../config.js');
-const achievementTitles = require('../achievement-titles.json');
 const i18n = require('../i18n.js');
 
 const {
@@ -62,7 +61,6 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
         conquestSelfCount,
         conquestTypes: enums.conquestTypes,
         achievementsRepeatableCount,
-        achievementTitles,
         achievementsLatest,
         memberChangesCount,
         navigation: createNavigation([
@@ -392,7 +390,6 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
         achievementsRepeatableLastEarned,
         achievementsRepeatableDetailed,
         subCategory,
-        achievementTitles,
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},

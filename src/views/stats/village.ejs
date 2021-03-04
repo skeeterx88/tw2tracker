@@ -27,7 +27,7 @@
                             <% if (village.character_id) { -%>
                                 <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.character_id %>"><%= village.player_name %></a></td>
                             <% } else { -%>
-                                <td><%= i18n('abandoned', 'village_profile', lang) %></td>
+                                <td><%= i18n('abandoned_village', 'village_profile', lang) %></td>
                             <% } -%>
                         </tr>
                         <tr>
@@ -83,7 +83,7 @@
                                             <% } -%>
                                         </td>
                                     <% } else { -%>
-                                        <td><%= i18n('abandoned', 'village_profile', lang) %></td>
+                                        <td><%= i18n('abandoned_village', 'village_profile', lang) %></td>
                                     <% } -%>
 
                                     <td>

@@ -112,10 +112,10 @@
                             <% for (let achievement of achievementsLatest) { -%>
                                 <tr>
                                     <% if (achievement.category === 'repeatable') { -%>
-                                        <td><%= achievementTitles[achievement.type] %></td>
+                                        <td><%= i18n(achievement.type, 'achievements', lang) %></td>
                                         <td><%= formatDate(achievement.time_last_level, world.time_offset, 'day-only') %></td>
                                     <% } else { -%>
-                                        <td><%= achievementTitles[achievement.type] %></td>
+                                        <td><%= i18n(achievement.type, 'achievements', lang) %></td>
                                         <td><%= formatDate(achievement.time_last_level, world.time_offset, 'hours-only') %></td>
                                     <% } -%>
                                 </tr>

@@ -5,7 +5,6 @@ const utils = require('../utils');
 const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
-const achievementTitles = require('../achievement-titles.json');
 const i18n = require('../i18n.js');
 
 const {
@@ -169,7 +168,6 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         world,
         lastConquests,
         achievements,
-        achievementTitles,
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},

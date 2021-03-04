@@ -214,7 +214,7 @@
                         <% if (achievements.counts.players.daily) { -%>
                             <% for (let [type, players] of achievements.groups.players.daily) { -%>
                                 <tr>
-                                    <th><%= achievementTitles[type] %>:</th>
+                                    <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let player of players) { -%>
                                             <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
@@ -246,7 +246,7 @@
                         <% if (achievements.counts.players.weekly) { -%>
                             <% for (let [type, players] of achievements.groups.players.weekly) { -%>
                                 <tr>
-                                    <th><%= achievementTitles[type] %>:</th>
+                                    <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let player of players) { -%>
                                             <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
@@ -278,7 +278,7 @@
                         <% if (achievements.counts.tribes.daily) { -%>
                             <% for (let [type, tribes] of achievements.groups.tribes.daily) { -%>
                                 <tr>
-                                    <th><%= achievementTitles[type] %>:</th>
+                                    <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let tribe of tribes) { -%>
                                             <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
@@ -310,7 +310,7 @@
                         <% if (achievements.counts.tribes.weekly) { -%>
                             <% for (let [type, tribes] of achievements.groups.tribes.weekly) { -%>
                                 <tr>
-                                    <th><%= achievementTitles[type] %>:</th>
+                                    <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let tribe of tribes) { -%>
                                             <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>

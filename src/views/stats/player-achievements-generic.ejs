@@ -1,6 +1,9 @@
 <div class="content">
     <div class="left">
-        <h2><%= navigationTitle %></h2>
+        <h2>
+            <%= i18n(selectedCategory, 'achievement_categories', lang) %>
+            <%= i18n('achievements', 'player_profile_achievements', lang) %>
+        </h2>
 
         <table class="content-border">
             <colgroup>
@@ -21,7 +24,7 @@
                 <% if (achievementByCategory[selectedCategory].length) { -%>
                     <% for (let achievement of achievementByCategory[selectedCategory]) { %>
                         <tr>
-                            <td><%= achievementTitles[achievement.type] %></td>
+                            <td><%= i18n(achievement.type, 'achievements', lang) %></td>
                             <td><%= formatNumbers(achievement.points) %></td>
                             <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
                             <td><%= formatDate(achievement.time_last_level, world.time_offset) %></td>

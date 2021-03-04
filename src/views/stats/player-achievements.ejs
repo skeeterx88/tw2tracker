@@ -2,7 +2,7 @@
     <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements" class="item <% __append(selectedCategory ? '':  'selected') %>">Overview</li></a>
 
     <% for (let category of Object.keys(achievementByCategory)) { %>
-        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>" class="item <% __append(category === selectedCategory ? 'selected' : '') %>"><%= i18n(category, 'achievements', lang) %></a>
+        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= category %>" class="item <% __append(category === selectedCategory ? 'selected' : '') %>"><%= i18n(category, 'achievement_categories', lang) %></a>
     <% } %>
 </div>
 

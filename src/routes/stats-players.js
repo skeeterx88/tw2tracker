@@ -6,7 +6,6 @@ const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
 const enums = require('../enums.js');
-const achievementTitles = require('../achievement-titles.json');
 const i18n = require('../i18n.js');
 
 const {
@@ -79,7 +78,6 @@ const playerProfileRouter = utils.asyncRouter(async function (req, res, next) {
         conquestSelfCount,
         conquestTypes: enums.conquestTypes,
         achievementPoints,
-        achievementTitles,
         achievementsLatest,
         achievementTypes,
         tribeChangesCount,
@@ -370,7 +368,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
 
     if (!selectedCategory) {
         categoryTemplate = 'overview';
-        navigationTitle = i18n(selectedCategory, 'achievements', res.locals.lang) + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievement_categories', res.locals.lang) + ' ' + i18n('achievements', 'player_profile_achievements', res.locals.lang);
         
         const categoriesMaxPoints = {};
 
@@ -411,7 +409,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         }]);
     } else if (selectedCategory === 'repeatable') {
         categoryTemplate = 'repeatable';
-        navigationTitle = i18n(selectedCategory, 'achievements', res.locals.lang) + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievement_categories', res.locals.lang) + ' Achievements';
 
         for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
@@ -428,7 +426,7 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         }
     } else {
         categoryTemplate = 'generic';
-        navigationTitle = i18n(selectedCategory, 'achievements', res.locals.lang) + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievement_categories', res.locals.lang) + ' Achievements';
     }
 
     res.render('stats', {
@@ -450,7 +448,6 @@ const playerAchievementsRouter = utils.asyncRouter(async function (req, res, nex
         achievementsRepeatableLastEarned,
         achievementsRepeatableCount,
         achievementsRepeatableDetailed,
-        achievementTitles,
         achievementTypes,
         navigationTitle,
         navigation: createNavigation([
