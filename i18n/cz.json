@@ -403,7 +403,7 @@
         "villages": "vesnice",
         "dynamic_map": "Dynamická mapa",
         "static_map": "Statická mapa",
-        "notif_static_share_expire": "Statická mapa expiruje %staticMapExpireTime% po posledním kliknutí na odkaz.",
+        "notif_static_share_expire": "Statická mapa expiruje %{static_map_expire_time} po posledním kliknutí na odkaz.",
         "error_invalid_continent": "Neplatný kontinent",
         "error_struct_not_found": "Struktura dat nenalezena",
         "error_world_not_found": "Svět neexistuje",

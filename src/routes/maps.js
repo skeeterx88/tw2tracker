@@ -85,6 +85,7 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
         marketId,
         world,
         backendValues: {
+            language: languages[res.locals.lang],
             marketId,
             worldNumber,
             worldName: world.name,

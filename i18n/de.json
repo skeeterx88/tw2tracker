@@ -403,7 +403,7 @@
         "villages": "Dörfer",
         "dynamic_map": "Dynamische Karte",
         "static_map": "Statische Karte",
-        "notif_static_share_expire": "Die statische Karte läuft %staticMapExpireTime% nach dem letzten Zugriff ab.",
+        "notif_static_share_expire": "Die statische Karte läuft %{static_map_expire_time} nach dem letzten Zugriff ab.",
         "error_invalid_continent": "ungültiger Inhalt",
         "error_struct_not_found": "Strukturen konnten nicht geladen werden",
         "error_world_not_found": "Die Welt existiert nicht",

@@ -618,7 +618,7 @@ require([
 
                 notif({
                     title: i18n('static_map', 'maps'),
-                    content: i18n('notif_static_share_expire', 'maps'),
+                    content: i18n('notif_static_share_expire', 'maps', [staticMapExpireTime]),
                     link: location.origin + result,
                     timeout: 0
                 });
