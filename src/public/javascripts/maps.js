@@ -4,6 +4,7 @@ require([
     'TW2DataLoader',
     'TW2Tooltip',
     'utils',
+    'i18n',
     'backendValues'
 ], function (
     AutoComplete,
@@ -11,13 +12,13 @@ require([
     TW2DataLoader,
     TW2Tooltip,
     utils,
+    i18n,
     {
         marketId,
         worldNumber,
         mapShare,
         lastDataSyncDate,
-        staticMapExpireTime,
-        i18n
+        staticMapExpireTime
     }
 ) {
     let colorPicker;
@@ -123,7 +124,7 @@ require([
                 },
                 noResults: () => {
                     const $item = document.createElement('li');
-                    $item.innerHTML = i18n('search_no_results', 'maps', lang);
+                    $item.innerHTML = i18n('search_no_results', 'maps');
                     autoComplete.resultsList.view.appendChild($item);
                 },
                 highlight: true,
@@ -209,7 +210,7 @@ require([
             }
 
             $villages.classList.add('villages');
-            $villages.innerHTML = villages > 1 ? `${villages} ${i18n('villages', 'maps', lang)}` : `${villages} ${i18n('village', 'maps', lang)}`;
+            $villages.innerHTML = villages > 1 ? `${villages} ${i18n('villages', 'maps')}` : `${villages} ${i18n('village', 'maps')}`;
 
             $item.appendChild($icon);
             $item.appendChild($name);
@@ -497,7 +498,7 @@ require([
             } else {
                 const message = await response.text();
                 notif({
-                    title: i18n('failed_load_map_share', 'errors', lang),
+                    title: i18n('failed_load_map_share', 'errors'),
                     content: message,
                     timeout: 0
                 });
@@ -538,13 +539,13 @@ require([
                 const result = await map.shareMap(TW2Map.mapShareTypes.DYNAMIC);
 
                 notif({
-                    title: i18n('dynamic_map', 'maps', lang),
+                    title: i18n('dynamic_map', 'maps'),
                     link: location.origin + result,
                     timeout: 0
                 });
             } catch (error) {
                 notif({
-                    title: i18n('failed_gen_share_map', 'errors', lang),
+                    title: i18n('failed_gen_share_map', 'errors'),
                     content: error.message
                 });
             }
@@ -567,14 +568,14 @@ require([
                 const result = await map.shareMap(TW2Map.mapShareTypes.STATIC);
 
                 notif({
-                    title: i18n('static_map', 'maps', lang),
-                    content: i18n('notif_static_share_expire', 'maps', lang),
+                    title: i18n('static_map', 'maps'),
+                    content: i18n('notif_static_share_expire', 'maps'),
                     link: location.origin + result,
                     timeout: 0
                 });
             } catch (error) {
                 notif({
-                    title: i18n('failed_gen_share_map', 'errors', lang),
+                    title: i18n('failed_gen_share_map', 'errors'),
                     content: error.message
                 });
             }

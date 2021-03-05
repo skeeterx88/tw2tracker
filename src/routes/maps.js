@@ -8,6 +8,7 @@ const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
 const i18n = require('../i18n.js');
+const languages = require('../languages.js');
 const mapsAPIRouter = require('./maps-api.js');
 const {createNavigation} = require('../router-helpers.js');
 
@@ -38,6 +39,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         marketId,
         world,
         backendValues: {
+            language: languages[res.locals.lang],
             marketId,
             worldNumber,
             worldName: world.name,
