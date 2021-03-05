@@ -5,4 +5,4 @@ settings.json
 logs/
 .idea/
 .vscode/
-config.toml
+config.json
