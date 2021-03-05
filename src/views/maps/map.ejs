@@ -25,9 +25,13 @@
                 <div id="highlights">
                     <label>
                         <h2 id="highlights-title"><%= i18n('header_highlights', 'maps', lang) %></h2>
-                        <input type="text" id="highlight-id" class="input" spellcheck="false" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
+                        <input type="text" id="highlight-id" class="input" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
                     </label>
                     <ul id="highlight-items"></ul>
+
+                    <div id="search-results" class="hidden">
+                        <div id="search-no-results" class="hidden"><%= i18n('search_no_results', 'maps', lang) %></div>
+                    </div>
                 </div>
 
                 <footer>
@@ -103,7 +107,6 @@
         <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
         <script defer type="text/javascript" src="/javascripts/utils.js"></script>
         <script defer type="text/javascript" src="/javascripts/i18n.js"></script>
-        <script defer type="text/javascript" src="/javascripts/libs/autoComplete.min.js"></script>
         <script defer type="text/javascript" src="/javascripts/map.js"></script>
         <script defer type="text/javascript" src="/javascripts/maps.js"></script>
     </body>

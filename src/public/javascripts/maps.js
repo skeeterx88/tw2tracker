@@ -1,5 +1,4 @@
 require([
-    'AutoComplete',
     'TW2Map',
     'TW2DataLoader',
     'TW2Tooltip',
@@ -7,7 +6,6 @@ require([
     'i18n',
     'backendValues'
 ], function (
-    AutoComplete,
     TW2Map,
     TW2DataLoader,
     TW2Tooltip,
@@ -75,92 +73,145 @@ require([
         });
     };
 
-    const setupCustomHighlights = () => {
-        const $highlightId = document.getElementById('highlight-id');
+    const setupCustomHighlights = async () => {
+        const $input = document.getElementById('highlight-id');
+        const $results = document.getElementById('search-results');
+        const $noResults = document.getElementById('search-no-results');
         const $highlightItems = document.getElementById('highlight-items');
+        const maxResults = 5;
+        let selectedIndex = 0;
+        let results = [];
 
-        const setupAutoComplete = () => {
-            const autoComplete = new AutoComplete({
-                data: {
-                    src: async () => {
-                        await loader.loadInfo;
+        function onResults (newResults) {
+            results = newResults;
 
-                        const matches = [];
+            for (const item of results) {
+                const $item = document.createElement('p');
+                $item.classList.add('result');
+                $item.innerText = item.id;
+                $results.appendChild($item);
+                $item.addEventListener('click', function (event) {
+                    onSelect(item);
+                });
+            }
 
-                        for (const [name] of Object.values(loader.players)) {
-                            matches.push({
-                                search: name,
-                                id: name,
-                                highlightType: TW2Map.highlightTypes.PLAYERS
-                            });
-                        }
+            $noResults.classList.add('hidden');
+            $results.classList.remove('hidden');
 
-                        for (const [name, tag] of Object.values(loader.tribes)) {
-                            matches.push({
-                                search: `${tag} (${name})`,
-                                id: tag,
-                                highlightType: TW2Map.highlightTypes.TRIBES
-                            });
-                        }
+            selectedIndex = 0;
+            selectResult(selectedIndex);
+        }
 
-                        return matches;
-                    },
-                    key: ['search'],
-                    cache: false
-                },
-                searchEngine: 'loose',
-                selector: '#highlight-id',
-                resultsList: {
-                    render: true
-                },
-                threshold: 1,
-                trigger: {
-                    event: ['input', 'keypress', 'focusin']
-                },
-                sort: (a, b) => {
-                    if (a.match < b.match) return -1;
-                    if (a.match > b.match) return 1;
-                    return 0;
-                },
-                noResults: () => {
-                    const $item = document.createElement('li');
-                    $item.innerHTML = i18n('search_no_results', 'maps');
-                    autoComplete.resultsList.view.appendChild($item);
-                },
-                highlight: true,
-                onSelection: (feedback) => {
-                    const {id, highlightType} = feedback.selection.value;
-                    const color = utils.arrayRandom(TW2Map.colorPalette.flat());
+        function onNoResults () {
+            results = [];
+            $noResults.classList.remove('hidden');
+            $results.classList.remove('hidden');
+        }
 
-                    map.addHighlight(highlightType, id, color);
-                    $highlightId.value = '';
+        function onSelect (item) {
+            resetSearch();
+            const color = utils.arrayRandom(TW2Map.colorPalette.flat());
+            map.addHighlight(item.highlightType, item.id, color);
+        }
+
+        function selectResult (index) {
+            const $current = $results.querySelector('.selected');
+
+            if ($current) {
+                $current.classList.remove('selected');
+            }
+
+            const $item = $results.querySelectorAll('.result')[index];
+            $item.classList.add('selected');
+        }
+
+        function onMove (dir) {
+            if (results.length) {
+                selectedIndex = Math.max(0, Math.min(maxResults - 1, selectedIndex + dir));
+                selectResult(selectedIndex);
+            }
+        }
+
+        function resetSearch () {
+            $input.value = '';
+            results = [];
+            $noResults.classList.add('hidden');
+            $results.classList.add('hidden');
+        }
+
+        const data = await (async () => {
+            await loader.loadInfo;
+
+            const matches = [];
+
+            for (const [name] of Object.values(loader.players)) {
+                matches.push({
+                    search: name.toLowerCase(),
+                    id: name,
+                    highlightType: TW2Map.highlightTypes.PLAYERS
+                });
+            }
+
+            for (const [name, tag] of Object.values(loader.tribes)) {
+                matches.push({
+                    search: (tag + name).toLowerCase(),
+                    id: tag,
+                    highlightType: TW2Map.highlightTypes.TRIBES
+                });
+            }
+
+            return matches;
+        })();
+
+        $input.addEventListener('keydown', function (event) {
+            if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
+                event.preventDefault();
+            }
+        });
+
+        $input.addEventListener('keyup', function (event) {
+            if (event.code === 'ArrowDown') {
+                return onMove(1);
+            } else if (event.code === 'ArrowUp') {
+                return onMove(-1);
+            } else if (event.code === 'Escape') {
+                return resetSearch();
+            } else if (event.code === 'Enter') {
+                if (results.length) {
+                    return onSelect(results[selectedIndex]);
                 }
-            });
+            }
 
-            $highlightId.addEventListener('blur', () => {
-                autoComplete.resultsList.view.style.display = 'none';
-            });
+            const value = $input.value.toLowerCase();
 
-            $highlightId.addEventListener('focus', () => {
-                autoComplete.resultsList.view.style.display = '';
-            });
+            if (!value.length) {
+                return resetSearch();
+            }
 
-            $highlightId.addEventListener('keydown', async (event) => {
-                if (event.key === 'Escape') {
-                    $highlightId.value = '';
-                    $highlightId.dispatchEvent(new Event('input'));
+            if (results.length) {
+                for (const $oldResult of $results.querySelectorAll('.result')) {
+                    $oldResult.remove();
                 }
-            });
+            }
 
-            $highlightId.addEventListener('autoComplete', ({detail}) => {
-                if (detail.event.key == 'Enter' && detail.matches > 0) {
-                    autoComplete.listMatchedResults(autoComplete.dataStream).then(() => {
-                        const first = autoComplete.resultsList.view.children.item(0);
-                        first.dispatchEvent(new Event('mousedown'));
-                    });
+            const newResults = [];
+
+            for (const item of data) {
+                if (item.search.includes(value)) {
+                    newResults.push(item);
+
+                    if (newResults.length >= maxResults) {
+                        break;
+                    }
                 }
-            });
-        };
+            }
+
+            if (newResults.length) {
+                onResults(newResults);
+            } else {
+                onNoResults();
+            }
+        });
 
         map.on('add highlight', (highlightType, id, displayName, color) => {
             const $item = document.createElement('li');
@@ -239,8 +290,6 @@ require([
                 $item.remove();
             }
         });
-
-        setupAutoComplete();
     };
 
     const setupColorPicker = () => {

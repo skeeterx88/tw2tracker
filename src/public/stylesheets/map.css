@@ -240,6 +240,7 @@ button.red:focus {
 
 #highlights {
     height: calc(100% - 170px);
+    position: relative;
 }
 
 #highlight-id {
@@ -350,7 +351,6 @@ button.red:focus {
     position: absolute;
     bottom: 0px;
 }
-
 
 #map-share-wrapper {
     margin-bottom: 10px;
@@ -591,11 +591,7 @@ div.text-container {
     box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #d8bfb0;
 }
 
-.autoComplete_highlighted {
-    font-weight: bold;
-}
-
-#autoComplete_list {
+#search-results {
     color: #000;
     line-height: 15px;
     background: url(/images/noise-3.png) top left #ceab84;
@@ -605,30 +601,35 @@ div.text-container {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 3px;
-    width: 130px;
-    position: fixed;
-    margin: 0;
-    margin-left: 4px;
-    margin-top: 4px;
+    width: 134px;
     z-index: 10;
+    position: absolute;
+    top: 45px;
+    left: 5px;
 }
 
-#autoComplete_list:empty {
+#search-results.hidden,
+#search-results .hidden {
     display: none;
 }
 
-#autoComplete_list li {
+#search-no-results {
+    opacity: 0.5;
+}
+
+#search-results .result {
     cursor: pointer;
+    margin: 0px;
 }
 
-#autoComplete_list li:hover {
+#search-results .result:hover {
     color: #824300;
     background-color: #f4dec666;
 }
 
-#autoComplete_list li.autoComplete_selected {
+#search-results .result.selected {
     color: #824300;
-    background-color: #f4dec666;
+    font-weight: bold;
 }
 
 #notif {
