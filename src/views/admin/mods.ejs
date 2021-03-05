@@ -26,7 +26,7 @@
                                 <% for (let privilege of modPrivilegeTypes) { %>
                                     <label>
                                         <input type="checkbox" name="privileges" value="<%= privilege %>" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
-                                        <span><%= i18n(privilege, 'admin_mod_accounts_privileges') %></span>
+                                        <span><%= i18n(privilege, 'admin_mod_accounts_privileges', lang) %></span>
                                     </label>
                                 <% } %>
                             </fieldset>

@@ -299,6 +299,7 @@
         "username_label": "Name:",
         "password_label": "Pass:",
         "email_label": "Email:",
+        "button_login": "Login",
         "keep_password_placehold": "left empty to keep old password",
         "auth_error_account_not_exist": "This account does not exist.",
         "auth_error_account_not_enabled": "This account is not enabled.",

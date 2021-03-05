@@ -20,16 +20,16 @@
                         <div class="content-border">
                             <form action="/login" method="POST">
                                 <label class="input">
-                                    <span>Name:</span>
+                                    <span><%= i18n('username_label', 'admin', lang) %></span>
                                     <input type="text" class="relax-input" name="username" required>
                                 </label>
                                 <label class="input">
-                                    <span>Pass:</span>
+                                    <span><%= i18n('password_label', 'admin', lang) %></span>
                                     <input type="password" class="relax-input" name="password" required>
                                 </label>
 
                                 <div class="actions">
-                                    <input type="submit" value="Login" class="relax-button">
+                                    <input type="submit" value="<%= i18n('button_login', 'admin', lang) %>" class="relax-button">
                                 </div>
                             </form>
                         </div>
