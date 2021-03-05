@@ -11,12 +11,14 @@ const {
     paramWorld,
     paramWorldParse,
     createPagination,
-    createNavigation
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
 } = require('../router-helpers.js');
 
 const searchCategories = ['players', 'tribes', 'villages'];
 
-const searchPostRedirectRouter = utils.asyncRouter(async function (req, res, next) {
+const searchPostRedirectRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -36,7 +38,7 @@ const searchPostRedirectRouter = utils.asyncRouter(async function (req, res, nex
     return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
 });
 
-const searchGetRedirectRouter = utils.asyncRouter(async function (req, res, next) {
+const searchGetRedirectRouter = asyncRouter(async function (req, res, next) {
     const {
         marketId,
         worldNumber
@@ -45,7 +47,7 @@ const searchGetRedirectRouter = utils.asyncRouter(async function (req, res, next
     return res.redirect(302, `/stats/${marketId}/${worldNumber}`);
 });
 
-const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
+const categorySearchRouter = asyncRouter(async function (req, res, next) {
     const category = req.params.category;
 
     if (!searchCategories.includes(category)) {
@@ -87,6 +89,11 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
     const results = allResults.slice(offset, offset + limit);
     const total = allResults.length;
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber
+    });
+
     return res.render('stats', {
         page: 'stats/search',
         title: i18n('stats_search', 'page_titles', res.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config.site_name]),
@@ -101,11 +108,7 @@ const categorySearchRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('search', 'navigation', res.locals.lang), replaces: [rawQuery]},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber
-        }
+        ])
     });
 });
 

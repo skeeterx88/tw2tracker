@@ -148,6 +148,19 @@ function groupAchievements (achievements) {
     return Object.entries(group);
 }
 
+const mergeBackendLocals = function (res, obj) {
+    res.locals.backendValues = {
+        ...res.locals.backendValues,
+        ...obj
+    };
+}
+
+const asyncRouter = function (handler) {
+    return function (req, res, next) {
+        Promise.resolve(handler(req, res, next)).catch(next);
+    };
+};
+
 module.exports = {
     getPlayer,
     getPlayerVillages,
@@ -160,5 +173,7 @@ module.exports = {
     paramVillageParse,
     createPagination,
     groupAchievements,
-    createNavigation
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
 };

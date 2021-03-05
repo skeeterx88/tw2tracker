@@ -10,10 +10,12 @@ const {
     paramWorld,
     paramWorldParse,
     paramVillageParse,
-    createNavigation
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
 } = require('../router-helpers.js');
 
-const villageRouter = utils.asyncRouter(async function (req, res, next) {
+const villageRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -33,6 +35,14 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
 
     const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        village,
+        mapHighlights: [village],
+        mapHighlightsType: 'villages'
+    });
+
     res.render('stats', {
         page: 'stats/village',
         title: i18n('stats_village', 'page_titles', res.locals.lang, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config.site_name]),
@@ -46,14 +56,7 @@ const villageRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('village', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/villages/${village.id}`, replaces: [village.name]}
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber,
-            village,
-            mapHighlights: [village],
-            mapHighlightsType: 'villages'
-        }
+        ])
     });
 });
 

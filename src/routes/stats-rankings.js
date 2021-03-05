@@ -11,7 +11,9 @@ const {
     paramWorld,
     paramWorldParse,
     createPagination,
-    createNavigation
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
 } = require('../router-helpers.js');
 
 const rankingCategories = ['players', 'tribes'];
@@ -27,7 +29,7 @@ const rankingRouterSqlMap = {
     }
 };
 
-const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) {
+const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -57,6 +59,11 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
     const total = parseInt(count, 10);
     const capitalizedCategory = utils.capitalize(category);
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber
+    });
+
     res.render('stats', {
         page: 'stats/ranking',
         title: i18n('stats_ranking', 'page_titles', res.locals.lang, [capitalizedCategory, marketId.toUpperCase(), world.name, config.site_name]),
@@ -72,11 +79,7 @@ const rankingCategoryRouter = utils.asyncRouter(async function (req, res, next) 
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('ranking', 'navigation', res.locals.lang), replaces: [capitalizedCategory]},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber
-        }
+        ])
     });
 });
 

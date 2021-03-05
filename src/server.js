@@ -11,7 +11,6 @@ const passport = require('passport');
 const passportLocal = require('passport-local');
 const connectFlash = require('connect-flash');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
 const pgArray = require('pg').types.arrayParser;
 const fs = require('fs');
 
@@ -20,12 +19,14 @@ const sql = require('./sql.js');
 const config = require('./config.js');
 const enums = require('./enums.js');
 const i18n = require('./i18n.js');
+const languages = require('./languages.js');
 const utils = require('./utils.js');
 
+const development = process.env.NODE_ENV === 'development';
 const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT;
 const app = express();
 
-if (process.env.NODE_ENV === 'production') {
+if (!development) {
     app.use(function (req, res, next) {
         if (req.headers['x-forwarded-proto'] === 'https') {
             next();
@@ -110,16 +111,23 @@ const loginRouter = require('./routes/login.js');
 const logoutRouter = require('./routes/logout.js');
 const mapsRouter = require('./routes/maps.js');
 
-const languages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
+const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
 
 app.use(function (req, res, next) {
     res.locals.i18n = i18n;
-    res.locals.languages = languages;
+    res.locals.availableLanguages = availableLanguages;
     res.locals.formatNumbers = utils.ejsHelpers.formatNumbers;
     res.locals.formatDate = utils.ejsHelpers.formatDate;
     res.locals.capitalize = utils.ejsHelpers.capitalize;
     res.locals.sprintf = utils.sprintf;
     res.locals.lang = req.session.lang || config.lang;
+
+    res.locals.backendValues = {
+        selectedLanguage: res.locals.lang,
+        language: languages[res.locals.lang],
+        development
+    };
+
     next();
 });
 
@@ -138,7 +146,7 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
     const status = err.status || 500;
-    res.locals.error = req.app.get('env') === 'development' ? err.stack : err.message;
+    res.locals.error = development ? err.stack : err.message;
     res.locals.status = status;
     res.locals.title = 'Tw2-Tracker Error';
 

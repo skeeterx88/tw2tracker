@@ -104,12 +104,6 @@ const sha1sum = function (value) {
     return hash.digest('hex');
 };
 
-const asyncRouter = function (handler) {
-    return function (req, res, next) {
-        Promise.resolve(handler(req, res, next)).catch(next);
-    };
-};
-
 const timeout = function (handler, time, errorMessage) {
     return new Promise(async function (resolve, reject) {
         const id = setTimeout(function () {
@@ -190,7 +184,6 @@ module.exports = {
     getBuffer,
     perf,
     sha1sum,
-    asyncRouter,
     timeout,
     hasOwn,
     ejsHelpers,

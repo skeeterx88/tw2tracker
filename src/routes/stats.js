@@ -12,7 +12,9 @@ const {
     paramWorldParse,
     paramMarket,
     groupAchievements,
-    createNavigation
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
 } = require('../router-helpers.js');
 
 const rankingsRouter = require('./stats-rankings.js');
@@ -22,7 +24,7 @@ const playersRouter = require('./stats-players.js');
 const tribesRouter = require('./stats-tribes.js');
 const conquestsRouter = require('./stats-conquests.js');
 
-const marketsRouter = utils.asyncRouter(async function (req, res, next) {
+const marketsRouter = asyncRouter(async function (req, res, next) {
     const worlds = await db.any(sql.getWorlds);
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)));
     const worldsByMarket = {};
@@ -48,6 +50,11 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         };
     });
 
+    mergeBackendLocals(res, {
+        worldsByMarket,
+        marketStats
+    });
+
     res.render('stats', {
         page: 'market-list',
         title: i18n('stats_servers', 'page_titles', res.locals.lang, [config.site_name]),
@@ -57,17 +64,11 @@ const marketsRouter = utils.asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('servers', 'navigation', res.locals.lang)}
-        ]),
-        backendValues: {
-            worldsByMarket,
-            marketStats,
-            languages: res.locals.languages,
-            selectedLanguage: req.session.lang
-        }
+        ])
     });
 });
 
-const worldsRouter = utils.asyncRouter(async function (req, res, next) {
+const worldsRouter = asyncRouter(async function (req, res, next) {
     if (!paramMarket(req)) {
         return next();
     }
@@ -86,6 +87,10 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
         [i18n('closed_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => !world.open)]
     ];
 
+    mergeBackendLocals(res, {
+        marketId
+    });
+
     res.render('stats', {
         page: 'world-list',
         title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config.site_name]),
@@ -96,14 +101,11 @@ const worldsRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('worlds', 'navigation', res.locals.lang)}
-        ]),
-        backendValues: {
-            marketId
-        }
+        ])
     });
 });
 
-const worldRouter = utils.asyncRouter(async function (req, res, next) {
+const worldRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -157,6 +159,15 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
         }
     };
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        players,
+        tribes,
+        mapHighlights: tribes.slice(0, 3),
+        mapHighlightsType: 'tribes'
+    });
+
     res.render('stats', {
         page: 'stats/world',
         title: i18n('stats_world', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
@@ -171,15 +182,7 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: world.open ? i18n('world', 'navigation', res.locals.lang) : i18n('world_closed', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/`, replaces: [world.name]},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber,
-            players,
-            tribes,
-            mapHighlights: tribes.slice(0, 3),
-            mapHighlightsType: 'tribes'
-        }
+        ])
     });
 });
 

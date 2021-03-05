@@ -13,12 +13,14 @@ const {
     paramWorldParse,
     paramTribeParse,
     createPagination,
-    createNavigation
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
 } = require('../router-helpers.js');
 
 const conquestCategories = ['gain', 'loss', 'all', 'self'];
 
-const tribeRouter = utils.asyncRouter(async function (req, res, next) {
+const tribeRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -47,6 +49,14 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
 
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count;
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        tribe,
+        mapHighlights: [tribe],
+        mapHighlightsType: 'tribes'
+    });
+
     res.render('stats', {
         page: 'stats/tribe',
         title: i18n('stats_tribe', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
@@ -67,18 +77,11 @@ const tribeRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber,
-            tribe,
-            mapHighlights: [tribe],
-            mapHighlightsType: 'tribes'
-        }
+        ])
     });
 });
 
-const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
+const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -144,6 +147,14 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, tribeId})).count;
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        tribe,
+        mapHighlights: [tribe],
+        mapHighlightsType: 'tribes'
+    });
+
     res.render('stats', {
         page: 'stats/tribe-conquests',
         title: i18n('stats_tribe_conquests', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
@@ -162,18 +173,11 @@ const tribeConquestsRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: navigationTitle}
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber,
-            tribe,
-            mapHighlights: [tribe],
-            mapHighlightsType: 'tribes'
-        }
+        ])
     });
 });
 
-const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
+const tribeMembersRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -192,6 +196,14 @@ const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, [marketId, worldNumber]);
     const members = await db.any(sql.getTribeMembers, {worldId, tribeId});
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        tribe,
+        mapHighlights: [tribe],
+        mapHighlightsType: 'tribes'
+    });
+
     res.render('stats', {
         page: 'stats/tribe-members',
         title: i18n('stats_tribe_members', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
@@ -205,18 +217,11 @@ const tribeMembersRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('members', 'navigation', res.locals.lang)},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber,
-            tribe,
-            mapHighlights: [tribe],
-            mapHighlightsType: 'tribes'
-        }
+        ])
     });
 });
 
-const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
+const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -241,6 +246,14 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
     const villages = allVillages.slice(offset, offset + limit);
     const total = allVillages.length;
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        tribe,
+        mapHighlights: [tribe],
+        mapHighlightsType: 'tribes'
+    });
+
     res.render('stats', {
         page: 'stats/tribe-villages',
         title: i18n('stats_tribe_villages', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
@@ -255,18 +268,11 @@ const tribeVillagesRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('villages', 'navigation', res.locals.lang)},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber,
-            tribe,
-            mapHighlights: [tribe],
-            mapHighlightsType: 'tribes'
-        }
+        ])
     });
 });
 
-const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, next) {
+const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -303,6 +309,11 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
         });
     }
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber
+    });
+
     res.render('stats', {
         page: 'stats/tribe-member-changes',
         title: i18n('stats_tribe_member_changes', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
@@ -318,15 +329,11 @@ const tribeMembersChangeRouter = utils.asyncRouter(async function (req, res, nex
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('member_changes', 'navigation', res.locals.lang)},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber
-        }
+        ])
     });
 });
 
-const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next) {
+const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -377,6 +384,11 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
         }
     }
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber
+    });
+
     res.render('stats', {
         page: 'stats/tribe-achievements',
         title: i18n('stats_tribe_achievements', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.site_name]),
@@ -395,11 +407,7 @@ const tribeAchievementsRouter = utils.asyncRouter(async function (req, res, next
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('achievements', 'navigation', res.locals.lang)},
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber
-        }
+        ])
     });
 });
 

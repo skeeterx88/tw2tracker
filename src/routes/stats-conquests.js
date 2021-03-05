@@ -10,10 +10,12 @@ const {
     paramWorld,
     paramWorldParse,
     createPagination,
-    createNavigation
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
 } = require('../router-helpers.js');
 
-const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
+const conquestsRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
         return next();
     }
@@ -35,6 +37,11 @@ const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
     const conquests = await db.any(sql.getWorldConquests, {worldId, offset, limit});
     const total = parseInt((await db.one(sql.getWorldConquestsCount, {worldId})).count, 10);
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber
+    });
+
     res.render('stats', {
         page: 'stats/conquests',
         title: i18n('stats_world_conquests', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
@@ -48,11 +55,7 @@ const conquestsRouter = utils.asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('conquests', 'navigation', res.locals.lang)}
-        ]),
-        backendValues: {
-            marketId,
-            worldNumber
-        }
+        ])
     });
 });
 

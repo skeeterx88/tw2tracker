@@ -10,9 +10,14 @@ const sql = require('../sql.js');
 const i18n = require('../i18n.js');
 const languages = require('../languages.js');
 const mapsAPIRouter = require('./maps-api.js');
-const {createNavigation} = require('../router-helpers.js');
 
-const worldRouter = utils.asyncRouter(async function (req, res, next) {
+const {
+    createNavigation,
+    mergeBackendLocals,
+    asyncRouter
+} = require('../router-helpers.js');
+
+const worldRouter = asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next();
     }
@@ -34,22 +39,22 @@ const worldRouter = utils.asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, [marketId, worldNumber]);
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        worldName: world.name,
+        lastDataSyncDate,
+        staticMapExpireTime: config.sync.static_share_expire_time
+    });
+
     res.render('maps/map', {
         title: i18n('maps_world_map', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
-        world,
-        backendValues: {
-            language: languages[res.locals.lang],
-            marketId,
-            worldNumber,
-            worldName: world.name,
-            lastDataSyncDate,
-            staticMapExpireTime: config.sync.static_share_expire_time
-        }
+        world
     });
 });
 
-const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
+const mapShareRouter = asyncRouter(async function (req, res, next) {
     if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
         return next();
     }
@@ -80,18 +85,18 @@ const mapShareRouter = utils.asyncRouter(async function (req, res, next) {
 
     db.query(sql.maps.updateShareAccess, [mapShareId]);
 
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber,
+        worldName: world.name,
+        lastDataSyncDate,
+        mapShare
+    });
+
     res.render('maps/map', {
         title: i18n('maps_world_map_shared', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
         marketId,
-        world,
-        backendValues: {
-            language: languages[res.locals.lang],
-            marketId,
-            worldNumber,
-            worldName: world.name,
-            lastDataSyncDate,
-            mapShare
-        }
+        world
     });
 });
 

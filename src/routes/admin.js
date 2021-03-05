@@ -17,6 +17,11 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const createError = require('http-errors');
 
+const {
+    mergeBackendLocals,
+    asyncRouter
+} = require('../router-helpers.js');
+
 function createAdminMenu (user, selected) {
     const adminMenu = [
         ['sync', {
@@ -48,12 +53,19 @@ function createPrivilegeChecker (privilege) {
     }
 }
 
-const adminPanelRouter = utils.asyncRouter(async function (req, res) {
+const adminPanelRouter = asyncRouter(async function (req, res) {
     const openWorlds = await db.any(sql.getOpenWorlds);
     const closedWorlds = await db.any(sql.getClosedWorlds);
     const markets = await db.any(sql.getMarkets);
     const subPage = 'sync';
     const menu = createAdminMenu(req.user, subPage);
+
+    mergeBackendLocals(res, {
+        syncStates: enums.syncStates,
+        subPage,
+        accountPrivileges: req.user.privileges,
+        privilegeTypes
+    });
 
     res.render('admin', {
         title: i18n('admin_panel', 'page_titles', res.locals.lang, [config.site_name]),
@@ -63,19 +75,11 @@ const adminPanelRouter = utils.asyncRouter(async function (req, res) {
         closedWorlds,
         markets,
         privilegeTypes,
-        user: req.user,
-        backendValues: {
-            language: languages[res.locals.lang],
-            development,
-            syncStates: enums.syncStates,
-            subPage,
-            accountPrivileges: req.user.privileges,
-            privilegeTypes
-        }
+        user: req.user
     });
 });
 
-const syncDataRouter = utils.asyncRouter(async function (req, res) {
+const syncDataRouter = asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = parseInt(req.params.worldNumber, 10);
     const worldId = marketId + worldNumber;
@@ -93,7 +97,7 @@ const syncDataRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/sync#world-${worldId}`);
 });
 
-const syncDataAllRouter = utils.asyncRouter(async function (req, res) {
+const syncDataAllRouter = asyncRouter(async function (req, res) {
     syncSocket.send(JSON.stringify({
         code: enums.SYNC_REQUEST_SYNC_DATA_ALL
     }));
@@ -101,7 +105,7 @@ const syncDataAllRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/sync');
 });
 
-const syncAchievementsRouter = utils.asyncRouter(async function (req, res) {
+const syncAchievementsRouter = asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = parseInt(req.params.worldNumber, 10);
     const worldId = marketId + worldNumber;
@@ -119,7 +123,7 @@ const syncAchievementsRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/sync#world-${worldId}`);
 });
 
-const syncAchievementsAllRouter = utils.asyncRouter(async function (req, res) {
+const syncAchievementsAllRouter = asyncRouter(async function (req, res) {
     syncSocket.send(JSON.stringify({
         code: enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL
     }));
@@ -127,7 +131,7 @@ const syncAchievementsAllRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/sync');
 });
 
-const scrapeMarketsRouter = utils.asyncRouter(async function (req, res) {
+const scrapeMarketsRouter = asyncRouter(async function (req, res) {
     syncSocket.send(JSON.stringify({
         code: enums.SYNC_REQUEST_SYNC_MARKETS
     }));
@@ -135,7 +139,7 @@ const scrapeMarketsRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/sync');
 });
 
-const scrapeWorldsRouter = utils.asyncRouter(async function (req, res) {
+const scrapeWorldsRouter = asyncRouter(async function (req, res) {
     syncSocket.send(JSON.stringify({
         code: enums.SYNC_REQUEST_SYNC_WORLDS
     }));
@@ -143,7 +147,7 @@ const scrapeWorldsRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/sync');
 });
 
-const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
+const toggleSyncRouter = asyncRouter(async function (req, res) {
     const marketId = req.params.marketId;
     const worldNumber = req.params.worldNumber ? parseInt(req.params.worldNumber, 10) : false;
     const worldId = marketId + worldNumber;
@@ -164,7 +168,7 @@ const toggleSyncRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/sync#world-${worldId}`);
 });
 
-const accountsRouter = utils.asyncRouter(async function (req, res) {
+const accountsRouter = asyncRouter(async function (req, res) {
     const markets = await db.map(sql.getMarkets, [], market => market.id);
     const accounts = await db.map(sql.getAccounts, [], function (account) {
         account.missingMarkets = getMissingMarkets(account.markets, markets);
@@ -180,21 +184,21 @@ const accountsRouter = utils.asyncRouter(async function (req, res) {
     const subPage = 'accounts';
     const menu = createAdminMenu(req.user, subPage);
 
+    mergeBackendLocals(res, {        
+        syncStates: enums.syncStates,
+        subPage
+    });
+
     res.render('admin', {
         title: i18n('admin_panel_sync_accounts', 'page_titles', res.locals.lang, [config.site_name]),
         menu,
         subPage,
         accounts,
-        markets,
-        backendValues: {
-            development,
-            syncStates: enums.syncStates,
-            subPage
-        }
+        markets
     });
 });
 
-const accountsAddMarketRouter = utils.asyncRouter(async function (req, res) {
+const accountsAddMarketRouter = asyncRouter(async function (req, res) {
     const accountId = req.params.accountId;
     const marketId = req.params.marketId;
     const account = await db.any(sql.getAccount, {accountId});
@@ -220,7 +224,7 @@ const accountsAddMarketRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
-const accountsRemoveMarketRouter = utils.asyncRouter(async function (req, res) {
+const accountsRemoveMarketRouter = asyncRouter(async function (req, res) {
     const accountId = req.params.accountId;
     const marketId = req.params.marketId;
     const account = await db.any(sql.getAccount, {accountId});
@@ -246,7 +250,7 @@ const accountsRemoveMarketRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
-const accountsDeleteRouter = utils.asyncRouter(async function (req, res) {
+const accountsDeleteRouter = asyncRouter(async function (req, res) {
     const accountId = req.params.accountId;
     const account = await db.any(sql.getAccount, {accountId});
 
@@ -261,7 +265,7 @@ const accountsDeleteRouter = utils.asyncRouter(async function (req, res) {
     res.redirect('/admin/accounts');
 });
 
-const accountsEditRouter = utils.asyncRouter(async function (req, res) {
+const accountsEditRouter = asyncRouter(async function (req, res) {
     const {name, pass, id: accountId} = req.body;
     const account = await db.any(sql.getAccount, {accountId});
 
@@ -286,7 +290,7 @@ const accountsEditRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
-const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
+const accountsCreateRouter = asyncRouter(async function (req, res) {
     const {name, pass, id: accountId} = req.body;
 
     if (pass.length < 4) {
@@ -311,7 +315,7 @@ const accountsCreateRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/accounts#account-${accountId}`);
 });
 
-const modsRouter = utils.asyncRouter(async function (req, res) {
+const modsRouter = asyncRouter(async function (req, res) {
     const modPrivilegeTypes = await db.map(sql.getModPrivilegeTypes, [], (privilege) => privilege.type);
     const mods = await db.map(sql.getMods, [], function (mod) {
         mod.privileges = pgArray.create(mod.privileges, String).parse();
@@ -321,20 +325,20 @@ const modsRouter = utils.asyncRouter(async function (req, res) {
     const subPage = 'mods';
     const menu = createAdminMenu(req.user, subPage);
 
+    mergeBackendLocals(res, {
+        subPage
+    });
+
     res.render('admin', {
         title: i18n('admin_panel_mod_accounts', 'page_titles', res.locals.lang, [config.site_name]),
         menu,
         subPage,
         mods,
-        modPrivilegeTypes,
-        backendValues: {
-            development,
-            subPage
-        }
+        modPrivilegeTypes
     });
 });
 
-const modsEditRouter = utils.asyncRouter(async function (req, res) {
+const modsEditRouter = asyncRouter(async function (req, res) {
     let {id, name, pass, email, privileges} = req.body;
 
     id = parseInt(id, 10);
@@ -389,7 +393,7 @@ const modsEditRouter = utils.asyncRouter(async function (req, res) {
     }
 });
 
-const modsCreateRouter = utils.asyncRouter(async function (req, res) {
+const modsCreateRouter = asyncRouter(async function (req, res) {
     let {name, pass, email, privileges} = req.body;
 
     if (name.length < 3) {
@@ -430,7 +434,7 @@ const modsCreateRouter = utils.asyncRouter(async function (req, res) {
     res.redirect(`/admin/mods#mod-${id}`);
 });
 
-const modsDeleteRouter = utils.asyncRouter(async function (req, res) {
+const modsDeleteRouter = asyncRouter(async function (req, res) {
     let {id} = req.params;
 
     const [mod] = await db.any(sql.getMod, {id});

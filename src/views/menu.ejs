@@ -16,7 +16,7 @@
         <div class="close-wrapper"><span class="close">x</span></div>
     </header>
 
-    <% for (const langId of languages) { -%>
+    <% for (const langId of availableLanguages) { -%>
         <a href="/change-language/<%= langId %>"><span class="flag-<%= langId %>"><%= i18n('language', 'meta', langId) %></span></a>
     <% } -%>
 </div>

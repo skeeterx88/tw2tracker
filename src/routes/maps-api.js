@@ -9,11 +9,15 @@ const sql = require('../sql.js');
 const utils = require('../utils.js');
 const enums = require('../enums.js');
 const i18n = require('../i18n.js');
-const {paramWorldParse} = require('../router-helpers.js');
+
+const {
+    paramWorldParse,
+    asyncRouter
+} = require('../router-helpers.js');
 
 const GZIP_EMPTY_CONTINENT = Buffer.from([31, 139, 8, 0, 0, 0, 0, 0, 0, 3, 171, 174, 5, 0, 67, 191, 166, 163, 2, 0, 0, 0]);
 
-const getWorldInfoRouter = utils.asyncRouter(async function (req, res) {
+const getWorldInfoRouter = asyncRouter(async function (req, res) {
     const {
         marketId,
         worldId,
@@ -54,19 +58,19 @@ const getWorldInfoRouter = utils.asyncRouter(async function (req, res) {
     res.end(data);
 });
 
-const getOpenWorldsRouter = utils.asyncRouter(async function (req, res) {
+const getOpenWorldsRouter = asyncRouter(async function (req, res) {
     const allWorlds = await db.any(sql.getOpenWorlds);
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(allWorlds));
 });
 
-const getMarketsRouters = utils.asyncRouter(async function (req, res) {
+const getMarketsRouters = asyncRouter(async function (req, res) {
     const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(marketsWithAccounts));
 });
 
-const getContinentRouter = utils.asyncRouter(async function (req, res) {
+const getContinentRouter = asyncRouter(async function (req, res) {
     const {
         marketId,
         worldId,
@@ -124,7 +128,7 @@ const getContinentRouter = utils.asyncRouter(async function (req, res) {
     res.end(data);
 });
 
-const getStructRouter = utils.asyncRouter(async function (req, res) {
+const getStructRouter = asyncRouter(async function (req, res) {
     const {
         worldId
     } = await paramWorldParse(req);
@@ -155,7 +159,7 @@ const getStructRouter = utils.asyncRouter(async function (req, res) {
     res.end(struct);
 });
 
-const crateShareRouter = utils.asyncRouter(async function (req, res) {
+const crateShareRouter = asyncRouter(async function (req, res) {
     const {
         marketId,
         worldNumber,
@@ -217,7 +221,7 @@ const crateShareRouter = utils.asyncRouter(async function (req, res) {
     res.end(`/maps/${marketId}/${worldNumber}/share/${shareId}`);
 });
 
-const getShareRouter = utils.asyncRouter(async function (req, res) {
+const getShareRouter = asyncRouter(async function (req, res) {
     const {
         mapShareId,
         marketId,
