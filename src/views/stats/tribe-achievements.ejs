@@ -1,7 +1,7 @@
 <div class="content">
     <div class="<% __append(subCategory === 'detailed' ? 'single' : 'left') %>">
         <section class="tribe-achievements">
-            <h2><%= i18n('achievements', 'tribe_profile', lang).header_achievements %><th><% __append(subCategory === 'detailed' ? ` (${i18n('achievements', 'tribe_profile', lang).detailed})` : '') %></th></h2>
+            <h2><%= i18n('header_achievements', 'tribe_profile_achievements', lang) %><th><% __append(subCategory === 'detailed' ? ` (${i18n('detailed', 'tribe_profile_achievements', lang)})` : '') %></th></h2>
 
             <table class="content-border">
                 <colgroup>
@@ -11,7 +11,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th><% __append(subCategory === 'detailed' ? i18n('achievements', 'tribe_profile', lang).column_earned : i18n('achievements', 'tribe_profile', lang).column_last_earned) %></th>
+                        <th><% __append(subCategory === 'detailed' ? i18n('column_earned', 'tribe_profile_achievements', lang) : i18n('column_last_earned', 'tribe_profile_achievements', lang)) %></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,13 +27,13 @@
                             <% for (let [type, count] of Object.entries(achievementsRepeatableCategoryCount)) { %>
                                 <tr>
                                     <td><%= i18n(type, 'achievements', lang) %> (<%= count %>x)</td>
-                                    <td><%= achievementsRepeatableLastEarned[type] || i18n('achievements', 'tribe_profile', lang).never %></td>
+                                    <td><%= achievementsRepeatableLastEarned[type] || i18n('never', 'tribe_profile_achievements', lang) %></td>
                                 </tr>
                             <% } %>
                         <% } -%>
                     <% } else { -%>
                         <tr>
-                            <td colspan="2"><%= i18n('achievements', 'tribe_profile', lang).no_recent_achievements %></td>
+                            <td colspan="2"><%= i18n('no_recent_achievements', 'tribe_profile_achievements', lang) %></td>
                         </tr>
                     <% } -%>
                 </tbody>
@@ -41,9 +41,9 @@
 
             <div class="section-actions">
                 <% if (subCategory === 'detailed') { -%>
-                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= i18n('achievements', 'tribe_profile', lang).view_simple_achievements %></a>
+                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements"><%= i18n('view_simple_achievements', 'tribe_profile_achievements', lang) %></a>
                 <% } else { -%>
-                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements/detailed"><%= i18n('achievements', 'tribe_profile', lang).view_detailed_achievements %></a>
+                    <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/achievements/detailed"><%= i18n('view_detailed_achievements', 'tribe_profile_achievements', lang) %></a>
                 <% } -%>
             </div>
         </section>
