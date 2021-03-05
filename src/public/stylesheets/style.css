@@ -313,6 +313,7 @@ div.modal {
 #search .relax-button {
     height: 25px;
     vertical-align: top;
+    margin: 0px;
 }
 
 .relax-input {
@@ -348,7 +349,7 @@ div.modal {
     height: 25px;
     line-height: 25px;
     padding: 0px 5px;
-    margin: 0px 5px;
+    margin: 5px 5px;
     font-weight: bold;
     outline: none;
     cursor: pointer;
@@ -391,11 +392,6 @@ div.modal {
 
 .relax-button.green:hover {
     background: url(/images/noise.webp), linear-gradient(#46c134, #1a5b1b);
-}
-
-input[type="submit"].relax-button,
-input[type="button"].relax-button {
-    height: 24px;
 }
 
 form input[type="submit"]:hover,
