@@ -1,3 +1,5 @@
+/*global debug*/
+
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
@@ -23,12 +25,6 @@ module.exports = async function (marketId, worldNumber) {
     const achievementsData = {
         players: new Map(),
         tribes: new Map()
-    };
-
-    const sleep = function (ms) {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, typeof ms === 'number' ? ms : 1000);
-        });
     };
 
     const loadTribes = function (offset) {
@@ -69,8 +65,6 @@ module.exports = async function (marketId, worldNumber) {
                 loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
                 loadTribes(offset + (RANKING_QUERY_COUNT * 3))
             ]);
-
-            // await sleep(150);
         }
     };
 
@@ -112,8 +106,6 @@ module.exports = async function (marketId, worldNumber) {
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
                 loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
             ]);
-
-            // await sleep(150);
         }
     };
 

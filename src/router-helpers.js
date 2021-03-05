@@ -2,7 +2,6 @@ const createError = require('http-errors');
 const utils = require('./utils.js');
 const db = require('./db.js');
 const sql = require('./sql.js');
-const i18n = require('./i18n.js');
 const config = require('./config.js');
 
 async function getPlayer (worldId, playerId) {
@@ -153,7 +152,7 @@ const mergeBackendLocals = function (res, obj) {
         ...res.locals.backendValues,
         ...obj
     };
-}
+};
 
 const asyncRouter = function (handler) {
     return function (req, res, next) {

@@ -130,7 +130,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
                 const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60;
                 if (minutesSinceLastSync < config.scraper_interval_minutes) {
                     debug.sync('world:%s already sinced', worldId, attempt);
-                    return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, syncDate]);
+                    return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, Date.now()]);
                 }
             }
 
@@ -149,7 +149,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             } else if (!worldCharacter.allow_login) {
                 await db.query(sql.closeWorld, [marketId, worldNumber]);
                 debug.sync('world:%s closing', worldId);
-                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, syncDate]);
+                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, Date.now()]);
             }
 
             page = await createPuppeteerPage();
@@ -972,12 +972,6 @@ async function createPuppeteerPage () {
     const page = await browser.newPage();
     await page.exposeFunction('debug', debug.puppeteer);
     return page;
-
-    // return page.on('console', function ({_type, _text}) {
-    //     if (_type === 'log' && _text.startsWith('tw2tracker: ')) {
-    //         debug.sync(_text.replace('tw2tracker: ', ''));
-    //     }
-    // });
 }
 
 async function getWorld (marketId, worldNumber) {
