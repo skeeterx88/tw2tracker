@@ -56,7 +56,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
     });
 
     res.render('stats', {
-        page: 'market-list',
+        page: 'stats/market-list',
         title: i18n('stats_servers', 'page_titles', res.locals.lang, [config.site_name]),
         pageType: 'stats',
         marketStats,
@@ -92,7 +92,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
     });
 
     res.render('stats', {
-        page: 'world-list',
+        page: 'stats/world-list',
         title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config.site_name]),
         marketId,
         worlds,
