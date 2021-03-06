@@ -753,6 +753,14 @@ a.achievement-subject:last-child:after {
     border-radius: 3px;
 }
 
+.message {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #101e102b;
+    background: #00ff002b;
+    border-radius: 3px;
+}
+
 .warning {
     padding: 10px;
     border: 2px solid #ffd000;

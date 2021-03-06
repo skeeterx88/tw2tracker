@@ -16,6 +16,14 @@
                 </div>
             <% } %>
 
+            <% for (const error of errors) { %>
+                <p class="error"><%= error %></p>
+            <% } %>
+
+            <% for (const message of messages) { %>
+                <p class="message"><%= message %></p>
+            <% } %>
+
             <%- include('./admin/' + subPage + '.ejs') %>
         </main>
 

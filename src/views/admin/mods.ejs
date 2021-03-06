@@ -23,7 +23,7 @@
                             <fieldset class="align-checkbox">
                                 <legend><%= i18n('privilege_list', 'admin_mod_accounts', lang) %></legend>
 
-                                <% for (let privilege of modPrivilegeTypes) { %>
+                                <% for (const privilege of Object.values(privilegeTypes)) { %>
                                     <label>
                                         <input type="checkbox" name="privileges" value="<%= privilege %>" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
                                         <span><%= i18n(privilege, 'admin_mod_accounts_privileges', lang) %></span>
@@ -68,7 +68,7 @@
                         <fieldset class="align-checkbox">
                             <legend><%= i18n('privilege_list', 'admin_mod_accounts', lang) %></legend>
 
-                            <% for (let privilege of modPrivilegeTypes) { %>
+                            <% for (const privilege of Object.values(privilegeTypes)) { %>
                                 <label>
                                     <input type="checkbox" name="privileges" value="<%= privilege %>" />
                                     <span><%= i18n(privilege, 'admin_mod_accounts_privileges', lang) %></span>
