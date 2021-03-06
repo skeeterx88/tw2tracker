@@ -107,8 +107,8 @@
         "column_owner": "Owner",
         "abandoned_village": "Abandoned",
         "error_no_search": "No search specified",
-        "error_min_chars": "Minimum search characters is 3",
-        "error_max_chars": "Maximum search characters is 20"
+        "error_min_chars": "Minimum search characters is %{min_chars}",
+        "error_max_chars": "Maximum search characters is %{max_chars}"
     },
     "world_conquests": {
         "header_world_conquests": "World Conquests",

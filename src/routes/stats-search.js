@@ -76,12 +76,12 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         throw createError(500, i18n('error_no_search', 'world_search', res.locals.lang));
     }
 
-    if (rawQuery.length < 3) {
-        throw createError(500, i18n('error_min_chars', 'world_search', res.locals.lang));
+    if (rawQuery.length < config.search.min_search_characters) {
+        throw createError(500, i18n('error_min_chars', 'world_search', res.locals.lang, [config.search.min_search_characters]));
     }
 
-    if (rawQuery.length > 20) {
-        throw createError(500, i18n('error_max_chars', 'world_search', res.locals.lang));
+    if (rawQuery.length > config.search.max_search_characters) {
+        throw createError(500, i18n('error_max_chars', 'world_search', res.locals.lang, [config.search.max_search_characters]));
     }
 
     const query = '%' + rawQuery + '%';

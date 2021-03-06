@@ -109,8 +109,8 @@
         "column_owner": "Właściciel",
         "abandoned_village": "Opuszczone",
         "error_no_search": "Nie określono wyszukiwania",
-        "error_min_chars": "Minimalne wyszukiwanie to 3 znaki",
-        "error_max_chars": "Maksymalne wyszukiwanie 20 znaków"
+        "error_min_chars": "Minimalne wyszukiwanie to %{min_chars} znaki",
+        "error_max_chars": "Maksymalne wyszukiwanie %{max_chars} znaków"
     },
     "world_conquests": {
         "header_world_conquests": "Podboje Świata",

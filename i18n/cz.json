@@ -107,8 +107,8 @@
         "column_owner": "Majitel",
         "abandoned_village": "Barbaři",
         "error_no_search": "Neplatný hledaný výraz",
-        "error_min_chars": "Minimální počet znaků jsou 3",
-        "error_max_chars": "maximální počet znaků je 20"
+        "error_min_chars": "Minimální počet znaků jsou %{min_chars}",
+        "error_max_chars": "maximální počet znaků je %{max_chars}"
     },
     "world_conquests": {
         "header_world_conquests": "Světové zábory",
