@@ -3,7 +3,7 @@
         "language": "Português"
     },
     "main_menu": {
-        "home": "Página Ínicial",
+        "home": "Página Inicial",
         "stats": "Estatística",
         "maps": "Mapas",
         "donate": "Doações",
@@ -29,7 +29,7 @@
         "tribes": "tribos",
         "villages": "aldeias",
         "settings": "Configurações:",
-        "setting_world_type": "Tipo de Mundo:",
+        "setting_world_type": "Categoria de Mundo:",
         "world_type_victory_points": "Pontos de Vitória",
         "world_type_domination": "Dominação",
         "setting_troop_relocation": "Relocação de Tropas:",
@@ -47,7 +47,6 @@
         "view_world_map": "Ver mapa do mundo completo"
     },
     "world": {
-        "missing_data_warning": "This world has incomplete data and may be missing conquests and some accurate dates.",
         "missing_data_warning": "Esse mundo possui dados incompletos e conquistas podem estar faltando e algumas datas inválidas.",
         "header_search": "Pesquisa",
         "header_tribes": "Tribos",
@@ -76,8 +75,8 @@
         "view_tribes_ranking": "Ver classificação completa de tribos",
         "view_players_ranking": "Ver classificação completa de jogadores",
         "view_world_conquests": "Ver todas conquistas do mundo",
-        "no_conquests": "Nenhuma conquistas até agora.",
-        "no_daily_achievements": "Sem conquistas diária hoje.",
+        "no_conquests": "Nenhuma conquista até agora.",
+        "no_daily_achievements": "Sem conquistas diárias hoje.",
         "no_weekly_achievements": "Sem conquistas semanais.",
         "stats_players": "Jogadores",
         "stats_villages": "Aldeias",
@@ -119,7 +118,7 @@
         "conquest_new_owner": "Novo dono",
         "conquest_date_hour": "Data/Hora",
         "village_abandoned": "Abandonada",
-        "no_conquests": "Nenhuma conquistas até agora.",
+        "no_conquests": "Nenhuma conquista até agora.",
         "abandoned_village": "Abandonada"
     },
     "tribe_profile": {
@@ -131,7 +130,7 @@
         "tribe_level": "Nível:",
         "tribe_villages": "Aldeias:",
         "tribe_points": "Pontos:",
-        "tribe_members": "Members:",
+        "tribe_members": "Membros:",
         "tribe_bash_attack": "Pontos Ofensivos:",
         "tribe_bash_defense": "Pontos Defensivos:",
         "tribe_avg_points_member": "Média de Pontos/Membro:",
@@ -141,8 +140,8 @@
         "tribe_achievements": "Conquistas Diárias/Semanais:",
         "tribe_record_rank": "Melhor Posição:",
         "tribe_record_points": "Melhor Pontuação:",
-        "tribe_record_villages": "Maior Nº de Aldeias:",
-        "tribe_first_seen": "Vísto pela 1ª vez em:",
+        "tribe_record_villages": "Maior Núm. De Aldeias:",
+        "tribe_first_seen": "Visto pela 1ª vez em:",
         "achievement_name": "Nome",
         "achievement_date_time": "Data/Hora",
         "view_tribe_achievements": "Ver conquistas da tribo",
@@ -152,7 +151,7 @@
     "tribe_profile_villages": {
         "header_tribe_villages": "Aldeias da Tribo",
         "column_village": "Aldeia",
-        "column_coords": "Coords",
+        "column_coords": "Localização",
         "column_points": "Pontos",
         "column_owner": "Dono"
     },
@@ -171,7 +170,7 @@
         "column_action": "Ação",
         "left": "Saiu",
         "join": "Entrou",
-        "no_changes": "Sem mundanças de tribo por enquanto."
+        "no_changes": "Sem mudanças de tribo por enquanto."
     },
     "tribe_profile_conquests": {
         "header_conquests": "Conquistas",
@@ -184,7 +183,7 @@
         "column_old_owner": "Antigo dono",
         "column_new_owner": "Novo dono",
         "column_date_hour": "Data/Hora",
-        "no_conquests": "Nenhuma conquistas até agora.",
+        "no_conquests": "Nenhuma conquista até agora.",
         "abandoned_village": "Abandonada"
     },
     "tribe_profile_achievements": {
@@ -192,8 +191,8 @@
         "column_name": "Nome",
         "column_last_earned": "Última ganha em",
         "column_earned": "Ganha em",
-        "view_detailed_achievements": "Ver conquistas diárias/semanais detalhada",
-        "view_simple_achievements": "Ver conquistas diárias/semanais simplificada",
+        "view_detailed_achievements": "Ver conquistas diárias/semanal detalhada",
+        "view_simple_achievements": "Ver conquistas diárias/semanal simplificada",
         "sub_title_all": "Conquistas",
         "sub_title_gain": "Conquistas Ganhas",
         "sub_title_loss": "Conquistas Perdidas",
@@ -214,12 +213,12 @@
         "player_bash_attack": "Pontos Ofensivos:",
         "player_bash_defense": "Pontos Defensivos:",
         "player_avg_points_village": "Média de Pontos/Aldeia:",
-        "player_tribe_changes": "Mundanças de Tribos:",
+        "player_tribe_changes": "Mudanças de Tribos:",
         "player_conquests": "Conquista de Aldeias:",
         "player_achievement_points": "Pontos de Conquistas:",
         "player_record_rank": "Melhor Posição:",
         "player_record_points": "Melhor Pontuação:",
-        "player_record_villages": "Maior Nº de Aldeias:",
+        "player_record_villages": "Maior Num. De Aldeias:",
         "achievement_name": "Nome",
         "achievement_date_time": "Data/Hora",
         "view_player_achievements": "Ver conquistas do jogador",
@@ -229,11 +228,11 @@
     "player_profile_villages": {
         "header": "Aldeias do Jogador",
         "column_name": "Aldeia",
-        "column_coords": "Coords",
+        "column_coords": "Localização",
         "column_points": "Pontos"
     },
     "player_profile_tribe_changes": {
-        "header": "Mundanças de Tribos do Jogador",
+        "header": "Mudanças de Tribos do Jogador",
         "column_date_hour": "Data/Hora",
         "column_old_tribe": "Tribo antiga",
         "column_new_tribe": "Tribo nova",
@@ -255,7 +254,7 @@
         "column_old_owner": "Antigo dono",
         "column_new_owner": "Novo dono",
         "column_date_hour": "Data/Hora",
-        "no_conquests": "Nenhuma conquistas até agora.",
+        "no_conquests": "Nenhuma conquista até agora.",
         "abandoned_village": "Abandonada"
     },
     "player_profile_achievements": {
@@ -268,15 +267,15 @@
         "column_points": "Pontos",
         "column_category": "Categoria",
         "column_progress": "Progresso",
-        "view_detailed_achievements": "Ver conquistas diárias/semanais detalhada",
-        "view_simple_achievements": "Ver conquistas diárias/semanais simplificada",
+        "view_detailed_achievements": "Ver conquistas diárias/semanal detalhada",
+        "view_simple_achievements": "Ver conquistas diárias/semanal simplificada",
         "category_no_achievements": "Sem conquistas nesta categoria por enquanto.",
         "never": "Nunca",
         "detailed": "Detalhado"
     },
     "village_profile": {
         "header_village_profile": "Perfil da Aldeia",
-        "header_conquest_history": "Hístorico de Conquistas",
+        "header_conquest_history": "Histórico de Conquistas",
         "header_last_achievements": "Últimas Conquistas do Jogador",
         "village_name": "Nome:",
         "village_location": "Localização:",
@@ -306,32 +305,32 @@
         "auth_error_account_not_enabled": "Essa conta não está ativada.",
         "auth_error_invalid_password": "Senha inválida.",
         "error_not_authorized": "Você não tem permissão para fazer essa ação.",
-        "error_sync_toggle_world_only": "Alternar Sync só esta disponível para mundos, não servers.",
+        "error_sync_toggle_world_only": "Alternar Sync só esta disponível para mundos, não servidores.",
         "error_sync_account_not_exist": "Sync Conta %{account_id} não existe.",
-        "error_sync_market_not_exist": "Server %{market_id} não existe.",
+        "error_sync_market_not_exist": "Servidor %{market_id} não existe.",
         "error_sync_account_market_included": "Conta Sync já tem esse server incluído.",
         "error_passworld_minimum_length": "Mínimo de caracteres para a senha é %{password_minimum_length}.",
         "error_username_minimum_length": "Mínimo de caracteres para nome de Conta Sync é %{username_minimum_length}.",
         "error_sync_username_already_exists": "Uma Conta Sync com o nome \"%{username}\" já existe.",
         "error_mod_username_already_exists": "Uma Conta Moderador com esse nome já existe",
         "error_mod_account_email_already_exists": "Esse email já está em uso por outra conta",
-        "error_invalid_privilege": "Tipo de privilégio inválido",
+        "error_invalid_privilege": "Categoria de privilégio inválido",
         "error_mod_account_not_exists": "Essa Conta Moderador não existe"
     },
     "admin_menu": {
         "sync": "Sync",
-        "accounts": "Contas Sync",
-        "mods": "Contas Moderador",
+        "accounts": "Contas de Sync",
+        "mods": "Contas de Moderador",
         "settings": "Configurações",
         "logout": "Sair"
     },
     "admin_sync": {
         "header_worlds": "Sync Mundos",
         "header_summary": "Sync Resumo",
-        "header_panel": "Sync Painél",
-        "sync_all_data_active": "Sync de dados em todos mundos ativo:",
+        "header_panel": "Sync Painel",
+        "sync_all_data_active": "Sync de dados em todos os mundos ativo:",
         "sync_data_active_worlds": "Syncs de dados ativo nos mundos:",
-        "sync_all_achievements_active": "Sync de conquistas em todos mundos ativo:",
+        "sync_all_achievements_active": "Sync de conquistas em todos os mundos ativo:",
         "sync_achievements_active_worlds": "Syncs de conquistas ativo nos mundos:",
         "no": "Não",
         "yes": "Sim",
@@ -355,26 +354,26 @@
         "fail": "Falha",
         "already_synced": "Já sincronizado",
         "world_closed": "Mundo Fechado",
-        "sync_no_accounts": "Sem Contas Sync"
+        "sync_no_accounts": "Sem Contas de Sync"
     },
     "admin_sync_accounts": {
-        "header_accounts": "Contas Sync",
+        "header_accounts": "Contas de Sync",
         "header_add_account": "Add Conta Sync",
-        "account_markets": "Servers da conta:",
-        "available_markets": "Servers disponíveis:",
-        "add_market": "Add server",
+        "account_markets": "Servidores da conta:",
+        "available_markets": "Servidores disponíveis:",
+        "add_market": "Add servidor",
         "test_account": "Testar conta",
         "add_account": "Add conta",
         "delete_account": "Deletar conta",
-        "click_to_remove": "Clique para remover server:",
-        "click_to_add": "Clique para adicionar server:",
-        "no_markets": "Nenhum server incluído.",
-        "all_markets": "Todos servers incluído."
+        "click_to_remove": "Clique para remover servidor:",
+        "click_to_add": "Clique para adicionar servidor:",
+        "no_markets": "Nenhum servidor incluído.",
+        "all_markets": "Todos os servidores incluído."
     },
     "admin_mod_accounts": {
-        "header_mod_accounts": "Contas Mod",
-        "header_add_account": "Add Conta Mod",
-        "privilege_list": "Mod privilégios:",
+        "header_mod_accounts": "Contas de Moderador",
+        "header_add_account": "Add Conta de Moderador",
+        "privilege_list": "Privilégios de moderador:",
         "save": "Salvar",
         "delete": "Deletar",
         "create": "Criar"
@@ -382,15 +381,15 @@
     "admin_mod_accounts_privileges": {
         "start_sync": "Iniciar Syncs",
         "control_sync": "Controlar Syncs",
-        "modify_accounts": "Modificar Contas Sync",
-        "modify_mods": "Modificar Contas Mod",
+        "modify_accounts": "Modificar Contas de Sync",
+        "modify_mods": "Modificar Contas de Moderador",
         "modify_settings": "Modificar Configurações"
     },
     "maps": {
         "header_highlights": "Marcações",
         "button_settings": "Configurações",
-        "button_gen_dynamic_map": "Gerar map dinâmico",
-        "button_gen_static_map": "Gerar map estático",
+        "button_gen_dynamic_map": "Gerar mapa dinâmico",
+        "button_gen_static_map": "Gerar mapa estático",
         "settings_bg_color": "Cor de fundo",
         "settings_neutral_color": "Cor das aldeias neutras",
         "settings_barbarian_color": "Cor das aldeias abandonadas",
@@ -403,7 +402,7 @@
         "search_no_results": "sem resultados",
         "village": "aldeia",
         "villages": "aldeias",
-        "dynamic_map": "Map dinâmico",
+        "dynamic_map": "Mapa dinâmico",
         "static_map": "Mapa estático",
         "notif_static_share_expire": "Mapas estáticos expiram em %{static_map_expire_time} depois do último acesso.",
         "error_invalid_continent": "Continente inválido",
@@ -419,7 +418,7 @@
         "player_points": "Pontos do Jogador",
         "tribe_name": "Nome da Tribo",
         "tribe_points": "Pontos da Tribo",
-        "province_name": "Nome da Provincia"
+        "province_name": "Nome da Província"
     },
     "achievement_categories": {
         "overall": "Visão Geral",
@@ -550,9 +549,9 @@
     },
     "navigation": {
         "maps": "Mapas",
-        "servers": "Lista de Servers",
+        "servers": "Lista de Servidores",
         "worlds": "Lista de Mundos",
-        "server": "%{style}Server%{style_end} %{market_id}",
+        "server": "%{style}Servidor%{style_end} %{market_id}",
         "world": "%{style}Mundo%{style_end} %{world_name}",
         "world_closed": "%{style}Mundo%{style_end} %{world_name} %{style}(Fechado)%{style_end}",
         "player": "%{style}Jogador%{style_end} %{player_name}",
@@ -570,11 +569,11 @@
     },
     "page_titles": {
         "admin_panel": "Panel de Administração - %{site_name}",
-        "admin_panel_sync_accounts": "Panel de Administração - Contas Sync - %{site_name}",
-        "admin_panel_mod_accounts": "Panel de Administração - Contas Mod - %{site_name}",
+        "admin_panel_sync_accounts": "Panel de Administração - Contas de Sync - %{site_name}",
+        "admin_panel_mod_accounts": "Panel de Administração - Contas de Moderador - %{site_name}",
         "admin_panel_login": "Panel de Administração - Entrar - %{site_name}",
-        "stats_maps_servers": "Maps - Lista de Servers - %{site_name}",
-        "stats_maps_server_worlds": "Maps %{market_id} - Lista de Mundos - %{site_name}",
+        "stats_maps_servers": "Mapas - Lista de Servidores - %{site_name}",
+        "stats_maps_server_worlds": "Mapas %{market_id} - Lista de Mundos - %{site_name}",
         "maps_world_map": "Mapa %{market_id}/%{world_name} - %{site_name}",
         "maps_world_map_shared": "Mapa %{market_id}/%{world_name} - compartilhado - %{site_name}",
         "stats_world_conquests": "%{market_id}/%{world_name} - Conquistas - %{site_name}",
