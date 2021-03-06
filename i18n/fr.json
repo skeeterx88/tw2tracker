@@ -109,6 +109,8 @@
         "column_owner": "Propriétaire",
         "abandoned_village": "Abandonné",
         "error_no_search": "Aucune recherche spécifiée",
+        "error_min_chars": "%{min_chars} caractères minimum pour la recherche",
+        "error_max_chars": "%{max_chars} caractères maximum pour la recherche"
     },
     "world_conquests": {
         "header_world_conquests": "Conquêtes du monde",
@@ -595,5 +597,3 @@
         "stats_world": "%{market_id}/%{world_name} - %{site_name}"
     }
 }
-        "error_min_chars": "%{min_chars} caractères minimum pour la recherche",
-        "error_max_chars": "%{max_chars} caractères maximum pour la recherche"

@@ -33,6 +33,7 @@
         "world_type_victory_points": "Siegpunkte",
         "world_type_domination": "Vorherrschaft",
         "setting_troop_relocation": "Umsiedeln:",
+        
         "setting_enabled": "Aktiviert",
         "setting_disabled": "Deaktiviert",
         "open_date": "Weltenstart:",
@@ -107,6 +108,8 @@
         "column_owner": "Besitzer",
         "abandoned_village": "Verlassen",
         "error_no_search": "Keine Suche spezifiziert",
+        "error_min_chars": "Die minimale Sucheingabe beträgt %{min_chars} Zeichen",
+        "error_max_chars": "Die maximale Sucheingabe beträgt %{max_chars} Zeichen"
     },
     "world_conquests": {
         "header_world_conquests": "Eroberungen der Welt",
@@ -593,5 +596,3 @@
         "stats_world": "%{market_id}/%{world_name} - %{site_name}"
     }
 }
-        "error_min_chars": "Die minimale Sucheingabe beträgt %{min_chars} Zeichen",
-        "error_max_chars": "Die maximale Sucheingabe beträgt %{max_chars} Zeichen"
