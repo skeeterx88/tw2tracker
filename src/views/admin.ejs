@@ -6,13 +6,15 @@
         <%- include('./menu.ejs') %>
 
         <main class="content-border">
-            <div class="sub-menu">
-                <% for (const [id, data] of menu) { -%>
-                    <a href="/admin/<%= id %>" class="item <% __append(data.selected ? 'selected' : '') %>"><%= i18n(id, 'admin_menu', lang) %></a>
-                <% } -%>
+            <% if (menu) { %>
+                <div class="sub-menu">
+                    <% for (const [id, data] of menu) { -%>
+                        <a href="/admin/<%= id %>" class="item <% __append(data.selected ? 'selected' : '') %>"><%= i18n(id, 'admin_menu', lang) %></a>
+                    <% } -%>
 
-                <a class="item right" href="/logout"><%= i18n('logout', 'admin_menu', lang) %></a>
-            </div>
+                    <a class="item right" href="/admin/logout"><%= i18n('logout', 'admin_menu', lang) %></a>
+                </div>
+            <% } %>
 
             <%- include('./admin/' + subPage + '.ejs') %>
         </main>

@@ -3,24 +3,48 @@ const {ensureLoggedIn} = require('connect-ensure-login');
 
 const db = require('../db.js');
 const sql = require('../sql.js');
-const utils = require('../utils.js');
 const config = require('../config.js');
-const languages = require('../languages.js');
 const i18n = require('../i18n.js');
 const enums = require('../enums.js');
 const privilegeTypes = require('../privileges.json');
 const syncSocket = require('../sync-socket.js');
 const debug = require('../debug.js');
-const development = process.env.NODE_ENV === 'development';
 const pgArray = require('pg').types.arrayParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const createError = require('http-errors');
+const passport = require('passport');
 
 const {
     mergeBackendLocals,
     asyncRouter
 } = require('../router-helpers.js');
+
+const localAuthStrategy = passport.authenticate('local', {
+    successReturnToOrRedirect: '/admin',
+    failureRedirect: '/admin/login',
+    failureFlash: true
+});
+
+const loginRouter = asyncRouter(async function (req, res) {
+    const [error] = req.flash('error');
+
+    res.render('admin', {
+        subPage: 'login',
+        menu: false,
+        title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config.site_name]),
+        error
+    });
+});
+
+const logoutRouter = function (req, res) {
+    req.logout();
+    res.redirect('/admin/login');
+};
+
+const loginSuccessRouter = function (req, res) {
+    res.redirect('/admin');
+};
 
 function createAdminMenu (user, selected) {
     const adminMenu = [
@@ -39,7 +63,7 @@ function createAdminMenu (user, selected) {
     ];
 
     return adminMenu.filter(function ([id, data]) {
-        return data.enabled
+        return data.enabled;
     });
 }
 
@@ -50,7 +74,7 @@ function createPrivilegeChecker (privilege) {
         }
 
         next();
-    }
+    };
 }
 
 const adminPanelRouter = asyncRouter(async function (req, res) {
@@ -259,7 +283,7 @@ const accountsDeleteRouter = asyncRouter(async function (req, res) {
     }
 
     await db.query(sql.deleteAccount, {
-        accountId,
+        accountId
     });
 
     res.redirect('/admin/accounts');
@@ -339,7 +363,8 @@ const modsRouter = asyncRouter(async function (req, res) {
 });
 
 const modsEditRouter = asyncRouter(async function (req, res) {
-    let {id, name, pass, email, privileges} = req.body;
+    const {name, pass, email} = req.body;
+    let {id, privileges} = req.body;
 
     id = parseInt(id, 10);
 
@@ -394,7 +419,8 @@ const modsEditRouter = asyncRouter(async function (req, res) {
 });
 
 const modsCreateRouter = asyncRouter(async function (req, res) {
-    let {name, pass, email, privileges} = req.body;
+    const {name, pass, email} = req.body;
+    let {privileges} = req.body;
 
     if (name.length < 3) {
         throw createError(400, i18n('error_username_minimum_length', 'admin', res.locals.lang));
@@ -435,7 +461,7 @@ const modsCreateRouter = asyncRouter(async function (req, res) {
 });
 
 const modsDeleteRouter = asyncRouter(async function (req, res) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     const [mod] = await db.any(sql.getMod, {id});
 
@@ -454,7 +480,10 @@ const privilegeModifyMods = createPrivilegeChecker(privilegeTypes.MODIFY_MODS);
 // const privilegeModifySettings = createPrivilegeChecker(privilegeTypes.MODIFY_SETTINGS);
 
 const router = Router();
-router.use(ensureLoggedIn());
+router.get('/login', loginRouter);
+router.post('/login', localAuthStrategy, loginSuccessRouter);
+router.use(ensureLoggedIn('/admin/login'));
+router.get('/logout', logoutRouter);
 router.get('/', adminPanelRouter);
 router.get('/sync', adminPanelRouter);
 router.get('/sync/data/all', privilegeStartSync, syncDataAllRouter);

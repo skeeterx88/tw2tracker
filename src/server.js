@@ -107,8 +107,6 @@ app.use(connectFlash());
 const languagesRouter = require('./routes/lang.js');
 const statsRouter = require('./routes/stats.js');
 const adminRouter = require('./routes/admin.js');
-const loginRouter = require('./routes/login.js');
-const logoutRouter = require('./routes/logout.js');
 const mapsRouter = require('./routes/maps.js');
 
 const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
@@ -131,12 +129,15 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use('/change-language', languagesRouter);
 app.use('/', statsRouter);
 app.use('/admin', adminRouter);
-app.use('/login', loginRouter);
-app.use('/logout', logoutRouter);
 app.use('/maps', mapsRouter);
+app.use('/change-language', languagesRouter);
+
+// temporary
+app.use('/login', function (req, res) {
+    res.redirect('/admin/login');
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
