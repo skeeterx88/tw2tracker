@@ -29,9 +29,6 @@
                 <td><%= tribe.rank %></td>
                 <td>
                     <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
-                    <% if (tribe.rank < 4) { %>
-                        <div class="top-colors"></div>
-                    <% } %>
                 </td>
                 <td><%= formatNumbers(tribe.members) %></td>
                 <td><%= formatNumbers(tribe.points) %></td>
