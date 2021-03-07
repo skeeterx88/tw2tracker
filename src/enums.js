@@ -34,20 +34,6 @@ module.exports = {
     AUTH_ERROR_INVALID_PASSWORD: 'auth_error_invalid_password',
 
     EMPTY_CONTINENT: 'empty_continent',
-    achievementCommitTypes: {
-        ADD: 'add',
-        UPDATE: 'update'
-    },
-    syncStates: {
-        START: 'start',
-        FINISH: 'finish',
-        UPDATE: 'update',
-        ACHIEVEMENT_START: 'achievement_start',
-        ACHIEVEMENT_FINISH: 'achievement_finish',
-        WORLDS_START: 'worlds_start',
-        WORLDS_FINISH: 'worlds_finish',
-        TOGGLE_WORLD: 'toggle_world'
-    },
     mapShareTypes: {
         STATIC: 'static',
         DYNAMIC: 'dynamic'

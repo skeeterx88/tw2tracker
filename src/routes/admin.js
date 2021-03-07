@@ -135,7 +135,6 @@ const syncRouter = asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     mergeBackendLocals(res, {
-        syncStates: enums.syncStates,
         subPage,
         accountPrivileges: req.user.privileges,
         privilegeTypes
@@ -279,7 +278,6 @@ const accountsRouter = asyncRouter(async function (req, res) {
     const menu = createAdminMenu(req.user, subPage);
 
     mergeBackendLocals(res, {        
-        syncStates: enums.syncStates,
         subPage
     });
 
