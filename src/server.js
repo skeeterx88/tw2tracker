@@ -21,6 +21,7 @@ module.exports = function () {
     const i18n = require('./i18n.js');
     const languages = require('./languages.js');
     const utils = require('./utils.js');
+    const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
 
     const development = process.env.NODE_ENV === 'development';
     const httpServer = http.createServer();
@@ -105,12 +106,10 @@ module.exports = function () {
     app.use(passport.session());
     app.use(connectFlash());
 
-    const languagesRouter = require('./routes/lang.js');
+    const languagesRouter = require('./routes/languages.js');
     const statsRouter = require('./routes/stats.js');
     const adminRouter = require('./routes/admin.js');
     const mapsRouter = require('./routes/maps.js');
-
-    const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
 
     app.use(function (req, res, next) {
         res.locals.i18n = i18n;
@@ -134,7 +133,7 @@ module.exports = function () {
     app.use('/', statsRouter);
     app.use('/admin', adminRouter);
     app.use('/maps', mapsRouter);
-    app.use('/change-language', languagesRouter);
+    app.use('/language', languagesRouter);
 
     // temporary
     app.use('/login', function (req, res) {

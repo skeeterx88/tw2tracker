@@ -900,6 +900,25 @@ a.achievement-subject:last-child:after {
     color: #50311d;
 }
 
+#languages-page a {
+    text-decoration: none;
+}
+
+#languages-page .lang {
+    display: inline-block;
+    padding: 10px;
+    font-size: 1.1rem;
+    margin: 5px;
+}
+
+#languages-page .lang:hover {
+    background: url(/images/noise.webp) #fff7e2;
+}
+
+#languages-page .lang span {
+    padding-left: 30px;
+}
+
 #language-list {
     width: 200px;
 }

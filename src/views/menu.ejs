@@ -6,17 +6,17 @@
     </div>
 
     <div class="right">
-        <a href="/change-language" class="red" id="language-selector"><span class="flag-<%= lang %>"><%= i18n('lang', 'main_menu', lang) %></span></a>
+        <a href="/language" class="red" id="language-selector"><span class="flag-<%= lang %>"><%= i18n('lang', 'main_menu', lang) %></span></a>
     </div>
 </nav>
 
 <div id="language-list" class="modal-container hidden">
     <header>
-        <h2>Languages</h2>
+        <h2><%= i18n('lang', 'main_menu', lang) %></h2>
         <div class="close-wrapper"><span class="close">x</span></div>
     </header>
 
     <% for (const langId of availableLanguages) { -%>
-        <a href="/change-language/<%= langId %>"><span class="flag-<%= langId %>"><%= i18n('language', 'meta', langId) %></span></a>
+        <a href="/language/<%= langId %>"><span class="flag-<%= langId %>"><%= i18n('language', 'meta', langId) %></span></a>
     <% } -%>
 </div>

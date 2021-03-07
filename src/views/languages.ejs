@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('./head.ejs') %>
+    <body id="admin">
+        <header id="main-header"></header>
+        <%- include('./menu.ejs') %>
+
+        <main class="content-border">
+            <div class="content" id="languages-page">
+                <div class="single">
+                    <h1><%= i18n('lang', 'main_menu', lang) %></h1>
+
+                    <% for (const langId of availableLanguages) { %>
+                        <a href="/language/<%= langId %>">
+                            <div class="lang relax-container">
+                                <span class="flag-<%= langId %>"><%= i18n('language', 'meta', langId) %></span>
+                            </div>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+
+        <%- include('./footer.ejs') %>
+
+        <script sync type="text/javascript" src="/javascripts/libs/require.min.js"></script>
+        <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>
+        <script defer type="text/javascript" src="/javascripts/language-selector.js"></script>
+    </body>
+</html>
