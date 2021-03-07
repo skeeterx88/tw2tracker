@@ -1,0 +1,7 @@
+{
+    "SUCCESS": "success",
+    "FAIL": "fail",
+    "ALREADY_SYNCED": "already_synced",
+    "NO_ACCOUNTS": "no_accounts",
+    "WORLD_CLOSED": "world_closed"
+}

@@ -15,7 +15,14 @@ const enums = require('./enums.js');
 const scraperData = require('./scraper-data.js');
 const scraperAchievements = require('./scraper-achievements.js');
 const scraperReadyState = require('./scraper-ready-state.js');
+
 const syncCommands = require('./sync-commands.json');
+const syncStatus = require('./sync-status.json');
+const syncEvents = require('./sync-events.json');
+const syncFlags = require('./sync-flags.json');
+
+const ACHIEVEMENT_COMMIT_ADD = 'achievement_commit_add';
+const ACHIEVEMENT_COMMIT_UPDATE = 'achievement_commit_update';
 
 const auths = {};
 const Sync = {};
@@ -30,21 +37,21 @@ const running = {
 Sync.init = async function () {
     debug.sync('initializing sync system');
 
-    Events.on(enums.SYNC_DATA_START, function (worldId) {
+    Events.on(syncEvents.DATA_START, function (worldId) {
         db.query(sql.setWorldSyncDataActive, {active: true, worldId});
     });
 
-    Events.on(enums.SYNC_DATA_FINISH, function (worldId, status) {
+    Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
         db.none(sql.updateDataSync, {status, worldId});
         db.none(sql.setWorldSyncDataActive, {active: false, worldId});
         running.data.delete(worldId);
     });
 
-    Events.on(enums.SYNC_ACHIEVEMENTS_START, function (worldId) {
+    Events.on(syncEvents.ACHIEVEMENTS_START, function (worldId) {
         db.none(sql.setWorldSyncAchievementsActive, {active: true, worldId});
     });
 
-    Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, function (worldId, status) {
+    Events.on(syncEvents.ACHIEVEMENTS_FINISH, function (worldId, status) {
         db.none(sql.updateAchievementsSync, {status, worldId});
         db.none(sql.setWorldSyncAchievementsActive, {active: false, worldId});
         running.achievements.delete(worldId);
@@ -150,7 +157,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
     const world = await getWorld(marketId, worldNumber);
 
-    Events.trigger(enums.SYNC_DATA_START, [worldId]);
+    Events.trigger(syncEvents.DATA_START, [worldId]);
     debug.sync('world:%s start data sync (attempt %i)', worldId, attempt);
 
     let page;
@@ -160,7 +167,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             if (!world.sync_enabled) {
-                Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL]);
+                Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.FAIL]);
                 return false;
             }
 
@@ -178,7 +185,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             if (!account) {
                 debug.sync('world:%s all accounts failed to authenticate', worldId);
-                Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS]);
+                Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.NO_ACCOUNTS]);
                 return false;
             }
 
@@ -189,7 +196,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             } else if (!worldCharacter.allow_login) {
                 await db.query(sql.closeWorld, [marketId, worldNumber]);
                 debug.sync('world:%s closing', worldId);
-                Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED]);
+                Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.WORLD_CLOSED]);
                 return false;
             }
 
@@ -222,7 +229,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await page.close();
 
             debug.sync('world:%s data sync finished', worldId);
-            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS]);
+            Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.SUCCESS]);
         }, '5 minutes');
 
         return true;
@@ -236,7 +243,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < config.sync.max_sync_attempts) {
             return await Sync.data(marketId, worldNumber, flag, attempt + 1);
         } else {
-            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL]);
+            Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.FAIL]);
             throw new Error(error.message);
         }
     }
@@ -255,7 +262,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const world = await getWorld(marketId, worldNumber);
 
     debug.sync('world:%s start achievements sync (attempt %d)', worldId, attempt);
-    Events.trigger(enums.SYNC_ACHIEVEMENTS_START, [worldId]);
+    Events.trigger(syncEvents.ACHIEVEMENTS_START, [worldId]);
 
     let page;
 
@@ -264,7 +271,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             if (!world.sync_enabled) {
-                Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL]);
+                Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.FAIL]);
                 return false;
             }
 
@@ -272,7 +279,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
             if (!account) {
                 debug.sync('world:%s all accounts failed to authenticate', worldId);
-                Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS]);
+                Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.NO_ACCOUNTS]);
                 return false;
             }
 
@@ -287,7 +294,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             await page.close();
 
             debug.sync('world:%s achievements sync finished', worldId);
-            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS]);
+            Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.SUCCESS]);
         }, '20 minutes');
 
         return true;
@@ -301,7 +308,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < config.sync.max_sync_attempts) {
             return await Sync.achievements(marketId, worldNumber, flag, attempt + 1);
         } else {
-            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL]);
+            Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.FAIL]);
             throw new Error(error.message);
         }
     }
@@ -318,7 +325,7 @@ Sync.dataAll = async function (flag) {
                 const world = queue.shift();
                 Sync.data(world.market, world.num, flag);
             } else {
-                await Events.on(enums.SYNC_DATA_FINISH);
+                await Events.on(syncEvents.DATA_FINISH);
             }
         }
     }
@@ -338,7 +345,7 @@ Sync.achievementsAll = async function (flag) {
                 const world = queue.shift();
                 Sync.achievements(world.market, world.num, flag);
             } else {
-                await Events.on(enums.SYNC_ACHIEVEMENTS_FINISH);
+                await Events.on(syncEvents.ACHIEVEMENTS_FINISH);
             }
         }
     }
@@ -635,7 +642,7 @@ Sync.toggle = async function (marketId, worldNumber) {
         enabled
     });
 
-    Events.trigger(enums.SYNC_TOGGLE_WORLD, [marketId, worldNumber, enabled]);
+    Events.trigger(syncEvents.TOGGLE_WORLD, [marketId, worldNumber, enabled]);
 
     return true;
 };
@@ -819,12 +826,12 @@ async function commitAchievementsDatabase (data, worldId) {
 
     const sqlSubjectMap = {
         players: {
-            [enums.achievementCommitTypes.ADD]: sql.addPlayerAchievement,
-            [enums.achievementCommitTypes.UPDATE]: sql.updatePlayerAchievement
+            [ACHIEVEMENT_COMMIT_ADD]: sql.addPlayerAchievement,
+            [ACHIEVEMENT_COMMIT_UPDATE]: sql.updatePlayerAchievement
         },
         tribes: {
-            [enums.achievementCommitTypes.ADD]: sql.addTribeAchievement,
-            [enums.achievementCommitTypes.UPDATE]: sql.updateTribeAchievement
+            [ACHIEVEMENT_COMMIT_ADD]: sql.addTribeAchievement,
+            [ACHIEVEMENT_COMMIT_UPDATE]: sql.updateTribeAchievement
         }
     };
 
@@ -847,8 +854,8 @@ async function commitAchievementsDatabase (data, worldId) {
             }
 
             log[subjectType] = {
-                added: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.ADD).length,
-                updated: modifiedAchievements.filter(({commitType}) => commitType === enums.achievementCommitTypes.UPDATE).length
+                added: modifiedAchievements.filter(({commitType}) => commitType === ACHIEVEMENT_COMMIT_ADD).length,
+                updated: modifiedAchievements.filter(({commitType}) => commitType === ACHIEVEMENT_COMMIT_UPDATE).length
             };
         }
 
@@ -1010,7 +1017,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
 
                 for (const type of missingTypes) {
                     achievementsToMerge.push({
-                        commitType: enums.achievementCommitTypes.ADD,
+                        commitType: ACHIEVEMENT_COMMIT_ADD,
                         achievement: newAchievements.unique[type]
                     });
                 }
@@ -1024,7 +1031,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
 
                 if (newAchievements.unique[type].level > oldAchievements.unique[type].level) {
                     achievementsToMerge.push({
-                        commitType: enums.achievementCommitTypes.UPDATE,
+                        commitType: ACHIEVEMENT_COMMIT_UPDATE,
                         achievement: newAchievements.unique[type]
                     });
                 }
@@ -1044,7 +1051,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
 
                 achievementsToMerge.push(...merge.map(achievement => {
                     return {
-                        commitType: enums.achievementCommitTypes.ADD,
+                        commitType: ACHIEVEMENT_COMMIT_ADD,
                         achievement
                     };
                 }));
@@ -1052,7 +1059,7 @@ async function getModifiedAchievements (subjectType, achievements, worldId) {
         } else {
             achievementsToMerge.push(...newAchievementsRaw.map(achievement => {
                 return {
-                    commitType: enums.achievementCommitTypes.ADD,
+                    commitType: ACHIEVEMENT_COMMIT_ADD,
                     achievement
                 };
             }));
