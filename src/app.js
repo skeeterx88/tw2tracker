@@ -24,10 +24,10 @@
     const Sync = require('./sync.js');
     const cpus = require('os').cpus();
 
-    Sync.init();
-
     for (let i = 0; i < cpus.length; i++) {
         const worker = cluster.fork();
         worker.on('message', Sync.trigger);
     }
+
+    Sync.init();
 })();
