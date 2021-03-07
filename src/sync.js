@@ -171,12 +171,12 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
                 return false;
             }
 
-            if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
-                const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60;
+            if (flag !== syncFlags.IGNORE_LAST_SYNC && world.last_data_sync_date) {
+                const elapsedTime = utils.UTC() - world.last_data_sync_date;
 
-                if (minutesSinceLastSync < config.scraper_interval_minutes) {
+                if (elapsedTime < humanInterval(config.sync.min_time_between_data_syncs)) {
                     debug.sync('world:%s already sinced', worldId, attempt);
-                    Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED]);
+                    Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.ALREADY_SYNCED]);
                     return false;
                 }
             }
@@ -273,6 +273,16 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             if (!world.sync_enabled) {
                 Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.FAIL]);
                 return false;
+            }
+
+            if (flag !== syncFlags.IGNORE_LAST_SYNC && world.last_achievements_sync_date) {
+                const elapsedTime = utils.UTC() - world.last_achievements_sync_date;
+
+                if (elapsedTime < humanInterval(config.sync.min_time_between_achievement_syncs)) {
+                    debug.sync('world:%s already sinced', worldId, attempt);
+                    Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.ALREADY_SYNCED]);
+                    return false;
+                }
             }
 
             const account = await Sync.auth(marketId);
