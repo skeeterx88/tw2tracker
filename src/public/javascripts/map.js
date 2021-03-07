@@ -1,11 +1,15 @@
 define('TW2Map', [
+    'i18n',
     'utils',
     'backendValues'
 ], function (
+    i18n,
     utils,
     {
         marketId,
-        worldNumber
+        worldNumber,
+        mapShareTypes,
+
     }
 ) {
     const TW2Map = function (containerSelector, loader, tooltip, settings) {

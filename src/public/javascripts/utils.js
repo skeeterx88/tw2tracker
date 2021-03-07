@@ -113,6 +113,11 @@ define('utils', function () {
         };
     };
 
+    function sprintf (string, tokens = []) {
+        let i = 0;
+        return string.replace(/%{[^}]*}/g, () => tokens[i++]);
+    }
+
     return {
         hasOwn,
         ajaxPost,
@@ -123,6 +128,7 @@ define('utils', function () {
         querySelectorFrom,
         formatSince,
         averageCoords,
-        getElemPosition
+        getElemPosition,
+        sprintf
     };
 });

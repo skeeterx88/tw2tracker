@@ -1,6 +1,8 @@
 define('i18n', [
+    'utils',
     'backendValues'
 ], function (
+    utils,
     {
         language
     }
