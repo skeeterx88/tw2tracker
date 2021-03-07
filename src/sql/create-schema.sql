@@ -19,7 +19,7 @@ CREATE TABLE public.accounts (
     id SERIAL PRIMARY KEY,
     name VARCHAR (255) UNIQUE NOT NULL,
     pass VARCHAR (255) NOT NULL,
-    markets VARCHAR[] DEFAULT '{}'
+    markets ARRAY[]::VARCHAR[]
 );
 
 CREATE TYPE public.mod_privilege_types AS ENUM ('start_sync', 'control_sync', 'modify_accounts', 'modify_mods', 'modify_settings');
