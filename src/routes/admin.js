@@ -106,9 +106,31 @@ const logoutRouter = function (req, res) {
 };
 
 const syncRouter = asyncRouter(async function (req, res) {
-    const openWorlds = await db.any(sql.getOpenWorlds);
-    const closedWorlds = await db.any(sql.getClosedWorlds);
-    const markets = await db.any(sql.getMarkets);
+    const [
+        openWorlds,
+        closedWorlds,
+        syncingWorlds,
+        markets
+    ] = await Promise.all([
+        db.any(sql.getOpenWorlds),
+        db.any(sql.getClosedWorlds),
+        db.any(sql.getSyncingWorlds),
+        db.any(sql.getMarkets)
+    ]);
+
+    const syncingDataWorlds = [];
+    const syncingAchievementsWorlds = [];
+
+    for (const world of syncingWorlds) {
+        if (world.sync_data_active) {
+            syncingDataWorlds.push(world.world_id);
+        }
+
+        if (world.sync_achievements_active) {
+            syncingAchievementsWorlds.push(world.world_id);
+        }
+    }
+
     const subPage = 'sync';
     const menu = createAdminMenu(req.user, subPage);
 
@@ -126,6 +148,8 @@ const syncRouter = asyncRouter(async function (req, res) {
         openWorlds,
         closedWorlds,
         markets,
+        syncingDataWorlds,
+        syncingAchievementsWorlds,
         privilegeTypes,
         user: req.user,
         errors: req.flash('error'),

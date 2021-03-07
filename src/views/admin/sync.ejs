@@ -57,23 +57,28 @@
 
             <div class="content-border">
                 <p>
-                    <label><%= i18n('sync_all_data_active', 'admin_sync', lang) %></label>
-                    <span id="sync-data-all-active"><%= i18n('no', 'admin_sync', lang) %></span>
-                </p>
-
-                <p>
                     <label><%= i18n('sync_data_active_worlds', 'admin_sync', lang) %></label>
-                    <span id="sync-active-data-worlds"><span class="empty"><%= i18n('none', 'admin_sync', lang) %></span></span>
+                    <span id="sync-active-data-worlds">
+                        <% if (syncingDataWorlds.length) { %>
+                            <% for (const worldId of syncingDataWorlds) { -%>
+                                <span class="world-label" data-world-id="<%= worldId %>"><%= worldId %></span>
+                            <% } -%>
+                        <% } else { %>
+                            <%= i18n('none', 'admin_sync', lang) %>
+                        <% } %>
+                    </span>
                 </p>
-
-                <p>
-                    <label><%= i18n('sync_all_achievements_active', 'admin_sync', lang) %></label>
-                    <span id="sync-achievements-all-active"><%= i18n('no', 'admin_sync', lang) %></span>
-                </p>
-
                 <p>
                     <label><%= i18n('sync_achievements_active_worlds', 'admin_sync', lang) %></label>
-                    <span id="sync-active-achievement-worlds"><span class="empty"><%= i18n('none', 'admin_sync', lang) %></span></span>
+                    <span id="sync-active-achievement-worlds">
+                        <% if (syncingAchievementsWorlds.length) { %>
+                            <% for (const worldId of syncingAchievementsWorlds) { -%>
+                                <span class="world-label" data-world-id="<%= worldId %>"><%= worldId %></span>
+                            <% } -%>
+                        <% } else { %>
+                            <%= i18n('none', 'admin_sync', lang) %>
+                        <% } %>
+                    </span>
                 </p>
 
             </div>
