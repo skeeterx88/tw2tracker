@@ -7,8 +7,8 @@ const router = express.Router();
 const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
-const enums = require('../enums.js');
 const i18n = require('../i18n.js');
+const mapShareTypes = require('../map-share-types.json');
 
 const {
     paramWorldParse,
@@ -114,7 +114,7 @@ const getContinentRouter = asyncRouter(async function (req, res) {
 
         data = await fs.promises.readFile(dataPath);
     } catch (error) {
-        etag = enums.EMPTY_CONTINENT;
+        etag = 'empty_continent';
 
         if (ifNoneMatchValue && ifNoneMatchValue === etag) {
             res.status(304);
@@ -195,7 +195,7 @@ const crateShareRouter = asyncRouter(async function (req, res) {
     const settingsString = JSON.stringify(settings);
     const {creation_date} = await db.one(sql.maps.createShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y]);
 
-    if (shareType === enums.mapShareTypes.STATIC) {
+    if (shareType === mapShareTypes.STATIC) {
         const dateId = utils.getHourlyDir(creation_date);
         const worldId = marketId + worldNumber;
         const copyDestination = path.join('.', 'data', 'static-maps', worldId, dateId);

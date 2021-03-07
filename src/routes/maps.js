@@ -8,11 +8,10 @@ const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
 const i18n = require('../i18n.js');
-const languages = require('../languages.js');
+const mapShareTypes = require('../map-share-types.json');
 const mapsAPIRouter = require('./maps-api.js');
 
 const {
-    createNavigation,
     mergeBackendLocals,
     asyncRouter
 } = require('../router-helpers.js');
@@ -44,7 +43,8 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         worldName: world.name,
         lastDataSyncDate,
-        staticMapExpireTime: config.sync.static_share_expire_time
+        staticMapExpireTime: config.sync.static_share_expire_time,
+        mapShareTypes
     });
 
     res.render('maps/map', {
@@ -90,7 +90,8 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         worldName: world.name,
         lastDataSyncDate,
-        mapShare
+        mapShare,
+        mapShareTypes
     });
 
     res.render('maps/map', {

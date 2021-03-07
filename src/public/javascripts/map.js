@@ -1214,11 +1214,6 @@ define('TW2Map', [
         ['#494500', '#02350f', '#00293a', '#730202', '#8c4700', '#8c8200', '#6a043e', '#723305', '#42108c', '#152232', '#00008c', '#8c0676', '#c766c7', '#00ff83']
     ];
 
-    TW2Map.mapShareTypes = {
-        STATIC: 'static',
-        DYNAMIC: 'dynamic'
-    };
-
     TW2Map.highlightTypes = {
         PLAYERS: 'players',
         TRIBES: 'tribes',
@@ -1238,7 +1233,8 @@ define('TW2DataLoader', [
     TW2Map,
     utils,
     {
-        mapShare
+        mapShare,
+        mapShareTypes
     }
 ) {
     const TW2DataLoader = function (marketId, worldNumber) {
@@ -1293,7 +1289,7 @@ define('TW2DataLoader', [
         };
 
         this.loadInfo = new Promise(async (resolve) => {
-            const url = typeof mapShare !== 'undefined' && mapShare.type === TW2Map.mapShareTypes.STATIC
+            const url = typeof mapShare !== 'undefined' && mapShare.type === mapShareTypes.STATIC
                 ? `/maps/api/${marketId}/${worldNumber}/info/${mapShare.share_id}`
                 : `/maps/api/${marketId}/${worldNumber}/info`;
 
@@ -1333,7 +1329,7 @@ define('TW2DataLoader', [
             }
 
             continentPromises[continent] = new Promise(async (resolve) => {
-                const url = typeof mapShare !== 'undefined' && mapShare.type === TW2Map.mapShareTypes.STATIC
+                const url = typeof mapShare !== 'undefined' && mapShare.type === mapShareTypes.STATIC
                     ? `/maps/api/${marketId}/${worldNumber}/continent/${continent}/${mapShare.share_id}`
                     : `/maps/api/${marketId}/${worldNumber}/continent/${continent}`;
 

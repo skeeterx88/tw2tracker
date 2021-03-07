@@ -16,7 +16,8 @@ require([
         worldNumber,
         mapShare,
         lastDataSyncDate,
-        staticMapExpireTime
+        staticMapExpireTime,
+        mapShareTypes
     }
 ) {
     let colorPicker;
@@ -390,7 +391,7 @@ require([
     };
 
     const setupDisplayLastSync = () => {
-        if (mapShare && mapShare.type === TW2Map.mapShareTypes.STATIC) {
+        if (mapShare && mapShare.type === mapShareTypes.STATIC) {
             return;
         }
 
@@ -585,7 +586,7 @@ require([
             $mapShareLoading.classList.remove('hidden');
 
             try {
-                const result = await map.shareMap(TW2Map.mapShareTypes.DYNAMIC);
+                const result = await map.shareMap(mapShareTypes.DYNAMIC);
 
                 notif({
                     title: i18n('dynamic_map', 'maps'),
@@ -614,7 +615,7 @@ require([
             $mapSaveLoading.classList.remove('hidden');
 
             try {
-                const result = await map.shareMap(TW2Map.mapShareTypes.STATIC);
+                const result = await map.shareMap(mapShareTypes.STATIC);
 
                 notif({
                     title: i18n('static_map', 'maps'),

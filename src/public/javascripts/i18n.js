@@ -19,5 +19,5 @@ define('i18n', [
         } catch (error) {
             return '[' + key + ', ' + namespace + ']';
         }
-    }
+    };
 });

@@ -10,7 +10,6 @@ const puppeteer = require('./puppeteer.js');
 const utils = require('./utils.js');
 const config = require('./config.js');
 const Events = require('./events.js');
-const enums = require('./enums.js');
 
 const scraperData = require('./scraper-data.js');
 const scraperAchievements = require('./scraper-achievements.js');
@@ -110,6 +109,9 @@ Sync.init = async function () {
     if (process.env.NODE_ENV !== 'development') {
         tasks.initChecker();
     }
+
+    // await Sync.dataAll();
+    // await Sync.achievementsAll();
 };
 
 Sync.trigger = function (msg) {

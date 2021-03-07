@@ -4,9 +4,11 @@ const router = express.Router();
 const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
-const enums = require('../enums.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
+const conquestTypes = require('../conquest-types.json');
+const memberChangeTypes = require('../member-change-types.json');
+
 
 const {
     paramWorld,
@@ -68,7 +70,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         conquestGainCount,
         conquestLossCount,
         conquestSelfCount,
-        conquestTypes: enums.conquestTypes,
+        conquestTypes,
         achievementsRepeatableCount,
         achievementsLatest,
         memberChangesCount,
@@ -134,11 +136,11 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
 
     const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
         if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
-            conquest.type = enums.conquestTypes.SELF;
+            conquest.type = conquestTypes.SELF;
         } else if (conquest.new_owner_tribe_id === tribeId) {
-            conquest.type = enums.conquestTypes.GAIN;
+            conquest.type = conquestTypes.GAIN;
         } else if (conquest.old_owner_tribe_id === tribeId) {
-            conquest.type = enums.conquestTypes.LOSS;
+            conquest.type = conquestTypes.LOSS;
         }
 
         return conquest;
@@ -163,7 +165,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         world,
         tribe,
         conquests,
-        conquestTypes: enums.conquestTypes,
+        conquestTypes,
         category,
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),
@@ -304,7 +306,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
                 id: change.character_id,
                 name: playersName[change.character_id]
             },
-            type: change.old_tribe === tribeId ? enums.tribeMemberChangeTypes.LEFT : enums.tribeMemberChangeTypes.JOIN,
+            type: change.old_tribe === tribeId ? memberChangeTypes.LEFT : memberChangeTypes.JOIN,
             date: change.date
         });
     }
@@ -322,7 +324,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         tribe,
         world,
         memberChanges,
-        tribeMemberChangeTypes: enums.tribeMemberChangeTypes,
+        memberChangeTypes,
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},

@@ -17,7 +17,7 @@ module.exports = function () {
     const db = require('./db.js');
     const sql = require('./sql.js');
     const config = require('./config.js');
-    const enums = require('./enums.js');
+    const authErrors = require('./auth-errors.json');
     const i18n = require('./i18n.js');
     const languages = require('./languages.js');
     const utils = require('./utils.js');
@@ -65,13 +65,13 @@ module.exports = function () {
 
         if (!account) {
             return done(null, false, {
-                message: i18n(enums.AUTH_ERROR_ACCOUNT_NOT_EXIST, 'admin')
+                message: i18n(authErrors.ACCOUNT_NOT_EXIST, 'admin')
             });
         }
 
         if (!account.enabled) {
             return done(null, false, {
-                message: i18n(enums.AUTH_ERROR_ACCOUNT_NOT_ENABLED, 'admin')
+                message: i18n(authErrors.ACCOUNT_NOT_ENABLED, 'admin')
             });
         }
 
@@ -79,7 +79,7 @@ module.exports = function () {
 
         if (!match) {
             return done(null, false, {
-                message: i18n(enums.AUTH_ERROR_INVALID_PASSWORD, 'admin')
+                message: i18n(authErrors.INVALID_PASSWORD, 'admin')
             });
         }
 

@@ -5,8 +5,8 @@ const db = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
-const enums = require('../enums.js');
 const i18n = require('../i18n.js');
+const conquestTypes = require('../conquest-types.json');
 
 const {
     paramWorld,
@@ -85,7 +85,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         conquestGainCount,
         conquestLossCount,
         conquestSelfCount,
-        conquestTypes: enums.conquestTypes,
+        conquestTypes,
         achievementPoints,
         achievementsLatest,
         achievementTypes,
@@ -197,11 +197,11 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
 
     const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, playerId, offset, limit}, function (conquest) {
         if (conquest.new_owner === conquest.old_owner) {
-            conquest.type = enums.conquestTypes.SELF;
+            conquest.type = conquestTypes.SELF;
         } else if (conquest.new_owner === playerId) {
-            conquest.type = enums.conquestTypes.GAIN;
+            conquest.type = conquestTypes.GAIN;
         } else if (conquest.old_owner === playerId) {
-            conquest.type = enums.conquestTypes.LOSS;
+            conquest.type = conquestTypes.LOSS;
         }
 
         return conquest;
@@ -226,7 +226,6 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         world,
         player,
         conquests,
-        conquestTypes: enums.conquestTypes,
         category,
         navigationTitle,
         pagination: createPagination(page, total, limit, req.path),

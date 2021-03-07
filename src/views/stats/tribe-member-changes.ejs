@@ -21,7 +21,7 @@
                             <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
                             <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
-                            <% if (change.type === tribeMemberChangeTypes.LEFT) { -%>
+                            <% if (change.type === memberChangeTypes.LEFT) { -%>
                                 <td><%= i18n('left', 'tribe_profile_member_changes', lang) %></td>
                             <% } else { -%>
                                 <td><%= i18n('join', 'tribe_profile_member_changes', lang) %></td>
