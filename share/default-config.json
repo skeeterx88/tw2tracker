@@ -19,7 +19,9 @@
         "max_sync_attempts": 3,
         "max_login_attempts": 3,
         "min_time_between_data_syncs": "5 minutes",
-        "min_time_between_achievement_syncs": "5 minutes"
+        "min_time_between_achievement_syncs": "5 minutes",
+        "max_sync_data_running_time": "5 minutes",
+        "max_sync_achievements_running_time": "30 minutes"
     },
     "sync_intervals": {
         "data_all": "60 minutes",

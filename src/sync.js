@@ -230,7 +230,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s data sync finished', worldId);
             Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.SUCCESS]);
-        }, '5 minutes');
+        }, humanInterval(config.sync.max_sync_data_running_time));
 
         return true;
     } catch (error) {
@@ -305,7 +305,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s achievements sync finished', worldId);
             Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.SUCCESS]);
-        }, '20 minutes');
+        }, humanInterval(config.sync.max_sync_achievements_running_time));
 
         return true;
     } catch (error) {
