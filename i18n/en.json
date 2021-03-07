@@ -317,6 +317,8 @@
         "error_mod_account_email_already_exists": "This email is already in use by another account",
         "error_invalid_privilege": "Invalid privilege type",
         "error_mod_account_not_exists": "This mod account does not exist",
+        "error_market_has_no_sync_accounts": "This market does not have any sync accounts.",
+        "error_world_not_found": "World does not exist",
         "message_world_toggled": "World %{world_id} toggled.",
         "message_scrape_worlds_started": "Scrape worlds started.",
         "message_scrape_markets_started": "Scrape markets started.",

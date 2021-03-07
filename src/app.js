@@ -1,9 +1,15 @@
 (async function () {
+    const cluster = require('cluster');
+    const server = require('./server.js');
+
+    if (!cluster.isMaster) {
+        return server();
+    }
+
     const db = require('./db.js');
 
     try {
-        const connection = await db.connect();
-        connection.done();
+        (await db.connect()).done();
     } catch (error) {
         throw new Error(`Can't connect to PostgreSQL database: ${error.message}`);
     }
@@ -15,24 +21,13 @@
         await db.query(sql.createSchema);
     }
 
-    const server = require('./server.js');
-    const cluster = require('cluster');
+    const Sync = require('./sync.js');
+    const cpus = require('os').cpus();
 
-    if (cluster.isMaster) {
-        const cpus = require('os').cpus();
-        const Sync = require('./sync.js');
+    Sync.init();
 
-        Sync.init();
-
-        if (process.env.NODE_ENV === 'development') {
-            server();
-        } else {
-            for (let i = 0; i < cpus.length; i++) {
-                cluster.fork();
-            }
-        }
-    } else {
-        const server = require('./server.js');
-        server();
+    for (let i = 0; i < cpus.length; i++) {
+        const worker = cluster.fork();
+        worker.on('message', Sync.trigger);
     }
 })();

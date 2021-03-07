@@ -1,7 +1,6 @@
 const fs = require('fs');
 const zlib = require('zlib');
 const path = require('path');
-const WebSocket = require('ws');
 const humanInterval = require('human-interval');
 
 const debug = require('./debug.js');
@@ -16,11 +15,11 @@ const enums = require('./enums.js');
 const scraperData = require('./scraper-data.js');
 const scraperAchievements = require('./scraper-achievements.js');
 const scraperReadyState = require('./scraper-ready-state.js');
+const syncCommands = require('./sync-commands.json');
 
 const auths = {};
 const Sync = {};
 
-let internalCommSocket = null;
 let browser = null;
 
 const syncDataActiveWorlds = new Set();
@@ -52,8 +51,6 @@ Sync.init = async function () {
         await db.$pool.end();
         process.exit(0);
     });
-
-    initSyncSocketServer();
 
     const appState = await db.one(sql.getProgramState);
 
@@ -100,8 +97,39 @@ Sync.init = async function () {
     if (process.env.NODE_ENV !== 'development') {
         tasks.initChecker();
     }
+};
 
-    // await Sync.worlds();
+Sync.trigger = function (msg) {
+    switch (msg.command) {
+        case syncCommands.DATA_ALL: {
+            Sync.dataAll();
+            break;
+        }
+        case syncCommands.DATA: {
+            Sync.data(msg.marketId, msg.worldNumber);
+            break;
+        }
+        case syncCommands.ACHIEVEMENTS_ALL: {
+            Sync.achievementsAll();
+            break;
+        }
+        case syncCommands.ACHIEVEMENTS: {
+            Sync.achievements(msg.marketId, msg.worldNumber);
+            break;
+        }
+        case syncCommands.MARKETS: {
+            Sync.markets();
+            break;
+        }
+        case syncCommands.WORLDS: {
+            Sync.worlds();
+            break;
+        }
+        case syncCommands.TOGGLE: {
+            Sync.toggle(msg.marketId, msg.worldNumber);
+            break;
+        }
+    }
 };
 
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
@@ -1169,82 +1197,6 @@ async function fetchWorldTimeOffset (page, worldId) {
     } catch (error) {
         debug.sync('world:%s error fetching timezone (%s)', worldId, error.message);
     }
-}
-
-function initSyncSocketServer () {
-    debug.comm('initializing internal communication socket');
-
-    internalCommSocket = new WebSocket.Server({port: 7777});
-
-    internalCommSocket.on('connection', function (ws) {
-        const send = (state, data) => {
-            debug.comm('emit %o', [state, data]);
-            ws.send(JSON.stringify([state, data]));
-        };
-
-        Events.on(enums.SYNC_DATA_START, (worldId) => send(enums.syncStates.START, {worldId}));
-        Events.on(enums.SYNC_DATA_FINISH, (worldId, status, date) => send(enums.syncStates.FINISH, {worldId, status, date}));
-        Events.on(enums.SYNC_ACHIEVEMENTS_START, (worldId) => send(enums.syncStates.ACHIEVEMENT_START, {worldId}));
-        Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, (worldId, status, date) => send(enums.syncStates.ACHIEVEMENT_FINISH, {worldId, status, date}));
-        Events.on(enums.SYNC_WORLDS_START, () => send(enums.syncStates.WORLDS_START));
-        Events.on(enums.SYNC_WORLDS_FINISH, () => send(enums.syncStates.WORLDS_FINISH));
-        Events.on(enums.SYNC_TOGGLE_WORLD, (marketId, worldNumber, enabled) => send(enums.syncStates.TOGGLE_WORLD, {marketId, worldNumber, enabled}));
-
-        ws.on('message', async function (raw) {
-            const data = JSON.parse(raw);
-
-            debug.comm('message %o', data);
-
-            switch (data.code) {
-                case enums.SYNC_REQUEST_STATUS: {
-                    const worlds = Array.from(await db.any(sql.getOpenWorlds));
-
-                    send(enums.syncStates.UPDATE, {
-                        worlds,
-                        data: Array.from(syncDataActiveWorlds),
-                        achievements: Array.from(syncAchievementsActiveWorlds),
-                        other: {
-                            worldList: syncWorldListRunning
-                        }
-                    });
-                    break;
-                }
-                case enums.SYNC_REQUEST_SYNC_DATA_ALL: {
-                    Sync.dataAll();
-                    break;
-                }
-                case enums.SYNC_REQUEST_SYNC_DATA: {
-                    Sync.data(data.marketId, data.worldNumber);
-                    break;
-                }
-                case enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL: {
-                    Sync.achievementsAll();
-                    break;
-                }
-                case enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS: {
-                    Sync.achievements(data.marketId, data.worldNumber);
-                    break;
-                }
-                case enums.SYNC_REQUEST_SYNC_MARKETS: {
-                    Sync.markets();
-                    break;
-                }
-                case enums.SYNC_REQUEST_SYNC_WORLDS: {
-                    Sync.worlds();
-                    break;
-                }
-                case enums.SYNC_TOGGLE_WORLD: {
-                    Sync.toggle(data.marketId, data.worldNumber);
-                    break;
-                }
-            }
-        });
-    });
-}
-
-async function updateSyncLastStatus (type, status, marketId, worldNumber) {
-    const {last_sync_date} = await db.one(updateSyncStatusMap[type], [status, marketId, worldNumber]);
-    return utils.ejsHelpers.formatDate(last_sync_date);
 }
 
 module.exports = Sync;

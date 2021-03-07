@@ -6,9 +6,9 @@ const sql = require('../sql.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
 const enums = require('../enums.js');
+const syncCommands = require('../sync-commands.json');
 const privilegeTypes = require('../privileges.json');
 const privilegeTypesValue = Object.values(privilegeTypes);
-const syncSocket = require('../sync-socket.js');
 const debug = require('../debug.js');
 const pgArray = require('pg').types.arrayParser;
 const bcrypt = require('bcrypt');
@@ -18,8 +18,17 @@ const passport = require('passport');
 
 const {
     mergeBackendLocals,
-    asyncRouter
+    asyncRouter,
+    paramWorldParse,
+    paramWorld
 } = require('../router-helpers.js');
+
+function emitSync (command, data, callback) {
+    return new Promise(function (resolve) {
+        process.send({command, ...data});
+        setTimeout(resolve, 100);
+    });
+}
 
 const authRouter = asyncRouter(async function (req, res, next) {
     passport.authenticate('local', function (error, user, info) {
@@ -125,97 +134,107 @@ const syncRouter = asyncRouter(async function (req, res) {
 });
 
 const syncDataRouter = asyncRouter(async function (req, res) {
-    const marketId = req.params.marketId;
-    const worldNumber = parseInt(req.params.worldNumber, 10);
-    const worldId = marketId + worldNumber;
-    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
-    const worlds = await db.map(sql.getWorlds, [], world => world.num);
-
-    if (marketsWithAccounts.includes(marketId) && worlds.includes(worldNumber)) {
-        syncSocket.send(JSON.stringify({
-            code: enums.SYNC_REQUEST_SYNC_DATA,
-            marketId,
-            worldNumber
-        }));
+    if (!paramWorld(req)) {
+        req.flash('error', i18n('error_world_not_found', 'admin', res.locals.lang));
+        return res.redirect('/admin/sync');
     }
+
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req);
+
+    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
+
+    if (!marketsWithAccounts.includes(marketId)) {
+        req.flash('error', i18n('error_market_has_no_sync_accounts', 'admin', res.locals.lang, [worldId]));
+        return res.redirect('/admin/sync');
+    }
+
+    await emitSync(syncCommands.DATA, {
+        marketId,
+        worldNumber
+    });
 
     req.flash('messages', i18n('message_sync_data_world_started', 'admin', res.locals.lang, [worldId]));
     res.redirect(`/admin/sync#world-${worldId}`);
 });
 
 const syncDataAllRouter = asyncRouter(async function (req, res) {
-    syncSocket.send(JSON.stringify({
-        code: enums.SYNC_REQUEST_SYNC_DATA_ALL
-    }));
+    await emitSync(syncCommands.DATA_ALL);
 
     req.flash('messages', i18n('message_sync_data_all_started', 'admin', res.locals.lang));
     res.redirect('/admin/sync');
 });
 
 const syncAchievementsRouter = asyncRouter(async function (req, res) {
-    const marketId = req.params.marketId;
-    const worldNumber = parseInt(req.params.worldNumber, 10);
-    const worldId = marketId + worldNumber;
-    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
-    const worlds = await db.map(sql.getWorlds, [], world => world.num);
-
-    if (marketsWithAccounts.includes(marketId) && worlds.includes(worldNumber)) {
-        syncSocket.send(JSON.stringify({
-            code: enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS,
-            marketId,
-            worldNumber
-        }));
+    if (!paramWorld(req)) {
+        req.flash('error', i18n('error_world_not_found', 'admin', res.locals.lang));
+        return res.redirect('/admin/sync');
     }
+
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req);
+
+    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
+
+    if (!marketsWithAccounts.includes(marketId)) {
+        req.flash('error', i18n('error_market_has_no_sync_accounts', 'admin', res.locals.lang, [worldId]));
+        return res.redirect('/admin/sync');
+    }
+
+    await emitSync(syncCommands.ACHIEVEMENTS, {
+        marketId,
+        worldNumber
+    });
 
     req.flash('messages', i18n('message_sync_achievements_world_started', 'admin', res.locals.lang, [worldId]));
     res.redirect(`/admin/sync#world-${worldId}`);
 });
 
 const syncAchievementsAllRouter = asyncRouter(async function (req, res) {
-    syncSocket.send(JSON.stringify({
-        code: enums.SYNC_REQUEST_SYNC_ACHIEVEMENTS_ALL
-    }));
+    await emitSync(syncCommands.ACHIEVEMENTS_ALL);
 
     req.flash('messages', i18n('message_sync_achievements_all_started', 'admin', res.locals.lang));
     res.redirect('/admin/sync');
 });
 
 const scrapeMarketsRouter = asyncRouter(async function (req, res) {
-    syncSocket.send(JSON.stringify({
-        code: enums.SYNC_REQUEST_SYNC_MARKETS
-    }));
+    await emitSync(syncCommands.MARKETS);
 
     req.flash('messages', i18n('message_scrape_markets_started', 'admin', res.locals.lang));
     res.redirect('/admin/sync');
 });
 
 const scrapeWorldsRouter = asyncRouter(async function (req, res) {
-    syncSocket.send(JSON.stringify({
-        code: enums.SYNC_REQUEST_SYNC_WORLDS
-    }));
+    await emitSync(syncCommands.WORLDS);
 
     req.flash('messages', i18n('message_scrape_worlds_started', 'admin', res.locals.lang));
     res.redirect('/admin/sync');
 });
 
 const toggleSyncRouter = asyncRouter(async function (req, res) {
-    const marketId = req.params.marketId;
-    const worldNumber = req.params.worldNumber ? parseInt(req.params.worldNumber, 10) : false;
-    const worldId = marketId + worldNumber;
-    const code = worldNumber ? enums.SYNC_TOGGLE_WORLD : enums.SYNC_TOGGLE_MARKET;
-
-    if (!worldNumber) {
-        debug.sync(i18n('error_sync_toggle_world_only', 'admin', res.locals.lang));
-        req.flash('error', i18n('error_sync_toggle_world_only', 'admin', res.locals.lang));
-    } else {
-        req.flash('messages', i18n('message_world_toggled', 'admin', res.locals.lang, [worldId]));
-        syncSocket.send(JSON.stringify({
-            code,
-            marketId,
-            worldNumber
-        }));
+    if (!paramWorld(req)) {
+        req.flash('error', i18n('error_world_not_found', 'admin', res.locals.lang));
+        return res.redirect('/admin/sync');
     }
 
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req);
+
+    await emitSync(syncCommands.TOGGLE, {
+        marketId,
+        worldNumber
+    });
+
+    req.flash('messages', i18n('message_world_toggled', 'admin', res.locals.lang, [worldId]));
     res.redirect(`/admin/sync#world-${worldId}`);
 });
 
