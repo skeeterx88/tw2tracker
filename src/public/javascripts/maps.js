@@ -29,49 +29,43 @@ require([
         const $quickJumpY = document.querySelector('#quick-jump-y');
         const $quickJumpGo = document.querySelector('#quick-jump-go');
 
-        $quickJumpX.addEventListener('keydown', (event) => {
-            if (event.code === 'Enter') {
-                map.moveTo($quickJumpX.value, $quickJumpY.value);
+        const onInput = function (event) {
+            if (event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrag') {
+                const coords = event.target.value.match(/(\d{1,3})[^\d](\d{1,3})/);
+
+                if (coords !== null) {
+                    $quickJumpX.value = coords[1];
+                    $quickJumpY.value = coords[2];
+                    $quickJumpY.focus();
+                    return;
+                }
             }
-        });
 
-        const rnondigit = /[^\d]/g;
-        const rloosecoords = /(\d{1,3})[^\d](\d{1,3})/;
+            event.target.value = event.target.value.replace(/[^\d]/g, '');
 
-        const coordsInputFactory = ($input) => {
-            return (event) => {
-                if (event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrag') {
-                    const coords = $input.value.match(rloosecoords);
-
-                    if (coords !== null) {
-                        $quickJumpX.value = coords[1];
-                        $quickJumpY.value = coords[2];
-                        $quickJumpY.focus();
-
-                        return;
-                    }
-                }
-
-                $input.value = $input.value.replace(rnondigit, '');
-
-                if ($input.value.length > 3) {
-                    $input.value = $quickJumpX.value.slice(0, 3);
-                }
-            };
+            if (event.target.value.length > 3) {
+                event.target.value = $quickJumpX.value.slice(0, 3);
+            }
         };
 
-        $quickJumpX.addEventListener('input', coordsInputFactory($quickJumpX));
-        $quickJumpY.addEventListener('input', coordsInputFactory($quickJumpY));
-
-        $quickJumpY.addEventListener('keydown', (event) => {
-            if (event.code === 'Enter') {
-                map.moveTo($quickJumpX.value, $quickJumpY.value);
+        function onAction (event) {
+            if (event.code === 'Escape') {
+                $quickJumpX.value = '';
+                $quickJumpY.value = '';
+            } else if (event.code === 'Enter') {
+                move();
             }
-        });
+        }
 
-        $quickJumpGo.addEventListener('click', (event) => {
-            map.moveTo($quickJumpX.value, $quickJumpY.value);
-        });
+        function move () {
+            map.moveTo($quickJumpX.value || 500, $quickJumpY.value || 500);
+        }
+
+        $quickJumpX.addEventListener('input', onInput);
+        $quickJumpY.addEventListener('input', onInput);
+        $quickJumpX.addEventListener('keydown', onAction);
+        $quickJumpY.addEventListener('keydown', onAction);
+        $quickJumpGo.addEventListener('click', move);
     };
 
     const setupCustomHighlights = async () => {
