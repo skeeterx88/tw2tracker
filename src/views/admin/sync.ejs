@@ -52,6 +52,18 @@
         </section>
     </div>
     <div class="right">
+        <% if (user.privileges[privilegeTypes.START_SYNC]) { %>
+            <section id="sync-panel">
+                <h1><%= i18n('header_panel', 'admin_sync', lang) %></h1>
+
+                <div class="content-border">
+                    <div class="actions">
+                        <a id="sync-world-list" class="relax-button" data-active="no" href="/admin/sync/worlds"><%= i18n('button_sync_world_list', 'admin_sync', lang) %></a>
+                    </div>
+                </div>
+            </section>
+        <% } %>
+
         <section id="sync-summary">
             <h1><%= i18n('header_summary', 'admin_sync', lang) %></h1>
 
@@ -83,17 +95,5 @@
 
             </div>
         </section>
-
-        <% if (user.privileges[privilegeTypes.START_SYNC]) { %>
-            <section id="sync-panel">
-                <h1><%= i18n('header_panel', 'admin_sync', lang) %></h1>
-
-                <div class="content-border">
-                    <div class="actions">
-                        <a id="sync-world-list" class="relax-button" data-active="no" href="/admin/sync/worlds"><%= i18n('button_sync_world_list', 'admin_sync', lang) %></a>
-                    </div>
-                </div>
-            </section>
-        <% } %>
     </div>
 </div>
