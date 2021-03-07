@@ -1,15 +1,35 @@
+define('easingEffects', [], function () {
+    return {
+        linear: t => t,
+        easeInQuad: t => t*t,
+        easeOutQuad: t => t*(2-t),
+        easeInOutQuad: t => t<.5 ? 2*t*t : -1+(4-2*t)*t,
+        easeInCubic: t => t*t*t,
+        easeOutCubic: t => (--t)*t*t+1,
+        easeInOutCubic: t => t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1,
+        easeInQuart: t => t*t*t*t,
+        easeOutQuart: t => 1-(--t)*t*t*t,
+        easeInOutQuart: t => t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t,
+        easeInQuint: t => t*t*t*t*t,
+        easeOutQuint: t => 1+(--t)*t*t*t*t,
+        easeInOutQuint: t => t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t,
+        easeInOutSine: t => -(Math.cos(Math.PI * t) - 1) / 2
+    };
+});
+
 define('TW2Map', [
     'i18n',
     'utils',
+    'easingEffects',
     'backendValues'
 ], function (
     i18n,
     utils,
+    easingEffects,
     {
         marketId,
         worldNumber,
-        mapShareTypes,
-
+        mapShareTypes
     }
 ) {
     const TW2Map = function (containerSelector, loader, tooltip, settings) {
@@ -31,7 +51,9 @@ define('TW2Map', [
             quickHighlightColor: '#ffffff',
             activeVillageBorderColor: '#ffffff',
             activeVillageBorderOpacity: '80',
-            demarcationsColor: '#000000'
+            demarcationsColor: '#000000',
+            animationTime: 0.6,
+            animationEffect: 'easeInOutCubic'
         };
 
         settings = {
@@ -69,6 +91,16 @@ define('TW2Map', [
         let centerCoordY;
         let mouseCoordX;
         let mouseCoordY;
+
+        const easingEffectFn = easingEffects[settings.animationEffect];
+        let automaticMoviment = false;
+        let animationStartTime;
+        let animationStartX;
+        let animationStartY;
+        let animationEndX;
+        let animationEndY;
+        let animationDiffX;
+        let animationDiffY;
 
         const events = {};
 
@@ -756,7 +788,21 @@ define('TW2Map', [
 
         const continuousRender = () => {
             if (renderEnabled) {
+                if (automaticMoviment) {
+                    const step = (Date.now() - animationStartTime) / (settings.animationTime * 1000);
+                    const multiplier = easingEffectFn(step);
+                    positionX = Math.ceil(animationStartX + (multiplier * animationDiffX));
+                    positionY = Math.ceil(animationStartY + (multiplier * animationDiffY));
+
+                    if (step >= settings.animationTime + 0.3) {
+                        renderEnabled = false;
+                        automaticMoviment = false;
+                    }
+                }
+
                 renderViewport();
+                renderVisibleDemarcations();
+                renderVisibleContinents();
             }
 
             requestAnimationFrame(continuousRender);
@@ -902,31 +948,20 @@ define('TW2Map', [
         };
 
         this.moveTo = (x, y) => {
-            if (x === '' || isNaN(x) || y === '' || isNaN(y)) {
-                return;
-            }
-
-            const oldPositionX = positionX;
-            const oldPositionY = positionY;
-
-            positionX = utils.boundNumber(x, 0, 999) * zoomSettings.tileSize;
-            positionY = utils.boundNumber(y, 0, 999) * zoomSettings.tileSize;
-
-            if (oldPositionX === positionX && oldPositionY === positionY) {
-                return;
-            }
-
-            updateCenter();
+            animationStartTime = Date.now();
+            animationStartX = positionX;
+            animationStartY = positionY;
+            animationEndX = x * zoomSettings.tileSize;
+            animationEndY = y * zoomSettings.tileSize;
+            animationDiffX = animationEndX - animationStartX;
+            animationDiffY = animationEndY - animationStartY;
+            automaticMoviment = true;
+            renderEnabled = true;
+            activeVillage = false;
 
             if (tooltip) {
                 tooltip.hide();
             }
-
-            renderVisibleDemarcations();
-            renderVisibleContinents();
-            renderViewport();
-            activeVillage = false;
-            renderOverlay();
         };
 
         this.zoomIn = () => {
