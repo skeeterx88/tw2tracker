@@ -679,6 +679,7 @@ span.conquest-self {
                 inset -1px -1px 1px #00000040,
                 1px 1px 2px 3px #00000070;
     white-space: nowrap;
+    min-width: 70px;
 }
 
 .sub-menu .item.selected {
