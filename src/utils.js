@@ -133,6 +133,7 @@ function sprintf (string, tokens = []) {
     return string.replace(/%{[^}]*}/g, () => tokens[i++]);
 }
 
+// TODO: move utils.ejsHelpers functions to utils obj.
 const ejsHelpers = {
     formatNumbers: function (value) {
         return typeof value === 'number'

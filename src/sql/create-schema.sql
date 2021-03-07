@@ -57,7 +57,9 @@ CREATE TABLE public.worlds (
     close_date TIMESTAMP NULL,
     open_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     incomplete_data BOOLEAN DEFAULT FALSE,
-    sync_enabled BOOLEAN DEFAULT TRUE
+    sync_enabled BOOLEAN DEFAULT TRUE,
+    sync_data_active BOOLEAN DEFAULT FALSE,
+    sync_achievements_active BOOLEAN DEFAULT FALSE
 );
 
 CREATE TYPE public.map_share_type AS ENUM ('static', 'dynamic');

@@ -22,30 +22,33 @@ const Sync = {};
 
 let browser = null;
 
-const syncDataActiveWorlds = new Set();
-const syncAchievementsActiveWorlds = new Set();
-let syncDataAllRunning = false;
-let syncAchievementsAllRunning = false;
-let syncWorldListRunning = false;
-
-const updateSyncStatusMap = {
-    data: sql.updateDataSync,
-    achievements: sql.updateAchievementsSync
+const running = {
+    data: new Set(),
+    achievements: new Set()
 };
 
 Sync.init = async function () {
     debug.sync('initializing sync system');
 
-    Events.on(enums.SYNC_DATA_START, (worldId) => syncDataActiveWorlds.add(worldId));
-    Events.on(enums.SYNC_DATA_FINISH, (worldId) => syncDataActiveWorlds.delete(worldId));
-    Events.on(enums.SYNC_DATA_ALL_START, () => syncDataAllRunning = true);
-    Events.on(enums.SYNC_DATA_ALL_FINISH, () => syncDataAllRunning = false);
-    Events.on(enums.SYNC_ACHIEVEMENTS_START, (worldId) => syncAchievementsActiveWorlds.add(worldId));
-    Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, (worldId) => syncAchievementsActiveWorlds.delete(worldId));
-    Events.on(enums.SYNC_ACHIEVEMENTS_ALL_START, () => syncAchievementsAllRunning = true);
-    Events.on(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, () => syncAchievementsAllRunning = false);
-    Events.on(enums.SYNC_WORLDS_START, () => syncWorldListRunning = true);
-    Events.on(enums.SYNC_WORLDS_FINISH, () => syncWorldListRunning = false);
+    Events.on(enums.SYNC_DATA_START, function (worldId) {
+        db.query(sql.setWorldSyncDataActive, {active: true, worldId});
+    });
+
+    Events.on(enums.SYNC_DATA_FINISH, function (worldId, status) {
+        db.none(sql.updateDataSync, {status, worldId});
+        db.none(sql.setWorldSyncDataActive, {active: false, worldId});
+        running.data.delete(worldId);
+    });
+
+    Events.on(enums.SYNC_ACHIEVEMENTS_START, function (worldId) {
+        db.none(sql.setWorldSyncAchievementsActive, {active: true, worldId});
+    });
+
+    Events.on(enums.SYNC_ACHIEVEMENTS_FINISH, function (worldId, status) {
+        db.none(sql.updateAchievementsSync, {status, worldId});
+        db.none(sql.setWorldSyncAchievementsActive, {active: false, worldId});
+        running.achievements.delete(worldId);
+    });
 
     process.on('SIGTERM', async function () {
         await db.$pool.end();
@@ -66,6 +69,9 @@ Sync.init = async function () {
             value: false
         });
     }
+
+    await db.none(sql.resetWorldsSyncDataActive);
+    await db.none(sql.resetWorldsSyncAchievementsActive);
 
     const tasks = await Sync.tasks();
 
@@ -135,9 +141,14 @@ Sync.trigger = function (msg) {
 Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber;
 
-    if (syncDataActiveWorlds.has(worldId)) {
+    if (running.data.has(worldId)) {
         debug.sync('world:%s sync in progress', worldId);
+        return false;
     }
+
+    running.data.add(worldId);
+
+    const world = await getWorld(marketId, worldNumber);
 
     Events.trigger(enums.SYNC_DATA_START, [worldId]);
     debug.sync('world:%s start data sync (attempt %i)', worldId, attempt);
@@ -146,19 +157,20 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
     try {
         await utils.timeout(async function () {
-            const world = await getWorld(marketId, worldNumber);
             const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             if (!world.sync_enabled) {
-                const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
-                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, date]);
+                Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL]);
+                return false;
             }
 
             if (flag !== enums.IGNORE_LAST_SYNC && world.last_sync) {
                 const minutesSinceLastSync = (Date.now() - world.last_sync.getTime()) / 1000 / 60;
+
                 if (minutesSinceLastSync < config.scraper_interval_minutes) {
                     debug.sync('world:%s already sinced', worldId, attempt);
-                    return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED, Date.now()]);
+                    Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_ALREADY_SYNCED]);
+                    return false;
                 }
             }
 
@@ -166,8 +178,8 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             if (!account) {
                 debug.sync('world:%s all accounts failed to authenticate', worldId);
-                const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
-                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS, date]);
+                Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS]);
+                return false;
             }
 
             const worldCharacter = account.characters.find(({world_id}) => world_id === worldId);
@@ -177,7 +189,8 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             } else if (!worldCharacter.allow_login) {
                 await db.query(sql.closeWorld, [marketId, worldNumber]);
                 debug.sync('world:%s closing', worldId);
-                return Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED, Date.now()]);
+                Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_WORLD_CLOSED]);
+                return false;
             }
 
             page = await createPuppeteerPage();
@@ -209,13 +222,12 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             await page.close();
 
             debug.sync('world:%s data sync finished', worldId);
-            const date = await updateSyncLastStatus('data', enums.SYNC_SUCCESS, marketId, worldNumber);
-            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
-        }, '3 minutes');
+            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_SUCCESS]);
+        }, '5 minutes');
+
+        return true;
     } catch (error) {
         debug.sync('world:%s data sync failed (%s)', worldId, error.message);
-
-        syncDataActiveWorlds.delete(worldId);
 
         if (page) {
             await page.close();
@@ -224,8 +236,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < config.sync.max_sync_attempts) {
             return await Sync.data(marketId, worldNumber, flag, attempt + 1);
         } else {
-            const date = await updateSyncLastStatus('data', enums.SYNC_FAIL, marketId, worldNumber);
-            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL, date]);
+            Events.trigger(enums.SYNC_DATA_FINISH, [worldId, enums.SYNC_FAIL]);
             throw new Error(error.message);
         }
     }
@@ -234,9 +245,14 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     const worldId = marketId + worldNumber;
 
-    if (syncAchievementsActiveWorlds.has(worldId)) {
-        return debug.sync('world:%s is already syncing achievements', worldId);
-    } 
+    if (running.achievements.has(worldId)) {
+        debug.sync('world:%s is already syncing achievements', worldId);
+        return false;
+    }
+
+    running.achievements.add(worldId);
+
+    const world = await getWorld(marketId, worldNumber);
 
     debug.sync('world:%s start achievements sync (attempt %d)', worldId, attempt);
     Events.trigger(enums.SYNC_ACHIEVEMENTS_START, [worldId]);
@@ -245,20 +261,19 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
     try {
         await utils.timeout(async function () {
-            const world = await getWorld(marketId, worldNumber);
             const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             if (!world.sync_enabled) {
-                const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
-                return Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, date]);
+                Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL]);
+                return false;
             }
 
             const account = await Sync.auth(marketId);
 
             if (!account) {
                 debug.sync('world:%s all accounts failed to authenticate', worldId);
-                const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
-                return Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS, date]);
+                Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_NO_ACCOUNTS]);
+                return false;
             }
 
             page = await createPuppeteerPage();
@@ -272,13 +287,12 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             await page.close();
 
             debug.sync('world:%s achievements sync finished', worldId);
-            const date = await updateSyncLastStatus('achievements', enums.SYNC_SUCCESS, marketId, worldNumber);
-            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS, date]);
+            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_SUCCESS]);
         }, '20 minutes');
+
+        return true;
     } catch (error) {
         debug.sync('world:%s achievements sync failed (%s)', worldId, error.message);
-
-        syncAchievementsActiveWorlds.delete(worldId);
 
         if (page) {
             await page.close();
@@ -287,101 +301,56 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         if (attempt < config.sync.max_sync_attempts) {
             return await Sync.achievements(marketId, worldNumber, flag, attempt + 1);
         } else {
-            const date = await updateSyncLastStatus('achievements', enums.SYNC_FAIL, marketId, worldNumber);
-            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL, date]);
+            Events.trigger(enums.SYNC_ACHIEVEMENTS_FINISH, [worldId, enums.SYNC_FAIL]);
             throw new Error(error.message);
         }
     }
 };
 
 Sync.dataAll = async function (flag) {
-    debug.sync('all-worlds-data sync start (parallel: %d)', config.sync.parallel_data_sync);
-
-    if (syncDataAllRunning) {
-        return debug.sync('all-worlds-data sync in progress');
-    }
-
-    Events.trigger(enums.SYNC_DATA_ALL_START);
+    debug.sync('all-worlds-data sync start');
 
     async function asynchronousSync () {
         const queue = await db.any(sql.getSyncEnabledWorlds);
-        const fails = [];
-        let running = 0;
 
         while (queue.length) {
-            if (running < config.sync.parallel_data_sync) {
+            if (running.data.size < config.sync.parallel_data_sync) {
                 const world = queue.shift();
-
-                running++;
-
-                Sync.data(world.market, world.num, flag).catch(function (error) {
-                    fails.push({
-                        marketId: world.market,
-                        worldNumber: world.num,
-                        message: error.message
-                    });
-                });
+                Sync.data(world.market, world.num, flag);
             } else {
                 await Events.on(enums.SYNC_DATA_FINISH);
-                running--;
             }
         }
-
-        return fails;
     }
 
-    const fails = await asynchronousSync();
+    await asynchronousSync();
     debug.sync('all-worlds-data sync finish');
-    Events.trigger(enums.SYNC_DATA_ALL_FINISH, fails);
 };
 
 Sync.achievementsAll = async function (flag) {
-    debug.sync('all-worlds-achievements sync start (parallel: %d)', config.sync.parallel_achievements_sync);
-
-    if (syncAchievementsAllRunning) {
-        return debug.sync('all-worlds-achievements in progress');
-    }
-
-    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_START);
+    debug.sync('all-worlds-achievements sync start');
 
     async function asynchronousSync () {
         const queue = await db.any(sql.getSyncEnabledWorlds);
-        const fails = [];
-        let running = 0;
 
         while (queue.length) {
-            if (running < config.sync.parallel_achievements_sync) {
+            if (running.achievements.size < config.sync.parallel_achievements_sync) {
                 const world = queue.shift();
-
-                running++;
-
-                Sync.achievements(world.market, world.num, flag).catch(function (error) {
-                    fails.push({
-                        marketId: world.market,
-                        worldNumber: world.num,
-                        message: error.message
-                    });
-                });
+                Sync.achievements(world.market, world.num, flag);
             } else {
                 await Events.on(enums.SYNC_ACHIEVEMENTS_FINISH);
-                running--;
             }
         }
-
-        return fails;
     }
 
-    const fails = await asynchronousSync();
-    debug.sync('all-worlds-achievements sync start');
-    Events.trigger(enums.SYNC_ACHIEVEMENTS_ALL_FINISH, fails);
+    await asynchronousSync();
+    debug.sync('all-worlds-achievements sync finish');
 };
 
 Sync.worlds = async function () {
     debug.worlds('start world list sync');
 
     const markets = await db.any(sql.getMarkets);
-
-    Events.trigger(enums.SYNC_WORLDS_START);
 
     for (const market of markets) {
         const marketId = market.id;
@@ -437,8 +406,6 @@ Sync.worlds = async function () {
             debug.worlds('market:%s failed to sync worlds (%s)', marketId, error.message);
         }
     }
-
-    Events.trigger(enums.SYNC_WORLDS_FINISH);
 };
 
 Sync.markets = async function () {
@@ -495,30 +462,30 @@ Sync.character = async function (marketId, worldNumber) {
 };
 
 Sync.auth = async function (marketId, attempt = 1) {
-    if (utils.hasOwn(auths, marketId)) {
+    if (auths[marketId]) {
         return await auths[marketId];
     }
-
-    const accounts = await db.any(sql.getMarketAccounts, {marketId});
-
-    if (!accounts.length) {
-        debug.auth('market:%s do not have any accounts', marketId, attempt);
-        return false;
-    }
-
-    const credentials = accounts[attempt - 1];
-
-    if (!credentials) {
-        debug.auth('market:%s all accounts failed to authenticate', marketId, attempt);
-        return false;
-    }
-
-    debug.auth('market:%s authenticating (attempt %d)', marketId, attempt);
 
     let page;
 
     try {
         auths[marketId] = utils.timeout(async function () {
+            const accounts = await db.any(sql.getMarketAccounts, {marketId});
+
+            if (!accounts.length) {
+                debug.auth('market:%s do not have any accounts', marketId, attempt);
+                return false;
+            }
+
+            const credentials = accounts[attempt - 1];
+
+            if (!credentials) {
+                debug.auth('market:%s all accounts failed to authenticate', marketId, attempt);
+                return false;
+            }
+
+            debug.auth('market:%s authenticating (attempt %d)', marketId, attempt);
+
             const urlId = marketId === 'zz' ? 'beta' : marketId;
 
             debug.auth('market:%s loading page', marketId);
