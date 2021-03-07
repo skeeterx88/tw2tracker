@@ -3,7 +3,6 @@ const path = require('path');
 const express = require('express');
 const createError = require('http-errors');
 const router = express.Router();
-const utils = require('../utils.js');
 const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
@@ -13,25 +12,25 @@ const mapsAPIRouter = require('./maps-api.js');
 
 const {
     mergeBackendLocals,
-    asyncRouter
+    asyncRouter,
+    paramWorld,
+    paramWorldParse
 } = require('../router-helpers.js');
 
 const worldRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next();
     }
 
-    const marketId = req.params.marketId;
-    const worldNumber = parseInt(req.params.worldNumber, 10);
-    const worldId = marketId + worldNumber;
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req);
 
     try {
         await fs.promises.access(path.join('.', 'data', worldId, 'info'));
     } catch (error) {
-        throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
-    }
-
-    if (!await utils.schemaExists(worldId)) {
         throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
     }
 
@@ -55,28 +54,21 @@ const worldRouter = asyncRouter(async function (req, res, next) {
 });
 
 const mapShareRouter = asyncRouter(async function (req, res, next) {
-    if (req.params.marketId.length !== 2 || isNaN(req.params.worldNumber)) {
+    if (!paramWorld(req)) {
         return next();
     }
 
+    const {
+        marketId,
+        worldNumber
+    } = await paramWorldParse(req);
+
     const mapShareId = req.params.mapShareId;
-    const marketId = req.params.marketId;
-    const worldNumber = parseInt(req.params.worldNumber, 10);
-
-    let mapShare;
-
-    const worldExists = await utils.schemaExists(marketId + worldNumber);
-
-    if (!worldExists) {
-        throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
-    }
-
     const world = await db.one(sql.getWorld, [marketId, worldNumber]);
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
+    const [mapShare] = await db.any(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber]);
 
-    try {
-        mapShare = await db.one(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber]);
-    } catch (error) {
+    if (!mapShare) {
         throw createError(404, i18n('missing_map_share', 'errors', res.locals.lang));
     }
 

@@ -3,6 +3,7 @@ const utils = require('./utils.js');
 const db = require('./db.js');
 const sql = require('./sql.js');
 const config = require('./config.js');
+const i18n = require('./i18n.js');
 
 async function getPlayer (worldId, playerId) {
     const player = await db.any(sql.getPlayer, {worldId, playerId});
@@ -54,7 +55,7 @@ async function paramWorldParse (req) {
     const worldSchema = await utils.schemaExists(worldId);
 
     if (!worldSchema) {
-        throw createError(404, 'This world does not exist');
+        throw createError(404, i18n('missing_world', 'errors', req.session.lang));
     }
 
     return {
