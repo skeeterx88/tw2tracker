@@ -30,8 +30,11 @@
 
 #sync-worlds .world-id {
     font-weight: bold;
+    display: inline-block;
     vertical-align: top;
-    margin-top: 2px;
+}
+
+#sync-worlds .values {
     display: inline-block;
 }
 
@@ -61,25 +64,15 @@
     cursor: wait;
 }
 
-#sync-worlds .last-data-sync-date,
-#sync-worlds .last-data-sync-status,
-#sync-worlds .last-achievements-sync-date,
-#sync-worlds .last-achievements-sync-status {
+#sync-worlds .sync-status {
     font-weight: bold;
 }
 
-#sync-worlds .sync-in-progress {
-    font-weight: bold;
-    color: green;
+#sync-worlds .field {
+    
 }
 
-#sync-worlds fieldset {
-    border: 1px solid #b77b56;
-    display: block;
-    min-width: 150px;
-    border-left: none;
-    border-bottom: none;
-    padding: 0 3px;
+#sync-worlds .type {
 }
 
 #sync-worlds .world {
@@ -153,10 +146,6 @@
 
 @media (max-width: 860px) {
     #sync-worlds fieldset {
-        display: block;
-    }
-
-    #sync-worlds .world-id {
         display: block;
     }
 }

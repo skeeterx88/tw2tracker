@@ -7,31 +7,23 @@
                 <% for (let world of openWorlds) { %>
                     <div class="world relax-container vertical" id="world-<%= world.world_id %>" data-market-id="<%= world.market %>" data-world-number="<%= world.num %>">
                         <div class="short-info">
-                            <p class="world-id">
+                            <div class="world-id">
                                 <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(` (${i18n('closed', 'admin_sync', lang)})`) } -%></span>
-                            </p>
-                            <fieldset>
-                                <legend><%= i18n('data_info', 'admin_sync', lang) %></legend>
-                                <p>
-                                    <%= i18n('last_time', 'admin_sync', lang) %>
-                                    <span class="last-data-sync-date" title="<% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date) : i18n('never', 'admin_sync', lang)) %>"><% __append(world.last_data_sync_date ? formatSince(world.last_data_sync_date) : i18n('never', 'admin_sync', lang)) %></span>
-                                </p>
-                                <p>
-                                    <%= i18n('last_status', 'admin_sync', lang) %>
-                                    <span class="last-data-sync-status"><% __append(i18n(world.last_data_sync_status, 'admin_sync_status', lang) || '-') %></span>
-                                </p>
-                            </fieldset>
-                            <fieldset>
-                                <legend><%= i18n('achievements_info', 'admin_sync', lang) %></legend>
-                                <p>
-                                    <%= i18n('last_time', 'admin_sync', lang) %>
-                                    <span class="last-achievements-sync-date" title="<% __append(world.last_achievements_sync_date ? formatDate(world.last_achievements_sync_date) : i18n('never', 'admin_sync', lang)) %>"><% __append(world.last_achievements_sync_date ? formatSince(world.last_achievements_sync_date) : i18n('never', 'admin_sync', lang)) %></span>
-                                </p>
-                                <p>
-                                    <%= i18n('last_status', 'admin_sync', lang) %>
-                                    <span class="last-achievements-sync-status"><% __append(i18n(world.last_achievements_sync_status, 'admin_sync_status', lang) || '-') %></span>
-                                </p>
-                            </fieldset>
+                            </div>
+
+                            <div class="values">
+                                <div class="field">
+                                    [<span class="type"><%= i18n('data_info', 'admin_sync', lang) %></span>
+                                    <span class="sync-status last-data-sync-status"><% __append(i18n(world.last_data_sync_status, 'admin_sync_status', lang) || '-') %></span>,
+                                    <span class="sync-value last-data-sync-date" title="<% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date) : i18n('never', 'admin_sync', lang)) %>"><% __append(world.last_data_sync_date ? formatSince(world.last_data_sync_date) : i18n('never', 'admin_sync', lang)) %></span>]
+                                </div>
+
+                                <div class="field">
+                                    [<span class="type"><%= i18n('achievements_info', 'admin_sync', lang) %></span>
+                                    <span class="sync-status last-achievements-sync-status"><% __append(i18n(world.last_achievements_sync_status, 'admin_sync_status', lang) || '-') %></span>,
+                                    <span class="sync-value last-achievements-sync-date" title="<% __append(world.last_achievements_sync_date ? formatDate(world.last_achievements_sync_date) : i18n('never', 'admin_sync', lang)) %>"><% __append(world.last_achievements_sync_date ? formatSince(world.last_achievements_sync_date) : i18n('never', 'admin_sync', lang)) %></span>]
+                                </div>
+                            </div>
                         </div>
 
                         <div class="actions">
