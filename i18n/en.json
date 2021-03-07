@@ -70,6 +70,9 @@
         "column_members": "Members",
         "column_points": "Points",
         "column_victory_points": "VP",
+        "column_victory_points_full": "Victory Points",
+        "column_domination": "%",
+        "column_domination_full": "World Domination Percentage",
         "column_villages": "Villages",
         "abandoned_village": "Abandoned",
         "view_tribes_ranking": "View complete tribes ranking",
@@ -90,8 +93,11 @@
         "column_members": "Members",
         "column_points": "Points",
         "column_victory_points": "VP",
+        "column_victory_points_full": "Victory Points",
         "column_villages": "Villages",
-        "column_player": "Player"
+        "column_player": "Player",
+        "column_domination": "%",
+        "column_domination_full": "World Domination"
     },
     "world_search": {
         "no_results": "No search results.",

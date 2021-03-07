@@ -59,6 +59,17 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     const total = parseInt(count, 10);
     const capitalizedCategory = utils.capitalize(category);
 
+    let displayDominationColumn = false;
+
+    if (!world.config.victory_points && offset < config.ui.ranking_page_items_per_page) {
+        displayDominationColumn = true;
+        const topTenVillages = ranking.slice(0, 10).reduce((villages, tribe) => villages + tribe.villages, 0);
+
+        for (let i = 0; i < 10; i++) {
+            ranking[i].domination = parseFloat((ranking[i].villages / topTenVillages * 100).toFixed(1));
+        }
+    }
+
     mergeBackendLocals(res, {
         marketId,
         worldNumber
@@ -73,6 +84,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         world,
         ranking,
         category,
+        displayDominationColumn,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},

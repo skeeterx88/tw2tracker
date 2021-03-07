@@ -15,11 +15,13 @@
             <th><%= i18n('column_tribe', 'world_ranking', lang) %></th>
             <th><%= i18n('column_members', 'world_ranking', lang) %></th>
             <th><%= i18n('column_points', 'world_ranking', lang) %></th>
-            <% if (world.config.victory_points) { -%>
-                <th title="Victory Points"><%= i18n('column_victory_points', 'world_ranking', lang) %></th>
+            <% if (world.config && world.config.victory_points) { -%>
+                <th title="<%= i18n('column_victory_points_full', 'world_ranking', lang) %>"><%= i18n('column_victory_points', 'world_ranking', lang) %></th>
             <% } -%>
             <th><%= i18n('column_villages', 'world_ranking', lang) %></th>
-        </tr>
+            <% if (displayDominationColumn) { -%>
+                <th title="<%= i18n('column_domination_full', 'world_ranking', lang) %>"><%= i18n('column_domination', 'world_ranking', lang) %></th>
+            <% } -%>
     </thead>
     <tbody>
         <% for (let tribe of ranking) { %>
@@ -28,17 +30,25 @@
                 <td>
                     <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
                     <% if (tribe.rank < 4) { %>
-                        <div class="color"></div>
+                        <div class="top-colors"></div>
                     <% } %>
                 </td>
                 <td><%= formatNumbers(tribe.members) %></td>
                 <td><%= formatNumbers(tribe.points) %></td>
 
-                <% if (world.config.victory_points) { -%>
+                <% if (world.config && world.config.victory_points) { -%>
                     <td><%= formatNumbers(tribe.victory_points) %></td>
                 <% } -%>
 
                 <td><%= formatNumbers(tribe.villages) %></td>
+
+                <% if (displayDominationColumn) { -%>
+                    <% if (tribe.domination) { -%>
+                        <td><%= tribe.domination %>%</td>
+                    <% } else { -%>
+                        <td>-</td>
+                    <% } -%>
+                <% } -%>
             </tr>
         <% } %>
     </tbody>

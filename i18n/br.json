@@ -70,6 +70,9 @@
         "column_members": "Membros",
         "column_points": "Pontos",
         "column_victory_points": "PV",
+        "column_victory_points_full": "Pontos de Vitória",
+        "column_domination": "%",
+        "column_domination_full": "Dominação do Mundo",
         "column_villages": "Aldeias",
         "abandoned_village": "Abandonada",
         "view_tribes_ranking": "Ver classificação completa de tribos",
@@ -90,8 +93,11 @@
         "column_members": "Membros",
         "column_points": "Pontos",
         "column_victory_points": "VP",
+        "column_victory_points_full": "Pontos de Vitória",
         "column_villages": "Aldeias",
-        "column_player": "Jogador"
+        "column_player": "Jogador",
+        "column_domination": "%",
+        "column_domination_full": "Dominação do Mundo"
     },
     "world_search": {
         "no_results": "Sem resultados na pesquisa.",

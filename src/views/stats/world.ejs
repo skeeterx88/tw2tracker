@@ -45,9 +45,12 @@
                             <th><%= i18n('column_members', 'world', lang) %></th>
                             <th><%= i18n('column_points', 'world', lang) %></th>
                             <% if (world.config && world.config.victory_points) { -%>
-                                <th title="Victory Points"><%= i18n('column_victory_points', 'world', lang) %></th>
+                                <th title="<%= i18n('column_victory_points_full', 'world', lang) %>"><%= i18n('column_victory_points', 'world', lang) %></th>
                             <% } -%>
                             <th><%= i18n('column_villages', 'world', lang) %></th>
+                            <% if (world.config && !world.config.victory_points) { -%>
+                                <th title="<%= i18n('column_domination_full', 'world', lang) %>"><%= i18n('column_domination', 'world', lang) %></th>
+                            <% } -%>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,6 +71,10 @@
                                 <% } -%>
 
                                 <td><%= formatNumbers(tribe.villages) %></td>
+
+                                <% if (world.config && !world.config.victory_points) { -%>
+                                    <td><%= tribe.domination %>%</td>
+                                <% } -%>
                             </tr>
                         <% } %>
                     </tbody>

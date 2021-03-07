@@ -136,6 +136,14 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         db.any(sql.getWorldLastTribeRepeatableAchievements, {worldId, period: '%-W%'})
     ]);
 
+    if (!world.config.victory_points) {
+        const topTenVillages = tribes.reduce((villages, tribe) => villages + tribe.villages, 0);
+
+        for (const tribe of tribes) {
+            tribe.domination = parseFloat((tribe.villages / topTenVillages * 100).toFixed(1));
+        }
+    }
+
     const achievements = {
         counts: {
             players: {
