@@ -1109,7 +1109,7 @@ define('TW2Map', [
             }
 
             if (!highlightsExport.length) {
-                throw new Error('No highlights to create a share');
+                throw new Error(i18n('error_map_share_no_highlights', 'maps'));
             }
 
             const response = await fetch('/maps/api/create-share', {

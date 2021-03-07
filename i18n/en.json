@@ -428,7 +428,8 @@
         "error_struct_not_found": "Struct data not found",
         "error_world_not_found": "World does not exist",
         "error_invalid_highlights": "Invalid highlights data",
-        "error_no_highlights_input": "No highlights specified"
+        "error_no_highlights_input": "No highlights specified",
+        "error_map_share_no_highlights": "No highlights to create a share"
     },
     "maps_tooltip": {
         "village": "Village",
