@@ -117,6 +117,7 @@ module.exports = function () {
         res.locals.availableLanguages = availableLanguages;
         res.locals.formatNumbers = utils.ejsHelpers.formatNumbers;
         res.locals.formatDate = utils.ejsHelpers.formatDate;
+        res.locals.formatSince = utils.formatSince;
         res.locals.capitalize = utils.ejsHelpers.capitalize;
         res.locals.sprintf = utils.sprintf;
         res.locals.lang = req.session.lang || config.lang;

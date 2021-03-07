@@ -174,6 +174,53 @@ const ejsHelpers = {
     capitalize
 };
 
+const UTC = function () {
+    const now = new Date();
+    return now.getTime() + now.getTimezoneOffset() * 1000 * 60;
+};
+
+const formatSince = function (date) {
+    const elapsedTime = UTC() - date;
+
+    const seconds = elapsedTime / 1000;
+    const minutes = seconds / 60;
+    const hours = minutes / 60;
+    const days = hours / 24;
+
+    let format = '';
+
+    if (minutes <= 1) {
+        format = 'just now';
+    } else if (hours <= 1) {
+        if (minutes < 2) {
+            format = '1 minute ago';
+        } else {
+            format = Math.floor(minutes) + ' minutes ago';
+        }
+    } else if (days <= 1) {
+        if (hours < 2) {
+            format = '1 hour ago';
+        } else {
+            format = Math.floor(hours) + ' hours ago';
+        }
+    } else {
+        if (days > 2) {
+            format = Math.floor(days) + ' days ago';
+        } else {
+            const dayHours = hours % 24;
+
+            if (dayHours <= 2) {
+                format = '1 day ago';
+            } else {
+                format = '1 day and ' + Math.floor(dayHours) + ' hours ago';
+            }
+            
+        }
+    }
+
+    return format;
+};
+
 module.exports = {
     noop,
     schemaExists,
@@ -189,5 +236,7 @@ module.exports = {
     hasOwn,
     ejsHelpers,
     capitalize,
-    sprintf
+    sprintf,
+    UTC,
+    formatSince
 };
