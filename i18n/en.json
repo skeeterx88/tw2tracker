@@ -309,7 +309,7 @@
         "error_sync_toggle_world_only": "Sync toggle is available for worlds only not markets.",
         "error_sync_account_not_exist": "Sync account %{account_id} does not exist.",
         "error_sync_market_not_exist": "Market %{market_id} does not exist.",
-        "error_sync_account_market_included": "Sync account already has market included.",
+        "error_sync_account_market_included": "Sync account already has market %{market_id} included.",
         "error_password_minimum_length": "Password minimum length is %{password_minimum_length}.",
         "error_username_minimum_length": "Sync account name minimum length is %{username_minimum_length}.",
         "error_sync_username_already_exists": "A sync account with name \"%{username}\" already exists.",
@@ -326,7 +326,15 @@
         "message_sync_data_all_started": "Sync data all started.",
         "message_sync_world_started": "Sync data on world %{world_id} started.",
         "message_sync_data_world_started": "Sync data on world %{world_id} started.",
-        "message_sync_achievements_world_started": "Sync achievements on world %{world_id} started."
+        "message_sync_achievements_world_started": "Sync achievements on world %{world_id} started.",
+        "message_sync_account_market_added": "Market %{market_id} added to sync account.",
+        "message_sync_account_market_removed": "Market added from sync account.",
+        "message_sync_account_deleted": "Sync account deleted.",
+        "message_sync_account_altered": "Sync account altered.",
+        "message_sync_account_added": "Sync account added.",
+        "message_mod_account_altered": "Mod account altered",
+        "message_mod_account_created": "Mod account created",
+        "message_mod_account_deleted": "Mod account deleted"
     },
     "admin_menu": {
         "sync": "Sync",
