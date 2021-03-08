@@ -262,6 +262,14 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
     running.achievements.add(worldId);
 
     const world = await getWorld(marketId, worldNumber);
+    const marketAccounts = await db.any(sql.getMarketAccounts, {marketId});
+
+    if (!marketAccounts.length) {
+        debug.sync('market:%s does not have any sync accounts', marketId);
+        Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.NO_ACCOUNTS]);
+        running.achievements.delete(worldId);
+        return false;
+    }
 
     debug.sync('world:%s start achievements sync (attempt %d)', worldId, attempt);
     Events.trigger(syncEvents.ACHIEVEMENTS_START, [worldId]);
@@ -291,7 +299,8 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
             if (!account) {
                 debug.sync('world:%s all accounts failed to authenticate', worldId);
-                Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.NO_ACCOUNTS]);
+                Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.AUTH_FAILED]);
+                running.achievements.delete(worldId);
                 return false;
             }
 
@@ -572,6 +581,11 @@ Sync.auth = async function (marketId, attempt = 1) {
 
             return account;
         }, '1 minute');
+
+        if (auths[marketId] === false) {
+            delete auths[marketId];
+            return false;
+        }
 
         return await auths[marketId];
     } catch (error) {

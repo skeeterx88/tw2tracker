@@ -3,5 +3,6 @@
     "FAIL": "fail",
     "ALREADY_SYNCED": "already_synced",
     "NO_ACCOUNTS": "no_accounts",
+    "AUTH_FAILED": "auth_failed",
     "WORLD_CLOSED": "world_closed"
 }

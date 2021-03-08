@@ -37,7 +37,7 @@ CREATE INDEX ON public.mods ((LOWER(name)));
 CREATE INDEX ON public.mods ((LOWER(email)));
 INSERT INTO public.mods (name, pass, email, privileges) VALUES ('admin', '$2b$10$qRNmynCwNPSzPK70izwTOumIE84CV4o364reaNKPhmhcMa/sDcyAK', 'admin@tw2-tracker.com', '{start_sync, control_sync, modify_accounts, modify_mods, modify_settings}');
 
-CREATE TYPE public.sync_status AS ENUM ('success', 'fail', 'already_synced', 'no_accounts', 'world_closed');
+CREATE TYPE public.sync_status AS ENUM ('success', 'fail', 'already_synced', 'no_accounts', 'world_closed', 'auth_failed');
 
 CREATE TABLE public.worlds (
     market VARCHAR (10) REFERENCES public.markets(id),
