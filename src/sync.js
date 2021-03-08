@@ -43,7 +43,6 @@ Sync.init = async function () {
     Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
         db.none(sql.updateDataSync, {status, worldId});
         db.none(sql.setWorldSyncDataActive, {active: false, worldId});
-        running.data.delete(worldId);
     });
 
     Events.on(syncEvents.ACHIEVEMENTS_START, function (worldId) {
@@ -53,7 +52,6 @@ Sync.init = async function () {
     Events.on(syncEvents.ACHIEVEMENTS_FINISH, function (worldId, status) {
         db.none(sql.updateAchievementsSync, {status, worldId});
         db.none(sql.setWorldSyncAchievementsActive, {active: false, worldId});
-        running.achievements.delete(worldId);
     });
 
     process.on('SIGTERM', async function () {
@@ -170,6 +168,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             if (!world.sync_enabled) {
                 Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.FAIL]);
+                running.data.delete(worldId);
                 return false;
             }
 
@@ -177,8 +176,9 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
                 const elapsedTime = utils.UTC() - world.last_data_sync_date;
 
                 if (elapsedTime < humanInterval(config.sync.min_time_between_data_syncs)) {
-                    debug.sync('world:%s already sinced', worldId, attempt);
+                    debug.sync('world:%s already sinced', worldId);
                     Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.ALREADY_SYNCED]);
+                    running.data.delete(worldId);
                     return false;
                 }
             }
@@ -188,6 +188,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             if (!account) {
                 debug.sync('world:%s all accounts failed to authenticate', worldId);
                 Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.NO_ACCOUNTS]);
+                running.data.delete(worldId);
                 return false;
             }
 
@@ -199,6 +200,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
                 await db.query(sql.closeWorld, [marketId, worldNumber]);
                 debug.sync('world:%s closing', worldId);
                 Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.WORLD_CLOSED]);
+                running.data.delete(worldId);
                 return false;
             }
 
@@ -232,11 +234,13 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s data sync finished', worldId);
             Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.SUCCESS]);
+            running.data.delete(worldId);
         }, humanInterval(config.sync.max_sync_data_running_time));
 
         return true;
     } catch (error) {
         debug.sync('world:%s data sync failed (%s)', worldId, error.message);
+        running.data.delete(worldId);
 
         if (page) {
             await page.close();
@@ -282,6 +286,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
             if (!world.sync_enabled) {
                 Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.FAIL]);
+                running.achievements.delete(worldId);
                 return false;
             }
 
@@ -291,6 +296,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
                 if (elapsedTime < humanInterval(config.sync.min_time_between_achievement_syncs)) {
                     debug.sync('world:%s already sinced', worldId, attempt);
                     Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.ALREADY_SYNCED]);
+                    running.data.delete(worldId);
                     return false;
                 }
             }
@@ -316,11 +322,13 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s achievements sync finished', worldId);
             Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.SUCCESS]);
+            running.achievements.delete(worldId);
         }, humanInterval(config.sync.max_sync_achievements_running_time));
 
         return true;
     } catch (error) {
         debug.sync('world:%s achievements sync failed (%s)', worldId, error.message);
+        running.achievements.delete(worldId);
 
         if (page) {
             await page.close();
