@@ -1255,6 +1255,8 @@ define('TW2Map', [
         ['#494500', '#02350f', '#00293a', '#730202', '#8c4700', '#8c8200', '#6a043e', '#723305', '#42108c', '#152232', '#00008c', '#8c0676', '#c766c7', '#00ff83']
     ];
 
+    TW2Map.colorPaletteTopThree = ['#FFF800', '#00FFFF', '#FF17BB'];
+
     TW2Map.highlightTypes = {
         PLAYERS: 'players',
         TRIBES: 'tribes',

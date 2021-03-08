@@ -22,8 +22,6 @@ require([
     let loader;
     let tooltip;
 
-    const colors = ['#ffee00', '#0000ff', '#ff0000'];
-
     const averagePositionFor = (type, id) => {
         let averageX;
         let averageY;
@@ -58,7 +56,7 @@ require([
         }
 
         for (let i = 0; i < mapHighlights.length; i++) {
-            $topColors[i].style.backgroundColor = colors[i];
+            $topColors[i].style.backgroundColor = TW2Map.colorPaletteTopThree[i];
         }
     };
 
@@ -85,7 +83,7 @@ require([
 
         if (typeof mapHighlights !== 'undefined') {
             for (let i = 0; i < mapHighlights.length; i++) {
-                map.addHighlight(mapHighlightsType, mapHighlights[i].name, colors[i]);
+                map.addHighlight(mapHighlightsType, mapHighlights[i].name, TW2Map.colorPaletteTopThree[i]);
             }
         }
     };
