@@ -405,7 +405,7 @@ div.world-title {
 }
 
 .relax-container {
-    background: url(/images/noise.webp) #f9eed166;
+    background: url(/images/noise.webp) #e1ce9f;
     border-color: #b18e76;
     border-radius: 1px;
     border-style: outset;
@@ -428,7 +428,7 @@ div.world-title {
     width: 150px;
 }
 
-#market-list .relax-container.market .title {
+#market-list .market .title {
     width: 100px;
 }
 
@@ -463,11 +463,11 @@ div.world-title {
     text-align: center;
 }
 
-.relax-container .world-list {
+.world-list {
     width: 100%;
 }
 
-.relax-sub-container {
+.world-list .world {
     color: #311a11;
     margin: 10px 0px;
     display: flex;
@@ -478,21 +478,21 @@ div.world-title {
     border-radius: 5px;
     border-style: inset;
     border-width: 1px;
-    border-color: #b18e7675;
+    border-color: #e4d6b8;
     padding: 2px 8px;
     align-items: center;
     box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.relax-sub-container.closed {
-    background-color: #d9cbac;
+.world-list .world.closed {
+    background-color: #d0c09a;
 }
 
-.relax-sub-container .title {
+.world-list .world .title {
     font-size: 1.0em;
 }
 
-.relax-sub-container .relax-button {
+.world-list .world .relax-button {
     border-radius: 1px;
     border-width: 1px;
     border-style: solid;
@@ -1053,7 +1053,7 @@ span[class^="flag-"] {
         width: 100%;
     }
 
-    #market-list .relax-container.market .title {
+    #market-list .market .title {
         width: 100%;
     }
 
