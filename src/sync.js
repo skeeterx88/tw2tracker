@@ -156,6 +156,14 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
     running.data.add(worldId);
 
     const world = await getWorld(marketId, worldNumber);
+    const marketAccounts = await db.any(sql.getMarketAccounts, {marketId});
+
+    if (!marketAccounts.length) {
+        debug.sync('market:%s does not have any sync accounts', marketId);
+        Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.NO_ACCOUNTS]);
+        running.data.delete(worldId);
+        return false;
+    }
 
     Events.trigger(syncEvents.DATA_START, [worldId]);
     debug.sync('world:%s start data sync (attempt %i)', worldId, attempt);
