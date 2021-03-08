@@ -36,24 +36,6 @@ const running = {
 Sync.init = async function () {
     debug.sync('initializing sync system');
 
-    Events.on(syncEvents.DATA_START, function (worldId) {
-        db.query(sql.setWorldSyncDataActive, {active: true, worldId});
-    });
-
-    Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
-        db.none(sql.updateDataSync, {status, worldId});
-        db.none(sql.setWorldSyncDataActive, {active: false, worldId});
-    });
-
-    Events.on(syncEvents.ACHIEVEMENTS_START, function (worldId) {
-        db.none(sql.setWorldSyncAchievementsActive, {active: true, worldId});
-    });
-
-    Events.on(syncEvents.ACHIEVEMENTS_FINISH, function (worldId, status) {
-        db.none(sql.updateAchievementsSync, {status, worldId});
-        db.none(sql.setWorldSyncAchievementsActive, {active: false, worldId});
-    });
-
     process.on('SIGTERM', async function () {
         await db.$pool.end();
         process.exit(0);
@@ -76,6 +58,24 @@ Sync.init = async function () {
 
     await db.none(sql.resetWorldsSyncDataActive);
     await db.none(sql.resetWorldsSyncAchievementsActive);
+
+    Events.on(syncEvents.DATA_START, function (worldId) {
+        db.query(sql.setWorldSyncDataActive, {active: true, worldId});
+    });
+
+    Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
+        db.none(sql.updateDataSync, {status, worldId});
+        db.none(sql.setWorldSyncDataActive, {active: false, worldId});
+    });
+
+    Events.on(syncEvents.ACHIEVEMENTS_START, function (worldId) {
+        db.none(sql.setWorldSyncAchievementsActive, {active: true, worldId});
+    });
+
+    Events.on(syncEvents.ACHIEVEMENTS_FINISH, function (worldId, status) {
+        db.none(sql.updateAchievementsSync, {status, worldId});
+        db.none(sql.setWorldSyncAchievementsActive, {active: false, worldId});
+    });
 
     const tasks = await Sync.tasks();
 
@@ -100,6 +100,7 @@ Sync.init = async function () {
         for (const {share_id, last_access} of shares) {
             if (now - last_access.getTime() < expireTime) {
                 await db.query(sql.maps.deleteStaticShare, [share_id]);
+                // TODO: delete data as well
             }
         }
     });
