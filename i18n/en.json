@@ -61,6 +61,7 @@
         "search_tribes": "Tribes",
         "search_villages": "Villages",
         "search_search": "Search",
+        "accessibility_search_label": "search field",
         "column_rank": "Rank",
         "column_tribe": "Tribe",
         "column_player": "Player",

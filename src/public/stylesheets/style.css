@@ -570,6 +570,10 @@ div.world-title {
     opacity: 0;
 }
 
+.absolute-hidden {
+    display: none;
+}
+
 fieldset {
     border: none;
     padding: 0px;
