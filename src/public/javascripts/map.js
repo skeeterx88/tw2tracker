@@ -454,6 +454,12 @@ define('TW2Map', [
                 unsetActiveVillage();
             });
 
+            $overlay.addEventListener('mouseenter', (event) => {
+                if (automaticMoviment) {
+                    automaticMoviment = false;
+                }
+            });
+
             if (settings.allowZoom) {
                 $overlay.addEventListener('wheel', (event) => {
                     if (settings.zoomWithShift && !event.shiftKey) {
