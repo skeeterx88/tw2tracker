@@ -3,7 +3,7 @@
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
-module.exports = async function (marketId, worldNumber) {
+module.exports = async function (marketId, worldNumber, config) {
     const worldId = marketId + worldNumber;
     const socketService = injector.get('socketService');
     const routeProvider = injector.get('routeProvider');

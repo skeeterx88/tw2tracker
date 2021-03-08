@@ -217,7 +217,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s waiting ready state', worldId);
 
-            await page.evaluate(scraperReadyState);
+            await page.evaluate(scraperReadyState, config);
 
             if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
                 await fetchWorldMapStructure(page, worldId, urlId);
@@ -233,7 +233,7 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s fetching data', worldId);
 
-            const data = await page.evaluate(scraperData);
+            const data = await page.evaluate(scraperData, config);
             await commitRawDataFilesystem(data, worldId);
             await commitDataDatabase(data, worldId);
             await commitDataFilesystem(worldId);
@@ -320,9 +320,9 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
             page = await createPuppeteerPage();
             await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
-            await page.evaluate(scraperReadyState);
+            await page.evaluate(scraperReadyState, config);
 
-            const achievements = await page.evaluate(scraperAchievements, marketId, worldNumber);
+            const achievements = await page.evaluate(scraperAchievements, marketId, worldNumber, config);
             await commitRawAchievementsFilesystem(achievements, worldId);
             await commitAchievementsDatabase(achievements, worldId);
 
@@ -539,14 +539,14 @@ Sync.auth = async function (marketId, attempt = 1) {
                 waitUntil: ['domcontentloaded', 'networkidle0']
             });
 
-            const account = await page.evaluate(function (marketId, credentials) {
+            const account = await page.evaluate(function (marketId, credentials, config) {
                 return new Promise(function (resolve, reject) {
                     const socketService = injector.get('socketService');
                     const routeProvider = injector.get('routeProvider');
 
                     const loginTimeout = setTimeout(function () {
                         reject('emit credentials timeout');
-                    }, 5000);
+                    }, humanInterval(config.sync_timeouts.auth_socket_emit));
 
                     debug('market:%s emit login command', marketId);
 
@@ -555,7 +555,7 @@ Sync.auth = async function (marketId, attempt = 1) {
                         resolve(data);
                     });
                 });
-            }, marketId, credentials);
+            }, marketId, credentials, config);
 
             if (!account) {
                 const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent);
@@ -1015,6 +1015,7 @@ async function createPuppeteerPage () {
 
     const page = await browser.newPage();
     await page.exposeFunction('debug', debug.puppeteer);
+    await page.exposeFunction('humanInterval', humanInterval);
     return page;
 }
 

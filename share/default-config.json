@@ -23,6 +23,12 @@
         "max_sync_data_running_time": "5 minutes",
         "max_sync_achievements_running_time": "30 minutes"
     },
+    "sync_timeouts": {
+        "ready_state": "20 seconds",
+        "load_continent_section": "15 seconds",
+        "load_continent": "15 seconds",
+        "auth_socket_emit": "5 seconds"
+    },
     "sync_intervals": {
         "data_all": "60 minutes",
         "achievements_all": "6 hours",
