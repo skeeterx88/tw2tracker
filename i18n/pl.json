@@ -355,7 +355,7 @@
         "fail": "Porażka",
         "already_synced": "Juz zsynchronizowane",
         "world_closed": "Świat Zamknięty",
-        "sync_no_accounts": "Brak synchro kont"
+        "no_accounts": "Brak synchro kont"
     },
     "admin_sync_accounts": {
         "header_accounts": "Synchronizacja Kont",

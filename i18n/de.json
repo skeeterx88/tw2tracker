@@ -354,7 +354,7 @@
         "fail": "Fehlgeschlagen",
         "already_synced": "Bereits synchronisiert",
         "world_closed": "Welt geschlossen",
-        "sync_no_accounts": "Keine Synchroniserung Accounts"
+        "no_accounts": "Keine Synchroniserung Accounts"
     },
     "admin_sync_accounts": {
         "header_accounts": "Accounts Synchronisieren",

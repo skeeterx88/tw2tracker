@@ -353,7 +353,7 @@
         "fail": "Selhalo",
         "already_synced": "Synchronizován",
         "world_closed": "Svět uzavřen",
-        "sync_no_accounts": "Žádné účty pro synchronizaci"
+        "no_accounts": "Žádné účty pro synchronizaci"
     },
     "admin_sync_accounts": {
         "header_accounts": "Synchronizační účty",

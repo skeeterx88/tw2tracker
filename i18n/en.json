@@ -380,7 +380,7 @@
         "fail": "Fail",
         "already_synced": "Already Synced",
         "world_closed": "World Closed",
-        "sync_no_accounts": "No Sync Accounts"
+        "no_accounts": "No Sync Accounts"
     },
     "admin_sync_accounts": {
         "header_accounts": "Sync Accounts",
