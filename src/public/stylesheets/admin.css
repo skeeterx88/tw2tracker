@@ -12,13 +12,13 @@
 }
 
 .world-label {
-    border: 1px solid #794929;
+    border: 1px solid hsl(24, 49%, 32%);
     border-radius: 2px;
-    background: url(/images/noise.webp), linear-gradient(#8d5b39, #583f2d);
-    box-shadow: inset 0 0 0 1px #47240e;
-    color: #e0bfbf;
+    background: url(/images/noise.webp), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    box-shadow: inset 0 0 0 1px hsl(23, 67%, 17%);
+    color: hsl(0, 35%, 81%);
     padding: 0px 3px;
-    text-shadow: 1px 1px 0px #000;
+    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
     margin: 0px 1px;
     cursor: default;
 }
@@ -52,8 +52,8 @@
 }
 
 #sync-worlds .world .in-progress {
-    box-shadow: 0 0 0 1px green, inset 0 0 0 1px green, 2px 2px 2px #000;
-    border-color: #88bb7b;
+    box-shadow: 0 0 0 1px green, inset 0 0 0 1px green, 2px 2px 2px hsl(0, 0%, 0%);
+    border-color: hsl(108, 32%, 61%);
 }
 
 #sync-worlds .relax-button {
@@ -103,7 +103,7 @@
 }
 
 #admin section .content-border {
-    background: #ab80455e;
+    background: hsla(35, 43%, 47%, 55%);
     padding: 5px;
 }
 

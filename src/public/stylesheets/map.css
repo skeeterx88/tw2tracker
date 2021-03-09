@@ -20,7 +20,7 @@ button {
 }
 
 a {
-    color: #00B7FF;
+    color: hsl(197, 100%, 50%);
     text-decoration: none;
     font-weight: bold;
 }
@@ -35,7 +35,7 @@ a {
 }
 
 #map-page header a {
-    color: #ffeccc;
+    color: hsl(38, 100%, 90%);
 }
 
 #map-page footer {
@@ -64,7 +64,7 @@ ul {
 }
 
 ::placeholder {
-    color: #333;
+    color: hsl(0, 0%, 20%);
     text-shadow: none;
 }
 
@@ -81,7 +81,7 @@ h3 {
 }
 
 h1, h2, h3 {
-    text-shadow: 1px 1px 0px #000;
+    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
 }
 
 button {
@@ -89,46 +89,46 @@ button {
     padding: 0px 3px;
     outline: none;
     cursor: pointer;
-    color: #e0bfbf;
-    text-shadow: 1px 1px 0px #000;
+    color: hsl(0, 35%, 81%);
+    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
     border-radius: 1px;
     border-width: 1px;
     border-style: solid;
-    border-color: #794929;
-    background: url(/images/noise.png), linear-gradient(#8d5b39, #583f2d);
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000,
-                inset -1px -1px 2px #000;
+    border-color: hsl(24, 49%, 32%);
+    background: url(/images/noise.png), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
+                inset 0 0 0 1px hsl(23, 67%, 17%),
+                2px 2px 2px hsl(0, 0%, 0%),
+                inset -1px -1px 2px hsl(0, 0%, 0%);
 }
 
 button:hover,
 button:focus {
-    background: url(/images/noise.png), linear-gradient(#af7046, #583f2d);
+    background: url(/images/noise.png), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 26%));
 }
 
 button.red {
-    border-color: #923f32;
-    background-image: linear-gradient(#bd4646, #7d1616);
+    border-color: hsl(8, 49%, 38%);
+    background-image: linear-gradient(hsl(0, 47%, 51%), hsl(0, 70%, 29%));
 }
 
 button.red:hover,
 button.red:focus {
-    background-image: linear-gradient(#c75f5f, #7d1616);
+    background-image: linear-gradient(hsl(0, 48%, 58%), hsl(0, 70%, 29%));
 }
 
 .input {
     border-radius: 1px;
-    border: 1px solid #8d5b39;
-    background: url(/images/noise.png) #a07246;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000,
-                inset 1px 1px 3px #00000095;
+    border: 1px solid hsl(24, 42%, 39%);
+    background: url(/images/noise.png) hsl(29, 39%, 45%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
+                inset 0 0 0 1px hsl(23, 67%, 17%),
+                2px 2px 2px hsl(0, 0%, 0%),
+                inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
 }
 
 .input:focus-within {
-    border: 1px solid #b17a55;
+    border: 1px solid hsl(24, 37%, 51%);
 }
 
 #map-wrapper {
@@ -141,13 +141,13 @@ button.red:focus {
     width: 150px;
     flex-shrink: 0;
     height: 100%;
-    box-shadow: 5px 0px 6px #00000080;
+    box-shadow: 5px 0px 6px hsla(0, 0%, 0%, 80%);
     z-index: 5;
-    color: #ffeccc;
+    color: hsl(38, 100%, 90%);
     background: url(/images/side-bar-left.jpg) left repeat-y,
                 url(/images/side-bar-right.jpg) right repeat-y,
                 url(/images/side-bar-middle.jpg),
-                #413127;
+                hsl(23, 25%, 20%);
     position: relative;
     float: left;
 }
@@ -157,7 +157,7 @@ button.red:focus {
     width: 100%;
     height: 100%;
     user-select: none;
-    background-color: #436213;
+    background-color: hsl(84, 68%, 23%);
 }
 
 #panel-toggle {
@@ -169,11 +169,10 @@ button.red:focus {
     right: -28px;
     top: 0;
     bottom: 0;
-
     border-radius: 0px 5px 5px 0px;
-    border: 1px solid #6b635e;
-    background: url(/images/noise.png) #413127;
-    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #47240e, 5px 0px 6px #00000080;
+    border: 1px solid hsl(23, 6%, 39%);
+    background: url(/images/noise.png) hsl(23, 25%, 20%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 5px 0px 6px hsla(0, 0%, 0%, 80%);
 }
 
 #panel-toggle:after,
@@ -185,7 +184,7 @@ button.red:focus {
     display: inline-block;
     font-size: 25px;
     font-weight: bold;
-    color: #a59a8a;
+    color: hsl(36, 13%, 59%);
     cursor: pointer;
 }
 
@@ -204,7 +203,7 @@ button.red:focus {
 
 #quick-jump-coords {
     margin-left: 4px;
-    color: #6d4f32;
+    color: hsl(29, 37%, 31%);
     width: 88px;
     height: 22px;
     padding-top: 2px;
@@ -223,7 +222,7 @@ button.red:focus {
     text-align: center;
     padding: 0px;
     padding-top: 2px;
-    text-shadow: 0px 0px 1px #00000070;
+    text-shadow: 0px 0px 1px hsla(0, 0%, 0%, 70%);
 }
 
 #quick-jump-go {
@@ -250,7 +249,7 @@ button.red:focus {
     padding-left: 8px;
     padding-right: 8px;
     position: relative;
-    text-shadow: 0px 0px 1px #00000070;
+    text-shadow: 0px 0px 1px hsla(0, 0%, 0%, 70%);
 }
 
 #highlights-title {
@@ -262,12 +261,12 @@ button.red:focus {
     width: calc(100% - 11px);
     margin-top: 5px;
     margin-left: 2px;
-    text-shadow: 1px 1px 0px #000;
+    text-shadow: 1px 1px 0px hsl(0deg 0% 0%);
     height: calc(100% - 50px);
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: #806753 transparent;
+    scrollbar-color: hsl(27, 21%, 41%) transparent;
 }
 
 #highlight-items .item {
@@ -293,7 +292,7 @@ button.red:focus {
 }
 
 #highlight-items .item .name:hover {
-    color: #f3a859;
+    color: hsl(31, 87%, 65%);
 }
 
 #highlight-items .item .color {
@@ -305,24 +304,24 @@ button.red:focus {
     height: 10px;
     position: relative;
     border-radius: 1px;
-    border: 1px solid #8d5b39;
-    background: url(/images/noise.png) #a07246;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                1px 1px 2px #000;
+    border: 1px solid hsl(24, 42%, 39%);
+    background: url(/images/noise.png) hsl(29, 39%, 45%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
+                inset 0 0 0 1px hsl(23, 67%, 17%),
+                1px 1px 2px hsl(0, 0%, 0%);
     cursor: pointer;
 }
 
 #highlight-items .item .villages {
     width: 100%;
-    color: #bdaa89;
+    color: hsl(38, 28%, 64%);
     line-height: 0px;
     padding-left: 19px;
     font-size: 9px;
 }
 
 #highlight-items .item .color:hover {
-    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #d8bfb0;
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 34%, 77%);
 }
 
 #highlight-items .item .icon-players {
@@ -344,7 +343,7 @@ button.red:focus {
 }
 
 #highlight-items::-webkit-scrollbar-thumb {
-  background-color: #806753;
+  background-color: hsl(27, 21%, 41%);
 }
 
 #side-panel footer {
@@ -404,12 +403,12 @@ button.red:focus {
     top: 0px;
     z-index: 10;
     
-    background: url(/images/tooltip-background.png) #d0ac86;
+    background: url(/images/tooltip-background.png) hsl(31, 44%, 67%);
 }
 
 #color-picker td {
     padding:0;
-    border:1px solid #000;
+    border:1px solid hsl(0, 0%, 0%);
 }
 
 #color-picker .color {
@@ -421,19 +420,19 @@ button.red:focus {
 }
 
 #color-picker .active {
-    box-shadow: inset 0px 0px 0px 1px #00ff0080,
-                inset 0px 0px 0px 2px #00000080,
-                inset 0px 0px 0px 3px #00ff0080,
-                inset 0px 0px 0px 4px #00000080;
+    box-shadow: inset 0px 0px 0px 1px hsla(120, 100%, 50%, 80%),
+                inset 0px 0px 0px 2px hsla(0, 0%, 0%, 80%),
+                inset 0px 0px 0px 3px hsla(120, 100%, 50%, 80%),
+                inset 0px 0px 0px 4px hsla(0, 0%, 0%, 80%);
 }
 
 div.text-container {
     border-radius: 1px;
-    border: 1px solid #6b635e;
-    background: url(/images/noise.png) #413127;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                2px 2px 2px #000;
+    border: 1px solid hsl(23, 6%, 39%);
+    background: url(/images/noise.png) hsl(23, 25%, 20%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
+                inset 0 0 0 1px hsl(23, 67%, 17%),
+                2px 2px 2px hsl(0, 0%, 0%);
     padding: 2px 6px;
 }
 
@@ -442,8 +441,8 @@ div.text-container {
     bottom: 5px;
     margin-left: 5px;
     z-index: 10;
-    color: #a59a8a;
-    text-shadow: 1px 1px 0px #00000090;
+    color: hsl(36, 13%, 59%);
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
 }
 
 #map-info .hidden {
@@ -470,14 +469,14 @@ div.text-container {
 #all-worlds {
     position: absolute;
     width: 200px;
-    background: url(/images/noise.png) #6f4327;
-    color: #ffeccc;
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+    color: hsl(38, 100%, 90%);
     padding: 3px;
-    text-shadow: 1px 1px 0px #00000090;
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
     z-index: 7;
     transition: visibility 0.02s linear, opacity 0.02s linear;
-    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
-    border: 1px solid #5e351b;
+    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
+    border: 1px solid hsl(23, 55%, 24%);
     border-radius: 1px;
 }
 
@@ -512,8 +511,8 @@ div.text-container {
 }
 
 #all-market-worlds .world.selected {
-    background: url(/images/noise.png), linear-gradient(#6d5546, #422612);
-    border-color: #8a6d58;
+    background: url(/images/noise.png), linear-gradient(hsl(23, 22%, 35%), hsl(25, 57%, 16%));
+    border-color: hsl(25, 22%, 44%);
     font-weight: bold;
 }
 
@@ -533,12 +532,12 @@ div.text-container {
 }
 
 #all-markets div.market.selected {
-    background: #6d5546;
-    border-color: #b18e76;
+    background: hsl(23, 22%, 35%);
+    border-color: hsl(24, 27%, 58%);
 }
 
 #all-markets li:hover {
-    background: #865333;
+    background: hsl(23, 45%, 36%);
 }
 
 #change-settings {
@@ -549,14 +548,14 @@ div.text-container {
 #settings {
     position: absolute;
     width: 200px;
-    background: url(/images/noise.png) #6f4327;
-    color: #e0bfbf;
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+    color: hsl(0, 35%, 81%);
     padding: 3px;
-    text-shadow: 1px 1px 0px #00000090;
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
     z-index: 7;
     transition: visibility 0.02s linear, opacity 0.02s linear;
-    box-shadow: 0 0 0 1px #000, 0 0 0 2px #5e351b, 0 0 0 4px #000, 2px 2px 5px 5px #00000095;
-    border: 1px solid #5e351b;
+    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
+    border: 1px solid hsl(23, 55%, 24%);
     border-radius: 1px;
 }
 
@@ -578,26 +577,26 @@ div.text-container {
     height: 10px;
     position: relative;
     border-radius: 1px;
-    border: 1px solid #8d5b39;
-    background: url(/images/noise.png) #a07246;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240e,
-                1px 1px 2px #000;
+    border: 1px solid hsl(24, 42%, 39%);
+    background: url(/images/noise.png) hsl(29, 39%, 45%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
+                inset 0 0 0 1px hsl(23, 67%, 17%),
+                1px 1px 2px hsl(0, 0%, 0%);
     cursor: pointer;
     vertical-align: top;
 }
 
 #settings .color:hover {
-    box-shadow: 0 0 0 1px #47240e, inset 0 0 0 1px #d8bfb0;
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 34%, 77%);
 }
 
 #search-results {
-    color: #000;
+    color: hsl(0, 0%, 0%);
     line-height: 15px;
-    background: url(/images/noise-3.png) top left #ceab84;
-    box-shadow: inset 0 0 0 1px #533a1f,
-                inset 0 0 0 2px #dcba94,
-                5px 5px 5px #00000080;
+    background: url(/images/noise-3.png) top left hsl(32, 43%, 66%);
+    box-shadow: inset 0 0 0 1px hsl(31, 46%, 22%),
+                inset 0 0 0 2px hsl(32, 51%, 72%),
+                5px 5px 5px hsla(0, 0%, 0%, 80%);
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 3px;
@@ -623,12 +622,12 @@ div.text-container {
 }
 
 #search-results .result:hover {
-    color: #824300;
-    background-color: #f4dec666;
+    color: hsl(31, 100%, 25%);
+    background-color: hsla(31, 68%, 87%, 66%);
 }
 
 #search-results .result.selected {
-    color: #824300;
+    color: hsl(31, 100%, 25%);
     font-weight: bold;
 }
 
@@ -642,16 +641,16 @@ div.text-container {
     padding-bottom: 10px;
     z-index: 15;
     border-radius: 1px;
-    border: 1px solid #6b635e;
-    background: url(/images/noise.png) #351908;
-    box-shadow: 0 0 0 1px #47240e,
-                inset 0 0 0 1px #47240E,
-                2px 2px 5px #000,
-                inset 3px 3px 2px #ffffff10,
-                inset -3px -3px 2px #00000010;
+    border: 1px solid hsl(23, 6%, 39%);
+    background: url(/images/noise.png) hsl(23, 74%, 12%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
+                inset 0 0 0 1px hsl(23, 67%, 17%),
+                2px 2px 5px hsl(0, 0%, 0%),
+                inset 3px 3px 2px hsla(0, 0%, 100%, 10%),
+                inset -3px -3px 2px hsla(0, 0%, 0%, 10%);
     padding: 2px 6px;
-    color: #ffeccc;
-    text-shadow: 1px 1px 0px #00000090;
+    color: hsl(38, 100%, 90%);
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
 
 
     transition: visibility 0.1s linear,
@@ -684,8 +683,8 @@ div.text-container {
     font-size: 13px;
     text-align: center;
     margin: 3px;
-    text-shadow: 1px 1px 3px #000;
-    border-bottom: 1px solid #ffeccc50;
+    text-shadow: 1px 1px 3px hsl(0, 0%, 0%);
+    border-bottom: 1px solid hsla(38, 100%, 90%, 50%);
     padding-bottom: 5px;
     margin-bottom: 0px;
 }
@@ -735,7 +734,7 @@ div.text-container {
 .loading > div {
     width: 10px;
     height: 10px;
-    background-color: #9b724a;
+    background-color: hsl(30, 35%, 45%);
     border-radius: 100%;
     display: inline-block;
     animation: sk-bouncedelay 1s infinite ease-in-out both;
