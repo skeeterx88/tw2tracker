@@ -6,7 +6,7 @@ require([
         marketStats
     }
 ) {
-    const $markets = document.querySelectorAll('#market-list .market');
+    const $markets = document.querySelectorAll('.market-list .market');
 
     for (const $market of $markets) {
         const $worldList = $market.querySelector('.world-list');

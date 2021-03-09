@@ -1,7 +1,6 @@
 const express = require('express');
 const createError = require('http-errors');
 const router = express.Router();
-const utils = require('../utils');
 const config = require('../config.js');
 const db = require('../db.js');
 const sql = require('../sql.js');
@@ -81,11 +80,26 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
         throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
     }
 
-    const sortedWorlds = marketWorlds.sort((a, b) => a.num - b.num);
-    const worlds = [
-        [i18n('open_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => world.open)],
-        [i18n('closed_worlds', 'world_list', res.locals.lang), sortedWorlds.filter(world => !world.open)]
-    ];
+    const worlds = {
+        open: [],
+        closed: []
+    };
+
+    for (const world of marketWorlds) {
+        if (world.open) {
+            worlds.open.push(world);
+        } else {
+            worlds.closed.push(world);
+        }
+    }
+
+    const marketStats = {
+        players: marketWorlds.reduce((sum, world) => sum + world.player_count, 0),
+        tribes: marketWorlds.reduce((sum, world) => sum + world.tribe_count, 0),
+        villages: marketWorlds.reduce((sum, world) => sum + world.village_count, 0),
+        openWorlds: worlds.open.length,
+        closedWorlds: worlds.closed.length
+    };
 
     mergeBackendLocals(res, {
         marketId
@@ -96,6 +110,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
         title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config.site_name]),
         marketId,
         worlds,
+        marketStats,
         pageType: 'stats',
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},

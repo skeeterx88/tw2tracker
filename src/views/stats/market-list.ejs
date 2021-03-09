@@ -1,12 +1,9 @@
 <div class="content">
     <div class="single">
-        <section id="market-list">
+        <section class="market-list">
             <% for (let market of marketStats) { -%>
                 <div class="relax-container market">
-                    <h2 class="title">
-                        <span class="flag-<%= market.id %>"></span>
-                        <%= market.id.toUpperCase() %>
-                    </h2>
+                    <h2 class="title"><span class="flag-<%= market.id %>"><%= market.id.toUpperCase() %></span></h2>
                     <div class="stats">
                         <ul>
                             <li><%= formatNumbers(market.players) %> <%= i18n('players', 'market_list', lang) %></li>
@@ -25,18 +22,15 @@
                         <a class="relax-button toggle-list-worlds" href="/stats/<%= market.id %>"><%= i18n('world_list', 'market_list', lang) %></a>
                     </div>
 
-                    <div class="world-list hidden">
+                    <section class="world-list hidden">
                         <% for (const worldState of ['open', 'closed']) { %>
                             <% if (worldState === 'closed' && worldsByMarket[market.id].closed.length) { %>
                                 <h3><%= i18n('header_closed_worlds', 'market_list', lang) %></h3>
                             <% } %>
 
                             <% for (const [worldNumber, world] of worldsByMarket[market.id][worldState]) { -%>
-                                <div class="relax-sub-container world <%= worldState %>">
-                                    <h3 class="title">
-                                        <span class="flag-<%= world.market %>"></span>
-                                        <%= world.name %><sup><%= world.num %></sup>
-                                    </h3>
+                                <div class="world <%= worldState %>">
+                                    <h4 class="title"><span class="flag-<%= world.market %>"><%= world.name %></span><sup><%= world.num %></sup></h4>
 
                                     <div class="stats">
                                         <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n('players', 'world_list', lang) %></span></p>
@@ -70,7 +64,7 @@
                                 </div>
                             <% } -%>
                         <% } %>
-                    </div>
+                    </section>
                 </div>
             <% } -%>
         </section>
