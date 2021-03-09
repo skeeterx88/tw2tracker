@@ -19,9 +19,9 @@
         "open": "Open:",
         "closed": "Gesloten:",
         "open_worlds": "%{open_worlds} open werelden",
-        "closed_worlds": "%{closed_worlds} gesloten werelden"
-
-
+        "closed_worlds": "%{closed_worlds} gesloten werelden",
+        "world_list": "Wereld lijst",
+        "header_closed_worlds": "Gesloten Werelden"
     },
     "world_list": {
         "stats": "Statistieken:",
@@ -38,9 +38,9 @@
         "open_date": "Openingsdatum:",
         "close_date": "Sluitingsdatum:",
         "open_worlds": "Open Werelden",
-        "closed_worlds": "Gesloten Werelden"
-
-
+        "closed_worlds": "Gesloten Werelden",
+        "button_stats": "Statistieken",
+        "button_map": "Map"
     },
     "stats_map": {
         "header_map": "Wereld Kaart",
@@ -61,7 +61,7 @@
         "search_tribes": "Stammen",
         "search_villages": "Dorpen",
         "search_search": "Zoek",
-
+        "accessibility_search_label": "Zoek veld",
         "column_rank": "Rang",
         "column_tribe": "Stam",
         "column_player": "Speler",
@@ -71,9 +71,9 @@
         "column_members": "Leden",
         "column_points": "Punten",
         "column_victory_points": "OP",
-
-
-
+        "column_victory_points_full": "Overwinningspunten",
+        "column_domination": "%",
+        "column_domination_full": "Wereld Dominatie Percentage",
         "column_villages": "Dorpen",
         "abandoned_village": "Verlaten",
         "view_tribes_ranking": "Alle stammen ranking",
@@ -95,7 +95,10 @@
         "column_points": "Punten",
         "column_victory_points": "OP",
         "column_villages": "Stammen",
-        "column_player": "Speler"
+        "column_player": "Speler",
+        "column_victory_points_full": "Overwinningspunten",
+        "column_domination": "%",
+        "column_domination_full": "Werelddominatie"
     },
     "world_search": {
         "no_results": "Geen resultaten",
@@ -149,7 +152,8 @@
         "achievement_name": "Naam",
         "achievement_date_time": "Dag/Tijd",
         "view_tribe_achievements": "Laat Stam Achievements zien",
-        "no_recent_achievements": "Geen Recente Achievements."
+        "no_recent_achievements": "Geen Recente Achievements.",
+        "abandoned_village": "Verlaten"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Stam dorpen",
@@ -257,7 +261,8 @@
         "column_old_owner": "Oude eigenaar",
         "column_new_owner": "Nieuwe eigenaar",
         "column_date_hour": "Datum/Uur",
-        "no_conquests": "Nog geen veroveringen."
+        "no_conquests": "Nog geen veroveringen.",
+        "abandoned_village": "Verlaten"
     },
     "player_profile_achievements": {
         "achievements": "Achievements",
@@ -301,13 +306,11 @@
         "username_label": "Naam:",
         "password_label": "Wachtwoord:",
         "email_label": "Email:",
-
         "keep_password_placehold": "Laat open om oud wachtwoord te behouden",
         "auth_error_account_not_exist": "Dit account bestaat niet.",
         "auth_error_account_not_enabled": "Dit account is niet ingeschakeld.",
         "auth_error_invalid_password": "Dit wachtwoord is ongeldig.",
         "error_not_authorized_action": "Je hebt geen rechten om deze actie te doen.",
-
         "error_sync_toggle_world_only": "Sync toggle is available for worlds only not markets.",
         "error_sync_account_not_exist": "Synchroniseer accounts %{account_id} bestaat niet.",
         "error_sync_market_not_exist": "Markt %{market_id} bestaat niet",
@@ -318,25 +321,28 @@
         "error_mod_username_already_exists": "Er bestaat al een mod account me deze naam",
         "error_mod_account_email_already_exists": "Deze mail is al in gebruik voor een ander account",
         "error_invalid_privilege": "Ongeldig voorrecht type",
-        "error_mod_account_not_exists": "Dit mod account bestaat niet"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        "error_mod_account_not_exists": "Dit mod account bestaat niet",
+        "button_login": "Login",
+        "error_not_authorized_access": "Je hebt geen rechten om dit te doen.",
+        "error_password_minimum_length": "De minimale lengte voor het wachtwoord is %{password_minimum_length}.",
+        "error_market_has_no_sync_accounts": "Deze markt heeft geen gesynchroniseerde accounts.",
+        "error_world_not_found": "Wereld bestaat niet",
+        "message_world_toggled": "Wereld %{world_id} schakelen.",
+        "message_scrape_worlds_started": "Synchronisatie van de wereld lijst gestart.",
+        "message_scrape_markets_started": "Synchronisatie markt gestart.",
+        "message_sync_achievements_all_started": "Synchronisatie van achievements allemaal gestart.",
+        "message_sync_data_all_started": "Synchronisatie data allemaal gestart.",
+        "message_sync_world_started": "Synchronisatie data wereld %{world_id} gestart.",
+        "message_sync_data_world_started": "Synchronisatie van de data van de wereld %{world_id} gestart.",
+        "message_sync_achievements_world_started": "Synchronisatie van achievemnts van wereld %{world_id} gestart.",
+        "message_sync_account_market_added": "markt %{market_id} toegevoegt aan gesynchroniseerde accounts.",
+        "message_sync_account_market_removed": "Markt toegevoegt aan gescynchroniseerde accounts.",
+        "message_sync_account_deleted": "Synchronisatie account verwijdert.",
+        "message_sync_account_altered": "Synchronisatie account aangepast.",
+        "message_sync_account_added": "Synchronisatie account toegevoegd.",
+        "message_mod_account_altered": "Mod account aangepast",
+        "message_mod_account_created": "Mod account aangemaakt",
+        "message_mod_account_deleted": "Mod account verwijderd"
     },
     "admin_menu": {
         "sync": "Synchroniseren",
@@ -359,10 +365,10 @@
         "button_sync_world_list": "Sync Wereld Lijst",
         "button_sync_world_data": "Sync data",
         "button_sync_world_data_active": "synchronisatiegegevens in uitvoering...",
-        "button_sync_world_achievements": "Synchroniseer achievements",
+        "button_sync_world_achievements": "Sync achievements",
         "button_sync_world_achievements_active": "Synchronisatiegegevens in uitvoering...",
-        "button_disable_sync": "Synchronisatie uitschakelen",
-        "button_enable_sync": "Synchronisatie inschakelen",
+        "button_disable_sync": "Sync uitschakelen",
+        "button_enable_sync": "Sync inschakelen",
         "data_info": "Gegevens synchroniseren:",
         "achievements_info": "Achievement synchroniseren:",
         "last_time": "Laatste tijd:",
@@ -430,7 +436,8 @@
         "error_struct_not_found": "Struct data niet gevonden",
         "error_world_not_found": "Wereld bestaat niet",
         "error_invalid_highlights": "Ongeldige highlights data",
-        "error_no_highlights_input": "Geen highlights gespecificeerd"
+        "error_no_highlights_input": "Geen highlights gespecificeerd",
+        "error_map_share_no_highlights": "Geen highlights om een share te creëren"
     },
     "maps_tooltip": {
         "village": "Dorp",
@@ -614,6 +621,7 @@
         "stats_village": "Dorpen %{village_name} (%{village_x}|%{village_y}) - %{market_id}/%{world_name} - %{site_name}",
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
-        "stats_world": "%{market_id}/%{world_name} - %{site_name}"
+        "stats_world": "%{market_id}/%{world_name} - %{site_name}",
+        "languages": "Talen - %{site_name}"
     }
 }

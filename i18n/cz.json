@@ -80,7 +80,11 @@
         "no_weekly_achievements": "Žádné týdenní ocenění.",
         "stats_players": "Hráči",
         "stats_villages": "Vesnice",
-        "stats_tribes": "Kmeny"
+        "stats_tribes": "Kmeny",
+        "accessibility_search_label": "pole vyhledávání",
+        "column_victory_points_full": "Vítězné body",
+        "column_domination": "%",
+        "column_domination_full": "Světová dominance v procentech"
     },
     "world_ranking": {
         "header_players": "Hráčký žebříček",
@@ -91,7 +95,10 @@
         "column_points": "Body",
         "column_victory_points": "VP",
         "column_villages": "Vesnice",
-        "column_player": "Hráč"
+        "column_player": "Hráč",
+        "column_victory_points_full": "Vítězné body",
+        "column_domination": "%",
+        "column_domination_full": "Světová dominance"
     },
     "world_search": {
         "no_results": "Žádné výsledky.",
@@ -314,7 +321,27 @@
         "error_mod_username_already_exists": "AModerátorský účet s tímto jménem už existuje",
         "error_mod_account_email_already_exists": "Tento email je již používán jiným účtem",
         "error_invalid_privilege": "Neplatná práva",
-        "error_mod_account_not_exists": "Tento moderátorský účet neexistuje"
+        "error_mod_account_not_exists": "Tento moderátorský účet neexistuje",
+        "button_login": "Přihlásit",
+        "error_not_authorized_access": "Nemáš oprávnění k přístupu na tuto stránku.",
+        "error_market_has_no_sync_accounts": "Tento trh nemá žádné synchronizační účty.",
+        "error_world_not_found": "Svět neexistuje",
+        "message_world_toggled": "Svět %{world_id} přepnut.",
+        "message_scrape_worlds_started": "Synchronizace světového listu začala.",
+        "message_scrape_markets_started": "Synchronizace trhů začalaSync market list started.",
+        "message_sync_achievements_all_started": "Synchronizace úspěchů začala.",
+        "message_sync_data_all_started": "Synchronizace data začala.",
+        "message_sync_world_started": "Synchronizace na světě %{world_id} začala.",
+        "message_sync_data_world_started": "Synchronizace data na světě %{world_id} začala.",
+        "message_sync_achievements_world_started": "Synchronizace dúspěchů na světě %{world_id} začala.",
+        "message_sync_account_market_added": "Trh %{market_id} přidán k synchronizačnímu účtu.",
+        "message_sync_account_market_removed": "Thr přidán ze synchronizačního účtu.",
+        "message_sync_account_deleted": "Synchronizační účet smazán.",
+        "message_sync_account_altered": "Synchronizační účet upraven.",
+        "message_sync_account_added": "Synchronizační účet přidán.",
+        "message_mod_account_altered": "Účet moderátora upraven",
+        "message_mod_account_created": "Účet moderátora založen",
+        "message_mod_account_deleted": "Účet moderátora smazán"
     },
     "admin_menu": {
         "sync": "Synchronizace",
@@ -408,7 +435,8 @@
         "error_struct_not_found": "Struktura dat nenalezena",
         "error_world_not_found": "Svět neexistuje",
         "error_invalid_highlights": "Neplatná data zvíraznění",
-        "error_no_highlights_input": "Zvíraznění nespocifikována"
+        "error_no_highlights_input": "Zvíraznění nespocifikována",
+        "error_map_share_no_highlights": "Žádné zvíraznění ke sdílení mapy"
     },
     "maps_tooltip": {
         "village": "Vesnice",
@@ -592,6 +620,7 @@
         "stats_village": "Vesnice %{village_name} (%{village_x}|%{village_y}) - %{market_id}/%{world_name} - %{site_name}",
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
-        "stats_world": "%{market_id}/%{world_name} - %{site_name}"
+        "stats_world": "%{market_id}/%{world_name} - %{site_name}",
+        "languages": "Jazyky - %{site_name}"
     }
 }

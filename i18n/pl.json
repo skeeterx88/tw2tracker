@@ -82,7 +82,11 @@
         "no_weekly_achievements": "Brak tygodniowych osiągnięc.",
         "stats_players": "Gracze",
         "stats_villages": "Wioski",
-        "stats_tribes": "Plemiona"
+        "stats_tribes": "Plemiona",
+        "accessibility_search_label": "szukaj pola",
+        "column_victory_points_full": "Punkty Zwycięstwa",
+        "column_domination": "%",
+        "column_domination_full": "Procent dominacji Świata"
     },
     "world_ranking": {
         "header_players": "Ranking Graczy",
@@ -93,7 +97,10 @@
         "column_points": "Punkty",
         "column_victory_points": "PZ",
         "column_villages": "Wioski",
-        "column_player": "Gracz"
+        "column_player": "Gracz",
+        "column_victory_points_full": "Punkty Zwycięstwa",
+        "column_domination": "%",
+        "column_domination_full": "Dominacja Świata"
     },
     "world_search": {
         "no_results": "Brak wyników szukania.",
@@ -316,7 +323,27 @@
         "error_mod_username_already_exists": "Konto moderatora pod ta nazwą już istnieje",
         "error_mod_account_email_already_exists": "ten email przypisany jest juz do innego konta",
         "error_invalid_privilege": "Nieprawidlowy typ przywileju",
-        "error_mod_account_not_exists": "Konto moderatora nie istnieje"
+        "error_mod_account_not_exists": "Konto moderatora nie istnieje",
+        "button_login": "Login",
+        "error_not_authorized_access": "Nie masz pozwolenia wejścia na tę stronę.",
+        "error_market_has_no_sync_accounts": "Ten serwer nie ma żadnych kont.",
+        "error_world_not_found": "Świat nie istnieje",
+        "message_world_toggled": "Świat %{world_id} jest przełączany.",
+        "message_scrape_worlds_started": "Lista Światów wystartowała.",
+        "message_scrape_markets_started": "Lista serwerów wystartowała.",
+        "message_sync_achievements_all_started": "Wszystkie osiagnięcia wystartowały.",
+        "message_sync_data_all_started": "Wszystkie dane wystartowały.",
+        "message_sync_world_started": "Dane Świata %{world_id} wystartowały.",
+        "message_sync_data_world_started": "Data Świata %{world_id} wystartowała.",
+        "message_sync_achievements_world_started": "Osiagnięcia Świata %{world_id} wystartowały.",
+        "message_sync_account_market_added": "Serwer %{market_id} dodany do konta.",
+        "message_sync_account_market_removed": "serwer dodany przez konto.",
+        "message_sync_account_deleted": "Konto usunięte.",
+        "message_sync_account_altered": "Konto zmienione.",
+        "message_sync_account_added": "Konto dodane.",
+        "message_mod_account_altered": "Konto moderacji zmienione",
+        "message_mod_account_created": "Konto moderacji utworzone",
+        "message_mod_account_deleted": "Konto moderacji usunięte"
     },
     "admin_menu": {
         "sync": "Sync",
@@ -410,7 +437,8 @@
         "error_struct_not_found": "Nie znaleziono danych",
         "error_world_not_found": "Świat nie istnieje",
         "error_invalid_highlights": "Nieprawidłowe najważniejsze dane",
-        "error_no_highlights_input": "Nie określono najważniejszych danych"
+        "error_no_highlights_input": "Nie określono najważniejszych danych",
+        "error_map_share_no_highlights": "Brak zaznaczeń mapy do udostępnienia"
     },
     "maps_tooltip": {
         "village": "Wioska",
@@ -594,6 +622,7 @@
         "stats_village": "Wioska %{village_name} (%{village_x}|%{village_y}) - %{market_id}/%{world_name} - %{site_name}",
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
-        "stats_world": "%{market_id}/%{world_name} - %{site_name}"
+        "stats_world": "%{market_id}/%{world_name} - %{site_name}",
+        "languages": "Języki - %{site_name}"
     }
 }

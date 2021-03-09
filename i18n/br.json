@@ -322,7 +322,26 @@
         "error_mod_username_already_exists": "Uma Conta Moderador com esse nome já existe",
         "error_mod_account_email_already_exists": "Esse email já está em uso por outra conta",
         "error_invalid_privilege": "Categoria de privilégio inválido",
-        "error_mod_account_not_exists": "Essa Conta Moderador não existe"
+        "error_mod_account_not_exists": "Essa Conta Moderador não existe",
+        "error_not_authorized_access": "Você não tem permissão para acessar essa página.",
+        "error_market_has_no_sync_accounts": "Esse servidor não possúi nenhuma Conta Sync.",
+        "error_world_not_found": "Esse mundo não existe",
+        "message_world_toggled": "Mundo %{world_id} alternado.",
+        "message_scrape_worlds_started": "Sincronização da lista de mundos iníciada.",
+        "message_scrape_markets_started": "Sincronização da lista de servidores iníciada.",
+        "message_sync_achievements_all_started": "Sincronização de conquistas iníciada.",
+        "message_sync_data_all_started": "Syncronizar dados de todos os mundos iníciada.",
+        "message_sync_world_started": "Sincronização do mundo %{world_id} iníciada.",
+        "message_sync_data_world_started": "Sincronização de dados do mundo %{world_id} iníciada.",
+        "message_sync_achievements_world_started": "Sincronização de conquistas do mundo %{world_id} iníciada.",
+        "message_sync_account_market_added": "Servidor %{market_id} adicionado à Conta Sync.",
+        "message_sync_account_market_removed": "Servidor removido da Conta Sync.",
+        "message_sync_account_deleted": "Conta Sync deletada.",
+        "message_sync_account_altered": "Conta Sync alterada.",
+        "message_sync_account_added": "Conta Sync adicionada.",
+        "message_mod_account_altered": "Mod account alterada.",
+        "message_mod_account_created": "Mod account criada.",
+        "message_mod_account_deleted": "Mod account deletada."
     },
     "admin_menu": {
         "sync": "Sync",
@@ -416,7 +435,8 @@
         "error_struct_not_found": "Dados da estrutura do mapa não encontrado",
         "error_world_not_found": "Mundo não existe",
         "error_invalid_highlights": "Dados de marcação inválido",
-        "error_no_highlights_input": "Nenhuma marcação especificada"
+        "error_no_highlights_input": "Nenhuma marcação especificada",
+        "error_map_share_no_highlights": "Sem marcações para criar compatilhamento"
     },
     "maps_tooltip": {
         "village": "Aldeia",
@@ -600,6 +620,7 @@
         "stats_village": "Aldeia %{village_name} (%{village_x}|%{village_y}) - %{market_id}/%{world_name} - %{site_name}",
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
-        "stats_world": "%{market_id}/%{world_name} - %{site_name}"
+        "stats_world": "%{market_id}/%{world_name} - %{site_name}",
+        "languages": "Linguagem - %{site_name}"
     }
 }

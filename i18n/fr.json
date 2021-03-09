@@ -82,7 +82,11 @@
         "no_weekly_achievements": "Aucun succès de la semaine.",
         "stats_players": "Joueurs",
         "stats_villages": "Villages",
-        "stats_tribes": "Tribus"
+        "stats_tribes": "Tribus",
+        "accessibility_search_label": "Champ recherche",
+        "column_victory_points_full": "PDV",
+        "column_domination": "%",
+        "column_domination_full": "Pourcentage Domination"
     },
     "world_ranking": {
         "header_players": "Classement Joueurs",
@@ -93,7 +97,10 @@
         "column_points": "Points",
         "column_victory_points": "VP",
         "column_villages": "Villages",
-        "column_player": "Joueur"
+        "column_player": "Joueur",
+        "column_victory_points_full": "PDV",
+        "column_domination": "%",
+        "column_domination_full": "Domination monde"
     },
     "world_search": {
         "no_results": "Aucun résultat.",
@@ -316,7 +323,27 @@
         "error_mod_username_already_exists": "Un compte Mod avec ce nom existe déjà",
         "error_mod_account_email_already_exists": "Cet email est déjà utilisé par un autre compte",
         "error_invalid_privilege": "Type de droit invalide",
-        "error_mod_account_not_exists": "Ce compte Mod n'existe pas"
+        "error_mod_account_not_exists": "Ce compte Mod n'existe pas",
+        "button_login": "Se connecter",
+        "error_not_authorized_access": "Vous n'avez pas les permissions nécessaires pour accéder à cette page.",
+        "error_market_has_no_sync_accounts": "Ce serveur n'a pas de compte sync.",
+        "error_world_not_found": "Ce monde n'existe pas",
+        "message_world_toggled": "Monde %{world_id} ajouté.",
+        "message_scrape_worlds_started": "La synchronisation de la liste des mondes a débuté.",
+        "message_scrape_markets_started": "La synchronisation de la liste des serveurs a débuté.",
+        "message_sync_achievements_all_started": "La synchronisation de tous les succès a débuté.",
+        "message_sync_data_all_started": "La synchronisation de toutes les datas a débuté.",
+        "message_sync_world_started": "La synchronisation du monde %{world_id} a débuté.",
+        "message_sync_data_world_started": "La synchronisation des datas du monde %{world_id} a débuté.",
+        "message_sync_achievements_world_started": "La synchronisation des succès du monde %{world_id} a débuté.",
+        "message_sync_account_market_added": "Serveur %{market_id} ajouté au compte sync.",
+        "message_sync_account_market_removed": "Serveur retiré du compte sync.",
+        "message_sync_account_deleted": "Compte sync supprimé.",
+        "message_sync_account_altered": "Compte sync modifié.",
+        "message_sync_account_added": "Compte sync ajouté.",
+        "message_mod_account_altered": "Compte mod modifié.",
+        "message_mod_account_created": "Compte mod ajouté.",
+        "message_mod_account_deleted": "Compte mod supprimé."
     },
     "admin_menu": {
         "sync": "Sync",
@@ -410,7 +437,8 @@
         "error_struct_not_found": "Structure d'information pas trouvé",
         "error_world_not_found": "Le monde n'existe pas",
         "error_invalid_highlights": "Informations de légendes invalide",
-        "error_no_highlights_input": "Pas de légende specificée"
+        "error_no_highlights_input": "Pas de légende specificée",
+        "error_map_share_no_highlights": "Impossible de partager la carte s'il n'a pas de légendes."
     },
     "maps_tooltip": {
         "village": "Village",
@@ -594,6 +622,7 @@
         "stats_village": "Village %{village_name} (%{village_x}|%{village_y}) - %{market_id}/%{world_name} - %{site_name}",
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
-        "stats_world": "%{market_id}/%{world_name} - %{site_name}"
+        "stats_world": "%{market_id}/%{world_name} - %{site_name}",
+        "languages": "Langues - %{site_name}"
     }
 }
