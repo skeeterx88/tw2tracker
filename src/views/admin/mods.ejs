@@ -3,7 +3,7 @@
         <section id="mods-panel">
             <h1><%= i18n('header_mod_accounts', 'admin_mod_accounts', lang) %></h1>
 
-            <div class="content-border">
+            <div class="section-content">
                 <% for (let mod of mods) { %>
                     <div id="mod-<%= mod.id %>" class="mod relax-container">
                         <form method="POST" action="/admin/mods/edit">
@@ -47,7 +47,7 @@
         <section>
             <h1><%= i18n('header_add_account', 'admin_mod_accounts', lang) %></h1>
 
-            <div class="content-border">
+            <div class="section-content">
                 <div class="relax-container">
                     <form method="POST" action="/admin/mods/create">
                         <label class="input">

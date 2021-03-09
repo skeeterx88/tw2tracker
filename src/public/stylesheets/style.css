@@ -1,3 +1,22 @@
+:root {
+    --main-background: hsl(43deg 59% 78%);
+    --color-content: url(/images/noise.webp) hsl(40deg 53% 66%);
+    --color-table-row-even: url(/images/noise.webp) hsl(40deg 53% 64%);
+    --color-table-row-hover: url(/images/noise.webp) hsl(40deg 53% 69%);
+    --content-inner-shadow: inset -2px -2px 3px hsl(0, 0%, 0%, 30%);
+    --content-menu-shadow: 2px 2px 3px hsl(0, 0%, 0%, 35%);
+    --color-table-header: url(/images/noise.webp) hsl(40deg 53% 62%);
+    --color-highlight: hsl(39deg 35% 53%);
+    --color-content-layer-2: url(/images/noise.webp) hsl(43, 52%, 75%);
+    --shadow-border-1: 0px 0px 0px 1px hsl(23, 55%, 24%),
+                       0px 0px 0px 2px hsl(23, 47%, 36%),
+                       inset -2px -2px 2px hsla(0, 0%, 0%, 30%),
+                       2px 2px 4px hsla(0, 0%, 0%, 50%);
+    --shadow-border-2: 0 0 0 1px hsl(23deg 67% 17%),
+                       inset 0 0 0 1px hsl(23deg 67% 17%),
+                       2px 2px 2px hsl(0deg 0% 0%);
+}
+
 html {
     width: 100%;
     height: 100%;
@@ -5,7 +24,7 @@ html {
     font-family: 'Trebuchet MS', 'Lucida Grande', Helvetica, Arial, sans-serif;
     background: url(/images/background-scene.webp) top no-repeat, url(/images/noise.webp), hsl(37, 18%, 45%);
     margin: 0px;
-    color: $hsl(24, 47%, 21%);
+    color: hsl(24, 47%, 21%);
     box-sizing: border-box;
 }
 
@@ -34,12 +53,13 @@ textarea {
 }
 
 table {
-    background: $hsl(35, 43%, 47%);
+    background: var(--color-content);
     width: 100%;
+    box-shadow: var(--content-inner-shadow);
 }
 
 code {
-    background: $hsla(19, 58%, 41%, 38%);
+    background: hsla(19, 58%, 41%, 38%);
     padding: 3px;
     border-radius: 3px;
 }
@@ -89,6 +109,21 @@ sup {
     font-size: 0.7em;
 }
 
+main, footer {
+    position: relative;
+    margin: 0 auto;
+    padding: 10px;
+    box-shadow: var(--shadow-border-1);
+    border: 1px solid #3d3b51;
+    border-radius: 2px;
+    background: url(/images/noise.webp),
+                url(/images/content-border-left.webp) left repeat-y,
+                url(/images/content-border-right.webp) right repeat-y,
+                url(/images/content-border-top.webp) top repeat-x,
+                url(/images/content-border-bottom.webp) bottom repeat-x,
+                var(--main-background);
+}
+
 section {
     margin-bottom: 15px;
 }
@@ -99,7 +134,7 @@ header#main-header {
     background: url(/images/banner.svg) no-repeat center;
     background-size: 33em;
     margin-bottom: 10px;
-    filter: drop-shadow(10px 10px 12px hsla(0, 0%, 0%, 90%));
+    filter: drop-shadow(10px 10px 12px hsla(0, 0%, 0%, 50%));
 }
 
 #main-menu {
@@ -174,18 +209,6 @@ header#main-header {
     padding-left: 23px;
 }
 
-main, footer {
-    position: relative;
-    margin: 0 auto;
-    padding: 10px;
-    background: url(/images/noise.webp),
-                url(/images/content-border-left.webp) left repeat-y,
-                url(/images/content-border-right.webp) right repeat-y,
-                url(/images/content-border-top.webp) top repeat-x,
-                url(/images/content-border-bottom.webp) bottom repeat-x,
-                hsl(43, 59%, 78%);
-}
-
 footer {
     margin-top: 10px;
     margin-bottom: 50px;
@@ -203,7 +226,7 @@ table.vertical td {
 }
 
 table.vertical th {
-    background: hsla(35, 43%, 47%, 21%);
+    background: var(--color-table-header);
 }
 
 table.vertical .right {
@@ -211,11 +234,11 @@ table.vertical .right {
 }
 
 th {
-    background: hsl(35, 43%, 47%);
+    background: var(--color-table-header);
 }
 
 tr:nth-child(even) {
-    background: hsl(35, 38%, 58%);
+    background: var(--color-table-row-even);
 }
 
 td, th {
@@ -245,20 +268,13 @@ td, th {
     margin: 8px 0px;
 }
 
-.content-border {
-    border-radius: 2px;
-    box-shadow: 0px 0px 0px 1px hsl(23, 55%, 24%), 0px 0px 0px 2px hsl(23, 47%, 36%), inset -2px -2px 2px hsla(0, 0%, 0%, 50%), 2px 2px 4px hsla(0, 0%, 0%, 50%);
-    border: 1px solid hsl(245, 16%, 27%);
-}
-
 .content-menu {
     margin: 0px;
     padding: 0px;
-    background: hsl(35, 43%, 47%);
     text-align: center;
     border-bottom: 2px solid hsl(23, 55%, 24%);
     border-radius: 3px;
-    box-shadow: 0px 1px 3px hsl(23, 55%, 24%);
+    box-shadow: var(--content-menu-shadow);
 }
 
 .content-menu li {
@@ -307,7 +323,6 @@ div.modal {
 
 #search .wrapper {
     padding: 10px;
-    background: hsl(35, 43%, 47%);
     text-align: center;
 }
 
@@ -409,13 +424,20 @@ div.world-title {
     margin-bottom: 10px;
 }
 
+.section-content {
+    background: var(--color-content);
+    border-radius: 2px;
+    box-shadow: var(--shadow-border-1);
+    border: 1px solid hsl(245, 16%, 27%);
+}
+
 .relax-container {
-    background: url(/images/noise.webp) hsl(43, 52%, 75%);
+    background: var(--color-content-layer-2);
     border-color: hsl(24, 27%, 58%);
     border-radius: 1px;
     border-style: outset;
     border-width: 2px;
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%);
+    box-shadow: var(--shadow-border-2);
     color: hsl(17, 48%, 13%);
     margin: 10px 0px;
     padding: 5px;
@@ -593,7 +615,7 @@ fieldset legend {
 }
 
 .pagination {
-    background: hsl(35, 43%, 47%);
+    background: var(--color-content);
     width: 100%;
     text-align: center;
     padding: 3px 0px;
@@ -601,11 +623,11 @@ fieldset legend {
 }
 
 .pagination .page {
-    padding: 3px 4px;
+    padding: 0px 5px;
 }
 
 .pagination .current {
-    background: hsl(35, 49%, 43%);
+    background: var(--color-highlight);
     border-radius: 3px;
 }
 
@@ -623,6 +645,7 @@ fieldset legend {
     touch-action: none;
     height: 481px;
     background: hsl(84, 68%, 23%);
+    box-shadow: 0px 0px 0px 1px hsl(23deg 55% 24%), 0px 0px 0px 2px hsl(23deg 47% 36%), 2px 2px 4px hsl(0deg 0% 0% / 50%);
 }
 
 #tribes .top-colors {
@@ -639,7 +662,7 @@ fieldset legend {
 }
 
 table.quick-highlight tbody tr:hover td {
-    background: hsla(35, 63%, 67%, 57%);
+    background: var(--color-table-row-hover);
 }
 
 .world-map {
@@ -762,7 +785,7 @@ a.achievement-subject:last-child:after {
     width: 100%;
     padding: 10px;
     border: 2px solid hsl(0, 79%, 55%);
-    background: hsl(0, 100%, 50%);
+    background-color: hsl(0deg, 78%, 63%, 35%);
     border-radius: 3px;
 }
 
@@ -782,8 +805,6 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip {
-    font: 11px Arial, Helvetica, sans-serif;
-    text-align: left;
     opacity: 0;
     visibility: hidden;
     position: absolute;
@@ -794,7 +815,7 @@ a.achievement-subject:last-child:after {
     top: 0px;
     left: 0px;
     margin-top: 3px;
-    background: url(/images/noise.webp) hsl(31, 44%, 67%);
+    background: var(--color-content);
 }
 
 #map-tooltip table {
@@ -806,10 +827,9 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip td {
-    text-align: left;
-    border: 1px solid hsl(26, 100%, 24%);
+    border: 1px solid hsl(32deg 33% 48%);
     box-shadow: none;
-    background: url(/images/noise.webp) hsl(31, 40%, 61%);
+    background: url(/images/noise.webp) hsl(30deg 36% 60%);
     padding: 1px;
 }
 

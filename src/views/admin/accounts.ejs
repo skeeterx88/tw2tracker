@@ -3,7 +3,7 @@
         <section>
             <h1><%= i18n('header_accounts', 'admin_sync_accounts', lang) %></h1>
 
-            <div class="content-border">
+            <div class="section-content">
                 <% for (let account of accounts) { %>
                     <div id="account-<%= account.id %>" class="account relax-container">
                         <form method="POST" action="/admin/accounts/edit" class="form">
@@ -56,7 +56,7 @@
         <section>
             <h1><%= i18n('header_add_account', 'admin_sync_accounts', lang) %></h1>
 
-            <div class="content-border">
+            <div class="section-content">
                 <div class="account relax-container">
                     <form method="POST" action="/admin/accounts/create" class="form">
                         <label class="input">

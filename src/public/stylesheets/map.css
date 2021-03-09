@@ -47,7 +47,7 @@ a {
 
 #map-page td,
 #map-page th {
-    text-align: initial;
+    text-align: left;
 }
 
 a:hover {
@@ -349,6 +349,8 @@ button.red:focus {
 #side-panel footer {
     position: absolute;
     bottom: 0px;
+    box-shadow: none;
+    border: none;
 }
 
 #map-share-wrapper {
