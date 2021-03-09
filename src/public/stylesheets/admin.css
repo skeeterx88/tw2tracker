@@ -3,6 +3,10 @@
     top: 0px;
 }
 
+#admin .section-content {
+    padding: 5px;
+}
+
 #sync-summary p {
     margin: 0px;
 }
@@ -14,7 +18,7 @@
 .world-label {
     border: 1px solid hsl(24, 49%, 32%);
     border-radius: 2px;
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    background: url(/images/noise.webp), var(--bg-button);
     box-shadow: inset 0 0 0 1px hsl(23, 67%, 17%);
     color: hsl(0, 35%, 81%);
     padding: 0px 3px;
@@ -77,7 +81,7 @@
 
 #sync-worlds .world {
     flex-wrap: wrap;
-    margin: 5px 7px;
+    margin: 7px 3px;
 }
 
 #sync-worlds .world > * {

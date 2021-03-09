@@ -5,7 +5,7 @@
     --color-table-row-hover: url(/images/noise.webp) hsl(40deg 53% 69%);
     --content-inner-shadow: inset -2px -2px 3px hsl(0, 0%, 0%, 30%);
     --content-menu-shadow: 2px 2px 3px hsl(0, 0%, 0%, 35%);
-    --color-table-header: url(/images/noise.webp) hsl(40deg 53% 62%);
+    --color-table-header: url(/images/noise.webp) hsl(40deg 53% 60%);
     --color-highlight: hsl(39deg 35% 53%);
     --color-content-layer-2: url(/images/noise.webp) hsl(43, 52%, 75%);
     --shadow-border-1: 0px 0px 0px 1px hsl(23, 55%, 24%),
@@ -14,7 +14,20 @@
                        2px 2px 4px hsla(0, 0%, 0%, 50%);
     --shadow-border-2: 0 0 0 1px hsl(23deg 67% 17%),
                        inset 0 0 0 1px hsl(23deg 67% 17%),
-                       2px 2px 2px hsl(0deg 0% 0%);
+                       2px 2px 2px hsl(0deg 0% 0%),
+                       inset -1px -1px 2px hsl(0, 0%, 0%);
+    --shadow-border-input: 0 0 0 1px hsl(23, 67%, 17%),
+                           inset 0 0 0 1px hsl(23, 67%, 17%),
+                           2px 2px 2px hsl(0, 0%, 0%),
+                           inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
+    --shadow-button-1: 0 0 0 1px hsl(23deg 67% 17%),
+                       inset 0 0 0 1px hsl(23deg 67% 17%),
+                       2px 2px 2px hsl(0deg 0% 0% / 50%),
+                       inset -1px -1px 2px hsl(0deg 0% 0%);
+    --bg-button: linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    --bg-button-hover: linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    --bg-button-red: linear-gradient(hsl(0, 47%, 51%), hsl(0, 70%, 29%));
+    --bg-button-red-hover: linear-gradient(hsl(0, 48%, 58%), hsl(0, 70%, 29%));
 }
 
 html {
@@ -290,24 +303,21 @@ td, th {
     border-width: 1px;
     border-style: solid;
     border-color: hsl(24, 49%, 32%);
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                2px 2px 2px hsla(0, 0%, 0%, 50%),
-                inset -1px -1px 2px hsl(0, 0%, 0%);
+    background: url(/images/noise.webp), var(--bg-button);
+    box-shadow: var(--shadow-button-1);
 }
 
 .content-menu li:hover {
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 26%));
+    background: url(/images/noise.webp), var(--bg-button-hover);
 }
 
 .content-menu li.selected {
     border-color: hsl(8, 49%, 38%);
-    background-image: linear-gradient(hsl(0, 47%, 51%), hsl(0, 70%, 29%));
+    background-image: var(--bg-button-red);
 }
 
 .content-menu li.selected:hover {
-    background-image: linear-gradient(hsl(0, 48%, 58%), hsl(0, 70%, 29%));
+    background-image: var(--bg-button-red-hover);
 }
 
 div.modal {
@@ -342,10 +352,7 @@ div.modal {
     border: 1px solid hsl(24, 42%, 39%);
     padding: 1px 5px;
     background: url(/images/noise.webp) hsl(29, 39%, 45%);
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                2px 2px 2px hsl(0, 0%, 0%),
-                inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
+    box-shadow: var(--shadow-border-input);
 }
 
 .relax-input:focus {
@@ -380,11 +387,8 @@ div.modal {
     border-width: 1px;
     border-style: solid;
     border-color: hsl(24, 49%, 32%);
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                2px 2px 2px hsl(0, 0%, 0%),
-                inset -1px -1px 2px hsl(0, 0%, 0%);
+    background: url(/images/noise.webp), var(--bg-button);
+    box-shadow: var(--shadow-border-2);
 }
 
 .relax-button:hover {
@@ -707,12 +711,7 @@ span.conquest-self {
     background: url(/images/noise.webp), linear-gradient(hsl(34, 73%, 31%), hsl(36, 48%, 65%));
     text-align: center;
     font-weight: bold;
-    box-shadow: 0px 0px 0px 1px hsl(28, 62%, 16%),
-                0px 0px 0px 2px hsl(24, 49%, 52%),
-                0px 0px 0px 3px hsl(17, 28%, 10%),
-                inset 1px 1px 3px hsla(0, 0%, 100%, 40%),
-                inset -1px -1px 1px hsla(0, 0%, 0%, 40%),
-                1px 1px 2px 3px hsla(0, 0%, 0%, 70%);
+    box-shadow: 0px 0px 0px 1px hsl(28deg 62% 16%), 0px 0px 0px 2px hsl(24deg 49% 52%), 0px 0px 0px 3px hsl(17deg 28% 10%), inset 1px 1px 3px hsl(0deg 0% 100% / 40%), inset -1px -1px 1px hsl(0deg 0% 0% / 40%), 1px 1px 2px 3px hsl(0deg 0% 0% / 20%);
     white-space: nowrap;
     min-width: 70px;
 }
@@ -792,8 +791,8 @@ a.achievement-subject:last-child:after {
 .message {
     width: 100%;
     padding: 10px;
-    border: 2px solid hsl(120, 30%, 9%);
-    background: hsl(120, 100%, 50%);
+    border: 2px solid hsl(107deg 28% 49%);
+    background: url(/images/noise.webp) hsl(96deg 53% 77%);
     border-radius: 3px;
 }
 
