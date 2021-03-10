@@ -810,6 +810,7 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip {
+    font-size: 11px;
     opacity: 0;
     visibility: hidden;
     position: absolute;
@@ -836,11 +837,19 @@ a.achievement-subject:last-child:after {
     box-shadow: none;
     background: url(/images/noise.webp) hsl(30deg 36% 60%);
     padding: 1px;
+    text-align: left;
 }
 
 #map-tooltip td > div {
-    padding-left: 30px;
-    position: relative;
+    height: 25px;
+}
+
+#map-tooltip td > div > div {
+    /* background: red; */
+    display: inline-block;
+    height: 24px;
+    /* margin: 2px; */
+    vertical-align: top;
 }
 
 #map-tooltip .title {
@@ -857,8 +866,9 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip span,
-#map-tooltip div {
+#map-tooltip div > div {
     white-space: nowrap;
+    line-height: 13px;
 }
 
 #map-tooltip .village-name {
@@ -876,15 +886,15 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip .icon {
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    margin: 2px;
+    width: 26px;
+    height: 25px;
+    /* line-height: 24px; */
+    /* margin: 2px; */
     display: inline-block;
     border: 1px solid hsl(0, 13%, 15%);
-    position: absolute;
-    left: 0px;
-    top: 0px;
+    /* position: absolute; */
+    /* left: 0px; */
+    /* top: 0px; */
     background: linear-gradient(hsla(180, 20%, 1%, 73%), hsla(180, 20%, 1%, 00%)),
                 url(/images/background-icon-black.webp);
 }
@@ -892,8 +902,8 @@ a.achievement-subject:last-child:after {
 #map-tooltip .icon:before {
     content: ' ';
     display: inline-block;
-    width: 24px;
-    height: 24px;
+    width: 23px;
+    height: 23px;
     z-index: 1;
     background-repeat: no-repeat;
     background-position: center;
