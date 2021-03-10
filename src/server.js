@@ -29,7 +29,7 @@ module.exports = function () {
     const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT;
     const app = express();
 
-    if (!development) {
+    if (!development && config.force_https) {
         app.use(function (req, res, next) {
             if (req.headers['x-forwarded-proto'] === 'https') {
                 next();
