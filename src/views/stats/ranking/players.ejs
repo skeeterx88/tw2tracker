@@ -1,4 +1,4 @@
-<table class="quick-highlight">
+<table>
     <colgroup>
         <col width="50px">
         <col width="*">
@@ -23,7 +23,7 @@
     </thead>
     <tbody>
         <% for (let player of ranking) { %>
-            <tr data-id="<%= player.id %>" data-highlight-type="players">
+            <tr class="quick-highlight" data-id="<%= player.id %>" data-type="players">
                 <td><%= player.rank %></td>
                 <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
                 

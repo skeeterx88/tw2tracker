@@ -66,7 +66,7 @@
                             </tr>
                         <% } else { -%>
                             <% for (let conquest of conquests) { %>
-                                <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
+                                <tr data-id="<%= conquest.village_id %>" data-type="villages">
                                     <td><%= formatDate(conquest.date, world.time_offset, 'hours-only') %></td>
                                     <td><%= formatNumbers(conquest.village_points_then) %></td>
 

@@ -4,7 +4,7 @@
             <h2><%= i18n('header_tribe_villages', 'tribe_profile_villages', lang) %></h2>
 
             <div class="section-content">
-                <table class="quick-highlight">
+                <table>
                     <colgroup>
                         <col width="*">
                         <col width="70px">
@@ -21,7 +21,7 @@
                     </thead>
                     <tbody>
                         <% for (let village of villages) { %>
-                            <tr data-id="<%= village.village_id %>" data-highlight-type="villages">
+                            <tr class="quick-highlight" data-id="<%= village.village_id %>" data-type="villages">
                                 <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>/"><%= village.village_name %></a></td>
                                 <td><%= village.village_x %>|<%= village.village_y %></td>
                                 <td><%= formatNumbers(village.village_points) %></td>

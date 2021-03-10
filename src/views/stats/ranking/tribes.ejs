@@ -1,4 +1,4 @@
-<table class="quick-highlight">
+<table>
     <colgroup>
         <col width="50px">
         <col width="*">
@@ -26,7 +26,7 @@
     </thead>
     <tbody>
         <% for (let tribe of ranking) { %>
-            <tr data-id="<%= tribe.id %>" data-highlight-type="tribes">
+            <tr class="quick-highlight" data-id="<%= tribe.id %>" data-type="tribes">
                 <td><%= tribe.rank %></td>
                 <td>
                     <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>

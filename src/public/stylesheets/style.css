@@ -68,7 +68,7 @@ textarea {
 table {
     background: var(--color-content);
     width: 100%;
-    box-shadow: var(--content-inner-shadow);
+    border-spacing: 0px;
 }
 
 code {
@@ -257,8 +257,19 @@ tr:nth-child(even) {
 td, th {
     text-align: center;
     height: 20px;
-    padding: 1px 3px 1px 3px;
+    padding: 2px;
     white-space: nowrap;
+    margin: 0px;
+    border-top: 1px solid hsl(40deg 44% 65%);
+    border-bottom: 1px solid hsl(40deg 44% 58%);
+}
+
+tr:first-child td {
+    border-top: none;
+}
+
+tr:last-child td {
+    border-bottom: none;
 }
 
 th a,
@@ -671,7 +682,7 @@ fieldset legend {
     display: inline-block;
 }
 
-table.quick-highlight tbody tr:hover td {
+table tbody tr:hover td {
     background: var(--color-table-row-hover);
 }
 

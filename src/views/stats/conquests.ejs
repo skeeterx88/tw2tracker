@@ -4,7 +4,7 @@
             <h2><%= i18n('header_world_conquests', 'world_conquests', lang) %></h2>
 
             <div class="section-content">
-                <table class="quick-highlight">
+                <table>
                     <thead>
                         <th><%= i18n('conquest_village', 'world_conquests', lang) %></th>
                         <th><%= i18n('conquest_points', 'world_conquests', lang) %></th>
@@ -20,7 +20,7 @@
                             </tr>
                         <% } else { -%>
                             <% for (let conquest of conquests) { %>
-                                <tr data-id="<%= conquest.village_id %>" data-highlight-type="villages">
+                                <tr class="quick-highlight" data-id="<%= conquest.village_id %>" data-type="villages">
                                     <td>
                                         <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
                                     </td>

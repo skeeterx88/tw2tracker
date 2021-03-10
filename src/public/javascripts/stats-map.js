@@ -81,6 +81,10 @@ require([
 
         await loader.loadInfo;
 
+        addQuickHighlights();
+    };
+
+    const addQuickHighlights = () => {
         if (typeof mapHighlights !== 'undefined') {
             for (let i = 0; i < mapHighlights.length; i++) {
                 map.addHighlight(mapHighlightsType, mapHighlights[i].name, TW2Map.colorPaletteTopThree[i]);
@@ -88,8 +92,16 @@ require([
         }
     };
 
+    const removeQuickHighlights = () => {
+        if (typeof mapHighlights !== 'undefined') {
+            for (let i = 0; i < mapHighlights.length; i++) {
+                map.removeHighlight(mapHighlightsType, mapHighlights[i].name);
+            }
+        }
+    };
+
     const setupQuickHighlight = async () => {
-        const $highlightRows = document.querySelectorAll('.quick-highlight tbody tr');
+        const $highlightRows = document.querySelectorAll('.quick-highlight');
 
         if (!$highlightRows.length) {
             return false;
@@ -97,16 +109,38 @@ require([
 
         await loader.loadInfo;
 
+        let currentTemporaryHighlightType;
+
         for (const $row of $highlightRows) {
             $row.addEventListener('mouseenter', () => {
                 const id = parseInt($row.dataset.id, 10);
 
-                map.quickHighlight($row.dataset.highlightType, id);
-                const [averageX, averageY] = averagePositionFor($row.dataset.highlightType, id);
-                map.moveTo(averageX, averageY);
+                currentTemporaryHighlightType = $row.dataset.type;
+
+                if ($row.dataset.type === 'conquest') {
+                    removeQuickHighlights();
+
+                    const newOwner = parseInt($row.dataset.newOwner, 10);
+                    const oldOwner = parseInt($row.dataset.oldOwner, 10);
+
+                    if (oldOwner) {
+                        map.quickHighlight('players', oldOwner, 'blue');
+                    }
+
+                    map.quickHighlight('players', newOwner, 'red');
+                    map.quickHighlight('villages', id);
+                    map.moveTo(...averagePositionFor('villages', id));
+                } else {
+                    map.quickHighlight($row.dataset.type, id);
+                    map.moveTo(...averagePositionFor($row.dataset.type, id));
+                }
             });
 
             $row.addEventListener('mouseleave', () => {
+                if (currentTemporaryHighlightType === 'conquest') {
+                    addQuickHighlights();
+                }
+
                 map.quickHighlightOff();
             });
         }

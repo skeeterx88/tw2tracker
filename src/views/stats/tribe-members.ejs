@@ -4,7 +4,7 @@
             <h2><%= i18n('header_tribe_members', 'tribe_profile_members', lang) %></h2>
 
             <div class="section-content">
-                <table class="quick-highlight">
+                <table>
                     <colgroup>
                         <col width="5%">
                         <col width="*">
@@ -27,7 +27,7 @@
                         <% } %>
 
                         <% for (let member of members) { %>
-                            <tr data-id="<%= member.id %>" data-highlight-type="players">
+                            <tr class="quick-highlight" data-id="<%= member.id %>" data-type="players">
                                 <td><%= formatNumbers(member.rank) %></td>
                                 <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
                                 <td><%= formatNumbers(member.points) %></td>

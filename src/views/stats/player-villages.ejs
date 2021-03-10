@@ -1,7 +1,7 @@
 <div class="content">
     <div class="left">
         <h2><%= i18n('header', 'player_profile_villages', lang) %></h2>
-        <table class="section-content content-border quick-highlight">
+        <table class="section-content content-border">
             <colgroup>
                 <col width="*">
                 <col width="100px">
@@ -16,7 +16,7 @@
             </thead>
             <tbody>
                 <% for (let village of villages) { %>
-                    <tr data-id="<%= village.id %>" data-highlight-type="villages">
+                    <tr class="quick-highlight" data-id="<%= village.id %>" data-type="villages">
                         <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
                         <td><%= village.x + '|' + village.y %></td>
                         <td><%= formatNumbers(village.points) %></td>

@@ -1,7 +1,7 @@
 <div class="content">
     <div class="left">
         <h2><%= i18n('header_tribe_member_changes', 'tribe_profile_member_changes', lang) %></h2>
-        <table class="section-content content-border quick-highlight">
+        <table class="section-content content-border">
             <colgroup>
                 <col width="200px">
                 <col width="*">
@@ -17,7 +17,7 @@
             <tbody>
                 <% if (memberChanges.length) { -%>
                     <% for (let change of memberChanges) { %>
-                        <tr data-id="<%= change.player.id %>" data-highlight-type="players">
+                        <tr class="quick-highlight" data-id="<%= change.player.id %>" data-type="players">
                             <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
                             <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
