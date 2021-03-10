@@ -1,4 +1,4 @@
-const db = require('./db.js');
+const {db} = require('./db.js');
 const sql = require('./sql.js');
 const https = require('https');
 const crypto = require('crypto');

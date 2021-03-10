@@ -258,6 +258,12 @@ td, th {
     text-align: center;
     height: 20px;
     padding: 1px 3px 1px 3px;
+    white-space: nowrap;
+}
+
+th a,
+th a:hover {
+    color: inherit;
 }
 
 .content {
@@ -978,6 +984,20 @@ a.achievement-subject:last-child:after {
 
 #language-list h2 {
     margin: 0px;
+}
+
+.icon-sort {
+    background-image: url(/images/icons/down-arrow.svg);
+    background-repeat: no-repeat;
+    background-size: 8px;
+    display: inline-block;
+    height: 9px;
+    opacity: 0.5;
+    width: 14px;
+}
+
+.icon-sort.selected {
+    opacity: 1;
 }
 
 span[class^="flag-"] {

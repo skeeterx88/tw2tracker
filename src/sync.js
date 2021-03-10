@@ -4,7 +4,7 @@ const path = require('path');
 const humanInterval = require('human-interval');
 
 const debug = require('./debug.js');
-const db = require('./db.js');
+const {db} = require('./db.js');
 const sql = require('./sql.js');
 const puppeteer = require('./puppeteer.js');
 const utils = require('./utils.js');

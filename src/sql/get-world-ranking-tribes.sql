@@ -1,3 +1,4 @@
 SELECT * FROM ${worldId:name}.tribes
 WHERE archived = false
-ORDER BY rank ASC LIMIT ${limit} OFFSET ${offset}
+ORDER BY tribes.${sortField:name} ${sortOrder:raw}
+LIMIT ${limit} OFFSET ${offset}

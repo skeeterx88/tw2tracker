@@ -6,7 +6,7 @@
         return server();
     }
 
-    const db = require('./db.js');
+    const {db} = require('./db.js');
 
     try {
         (await db.connect()).done();

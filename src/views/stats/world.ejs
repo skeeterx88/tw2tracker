@@ -41,14 +41,14 @@
                     </colgroup>
                     <thead>
                         <tr>
-                            <th><%= i18n('column_rank', 'world', lang) %></th>
+                            <th><a href="?tsort=rank"><%= i18n('column_rank', 'world', lang) %> <span class="icon-sort <% if (tribeRankingSortField === 'rank') __append('selected') %>"></span></a></th>
                             <th><%= i18n('column_tribe', 'world', lang) %></th>
                             <th><%= i18n('column_members', 'world', lang) %></th>
-                            <th><%= i18n('column_points', 'world', lang) %></th>
+                            <th><a href="?tsort=points"><%= i18n('column_points', 'world', lang) %> <span class="icon-sort <% if (tribeRankingSortField === 'points') __append('selected') %>"></span></a></th>
                             <% if (world.config && world.config.victory_points) { -%>
-                                <th title="<%= i18n('column_victory_points_full', 'world', lang) %>"><%= i18n('column_victory_points', 'world', lang) %></th>
+                                <th title="<%= i18n('column_victory_points_full', 'world', lang) %>"><a href="?tsort=victory_points"><%= i18n('column_victory_points', 'world', lang) %> <span class="icon-sort <% if (tribeRankingSortField === 'victory_points') __append('selected') %>"></span></a></th>
                             <% } -%>
-                            <th><%= i18n('column_villages', 'world', lang) %></th>
+                            <th><a href="?tsort=villages"><%= i18n('column_villages', 'world', lang) %> <span class="icon-sort <% if (tribeRankingSortField === 'villages') __append('selected') %>"></span></a></th>
                             <% if (world.config && !world.config.victory_points) { -%>
                                 <th title="<%= i18n('column_domination_full', 'world', lang) %>"><%= i18n('column_domination', 'world', lang) %></th>
                             <% } -%>
@@ -104,14 +104,14 @@
                     </colgroup>
                     <thead>
                         <tr>
-                            <th><%= i18n('column_rank', 'world', lang) %></th>
+                            <th><a href="?psort=rank"><%= i18n('column_rank', 'world', lang) %> <span class="icon-sort <% if (playerRankingSortField === 'rank') __append('selected') %>"></span></a></th>
                             <th><%= i18n('column_player', 'world', lang) %></th>
                             <th><%= i18n('column_tribe', 'world', lang) %></th>
-                            <th><%= i18n('column_points', 'world', lang) %></th>
+                            <th><a href="?psort=points"><%= i18n('column_points', 'world', lang) %> <span class="icon-sort <% if (playerRankingSortField === 'points') __append('selected') %>"></span></a></th>
                             <% if (world.config && world.config.victory_points) { -%>
-                                <th title="Victory Points"><%= i18n('column_victory_points', 'world', lang) %></th>
+                                <th title="Victory Points"><a href="?psort=victory_points"><%= i18n('column_victory_points', 'world', lang) %> <span class="icon-sort <% if (playerRankingSortField === 'victory_points') __append('selected') %>"></span></a></th>
                             <% } -%>
-                            <th>Villages</th>
+                            <th><a href="?psort=villages"><%= i18n('column_villages', 'world', lang) %> <span class="icon-sort <% if (playerRankingSortField === 'villages') __append('selected') %>"></span></a></th>
                         </tr>
                     </thead>
                     <tbody>

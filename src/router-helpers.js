@@ -1,9 +1,11 @@
 const createError = require('http-errors');
 const utils = require('./utils.js');
-const db = require('./db.js');
+const {db} = require('./db.js');
 const sql = require('./sql.js');
 const config = require('./config.js');
 const i18n = require('./i18n.js');
+const rankingSortTypes = require('./ranking-sort-types.json');
+const rankingSortTypesValues = Object.values(rankingSortTypes);
 
 async function getPlayer (worldId, playerId) {
     const player = await db.any(sql.getPlayer, {worldId, playerId});
@@ -148,18 +150,53 @@ function groupAchievements (achievements) {
     return Object.entries(group);
 }
 
-const mergeBackendLocals = function (res, obj) {
+function mergeBackendLocals (res, obj) {
     res.locals.backendValues = {
         ...res.locals.backendValues,
         ...obj
     };
-};
+}
 
-const asyncRouter = function (handler) {
+function asyncRouter (handler) {
     return function (req, res, next) {
         Promise.resolve(handler(req, res, next)).catch(next);
     };
-};
+}
+
+function parseRankingSort (req, victoryPointSystem) {
+    if (req.query.tsort) {
+        req.session.tribeRankingSortField = req.query.tsort;
+    }
+
+    if (req.query.psort) {
+        req.session.playerRankingSortField = req.query.psort;
+    }
+
+    if (!rankingSortTypesValues.includes(req.session.tribeRankingSortField)) {
+        req.session.tribeRankingSortField = rankingSortTypes.VICTORY_POINTS;
+    }
+
+    if (!rankingSortTypesValues.includes(req.session.playerRankingSortField)) {
+        req.session.playerRankingSortField = rankingSortTypes.VICTORY_POINTS;
+    }
+
+    if (!victoryPointSystem) {
+        if (req.session.tribeRankingSortField === rankingSortTypes.VICTORY_POINTS) {
+            req.session.tribeRankingSortField = rankingSortTypes.POINTS;
+        }
+
+        if (req.session.playerRankingSortField === rankingSortTypes.VICTORY_POINTS) {
+            req.session.playerRankingSortField = rankingSortTypes.POINTS;
+        }
+    }
+
+    return {
+        playerRankingSortField: req.session.playerRankingSortField,
+        playerRankingSortOrder: req.session.playerRankingSortField === rankingSortTypes.RANK ? 'ASC' : 'DESC',
+        tribeRankingSortField: req.session.tribeRankingSortField,
+        tribeRankingSortOrder: req.session.tribeRankingSortField === rankingSortTypes.RANK ? 'ASC' : 'DESC'
+    };
+}
 
 module.exports = {
     getPlayer,
@@ -175,5 +212,6 @@ module.exports = {
     groupAchievements,
     createNavigation,
     mergeBackendLocals,
-    asyncRouter
+    asyncRouter,
+    parseRankingSort
 };

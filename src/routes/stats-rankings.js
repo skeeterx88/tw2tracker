@@ -1,7 +1,7 @@
 const express = require('express');
 const createError = require('http-errors');
 const router = express.Router();
-const db = require('../db.js');
+const {db} = require('../db.js');
 const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
@@ -13,7 +13,8 @@ const {
     createPagination,
     createNavigation,
     mergeBackendLocals,
-    asyncRouter
+    asyncRouter,
+    parseRankingSort
 } = require('../router-helpers.js');
 
 const rankingCategories = ['players', 'tribes'];
@@ -40,8 +41,6 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
-
     const category = req.params.category;
 
     if (!rankingCategories.includes(category)) {
@@ -54,7 +53,19 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     const limit = parseInt(config.ui.ranking_page_items_per_page, 10);
     const offset = limit * (page - 1);
 
-    const ranking = await db.any(rankingRouterSqlMap[category].ranking, {worldId, offset, limit});
+    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+
+    const {
+        playerRankingSortField,
+        playerRankingSortOrder,
+        tribeRankingSortField,
+        tribeRankingSortOrder
+    } = parseRankingSort(req, world.config.victory_points);
+
+    const sortField = category === 'players' ? playerRankingSortField : tribeRankingSortField;
+    const sortOrder = category === 'players' ? playerRankingSortOrder : tribeRankingSortOrder;
+
+    const ranking = await db.any(rankingRouterSqlMap[category].ranking, {worldId, offset, limit, sortField, sortOrder});
     const {count} = await db.one(rankingRouterSqlMap[category].count, {worldId});
     const total = parseInt(count, 10);
     const capitalizedCategory = utils.capitalize(category);
@@ -85,12 +96,13 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         ranking,
         category,
         displayDominationColumn,
+        sortField,
         pagination: createPagination(page, total, limit, req.path),
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('ranking', 'navigation', res.locals.lang), replaces: [capitalizedCategory]},
+            {label: i18n('ranking', 'navigation', res.locals.lang), replaces: [capitalizedCategory]}
         ])
     });
 });

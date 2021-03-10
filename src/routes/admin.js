@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const {ensureLoggedIn} = require('connect-ensure-login');
 
-const db = require('../db.js');
+const {db} = require('../db.js');
 const sql = require('../sql.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');

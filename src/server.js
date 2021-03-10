@@ -14,7 +14,7 @@ module.exports = function () {
     const pgArray = require('pg').types.arrayParser;
     const fs = require('fs');
 
-    const db = require('./db.js');
+    const {db} = require('./db.js');
     const sql = require('./sql.js');
     const config = require('./config.js');
     const authErrors = require('./auth-errors.json');
@@ -22,6 +22,7 @@ module.exports = function () {
     const languages = require('./languages.js');
     const utils = require('./utils.js');
     const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
+    const rankingSortTypes = require('./ranking-sort-types.json');
 
     const development = process.env.NODE_ENV === 'development';
     const httpServer = http.createServer();
@@ -120,6 +121,8 @@ module.exports = function () {
         res.locals.capitalize = utils.ejsHelpers.capitalize;
         res.locals.sprintf = utils.sprintf;
         res.locals.lang = req.session.lang || config.lang;
+        res.locals.tribeRankingSortField = req.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;
+        res.locals.playerRankingSortField = req.session.playerRankingSortField || rankingSortTypes.VICTORY_POINTS;
 
         res.locals.backendValues = {
             selectedLanguage: res.locals.lang,

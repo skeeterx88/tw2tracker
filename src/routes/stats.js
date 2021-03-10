@@ -2,9 +2,10 @@ const express = require('express');
 const createError = require('http-errors');
 const router = express.Router();
 const config = require('../config.js');
-const db = require('../db.js');
+const {db, pgp} = require('../db.js');
 const sql = require('../sql.js');
 const i18n = require('../i18n.js');
+const rankingSortTypes = require('../ranking-sort-types.json');
 
 const {
     paramWorld,
@@ -13,7 +14,8 @@ const {
     groupAchievements,
     createNavigation,
     mergeBackendLocals,
-    asyncRouter
+    asyncRouter,
+    parseRankingSort
 } = require('../router-helpers.js');
 
 const rankingsRouter = require('./stats-rankings.js');
@@ -131,8 +133,16 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
+    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+
+    const {
+        playerRankingSortField,
+        playerRankingSortOrder,
+        tribeRankingSortField,
+        tribeRankingSortOrder
+    } = parseRankingSort(req, world.config.victory_points);
+
     const [
-        world,
         players,
         tribes,
         lastConquests,
@@ -141,9 +151,8 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         lastDailyTribeAchievements,
         lastWeeklyTribeAchievements
     ] = await Promise.all([
-        db.one(sql.getWorld, [marketId, worldNumber]),
-        db.any(sql.getWorldTopPlayers, {worldId, limit: config.ui.world_page_maximum_ranking_items}),
-        db.any(sql.getWorldTopTribes, {worldId, limit: config.ui.world_page_maximum_ranking_items}),
+        db.any(sql.getWorldTopPlayers, {worldId, limit: config.ui.world_page_maximum_ranking_items, playerRankingSortField, playerRankingSortOrder}),
+        db.any(sql.getWorldTopTribes, {worldId, limit: config.ui.world_page_maximum_ranking_items, tribeRankingSortField, tribeRankingSortOrder}),
         db.any(sql.getWorldLastConquests, {worldId, limit: config.ui.world_page_maximum_last_conquests}),
         db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-%-%'}),
         db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-W%'}),
@@ -201,6 +210,8 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         world,
         lastConquests,
         achievements,
+        playerRankingSortField,
+        tribeRankingSortField,
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
