@@ -70,7 +70,7 @@ require([
         map = new TW2Map('#map', loader, tooltip, {
             allowZoom: true,
             zoomWithShift: true,
-            zoomLevel: 1,
+            zoomLevel: 2,
             inlineHighlight: true,
             quickHighlightColor: '#000000'
         });
