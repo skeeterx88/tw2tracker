@@ -64,7 +64,7 @@ define('TW2Map', [
         let activeVillage = false;
         let renderEnabled = false;
         let zoomSettings;
-        let quickHighlightVillages = false;
+        let quickHighlightVillages = [];
 
         const $zoomElements = {};
         const $viewport = document.createElement('canvas');
@@ -1078,11 +1078,7 @@ define('TW2Map', [
             renderViewport();
         };
 
-        this.quickHighlight = (type, id) => {
-            if (quickHighlightVillages) {
-                return false;
-            }
-
+        this.quickHighlight = (type, id, color = false) => {
             if (typeof id !== 'number') {
                 throw new Error('QuickHighlight: Invalid id');
             }
@@ -1127,19 +1123,23 @@ define('TW2Map', [
                 return false;
             }
 
-            quickHighlightVillages = formatVillagesToDraw(villages);
-            renderVillages(quickHighlightVillages, settings.quickHighlightColor);
+            const formated = formatVillagesToDraw(villages);
+            quickHighlightVillages.push(formated);
+            renderVillages(formated, color || settings.quickHighlightColor);
             renderViewport();
         };
 
         this.quickHighlightOff = () => {
-            if (!quickHighlightVillages) {
+            if (!quickHighlightVillages.length) {
                 return;
             }
 
-            renderVillages(quickHighlightVillages);
-            renderViewport();
-            quickHighlightVillages = false;
+            for (const villages of quickHighlightVillages) {
+                renderVillages(villages);
+                renderViewport();
+            }
+
+            quickHighlightVillages = [];
         };
 
         this.shareMap = async (shareType) => {
