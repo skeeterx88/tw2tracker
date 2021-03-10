@@ -1410,7 +1410,7 @@ define('TW2Tooltip', [], function () {
             throw new Error('Invalid tooltip element');
         }
 
-        const mouseDistance = 30;
+        const mouseDistance = 20;
 
         $tooltip.style.visibility = 'hidden';
         $tooltip.style.opacity = 0;
@@ -1428,25 +1428,28 @@ define('TW2Tooltip', [], function () {
         const $tribeVillages = $tooltip.querySelector('.tribe-villages');
         const $provinceName = $tooltip.querySelector('.province-name');
 
-        const mouseMoveHandler = (event) => {
-            let x = event.pageX;
-            let y = event.pageY;
+        const {
+            width: tooltipWidth,
+            height: tooltipHeight
+        } = $tooltip.getBoundingClientRect();
 
-            if (x + 400 > window.innerWidth) {
-                x -= 370;
-                x -= mouseDistance;
+        const mouseMoveHandler = (event) => {
+            let x = event.clientX;
+            let y = event.clientY;
+
+            if (x + tooltipWidth + mouseDistance > window.innerWidth) {
+                x -= tooltipWidth + mouseDistance;
             } else {
                 x += mouseDistance;
             }
 
-            if (y + 140 > window.innerHeight) {
-                y -= 110;
-                y -= mouseDistance;
+            if (y + tooltipHeight + mouseDistance > window.innerHeight) {
+                y -= tooltipHeight + mouseDistance;
             } else {
                 y += mouseDistance;
             }
 
-            $tooltip.style.transform = `translate3d(${x}px, ${y}px, 0px)`;
+            $tooltip.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)';
         };
 
         const setEvents = () => {

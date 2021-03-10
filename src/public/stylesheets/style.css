@@ -813,8 +813,8 @@ a.achievement-subject:last-child:after {
     font-size: 11px;
     opacity: 0;
     visibility: hidden;
-    position: absolute;
-    transition: opacity .2s;
+    position: fixed;
+    transition: all 0.2s;
     width: 360px;
     z-index: 5;
     padding: 3px;
