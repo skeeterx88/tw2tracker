@@ -825,6 +825,7 @@ a.achievement-subject:last-child:after {
     visibility: hidden;
     position: fixed;
     transition: all 0.2s;
+    pointer-events: none;
     width: 360px;
     z-index: 5;
     padding: 3px;
