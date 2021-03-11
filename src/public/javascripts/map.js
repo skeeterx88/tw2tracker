@@ -53,7 +53,7 @@ define('TW2Map', [
             activeVillageBorderOpacity: '80',
             demarcationsColor: '#000000',
             animationTime: 0.6,
-            animationEffect: 'easeInOutCubic'
+            animationEffect: 'easeOutQuart'
         };
 
         settings = {
