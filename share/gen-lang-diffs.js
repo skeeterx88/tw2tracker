@@ -19,7 +19,9 @@ for (const file of langs) {
 
     for (const [category] of Object.entries(en)) {
         for (const [key, string] of Object.entries(en[category])) {
-            if (!target[category][key]) {
+            if (!target[category]) {
+                diff[category] = en[category];
+            } else if (!target[category][key]) {
                 diff[category] = diff[category] || {};
                 diff[category][key] = string;
             }
