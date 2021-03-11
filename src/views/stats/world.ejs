@@ -225,7 +225,7 @@
                                     <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let player of players) { -%>
-                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
+                                            <a class="achievement-subject quick-highlight" data-id="<%= player.character_id %>" data-type="players" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
                                         <% } -%>
                                     </td>
                                 </tr>
@@ -257,7 +257,7 @@
                                     <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let player of players) { -%>
-                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
+                                            <a class="achievement-subject quick-highlight" data-id="<%= player.character_id %>" data-type="players" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.character_id %>"><%= player.player_name %></a>
                                         <% } -%>
                                     </td>
                                 </tr>
@@ -289,7 +289,7 @@
                                     <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let tribe of tribes) { -%>
-                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
+                                            <a class="achievement-subject quick-highlight" data-id="<%= tribe.tribe_id %>" data-type="tribes" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
                                         <% } -%>
                                     </td>
                                 </tr>
@@ -321,7 +321,7 @@
                                     <th><%= i18n(type, 'achievements', lang) %>:</th>
                                     <td>
                                         <% for (let tribe of tribes) { -%>
-                                            <a class="achievement-subject" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
+                                            <a class="achievement-subject quick-highlight" data-id="<%= tribe.tribe_id %>" data-type="tribes" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.tribe_id %>"><%= tribe.tribe_tag %></a>
                                         <% } -%>
                                     </td>
                                 </tr>
