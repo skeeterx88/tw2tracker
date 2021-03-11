@@ -27,7 +27,7 @@ module.exports = async function (marketId, worldNumber) {
     };
 
     const loadTribes = function (offset) {
-        debug('world:%s load tribes ranking %i/?', worldId, offset);
+        // debug('world:%s load tribes ranking %i/?', worldId, offset);
 
         return new Promise(function (resolve) {
             socketService.emit(routeProvider.RANKING_TRIBE, {
@@ -68,7 +68,7 @@ module.exports = async function (marketId, worldNumber) {
     };
 
     const loadPlayers = function (offset) {
-        debug('world:%s load players ranking %i/?', worldId, offset);
+        // debug('world:%s load players ranking %i/?', worldId, offset);
 
         return new Promise(function (resolve) {
             socketService.emit(routeProvider.RANKING_CHARACTER, {
@@ -132,7 +132,7 @@ module.exports = async function (marketId, worldNumber) {
         const tribeIdsArray = Array.from(tribeIds.values());
 
         for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
-            debug('world:%s load tribe achievements %i/%i', worldId, i, l);
+            // debug('world:%s load tribe achievements %i/%i', worldId, i, l);
 
             await Promise.all([
                 loadAchievements('tribes', tribeIdsArray[i]),
@@ -147,7 +147,7 @@ module.exports = async function (marketId, worldNumber) {
         const playerIdsArray = Array.from(playerIds.values());
 
         for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
-            debug('world:%s load player achievements %i/%i', worldId, i, l);
+            // debug('world:%s load player achievements %i/%i', worldId, i, l);
 
             await Promise.all([
                 loadAchievements('players', playerIdsArray[i]),
