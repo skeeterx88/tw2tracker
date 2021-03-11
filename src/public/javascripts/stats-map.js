@@ -124,10 +124,10 @@ require([
                     const oldOwner = parseInt($row.dataset.oldOwner, 10);
 
                     if (oldOwner) {
-                        map.quickHighlight('players', oldOwner, 'blue');
+                        map.quickHighlight('players', oldOwner, TW2Map.colorPaletteTopThree[2]);
                     }
 
-                    map.quickHighlight('players', newOwner, 'red');
+                    map.quickHighlight('players', newOwner, TW2Map.colorPaletteTopThree[1]);
                     map.quickHighlight('villages', id);
                     map.moveTo(...averagePositionFor('villages', id));
                 } else {
