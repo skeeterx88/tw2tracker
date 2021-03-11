@@ -81,7 +81,8 @@
         "no_weekly_achievements": "Keine wöchentliche Erfolge verfügbar",
         "stats_players": "Spieler",
         "stats_villages": "Dörfer",
-        "stats_tribes": "Stämme"
+        "stats_tribes": "Stämme",
+        "column_domination": "%"
     },
     "world_ranking": {
         "header_players": "Spieler Rangliste",
