@@ -7,8 +7,13 @@
     padding: 5px;
 }
 
-#sync-summary p {
-    margin: 0px;
+#sync-summary .summary-block {
+    margin: 10px 0px;
+}
+
+#sync-summary .summary-block label {
+    font-weight: bold;
+    display: block;
 }
 
 #sync-summary .value {
@@ -23,8 +28,9 @@
     color: hsl(0, 35%, 81%);
     padding: 0px 3px;
     text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
-    margin: 0px 1px;
+    margin: 1px 1px;
     cursor: default;
+    display: inline-block;
 }
 
 #sync-panel ul {

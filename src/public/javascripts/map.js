@@ -1410,7 +1410,7 @@ define('TW2Tooltip', [], function () {
             throw new Error('Invalid tooltip element');
         }
 
-        const mouseDistance = 20;
+        const mouseDistance = 30;
 
         $tooltip.style.visibility = 'hidden';
         $tooltip.style.opacity = 0;

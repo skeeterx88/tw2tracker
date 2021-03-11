@@ -108,25 +108,30 @@ const syncRouter = asyncRouter(async function (req, res) {
     const [
         openWorlds,
         closedWorlds,
-        syncingWorlds,
-        markets
+        markets,
+        syncQueue
     ] = await Promise.all([
         db.any(sql.getOpenWorlds),
         db.any(sql.getClosedWorlds),
-        db.any(sql.getSyncingWorlds),
-        db.any(sql.getMarkets)
+        db.any(sql.getMarkets),
+        db.any(sql.getSyncQueue)
     ]);
 
-    const syncingDataWorlds = [];
-    const syncingAchievementsWorlds = [];
+    const syncQueueTyped = {
+        data: [],
+        achievements: []
+    };
 
-    for (const world of syncingWorlds) {
-        if (world.sync_data_active) {
-            syncingDataWorlds.push(world.world_id);
-        }
+    const syncingWorlds = {
+        data: [],
+        achievements: []
+    };
 
-        if (world.sync_achievements_active) {
-            syncingAchievementsWorlds.push(world.world_id);
+    for (const item of syncQueue) {
+        if (item.active) {
+            syncingWorlds[item.type].push(item.market_id + item.world_number);
+        } else {
+            syncQueueTyped[item.type].push(item);
         }
     }
 
@@ -146,8 +151,8 @@ const syncRouter = asyncRouter(async function (req, res) {
         openWorlds,
         closedWorlds,
         markets,
-        syncingDataWorlds,
-        syncingAchievementsWorlds,
+        syncingWorlds,
+        syncQueueTyped,
         privilegeTypes,
         user: req.user,
         errors: req.flash('error'),

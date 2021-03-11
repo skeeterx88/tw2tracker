@@ -33,6 +33,98 @@ const running = {
     achievements: new Set()
 };
 
+const queue = {
+    data: [],
+    achievements: []
+};
+const processingQueue = {
+    data: false,
+    achievements: false
+};
+const queueEvents = {
+    data: {
+        START_QUEUE: 'sync_queue_data_start',
+        ITEM_FINISH: syncEvents.DATA_FINISH
+    },
+    achievements: {
+        START_QUEUE: 'sync_queue_achievements_start',
+        ITEM_FINISH: syncEvents.ACHIEVEMENTS_FINISH
+    }
+};
+
+Sync.initQueue = async function (type) {
+    debug.queue('init sync queue:%s', type);
+
+    async function processQueue () {
+        if (processingQueue[type]) {
+            return false;
+        }
+
+        debug.queue('queue:%s starting', type);
+        processingQueue[type] = true;
+
+        while (queue[type].length) {
+            if (running[type].size < config.sync.parallel_data_sync) {
+                const data = queue[type].shift();
+
+                Sync[type](data.market_id, data.world_number, null, function () {
+                    db.none(sql.removeSyncQueue, {
+                        id: data.id
+                    });
+                });
+
+                await db.none(sql.setQueueItemActive, {
+                    id: data.id,
+                    active: true
+                });
+            } else {
+                await Events.on(queueEvents[type].ITEM_FINISH);
+            }
+        }
+
+        debug.queue('queue:%s finished', type);
+        processingQueue[type] = false;
+    }
+
+    Events.on(queueEvents[type].START_QUEUE, processQueue);
+
+    await db.none(sql.resetQueueItems);
+    queue[type].push(...await db.any(sql.getSyncQueueType, {type}));
+
+    if (queue[type].length) {
+        processQueue();
+    }
+};
+
+Sync.addQueue = async function (type, worlds) {
+    debug.queue('add queue of type %s, worlds %s', type, worlds.map(({market_id, world_number}) => market_id + world_number).join(','));
+
+    if (!Array.isArray(worlds)) {
+        throw new Error('Sync addQueue: argument "worlds" is not of type "array"');
+    }
+
+    await db.tx(async function () {
+        for (const {market_id, world_number} of worlds) {
+            const data = await this.one(sql.addSyncQueue, {type, market_id, world_number});
+            queue[type].push(data);
+        }
+    });
+
+    if (!processingQueue[type]) {
+        Events.trigger(queueEvents[type].START_QUEUE);
+    }
+};
+
+Sync.all = async function (type, flag) {
+    const syncQueue = await db.map(sql.getSyncQueueNonActive, [], ({market_id, world_number}) => market_id + world_number);
+    const worlds = await db.map(sql.getSyncEnabledWorlds, [], function (world) {
+        return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
+    });
+    const uniqueWorlds = worlds.filter(world => world !== false);
+
+    Sync.addQueue(type, uniqueWorlds);
+};
+
 Sync.init = async function () {
     debug.sync('initializing sync system');
 
@@ -54,27 +146,14 @@ Sync.init = async function () {
             column: 'first_run',
             value: false
         });
-    }
 
-    await db.none(sql.resetWorldsSyncDataActive);
-    await db.none(sql.resetWorldsSyncAchievementsActive);
-
-    Events.on(syncEvents.DATA_START, function (worldId) {
-        db.query(sql.setWorldSyncDataActive, {active: true, worldId});
-    });
 
     Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
         db.none(sql.updateDataSync, {status, worldId});
-        db.none(sql.setWorldSyncDataActive, {active: false, worldId});
-    });
-
-    Events.on(syncEvents.ACHIEVEMENTS_START, function (worldId) {
-        db.none(sql.setWorldSyncAchievementsActive, {active: true, worldId});
     });
 
     Events.on(syncEvents.ACHIEVEMENTS_FINISH, function (worldId, status) {
         db.none(sql.updateAchievementsSync, {status, worldId});
-        db.none(sql.setWorldSyncAchievementsActive, {active: false, worldId});
     });
 
     const tasks = await Sync.tasks();
@@ -109,6 +188,9 @@ Sync.init = async function () {
         tasks.initChecker();
     }
 
+    await Sync.initQueue('data');
+    await Sync.initQueue('achievements');
+
     // await Sync.dataAll();
     // await Sync.achievementsAll();
 };
@@ -116,19 +198,25 @@ Sync.init = async function () {
 Sync.trigger = function (msg) {
     switch (msg.command) {
         case syncCommands.DATA_ALL: {
-            Sync.dataAll();
+            Sync.all('data');
             break;
         }
         case syncCommands.DATA: {
-            Sync.data(msg.marketId, msg.worldNumber);
+            Sync.addQueue('data', [{
+                market_id: msg.marketId,
+                world_number: msg.worldNumber
+            }]);
             break;
         }
         case syncCommands.ACHIEVEMENTS_ALL: {
-            Sync.achievementsAll();
+            Sync.all('achievements');
             break;
         }
         case syncCommands.ACHIEVEMENTS: {
-            Sync.achievements(msg.marketId, msg.worldNumber);
+            Sync.addQueue('achievements', [{
+                market_id: msg.marketId,
+                world_number: msg.worldNumber
+            }]);
             break;
         }
         case syncCommands.MARKETS: {
@@ -146,7 +234,7 @@ Sync.trigger = function (msg) {
     }
 };
 
-Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
+Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) {
     const worldId = marketId + worldNumber;
 
     if (running.data.has(worldId)) {
@@ -252,6 +340,10 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
             running.data.delete(worldId);
         }, humanInterval(config.sync.max_sync_data_running_time));
 
+        if (callback) {
+            callback(true);
+        }
+
         return true;
     } catch (error) {
         debug.sync('world:%s data sync failed (%s)', worldId, error.message);
@@ -262,15 +354,19 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
         }
 
         if (attempt < config.sync.max_sync_attempts) {
-            return await Sync.data(marketId, worldNumber, flag, attempt + 1);
+            return await Sync.data(marketId, worldNumber, flag, callback, attempt + 1);
         } else {
+            if (callback) {
+                callback(false);
+            }
+
             Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.FAIL]);
             throw new Error(error.message);
         }
     }
 };
 
-Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
+Sync.achievements = async function (marketId, worldNumber, flag, callback, attempt = 1) {
     const worldId = marketId + worldNumber;
 
     if (running.achievements.has(worldId)) {
@@ -342,6 +438,10 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
             running.achievements.delete(worldId);
         }, humanInterval(config.sync.max_sync_achievements_running_time));
 
+        if (callback) {
+            callback(true);
+        }
+
         return true;
     } catch (error) {
         debug.sync('world:%s achievements sync failed (%s)', worldId, error.message);
@@ -352,52 +452,16 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
         }
 
         if (attempt < config.sync.max_sync_attempts) {
-            return await Sync.achievements(marketId, worldNumber, flag, attempt + 1);
+            return await Sync.achievements(marketId, worldNumber, flag, callback, attempt + 1);
         } else {
+            if (callback) {
+                callback(false);
+            }
+
             Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.FAIL]);
             throw new Error(error.message);
         }
     }
-};
-
-Sync.dataAll = async function (flag) {
-    debug.sync('all-worlds-data sync start');
-
-    async function asynchronousSync () {
-        const queue = await db.any(sql.getSyncEnabledWorlds);
-
-        while (queue.length) {
-            if (running.data.size < config.sync.parallel_data_sync) {
-                const world = queue.shift();
-                Sync.data(world.market, world.num, flag);
-            } else {
-                await Events.on(syncEvents.DATA_FINISH);
-            }
-        }
-    }
-
-    await asynchronousSync();
-    debug.sync('all-worlds-data sync finish');
-};
-
-Sync.achievementsAll = async function (flag) {
-    debug.sync('all-worlds-achievements sync start');
-
-    async function asynchronousSync () {
-        const queue = await db.any(sql.getSyncEnabledWorlds);
-
-        while (queue.length) {
-            if (running.achievements.size < config.sync.parallel_achievements_sync) {
-                const world = queue.shift();
-                Sync.achievements(world.market, world.num, flag);
-            } else {
-                await Events.on(syncEvents.ACHIEVEMENTS_FINISH);
-            }
-        }
-    }
-
-    await asynchronousSync();
-    debug.sync('all-worlds-achievements sync finish');
 };
 
 Sync.worlds = async function () {

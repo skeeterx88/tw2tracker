@@ -59,9 +59,18 @@ CREATE TABLE public.worlds (
     close_date TIMESTAMP NULL,
     open_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     incomplete_data BOOLEAN DEFAULT FALSE,
-    sync_enabled BOOLEAN DEFAULT TRUE,
-    sync_data_active BOOLEAN DEFAULT FALSE,
-    sync_achievements_active BOOLEAN DEFAULT FALSE
+    sync_enabled BOOLEAN DEFAULT TRUE
+);
+
+CREATE TYPE public.sync_types AS ENUM ('data', 'achievements');
+
+CREATE TABLE public.sync_queue (
+    id SERIAL PRIMARY KEY,
+    type public.sync_types,
+    market_id TEXT NOT NULL,
+    world_number SMALLINT NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT FALSE,
+    start_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
 CREATE TYPE public.map_share_type AS ENUM ('static', 'dynamic');

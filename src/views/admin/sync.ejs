@@ -60,31 +60,54 @@
             <h1><%= i18n('header_summary', 'admin_sync', lang) %></h1>
 
             <div class="section-content">
-                <p>
+                <div class="summary-block">
                     <label><%= i18n('sync_data_active_worlds', 'admin_sync', lang) %></label>
                     <span id="sync-active-data-worlds">
-                        <% if (syncingDataWorlds.length) { %>
-                            <% for (const worldId of syncingDataWorlds) { -%>
+                        <% if (syncingWorlds.data.length) { %>
+                            <% for (const worldId of syncingWorlds.data) { -%>
                                 <span class="world-label" data-world-id="<%= worldId %>"><%= worldId %></span>
                             <% } -%>
                         <% } else { %>
                             <%= i18n('none', 'admin_sync', lang) %>
                         <% } %>
                     </span>
-                </p>
-                <p>
+                </div>
+                <div class="summary-block">
+                    <label><%= i18n('sync_data_queue', 'admin_sync', lang) %></label>
+                    <span id="sync-queue-data">
+                        <% if (syncQueueTyped.data.length) { %>
+                            <% for (const item of syncQueueTyped.data) { -%>
+                                <span class="world-label" data-market-id="<%= item.market_id %> data-world-number="<%= item.world_number %>"><%= item.market_id + item.world_number %></span>
+                            <% } -%>
+                        <% } else { %>
+                            <%= i18n('none', 'admin_sync', lang) %>
+                        <% } %>
+                    </span>
+                </div>
+                <div class="summary-block">
                     <label><%= i18n('sync_achievements_active_worlds', 'admin_sync', lang) %></label>
                     <span id="sync-active-achievement-worlds">
-                        <% if (syncingAchievementsWorlds.length) { %>
-                            <% for (const worldId of syncingAchievementsWorlds) { -%>
+                        <% if (syncingWorlds.achievements.length) { %>
+                            <% for (const worldId of syncingWorlds.achievements) { -%>
                                 <span class="world-label" data-world-id="<%= worldId %>"><%= worldId %></span>
                             <% } -%>
                         <% } else { %>
                             <%= i18n('none', 'admin_sync', lang) %>
                         <% } %>
                     </span>
-                </p>
-
+                </div>
+                <div class="summary-block">
+                    <label><%= i18n('sync_achievements_queue', 'admin_sync', lang) %></label>
+                    <span id="sync-queue-achievements">
+                        <% if (syncQueueTyped.achievements.length) { %>
+                            <% for (const item of syncQueueTyped.achievements) { -%>
+                                <span class="world-label" data-market-id="<%= item.market_id %> data-world-number="<%= item.world_number %>"><%= item.market_id + item.world_number %></span>
+                            <% } -%>
+                        <% } else { %>
+                            <%= i18n('none', 'admin_sync', lang) %>
+                        <% } %>
+                    </span>
+                </div>
             </div>
         </section>
     </div>

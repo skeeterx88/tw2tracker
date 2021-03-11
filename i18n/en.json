@@ -358,6 +358,8 @@
         "sync_data_active_worlds": "Currently active sync data worlds:",
         "sync_all_achievements_active": "Sync achievements all worlds active:",
         "sync_achievements_active_worlds": "Currently active sync achievements worlds:",
+        "sync_data_queue": "Queued sync data:",
+        "sync_achievements_queue": "Queued sync achievements:",
         "no": "No",
         "yes": "Yes",
         "none": "None",
