@@ -10,7 +10,6 @@
     --color-content-layer-2: url(/images/noise.webp) hsl(43, 52%, 75%);
     --shadow-border-1: 0px 0px 0px 1px hsl(23, 55%, 24%),
                        0px 0px 0px 2px hsl(23, 47%, 36%),
-                       inset -2px -2px 2px hsla(0, 0%, 0%, 30%),
                        2px 2px 4px hsla(0, 0%, 0%, 50%);
     --shadow-border-2: 0 0 0 1px hsl(23deg 67% 17%),
                        inset 0 0 0 1px hsl(23deg 67% 17%),
