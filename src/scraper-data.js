@@ -1,5 +1,3 @@
-/*global humanInterval*/
-
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
@@ -73,7 +71,7 @@ module.exports = async function (config) {
         return new Promise(function (resolve, reject) {
             const timeoutId = setTimeout(function () {
                 reject(LOAD_VILLAGE_SECTION_TIMEOUT);
-            }, humanInterval(config.sync_timeouts.load_continent_section));
+            }, config.loadContinentSectionTimeout);
 
             socketService.emit(routeProvider.MAP_GETVILLAGES, {
                 x: x,
@@ -92,7 +90,7 @@ module.exports = async function (config) {
         return new Promise(async function (resolve, reject) {
             const timeout = setTimeout(function () {
                 reject(new Error('Failed to fetch villages section'));
-            }, humanInterval(config.sync_timeouts.load_continent));
+            }, config.loadContinentTimeout);
 
             const loadVillages = await Promise.all([
                 loadVillageSection(x, y),

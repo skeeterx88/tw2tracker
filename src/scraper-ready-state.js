@@ -1,5 +1,3 @@
-/*global humanInterval*/
-
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */
@@ -22,7 +20,7 @@ module.exports = function (config) {
             } else {
                 reject('Could not get ready state (timeout)');
             }
-        }, humanInterval(config.sync_timeouts.ready_state));
+        }, config.timeout);
 
         const waitForInjector = function (callback) {
             if (typeof injector === 'undefined') {

@@ -22,6 +22,8 @@ CREATE TABLE public.accounts (
     markets VARCHAR[] DEFAULT '{}'
 );
 
+INSERT INTO public.accounts (name, pass, markets) VALUES ('tribalwarstracker', '7FONlraMpdnvrNIVE8aOgSGISVW00A', '{br,cz,de,en,es,fr,gr,hu,it,nl,pl,pt,ro,ru,sk,tr,us,zz}');
+
 CREATE TYPE public.mod_privilege_types AS ENUM ('start_sync', 'control_sync', 'modify_accounts', 'modify_mods', 'modify_settings');
 
 CREATE TABLE public.mods (

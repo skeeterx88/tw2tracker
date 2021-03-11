@@ -218,7 +218,9 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s waiting ready state', worldId);
 
-            await page.evaluate(scraperReadyState, config);
+            await page.evaluate(scraperReadyState, {
+                timeout: humanInterval(config.sync_timeouts.ready_state)
+            });
 
             if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
                 await fetchWorldMapStructure(page, worldId, urlId);
@@ -234,7 +236,11 @@ Sync.data = async function (marketId, worldNumber, flag, attempt = 1) {
 
             debug.sync('world:%s fetching data', worldId);
 
-            const data = await page.evaluate(scraperData, config);
+            const data = await page.evaluate(scraperData, {
+                loadContinentTimeout: humanInterval(config.sync_timeouts.load_continent),
+                loadContinentSectionTimeout: humanInterval(config.sync_timeouts.load_continent_section)
+
+            });
             await commitRawDataFilesystem(data, worldId);
             await commitDataDatabase(data, worldId);
             await commitDataFilesystem(worldId);
@@ -321,9 +327,11 @@ Sync.achievements = async function (marketId, worldNumber, flag, attempt = 1) {
 
             page = await createPuppeteerPage();
             await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
-            await page.evaluate(scraperReadyState, config);
+            await page.evaluate(scraperReadyState, {
+                timeout: humanInterval(config.sync_timeouts.ready_state)
+            });
 
-            const achievements = await page.evaluate(scraperAchievements, marketId, worldNumber, config);
+            const achievements = await page.evaluate(scraperAchievements, marketId, worldNumber);
             await commitRawAchievementsFilesystem(achievements, worldId);
             await commitAchievementsDatabase(achievements, worldId);
 
@@ -547,7 +555,7 @@ Sync.auth = async function (marketId, attempt = 1) {
 
                     const loginTimeout = setTimeout(function () {
                         reject('emit credentials timeout');
-                    }, humanInterval(config.sync_timeouts.auth_socket_emit));
+                    }, config.authSocketEmitTimeout);
 
                     debug('market:%s emit login command', marketId);
 
@@ -556,7 +564,9 @@ Sync.auth = async function (marketId, attempt = 1) {
                         resolve(data);
                     });
                 });
-            }, marketId, credentials, config);
+            }, marketId, credentials, {
+                authSocketEmitTimeout: humanInterval(config.sync_timeouts.auth_socket_emit)
+            });
 
             if (!account) {
                 const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent);
