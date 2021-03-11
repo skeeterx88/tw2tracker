@@ -140,13 +140,14 @@ Sync.init = async function () {
 
         await Sync.markets();
         await Sync.worlds();
-        await Sync.dataAll();
 
         await db.query(sql.updateProgramState, {
             column: 'first_run',
             value: false
         });
 
+        Sync.dataAll();
+    }
 
     Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
         db.none(sql.updateDataSync, {status, worldId});
