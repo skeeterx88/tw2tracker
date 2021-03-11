@@ -82,7 +82,10 @@
         "stats_players": "Spieler",
         "stats_villages": "Dörfer",
         "stats_tribes": "Stämme",
-        "column_domination": "%"
+        "column_domination": "%",
+        "column_domination_full": "Vorherrschaft in Prozent",
+        "accessibility_search_label": "Suchfeld",
+        "column_victory_points_full": "Siegpunkte"
     },
     "world_ranking": {
         "header_players": "Spieler Rangliste",
@@ -93,7 +96,10 @@
         "column_points": "Punkte",
         "column_victory_points": "SP",
         "column_villages": "Dörfer",
-        "column_player": "Spieler"
+        "column_player": "Spieler",
+        "column_victory_points_full": "Siegpunkte",
+        "column_domination": "%",
+        "column_domination_full": "Vorherrschaft"
     },
     "world_search": {
         "no_results": "Keine Suchergebnisse",
@@ -316,7 +322,27 @@
         "error_mod_username_already_exists": "Ein Moderator mit diesem Namen existiert bereits",
         "error_mod_account_email_already_exists": "Diese E-Mail wird bereits verwendet.",
         "error_invalid_privilege": "keine Berechtigung",
-        "error_mod_account_not_exists": "Dieser Moderator exisiert nicht."
+        "error_mod_account_not_exists": "Dieser Moderator exisiert nicht.",
+        "button_login": "Einloggen",
+        "error_not_authorized_access": "Du hast keine Berechtigung für diese Seite.",
+        "error_market_has_no_sync_accounts": "Diese Region hat keine synchronisierten Accounts.",
+        "error_world_not_found": "Diese Welt existiert nicht.",
+        "message_world_toggled": "Welt %{world_id} ein-/ausgeschaltet.",
+        "message_scrape_worlds_started": "Synchronisierung der Welt gestartet.",
+        "message_scrape_markets_started": "Synchroniesierung der Region gestartet.",
+        "message_sync_achievements_all_started": "Synchronisierung von allen Erfolgen gestartet.",
+        "message_sync_data_all_started": "Synchronisierung von allen Daten gestartet.",
+        "message_sync_world_started": "Synchronisierung der Welt %{world_id} gestartet.",
+        "message_sync_data_world_started": "Synchronisierung von Daten der Welt %{world_id} gestartet.",
+        "message_sync_achievements_world_started": "Synchronisierung von Erfolgen der Welt %{world_id} gestartet.",
+        "message_sync_account_market_added": "Region %{market_id} zu synchronisierten Accounts hinzugefügt.",
+        "message_sync_account_market_removed": "Region von synchronisierten Accounts hinzugefügt.",
+        "message_sync_account_deleted": "Synchronisierter Account gelöscht.",
+        "message_sync_account_altered": "Synchronisierter Account geändert.",
+        "message_sync_account_added": "Synchronisierter Account hinzugefügt.",
+        "message_mod_account_altered": "Moderator geändert",
+        "message_mod_account_created": "Moderator hinzugefügt",
+        "message_mod_account_deleted": "Moderator gelöscht"
     },
     "admin_menu": {
         "sync": "Synchronisieren",
@@ -410,7 +436,8 @@
         "error_struct_not_found": "Strukturen konnten nicht geladen werden",
         "error_world_not_found": "Die Welt existiert nicht",
         "error_invalid_highlights": "ungültige Daten zum Hervorheben",
-        "error_no_highlights_input": "nichts zum Hervorheben spezifiziert"
+        "error_no_highlights_input": "nichts zum Hervorheben spezifiziert",
+        "error_map_share_no_highlights": "Keine Highlights um die Karte zu teilen"
     },
     "maps_tooltip": {
         "village": "Dorf",
@@ -594,6 +621,7 @@
         "stats_village": "Dorf %{village_name} (%{village_x}|%{village_y}) - %{market_id}/%{world_name} - %{site_name}",
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
-        "stats_world": "%{market_id}/%{world_name} - %{site_name}"
+        "stats_world": "%{market_id}/%{world_name} - %{site_name}",
+        "languages": "Sprachen - %{site_name}"
     }
 }
