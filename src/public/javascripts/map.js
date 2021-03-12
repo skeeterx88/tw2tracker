@@ -1363,7 +1363,7 @@ define('TW2DataLoader', [
         });
 
         this.loadContinent = (continent) => {
-            if (typeof continent !== 'number' || continent < 0 || continent > 99) {
+            if (isNaN(continent) || continent < 0 || continent > 99) {
                 throw new Error('Invalid continent value');
             }
 

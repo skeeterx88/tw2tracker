@@ -919,6 +919,59 @@ async function commitDataDatabase (data, worldId) {
             this.none(sql.updatePlayerVillages, {worldId, character_id, villages_id});
         }
 
+        const playersAvgPosition = {};
+
+        for (const [playerId, villageIds] of data.villagesByPlayer) {
+            if (!villageIds.length) {
+                continue;
+            }
+
+            let sumX = 0;
+            let sumY = 0;
+
+            villageIds.forEach(function (vid) {
+                const {x, y} = villagesNew.get(vid);
+                sumX += x;
+                sumY += y;
+            });
+
+            const avgX = Math.floor(sumX / villageIds.length);
+            const avgY = Math.floor(sumY / villageIds.length);
+            const avg = [avgX, avgY];
+
+            playersAvgPosition[playerId] = avg;
+            this.none(sql.updatePlayerAvgCoords, {worldId, playerId, avg});
+        }
+
+        for (const [tribeId, tribeMembers] of data.playersByTribe) {
+            if (!tribeMembers.length) {
+                continue;
+            }
+
+            let count = 0;
+            let sumX = 0;
+            let sumY = 0;
+
+            tribeMembers.forEach(function (pid) {
+                if (playersAvgPosition[pid]) {
+                    const [x, y] = playersAvgPosition[pid];
+                    sumX += x;
+                    sumY += y;
+                    count++;
+                }
+            });
+
+            if (!count) {
+                continue;
+            }
+
+            const avgX = Math.floor(sumX / count);
+            const avgY = Math.floor(sumY / count);
+            const avg = [avgX, avgY];
+
+            this.none(sql.updateTribeAvgCoords, {worldId, tribeId, avg});
+        }
+
         const worldStats = {
             villages: data.villages.length,
             players: data.players.length,
@@ -999,8 +1052,8 @@ async function commitDataFilesystem (worldId) {
 
         await fs.promises.mkdir(dataPath, {recursive: true});
 
-        for (const {id, name, tribe_id, points, villages} of players) {
-            parsedPlayers[id] = [name, tribe_id || 0, points, villages];
+        for (const {id, name, tribe_id, points, villages, avg_coords} of players) {
+            parsedPlayers[id] = [name, tribe_id || 0, points, villages, avg_coords];
         }
 
         for (const village of villages) {
@@ -1039,8 +1092,8 @@ async function commitDataFilesystem (worldId) {
             await fs.promises.writeFile(path.join(dataPath, k), zlib.gzipSync(data));
         }
 
-        for (const {id, name, tag, points, villages} of tribes) {
-            parsedTribes[id] = [name, tag, points, villages];
+        for (const {id, name, tag, points, villages, avg_coords} of tribes) {
+            parsedTribes[id] = [name, tag, points, villages, avg_coords];
         }
 
         for (const {name} of provinces) {

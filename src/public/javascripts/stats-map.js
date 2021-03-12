@@ -28,11 +28,11 @@ require([
 
         switch (type) {
             case TW2Map.highlightTypes.TRIBES: {
-                [averageX, averageY] = utils.averageCoords(loader.tribePlayers[id].map((pid) => loader.playerVillages[pid]).flat());
+                [averageX, averageY] = loader.tribes[id][4];
                 break;
             }
             case TW2Map.highlightTypes.PLAYERS: {
-                [averageX, averageY] = utils.averageCoords(loader.playerVillages[id]);
+                [averageX, averageY] = loader.players[id][4];
                 break;
             }
             case TW2Map.highlightTypes.VILLAGES: {

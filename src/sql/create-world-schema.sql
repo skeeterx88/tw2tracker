@@ -44,7 +44,9 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.tribes (
 
     bash_rank_off INT,
     bash_rank_def INT,
-    bash_rank_total INT
+    bash_rank_total INT,
+
+    avg_coords INT[] DEFAULT '{500,500}'
 );
 
 CREATE TABLE IF NOT EXISTS ${worldId:name}.players (
@@ -74,7 +76,9 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.players (
 
     bash_rank_off INT,
     bash_rank_def INT,
-    bash_rank_total INT
+    bash_rank_total INT,
+
+    avg_coords INT[] DEFAULT '{500,500}'
 );
 
 CREATE TABLE IF NOT EXISTS ${worldId:name}.provinces (
