@@ -23,6 +23,8 @@ require([
     let colorPicker;
     let notif;
     const KEEP_COLORPICKER_OPEN = 'keep_colorpicker_open';
+    const HIGHLIGHTS_STORE_KEY = 'tw2_tracker_map_highlights_' + marketId + worldNumber;
+    const IGNORE_HIGHLIGHT_STORAGE = 'ignore_highlight_storage';
 
     const setupQuickJump = () => {
         const $quickJumpX = document.querySelector('#quick-jump-x');
@@ -134,6 +136,93 @@ require([
             $results.classList.add('hidden');
         }
 
+        map.on('add highlight', (highlightType, id, display, color, flag) => {
+            console.log('add highlight', highlightType, id, display, color, flag);
+            const $item = document.createElement('li');
+            const $name = document.createElement('div');
+            const $color = document.createElement('div');
+            const $villages = document.createElement('div');
+            const $icon = document.createElement('span');
+
+            $item.classList.add(`highlight-${utils.normalizeString(id)}`);
+            $item.classList.add('item');
+            $item.classList.add(highlightType);
+            $item.dataset.highlightType = highlightType;
+            $item.dataset.id = id;
+            $item.dataset.color = color;
+
+            $name.addEventListener('click', () => {
+                map.removeHighlight(highlightType, id);
+            });
+
+            $name.classList.add('name');
+            $name.innerHTML = display;
+            
+            $icon.classList.add(`icon-${highlightType}`);
+
+            $color.classList.add('color');
+            $color.classList.add('open-color-picker');
+            $color.style.backgroundColor = color;
+            $color.dataset.color = color;
+
+            $color.addEventListener('click', () => {
+                colorPicker($color, $color.dataset.color, (pickedColor) => {
+                    $color.dataset.color = pickedColor;
+                    map.addHighlight(highlightType, id, pickedColor);
+                    return true;
+                }, KEEP_COLORPICKER_OPEN);
+            });
+
+            let realId;
+            let villages;
+
+            if (highlightType === TW2Map.highlightTypes.PLAYERS) {
+                realId = typeof id === 'number' ? id : loader.playersByName[id.toLowerCase()];
+                villages = loader.players[realId][3];
+            } else if (highlightType === TW2Map.highlightTypes.TRIBES) {
+                realId = typeof id === 'number' ? id : loader.tribesByName[id.toLowerCase()] || loader.tribesByTag[id.toLowerCase()];
+                villages = loader.tribes[realId][3];
+            }
+
+            $villages.classList.add('villages');
+            $villages.innerHTML = villages > 1 ? `${villages} ${i18n('villages', 'maps')}` : `${villages} ${i18n('village', 'maps')}`;
+
+            $item.appendChild($icon);
+            $item.appendChild($name);
+            $item.appendChild($color);
+            $item.appendChild($villages);
+            $highlightItems.appendChild($item);
+
+            if (flag !== IGNORE_HIGHLIGHT_STORAGE) {
+                updateStoredHighlights();
+            }
+        });
+
+        map.on('update highlight', (highlightType, id, display, color) => {
+            const $item = $highlightItems.querySelector(`.highlight-${utils.normalizeString(id)}`);
+
+            if (!$item) {
+                return false;
+            }
+
+            const $color = $item.querySelector('.color');
+
+            $color.style.background = color;
+            $item.dataset.color = color;
+
+            updateStoredHighlights();
+        });
+
+        map.on('remove highlight', (highlightType, id) => {
+            const $item = $highlightItems.querySelector(`.highlight-${utils.normalizeString(id)}`);
+
+            if ($item) {
+                $item.remove();
+            }
+
+            updateStoredHighlights();
+        });
+
         const data = await (async () => {
             await loader.loadInfo;
 
@@ -205,84 +294,6 @@ require([
                 onResults(newResults);
             } else {
                 onNoResults();
-            }
-        });
-
-        map.on('add highlight', (highlightType, id, displayName, color) => {
-            const $item = document.createElement('li');
-            const $name = document.createElement('div');
-            const $color = document.createElement('div');
-            const $villages = document.createElement('div');
-            const $icon = document.createElement('span');
-
-            $item.classList.add(`highlight-${utils.normalizeString(id)}`);
-            $item.classList.add('item');
-            $item.classList.add(highlightType);
-            $item.dataset.highlightType = highlightType;
-            $item.dataset.id = id;
-            $item.dataset.color = color;
-
-            $name.addEventListener('click', () => {
-                map.removeHighlight(highlightType, id);
-            });
-
-            $name.classList.add('name');
-            $name.innerHTML = displayName;
-            
-            $icon.classList.add(`icon-${highlightType}`);
-
-            $color.classList.add('color');
-            $color.classList.add('open-color-picker');
-            $color.style.backgroundColor = color;
-            $color.dataset.color = color;
-
-            $color.addEventListener('click', () => {
-                colorPicker($color, $color.dataset.color, (pickedColor) => {
-                    $color.dataset.color = pickedColor;
-                    map.addHighlight(highlightType, id, pickedColor);
-                    return true;
-                }, KEEP_COLORPICKER_OPEN);
-            });
-
-            let realId;
-            let villages;
-
-            if (highlightType === TW2Map.highlightTypes.PLAYERS) {
-                realId = typeof id === 'number' ? id : loader.playersByName[id.toLowerCase()];
-                villages = loader.players[realId][3];
-            } else if (highlightType === TW2Map.highlightTypes.TRIBES) {
-                realId = typeof id === 'number' ? id : loader.tribesByName[id.toLowerCase()] || loader.tribesByTag[id.toLowerCase()];
-                villages = loader.tribes[realId][3];
-            }
-
-            $villages.classList.add('villages');
-            $villages.innerHTML = villages > 1 ? `${villages} ${i18n('villages', 'maps')}` : `${villages} ${i18n('village', 'maps')}`;
-
-            $item.appendChild($icon);
-            $item.appendChild($name);
-            $item.appendChild($color);
-            $item.appendChild($villages);
-            $highlightItems.appendChild($item);
-        });
-
-        map.on('update highlight', (highlightType, id, displayName, color) => {
-            const $item = $highlightItems.querySelector(`.highlight-${utils.normalizeString(id)}`);
-
-            if (!$item) {
-                return false;
-            }
-
-            const $color = $item.querySelector('.color');
-
-            $color.style.background = color;
-            $item.dataset.color = color;
-        });
-
-        map.on('remove highlight', (highlightType, id) => {
-            const $item = $highlightItems.querySelector(`.highlight-${utils.normalizeString(id)}`);
-
-            if ($item) {
-                $item.remove();
             }
         });
     };
@@ -823,6 +834,27 @@ require([
         });
     };
 
+    const setupStoredHighlights = async () => {
+        await loader.loadInfo;
+
+        const stored = localStorage.getItem(HIGHLIGHTS_STORE_KEY);
+
+        if (stored) {
+            const parsed = Object.values(JSON.parse(stored).highlights);
+
+            for (const items of parsed) {
+                for (const item of Object.values(items)) {
+                    const {highlightType, id, color} = item;
+                    map.addHighlight(highlightType, id, color, IGNORE_HIGHLIGHT_STORAGE);
+                }
+            }
+        }
+    };
+
+    function updateStoredHighlights () {
+        localStorage.setItem(HIGHLIGHTS_STORE_KEY, JSON.stringify({highlights: map.getHighlights()}));
+    }
+
     // const setupAbout = () => {
     //     const $contact = document.querySelector('#contact')
     //     const $about = document.querySelector('#about')
@@ -860,6 +892,7 @@ require([
     setupSettings();
     setupMapShare();
     setupPanelToggle();
+    setupStoredHighlights();
     // setupAbout()
 
     map.init();

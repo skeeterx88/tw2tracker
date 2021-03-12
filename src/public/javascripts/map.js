@@ -995,9 +995,9 @@ define('TW2Map', [
             };
         };
 
-        this.addHighlight = (highlightType, id, color) => {
+        this.addHighlight = (highlightType, id, color, _flag) => {
             let realId;
-            let displayName;
+            let display;
 
             if (typeof id === 'number' && loader[highlightType][id]) {
                 realId = id;
@@ -1020,26 +1020,25 @@ define('TW2Map', [
             switch (highlightType) {
                 case TW2Map.highlightTypes.TRIBES: {
                     const [name, tag] = loader.tribes[realId];
-                    displayName = `${tag} (${name})`;
+                    display = `${tag} (${name})`;
                     break;
                 }
                 case TW2Map.highlightTypes.PLAYERS: {
                     const [name] = loader.players[realId];
-                    displayName = name;
+                    display = name;
                     break;
                 }
             }
 
-            if (highlights[highlightType][realId]) {
-                this.trigger('update highlight', [highlightType, id, displayName, color]);
-            } else {
-                this.trigger('add highlight', [highlightType, id, displayName, color]);
-            }
+            const highlightExists = !!highlights[highlightType][realId];
 
-            highlights[highlightType][realId] = {
-                display: displayName,
-                color: color
-            };
+            highlights[highlightType][realId] = {highlightType, id, display, color};
+
+            if (highlightExists) {
+                this.trigger('update highlight', [highlightType, id, display, color, _flag]);
+            } else {
+                this.trigger('add highlight', [highlightType, id, display, color, _flag]);
+            }
 
             renderVillages(redrawVillages);
 
@@ -1144,6 +1143,10 @@ define('TW2Map', [
             }
 
             quickHighlightVillages = [];
+        };
+
+        this.getHighlights = () => {
+            return highlights;
         };
 
         this.shareMap = async (shareType) => {
