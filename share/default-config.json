@@ -45,6 +45,10 @@
         "chromium_path": "/usr/bin/chromium",
         "headless": true
     },
+    "emails": {
+        "issues": "issue@tw2-tracker.com",
+        "contact": "contact@tw2-tracker.com"
+    },
     "email_notification": {
         "warn_sync_mods_on_fails": 3
     },
