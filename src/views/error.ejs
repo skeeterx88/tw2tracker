@@ -6,11 +6,13 @@
         <%- include('menu.ejs') %>
 
         <main>
-            <h1>Something went wrong</h1>
-            <p><strong>Error <%= locals.status %></strong></p>
-            <p><pre><%= locals.error %></pre></p>
+            <h1><%= i18n('header_error', 'errors', lang, [status]) %> <%= error.message %></h1>
 
-            <p>If you believe you shouldn't been seing this page, send a message to us <code><a href="mailto:contact@tw2-tracker.com">contact@tw2-tracker.com</a></code></p>
+            <% if (development) { -%>
+                <pre><%= development ? error.stack : error.message %></pre>
+            <% } -%>
+
+            <p><%= i18n('contact_us', 'errors', lang) %> <code><a href="mailto:<%= config.emails.issues %>"><%= config.emails.issues %></a></code></p>
         </main>
     </body>
 </html>

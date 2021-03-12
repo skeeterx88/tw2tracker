@@ -151,13 +151,13 @@ module.exports = function () {
     // error handler
     app.use(function (err, req, res, next) {
         const status = err.status || 500;
-        res.locals.error = development ? err.stack : err.message;
+        res.locals.error = err;
         res.locals.status = status;
-        // TODO: don't hardcode values!
-        res.locals.title = 'Tw2-Tracker Error';
+        res.locals.title = i18n('header_error', 'errors', req.session.lang, [status]) + ' - ' + config.site_name;
+        res.locals.config = config;
+        res.locals.development = development;
 
-        res.status(status);
-        res.render('error');
+        res.status(status).render('error');
     });
 
     app.set('port', port);

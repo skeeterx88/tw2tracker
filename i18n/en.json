@@ -574,7 +574,9 @@
         "map_share_not_found": "Share data not found",
         "router_missing_sub_page": "This sub-page does not exist",
         "router_missing_category": "This category does not exist",
-        "router_missing_sub_category": "This sub-category does not exist"
+        "router_missing_sub_category": "This sub-category does not exist",
+        "contact_us": "If you believe you shouldn't been seeing this page, send a message to us",
+        "header_error": "Error %{error}"
     },
     "navigation": {
         "maps": "Maps",
