@@ -53,7 +53,7 @@ const queueEvents = {
 };
 
 Sync.initQueue = async function (type) {
-    debug.queue('init sync queue:%s', type);
+    debug.queue('initializing sync queue:%s', type);
 
     async function processQueue () {
         if (processingQueue[type]) {
@@ -146,7 +146,7 @@ Sync.init = async function () {
             value: false
         });
 
-        Sync.dataAll();
+        Sync.all('data');
     }
 
     Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
@@ -160,11 +160,11 @@ Sync.init = async function () {
     const tasks = await Sync.tasks();
 
     tasks.add('data_all', function () {
-        Sync.dataAll();
+        Sync.all('data');
     });
 
     tasks.add('achievements_all', function () {
-        Sync.achievementsAll();
+        Sync.all('achievements');
     });
 
     tasks.add('worlds', async function () {
@@ -192,8 +192,8 @@ Sync.init = async function () {
     await Sync.initQueue('data');
     await Sync.initQueue('achievements');
 
-    // await Sync.dataAll();
-    // await Sync.achievementsAll();
+    // await Sync.all('data');
+    // await Sync.all('achievements');
 };
 
 Sync.trigger = function (msg) {
