@@ -18,13 +18,9 @@ define('easingEffects', [], function () {
 });
 
 define('TW2Map', [
-    'i18n',
-    'utils',
     'easingEffects',
     'backendValues'
 ], function (
-    i18n,
-    utils,
     easingEffects,
     {
         marketId,
@@ -32,6 +28,14 @@ define('TW2Map', [
         mapShareTypes
     }
 ) {
+    const arrayRandom = function (arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    };
+
+    const boundNumber = function (value, min, max) {
+        return Math.min(max, Math.max(parseInt(value, 10), min));
+    };
+
     const TW2Map = function (containerSelector, loader, tooltip, settings) {
         const $container = document.querySelector(containerSelector);
 
@@ -230,7 +234,7 @@ define('TW2Map', [
             zoomSettings.mapWidth = 1000 * zoomSettings.tileSize;
             zoomSettings.mapHeight = 1000 * zoomSettings.tileSize;
 
-            if (!utils.hasOwn($zoomElements, settings.zoomLevel)) {
+            if (!$zoomElements[settings.zoomLevel]) {
                 $cache = document.createElement('canvas');
                 $cacheContext = $cache.getContext('2d');
 
@@ -339,7 +343,7 @@ define('TW2Map', [
 
                     if (activeVillage && activeVillage.character_id) {
                         clearOverlay();
-                        const color = utils.arrayRandom(TW2Map.colorPalette.flat());
+                        const color = arrayRandom(TW2Map.colorPalette.flat());
                         this.addHighlight(TW2Map.highlightTypes.PLAYERS, activeVillage.character_id, color);
                     }
                 }
@@ -362,7 +366,7 @@ define('TW2Map', [
 
                     if (activeVillage && activeVillage.character_id) {
                         clearOverlay();
-                        const color = utils.arrayRandom(TW2Map.colorPalette.flat());
+                        const color = arrayRandom(TW2Map.colorPalette.flat());
                         this.addHighlight(TW2Map.highlightTypes.PLAYERS, activeVillage.character_id, color);
                     }
                 }
@@ -390,8 +394,8 @@ define('TW2Map', [
 
                     dragging = true;
 
-                    positionX = utils.boundNumber(dragStartX - event.offsetX, 0, zoomSettings.mapWidth);
-                    positionY = utils.boundNumber(dragStartY - event.offsetY, 0, zoomSettings.mapHeight);
+                    positionX = boundNumber(dragStartX - event.offsetX, 0, zoomSettings.mapWidth);
+                    positionY = boundNumber(dragStartY - event.offsetY, 0, zoomSettings.mapHeight);
 
                     updateCenter();
 
@@ -414,8 +418,8 @@ define('TW2Map', [
 
                     dragging = true;
 
-                    positionX = utils.boundNumber(dragStartX - event.touches[0].pageX, 0, zoomSettings.mapWidth);
-                    positionY = utils.boundNumber(dragStartY - event.touches[0].pageY, 0, zoomSettings.mapHeight);
+                    positionX = boundNumber(dragStartX - event.touches[0].pageX, 0, zoomSettings.mapWidth);
+                    positionY = boundNumber(dragStartY - event.touches[0].pageY, 0, zoomSettings.mapHeight);
 
                     updateCenter();
 
@@ -509,10 +513,10 @@ define('TW2Map', [
         const getVisibleContinents = () => {
             const visibleContinents = [];
 
-            let ax = utils.boundNumber(((positionX - middleViewportOffsetX) / zoomSettings.tileSize), 0, 999);
-            let ay = utils.boundNumber(((positionY - middleViewportOffsetY) / zoomSettings.tileSize), 0, 999);
-            let bx = utils.boundNumber(((positionX + middleViewportOffsetX) / zoomSettings.tileSize), 0, 999);
-            let by = utils.boundNumber(((positionY + middleViewportOffsetY) / zoomSettings.tileSize), 0, 999);
+            let ax = boundNumber(((positionX - middleViewportOffsetX) / zoomSettings.tileSize), 0, 999);
+            let ay = boundNumber(((positionY - middleViewportOffsetY) / zoomSettings.tileSize), 0, 999);
+            let bx = boundNumber(((positionX + middleViewportOffsetX) / zoomSettings.tileSize), 0, 999);
+            let by = boundNumber(((positionY + middleViewportOffsetY) / zoomSettings.tileSize), 0, 999);
 
             ax = ax < 100 ? 0 : String(ax)[0];
             ay = ay < 100 ? 0 : String(ay)[0];
@@ -569,7 +573,7 @@ define('TW2Map', [
             }
 
             const visibleContinents = getVisibleContinents();
-            const nonRenderedContinents = visibleContinents.filter((k) => !utils.hasOwn(renderedZoomGrid[settings.zoomLevel], k));
+            const nonRenderedContinents = visibleContinents.filter((k) => !renderedZoomGrid[settings.zoomLevel][k]);
 
             for (let k of nonRenderedContinents) {
                 k = String(k);
@@ -828,16 +832,16 @@ define('TW2Map', [
 
             switch (highlightType) {
                 case TW2Map.highlightTypes.PLAYERS: {
-                    if (utils.hasOwn(loader.playersByName, lowerId)) {
+                    if (loader.playersByName[lowerId]) {
                         return loader.playersByName[lowerId];
                     } else {
                         throw new Error(`Highlights: Player ${id} not found`);
                     }
                 }
                 case TW2Map.highlightTypes.TRIBES: {
-                    if (utils.hasOwn(loader.tribesByTag, lowerId)) {
+                    if (loader.tribesByTag[lowerId]) {
                         return loader.tribesByTag[lowerId];
-                    } else if (utils.hasOwn(loader.tribesByName, lowerId)) {
+                    } else if (loader.tribesByName[lowerId]) {
                         return loader.tribesByName[lowerId];
                     } else {
                         throw new Error(`Highlights: Tribe ${id} not found`);
@@ -995,7 +999,7 @@ define('TW2Map', [
             let realId;
             let displayName;
 
-            if (typeof id === 'number' && utils.hasOwn(loader[highlightType], id)) {
+            if (typeof id === 'number' && loader[highlightType][id]) {
                 realId = id;
             } else if (typeof id === 'string') {
                 try {
@@ -1008,7 +1012,7 @@ define('TW2Map', [
             }
 
             if (!color) {
-                color = utils.arrayRandom(TW2Map.colorPalette.flat());
+                color = arrayRandom(TW2Map.colorPalette.flat());
             }
 
             const redrawVillages = getVillagesToDraw(highlightType, realId);
@@ -1026,7 +1030,7 @@ define('TW2Map', [
                 }
             }
 
-            if (utils.hasOwn(highlights[highlightType], realId)) {
+            if (highlights[highlightType][realId]) {
                 this.trigger('update highlight', [highlightType, id, displayName, color]);
             } else {
                 this.trigger('add highlight', [highlightType, id, displayName, color]);
@@ -1051,7 +1055,7 @@ define('TW2Map', [
         this.removeHighlight = (highlightType, id) => {
             let realId;
 
-            if (typeof id === 'number' && utils.hasOwn(loader[highlightType], id)) {
+            if (typeof id === 'number' && loader[highlightType][id]) {
                 realId = id;
             } else if (typeof id === 'string') {
                 try {
@@ -1087,7 +1091,7 @@ define('TW2Map', [
 
             switch (type) {
                 case TW2Map.highlightTypes.PLAYERS: {
-                    if (!utils.hasOwn(loader.players, id)) {
+                    if (!loader.players[id]) {
                         return false;
                     }
 
@@ -1095,7 +1099,7 @@ define('TW2Map', [
                     break;
                 }
                 case TW2Map.highlightTypes.TRIBES: {
-                    if (!utils.hasOwn(loader.tribes, id)) {
+                    if (!loader.tribes[id]) {
                         return false;
                     }
 
@@ -1103,7 +1107,7 @@ define('TW2Map', [
                     break;
                 }
                 case TW2Map.highlightTypes.VILLAGES: {
-                    if (!utils.hasOwn(loader.villagesById, id)) {
+                    if (!loader.villagesById[id]) {
                         return false;
                     }
 
@@ -1143,6 +1147,7 @@ define('TW2Map', [
         };
 
         this.shareMap = async (shareType) => {
+            const i18n = require('i18n');
             const highlightsExport = [];
 
             for (const [id, data] of Object.entries(highlights.players)) {
@@ -1200,7 +1205,7 @@ define('TW2Map', [
         };
 
         this.trigger = (event, args) => {
-            if (utils.hasOwn(events, event)) {
+            if (events[event]) {
                 for (const handler of events[event]) {
                     handler.apply(this, args);
                 }
@@ -1212,13 +1217,13 @@ define('TW2Map', [
         };
 
         this.changeSetting = (id, value, flag) => {
-            if (!utils.hasOwn(settings, id)) {
+            if (!settings[id]) {
                 throw new Error(`Setting '${id}' does not exist`);
             }
 
             settings[id] = value;
 
-            if (utils.hasOwn(settingTriggers, id)) {
+            if (settingTriggers[id]) {
                 settingTriggers[id](flag);
             }
 
@@ -1270,11 +1275,9 @@ define('TW2Map', [
 
 define('TW2DataLoader', [
     'TW2Map',
-    'utils',
     'backendValues'
 ], function (
     TW2Map,
-    utils,
     {
         mapShare,
         mapShareTypes
@@ -1367,7 +1370,7 @@ define('TW2DataLoader', [
                 throw new Error('Invalid continent value');
             }
 
-            if (utils.hasOwn(continentPromises, continent)) {
+            if (continentPromises[continent]) {
                 return continentPromises[continent];
             }
 

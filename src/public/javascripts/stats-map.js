@@ -2,13 +2,11 @@ require([
     'TW2Map',
     'TW2Tooltip',
     'TW2DataLoader',
-    'utils',
     'backendValues'
 ], function (
     TW2Map,
     TW2Tooltip,
     TW2DataLoader,
-    utils,
     {
         mapHighlights,
         mapHighlightsType,
