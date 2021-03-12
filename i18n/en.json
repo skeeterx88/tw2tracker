@@ -12,9 +12,9 @@
     },
     "market_list": {
         "stats": "Statistics:",
-        "players": "players",
-        "tribes": "tribes",
-        "villages": "villages",
+        "players": "%{count} players",
+        "tribes": "%{count} tribes",
+        "villages": "%{count} villages",
         "worlds": "Worlds:",
         "open": "Open:",
         "closed": "Closed:",
@@ -25,9 +25,9 @@
     },
     "world_list": {
         "stats": "Statistics:",
-        "players": "players",
-        "tribes": "tribes",
-        "villages": "villages",
+        "players": "%{count} players",
+        "tribes": "%{count} tribes",
+        "villages": "%{count} villages",
         "settings": "Settings:",
         "setting_world_type": "World Type:",
         "world_type_victory_points": "Victory Points",
@@ -82,9 +82,9 @@
         "no_conquests": "No conquests yet.",
         "no_daily_achievements": "No daily achievements today.",
         "no_weekly_achievements": "No weekly achievements.",
-        "stats_players": "Players",
-        "stats_villages": "Villages",
-        "stats_tribes": "Tribes"
+        "stats_players": "%{count} players",
+        "stats_villages": "%{count} villages",
+        "stats_tribes": "%{count} tribes"
     },
     "world_ranking": {
         "header_players": "Players Ranking",

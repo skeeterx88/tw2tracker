@@ -6,9 +6,9 @@
                     <h2 class="title"><span class="flag-<%= market.id %>"><%= market.id.toUpperCase() %></span></h2>
                     <div class="stats">
                         <ul>
-                            <li><%= formatNumbers(market.players) %> <%= i18n('players', 'market_list', lang) %></li>
-                            <li><%= formatNumbers(market.tribes) %> <%= i18n('tribes', 'market_list', lang) %></li>
-                            <li><%= formatNumbers(market.villages) %> <%= i18n('villages', 'market_list', lang) %></li>
+                            <li><%= i18n('players', 'market_list', lang, [formatNumbers(market.players)]) %></li>
+                            <li><%= i18n('tribes', 'market_list', lang, [formatNumbers(market.tribes)]) %></li>
+                            <li><%= i18n('villages', 'market_list', lang, [formatNumbers(market.villages)]) %></li>
                         </ul>
                     </div>
                     <div class="worlds">
@@ -33,9 +33,9 @@
                                     <h4 class="title"><span class="flag-<%= world.market %>"><%= world.name %></span><sup><%= world.num %></sup></h4>
 
                                     <div class="stats">
-                                        <p><span class="label"><%= formatNumbers(world.player_count) %> <%= i18n('players', 'world_list', lang) %></span></p>
-                                        <p><span class="label"><%= formatNumbers(world.tribe_count) %> <%= i18n('tribes', 'world_list', lang) %></span></p>
-                                        <p><span class="label"><%= formatNumbers(world.village_count) %> <%= i18n('villages', 'world_list', lang) %></span></p>
+                                        <p><span class="label"><%= i18n('players', 'world_list', lang, [formatNumbers(world.player_count)]) %></span></p>
+                                        <p><span class="label"><%= i18n('tribes', 'world_list', lang, [formatNumbers(world.tribe_count)]) %></span></p>
+                                        <p><span class="label"><%= i18n('villages', 'world_list', lang, [formatNumbers(world.village_count)]) %></span></p>
                                     </div>
 
                                     <% if (world.config) { -%>

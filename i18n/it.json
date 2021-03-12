@@ -11,18 +11,18 @@
     },
     "market_list": {
         "stats": "Statistiche:",
-        "players": "giocatori",
-        "tribes": "tribù",
-        "villages": "villaggi",
+        "players": "%{count} giocatori",
+        "tribes": "%{count} tribù",
+        "villages": "%{count} villaggi",
         "worlds": "Mondi:",
         "open": "Aperto:",
         "closed": "Chiuso:"
     },
     "world_list": {
         "stats": "Statistiche:",
-        "players": "giocatori",
-        "tribes": "tribù",
-        "villages": "villaggi",
+        "players": "%{count} giocatori",
+        "tribes": "%{count} tribù",
+        "villages": "%{count} villaggi",
         "settings": "Impostazioni:",
         "setting_world_type": "Tipologia Mondo:",
         "world_type_victory_points": "Punti Vittoria",
@@ -71,9 +71,9 @@
         "no_conquests": "Non ancora alcuna conquista",
         "no_daily_achievements": "Nessun successo giornaliero.",
         "no_weekly_achievements": "Nessun successo settimanale.",
-        "stats_players": "Giocatori",
-        "stats_villages": "Villaggi",
-        "stats_tribes": "Tribù"
+        "stats_players": "%{count} giocatori",
+        "stats_villages": "%{count} villaggi",
+        "stats_tribes": "%{count} tribù"
     },
     "world_ranking": {
         "header_players": "Classifica dei Giocatori",

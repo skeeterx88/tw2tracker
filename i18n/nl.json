@@ -12,9 +12,9 @@
     },
     "market_list": {
         "stats": "Statistieken:",
-        "players": "spelers",
-        "tribes": "stammen",
-        "villages": "dorpen",
+        "players": "%{count} spelers",
+        "tribes": "%{count} stammen",
+        "villages": "%{count} dorpen",
         "worlds": "Werelden:",
         "open": "Open:",
         "closed": "Gesloten:",
@@ -25,9 +25,9 @@
     },
     "world_list": {
         "stats": "Statistieken:",
-        "players": "spelers",
-        "tribes": "stammen",
-        "villages": "dorpen",
+        "players": "%{count} spelers",
+        "tribes": "%{count} stammen",
+        "villages": "%{count} dorpen",
         "settings": "Instellingen:",
         "setting_world_type": "Wereld Type:",
         "world_type_victory_points": "Overwinningspunten",
@@ -82,9 +82,9 @@
         "no_conquests": "Nog geen overnamen",
         "no_daily_achievements": "No daily achievements today.",
         "no_weekly_achievements": "Geen weklijkse Achievements",
-        "stats_players": "Spelers",
-        "stats_villages": "Dorpen",
-        "stats_tribes": "Stammen"
+        "stats_players": "%{count} spelers",
+        "stats_villages": "%{count} stammen",
+        "stats_tribes": "%{count} dorpen"
     },
     "world_ranking": {
         "header_players": "Spelers Ranking",

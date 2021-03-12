@@ -342,13 +342,13 @@
             <div class="section-content">
                 <table>
                     <tr>
-                        <td><%= formatNumbers(world.player_count) %> <%= i18n('stats_players', 'world', lang) %></td>
+                        <td><%= i18n('stats_players', 'world', lang, [formatNumbers(world.player_count)]) %></td>
                     </tr>
                     <tr>
-                        <td><%= formatNumbers(world.village_count) %> <%= i18n('stats_villages', 'world', lang) %></td>
+                        <td><%= i18n('stats_villages', 'world', lang, [formatNumbers(world.village_count)]) %></td>
                     </tr>
                     <tr>
-                        <td><%= formatNumbers(world.tribe_count) %> <%= i18n('stats_tribes', 'world', lang) %></td>
+                        <td><%= i18n('stats_tribes', 'world', lang, [formatNumbers(world.tribe_count)]) %></td>
                     </tr>
                 </table>
             </div>
