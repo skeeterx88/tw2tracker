@@ -641,10 +641,12 @@ fieldset legend {
     text-align: center;
     padding: 3px 0px;
     border-top: 1px solid hsl(23, 55%, 24%);
+    user-select: none;
 }
 
 .pagination .page {
     padding: 0px 5px;
+    cursor: pointer;
 }
 
 .pagination .current {

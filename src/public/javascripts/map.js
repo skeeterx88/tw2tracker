@@ -690,7 +690,7 @@ define('TW2Map', [
                 for (const y in villages[x]) {
                     const [, , , character_id] = villages[x][y];
 
-                    const tribeId = loader.players && character_id ? loader.players[character_id][1] : false;
+                    const tribeId = loader.players && character_id ? loader.players.get(character_id)[1] : false;
 
                     if (forceColor) {
                         context.fillStyle = forceColor;
@@ -908,10 +908,10 @@ define('TW2Map', [
                 const provinceName = loader.provinces[province_id];
 
                 if (villageCharacterId) {
-                    ([playerName, tribeId, playerPoints, playerVillages] = loader.players[villageCharacterId]);
+                    ([playerName, tribeId, playerPoints, playerVillages] = loader.players.get(villageCharacterId));
 
                     if (tribeId) {
-                        ([tribeName, tribeTag, tribePoints, tribeVillages] = loader.tribes[tribeId]);
+                        ([tribeName, tribeTag, tribePoints, tribeVillages] = loader.tribes.get(tribeId));
                     }
                 }
 
@@ -999,7 +999,7 @@ define('TW2Map', [
             let realId;
             let display;
 
-            if (typeof id === 'number' && loader[highlightType][id]) {
+            if (typeof id === 'number' && loader[highlightType].get(id)) {
                 realId = id;
             } else if (typeof id === 'string') {
                 try {
@@ -1019,12 +1019,12 @@ define('TW2Map', [
 
             switch (highlightType) {
                 case TW2Map.highlightTypes.TRIBES: {
-                    const [name, tag] = loader.tribes[realId];
+                    const [name, tag] = loader.tribes.get(realId);
                     display = `${tag} (${name})`;
                     break;
                 }
                 case TW2Map.highlightTypes.PLAYERS: {
-                    const [name] = loader.players[realId];
+                    const [name] = loader.players.get(realId);
                     display = name;
                     break;
                 }
@@ -1054,7 +1054,7 @@ define('TW2Map', [
         this.removeHighlight = (highlightType, id) => {
             let realId;
 
-            if (typeof id === 'number' && loader[highlightType][id]) {
+            if (typeof id === 'number' && loader[highlightType].has(id)) {
                 realId = id;
             } else if (typeof id === 'string') {
                 try {
@@ -1090,7 +1090,7 @@ define('TW2Map', [
 
             switch (type) {
                 case TW2Map.highlightTypes.PLAYERS: {
-                    if (!loader.players[id]) {
+                    if (!loader.players.has(id)) {
                         return false;
                     }
 
@@ -1098,7 +1098,7 @@ define('TW2Map', [
                     break;
                 }
                 case TW2Map.highlightTypes.TRIBES: {
-                    if (!loader.tribes[id]) {
+                    if (!loader.tribes.has(id)) {
                         return false;
                     }
 
@@ -1345,12 +1345,12 @@ define('TW2DataLoader', [
             const load = await fetch(url);
             const info = await load.json();
 
-            this.players = info.players;
-            this.tribes = info.tribes;
+            this.players = new Map(info.players);
+            this.tribes = new Map(info.tribes);
             this.provinces = info.provinces;
 
-            for (const id in this.players) {
-                const [name, tribeId] = this.players[id];
+            for (const [id, player] of this.players.entries()) {
+                const [name, tribeId] = player;
                 this.playersByName[name.toLowerCase()] = parseInt(id, 10);
 
                 if (tribeId) {
@@ -1359,10 +1359,10 @@ define('TW2DataLoader', [
                 }
             }
 
-            for (const id in this.tribes) {
-                const [name, tag] = this.tribes[id];
-                this.tribesByName[name.toLowerCase()] = parseInt(id, 10);
-                this.tribesByTag[tag.toLowerCase()] = parseInt(id, 10);
+            for (const [id, tribe] in this.tribes.entries()) {
+                const [name, tag] = tribe;
+                this.tribesByName[name.toLowerCase()] = id;
+                this.tribesByTag[tag.toLowerCase()] = id;
             }
 
             resolve();

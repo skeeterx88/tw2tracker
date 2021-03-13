@@ -1038,22 +1038,29 @@ async function commitDataFilesystem (worldId) {
     debug.sync('world:%s commit fs data', worldId);
 
     try {
-        const players = await db.any(sql.getWorldData, {worldId, table: 'players'});
-        const villages = await db.any(sql.getWorldData, {worldId, table: 'villages'});
-        const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes'});
-        const provinces = await db.any(sql.getWorldData, {worldId, table: 'provinces'});
+        const players = await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'rank'});
+        const villages = await db.any(sql.getWorldData, {worldId, table: 'villages', sort: 'points'});
+        const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'rank'});
+        const provinces = await db.any(sql.getWorldData, {worldId, table: 'provinces', sort: 'id'});
 
-        const parsedPlayers = {};
-        const parsedTribes = {};
+        const parsedPlayers = [];
+        const parsedTribes = [];
         const continents = {};
         const parsedProvinces = [];
 
         const dataPath = path.join('.', 'data', worldId);
 
         await fs.promises.mkdir(dataPath, {recursive: true});
-
-        for (const {id, name, tribe_id, points, villages, avg_coords} of players) {
-            parsedPlayers[id] = [name, tribe_id || 0, points, villages, avg_coords];
+        for (const player of players) {
+            parsedPlayers.push([player.id, [
+                player.name,
+                player.tribe_id || 0,
+                player.points,
+                player.villages,
+                player.avg_coords,
+                player.bash_points_off,
+                player.bash_points_def
+            ]]);
         }
 
         for (const village of villages) {
@@ -1092,8 +1099,16 @@ async function commitDataFilesystem (worldId) {
             await fs.promises.writeFile(path.join(dataPath, k), zlib.gzipSync(data));
         }
 
-        for (const {id, name, tag, points, villages, avg_coords} of tribes) {
-            parsedTribes[id] = [name, tag, points, villages, avg_coords];
+        for (const tribe of tribes) {
+            parsedTribes.push([tribe.id, [
+                tribe.name,
+                tribe.tag,
+                tribe.points,
+                tribe.villages,
+                tribe.avg_coords,
+                tribe.bash_points_off,
+                tribe.bash_points_def
+            ]]);
         }
 
         for (const {name} of provinces) {

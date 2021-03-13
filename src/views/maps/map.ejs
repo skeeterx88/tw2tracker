@@ -5,13 +5,16 @@
         <div id="map-wrapper">
             <div id="side-panel" class="hidden">
                 <header>
-                    <a href="/stats/<%= marketId %>/<%= world.num %>">
-                        <h1 id="world-name"><%= world.name %></h1>
-                    </a>
-                    <button id="current-world">
-                        <span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span>
-                    </button>
-                    <button id="change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
+                    <div class="world-name">
+                        <a href="/stats/<%= marketId %>/<%= world.num %>"><%= world.name %></a>
+                    </div>
+                    <div>
+                        <button id="current-world"><span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span></button>
+                        <button id="change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
+                    </div>
+                    <div>
+                        <button id="ranking-toggle"><%= i18n('button_ranking', 'maps', lang) %></button>
+                    </div>
                 </header>
 
                 <div id="quick-jump">
@@ -36,14 +39,18 @@
 
                 <footer>
                     <div id="map-share-wrapper">
-                        <button id="map-share">
-                            <span><%= i18n('button_gen_dynamic_map', 'maps', lang) %></span>
-                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
-                        </button>
-                        <button id="map-save">
-                            <span><%= i18n('button_gen_static_map', 'maps', lang) %></span>
-                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
-                        </button>
+                        <div>
+                            <button id="map-share">
+                                <span><%= i18n('button_gen_dynamic_map', 'maps', lang) %></span>
+                                <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                            </button>
+                        </div>
+                        <div>
+                            <button id="map-save">
+                                <span><%= i18n('button_gen_static_map', 'maps', lang) %></span>
+                                <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                            </button>
+                        </div>
                     </div>
 
                     <div id="site-info">
@@ -95,13 +102,96 @@
             <ul id="all-market-worlds"></ul>
         </div>
 
-        <div id="settings" class="hidden">
+        <div id="settings" class="floating-modal hidden">
             <div class="color-option" data-setting-id="backgroundColor"><label><%= i18n('settings_bg_color', 'maps', lang) %></label></div>
             <div class="color-option" data-setting-id="neutralColor"><label><%= i18n('settings_neutral_color', 'maps', lang) %></label></div>
             <div class="color-option" data-setting-id="barbarianColor"><label><%= i18n('settings_barbarian_color', 'maps', lang) %></label></div>
             <div class="color-option" data-setting-id="highlightPlayerColor"><label><%= i18n('settings_highlight_player_color', 'maps', lang) %></label></div>
             <div class="color-option" data-setting-id="demarcationsColor"><label><%= i18n('settings_demarcations_color', 'maps', lang) %></label></div>
         </div>
+
+        <template id="floating-modal">
+            <div class="floating-modal">
+                <header class="floating-modal-header">
+                    <div class="floating-modal-menu"></div>
+                    <div class="floating-modal-drag"></div>
+                    <div class="modal-actions">
+                        <button class="floating-modal-close red">x</button>
+                    </div>
+                </header>
+                <div class="floating-modal-body"></div>
+            </div>
+        </template>
+
+        <template id="ranking-players">
+            <table class="ranking ranking-players" data-type="players">
+                <colgroup>
+                    <col width="40px">
+                    <col width="*">
+                    <col width="50px">
+                    <col width="50px">
+                    <col width="60px">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th><%= i18n('column_rank', 'world', lang) %></t1h>
+                        <th><%= i18n('column_player', 'world', lang) %></th>
+                        <th><%= i18n('column_points', 'world', lang) %></th>
+                        <th><%= i18n('column_villages', 'world', lang) %></th>
+                        <th><%= i18n('column_bash_points', 'world', lang) %></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="10">
+                            <div class="pagination">
+                                <a class="page first">&lt;&lt;&lt; <%= i18n('first', 'pagination', lang) %></a>
+                                <a class="page prev">&lt; <%= i18n('previous', 'pagination', lang) %></a>
+                                <div class="pages"></div>
+                                <a class="page last"><%= i18n('last', 'pagination', lang) %> &gt;&gt;&gt;</a>
+                                <a class="page next"><%= i18n('next', 'pagination', lang) %> &gt;</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </template>
+
+        <template id="ranking-tribes">
+            <table class="ranking ranking-tribes" data-type="tribes">
+                <colgroup>
+                    <col width="40px">
+                    <col width="*">
+                    <col width="50px">
+                    <col width="50px">
+                    <col width="60px">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th><%= i18n('column_rank', 'world', lang) %></th>
+                        <th><%= i18n('column_tribe', 'world', lang) %></th>
+                        <th><%= i18n('column_points', 'world', lang) %></th>
+                        <th><%= i18n('column_villages', 'world', lang) %></th>
+                        <th><%= i18n('column_bash_points', 'world', lang) %></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="10">
+                            <div class="pagination">
+                                <a class="page first">&lt;&lt;&lt; <%= i18n('first', 'pagination', lang) %></a>
+                                <a class="page prev">&lt; <%= i18n('previous', 'pagination', lang) %></a>
+                                <div class="pages"></div>
+                                <a class="page last"><%= i18n('last', 'pagination', lang) %> &gt;&gt;&gt;</a>
+                                <a class="page next"><%= i18n('next', 'pagination', lang) %> &gt;</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </template>
 
         <script type="text/javascript" src="/javascripts/libs/require.min.js"></script>
         <script defer type="text/javascript">define('backendValues', () => (<%- JSON.stringify(backendValues) %>))</script>

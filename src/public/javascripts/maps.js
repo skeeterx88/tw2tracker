@@ -137,7 +137,6 @@ require([
         }
 
         map.on('add highlight', (highlightType, id, display, color, flag) => {
-            console.log('add highlight', highlightType, id, display, color, flag);
             const $item = document.createElement('li');
             const $name = document.createElement('div');
             const $color = document.createElement('div');
@@ -178,7 +177,7 @@ require([
 
             if (highlightType === TW2Map.highlightTypes.PLAYERS) {
                 realId = typeof id === 'number' ? id : loader.playersByName[id.toLowerCase()];
-                villages = loader.players[realId][3];
+                villages = loader.players.get(realId)[3];
             } else if (highlightType === TW2Map.highlightTypes.TRIBES) {
                 realId = typeof id === 'number' ? id : loader.tribesByName[id.toLowerCase()] || loader.tribesByTag[id.toLowerCase()];
                 villages = loader.tribes[realId][3];
@@ -228,7 +227,7 @@ require([
 
             const matches = [];
 
-            for (const [name] of Object.values(loader.players)) {
+            for (const [id, [name]] of Object.entries(loader.players)) {
                 matches.push({
                     search: name.toLowerCase(),
                     id: name,
@@ -851,6 +850,344 @@ require([
         }
     };
 
+    function createFloatingModal (id, items, onClose) {
+        const $template = document.querySelector('#floating-modal');
+        const $modal = $template.content.cloneNode(true).children[0];
+        const $header = $modal.querySelector('header');
+        const $modalBody = $modal.querySelector('.floating-modal-body');
+        const $close = $header.querySelector('.floating-modal-close');
+        const $drag = $header.querySelector('.floating-modal-drag');
+        const $menu = $header.querySelector('.floating-modal-menu');
+
+        let $selectedBody;
+        let $selectedButton;
+
+        $modal.id = id;
+
+        let firstItem = true;
+
+        for (const {label, $body, click} of items) {
+            const $button = document.createElement('button');
+            const $bodyWrapper = document.createElement('div');
+
+            $bodyWrapper.appendChild($body);
+
+            if (firstItem) {
+                $selectedBody = $bodyWrapper;
+                $selectedButton = $button;
+                $button.classList.add('selected');
+                $bodyWrapper.classList.add('selected');
+                firstItem = false;
+            }
+
+            $button.innerText = label;
+            $button.addEventListener('click', function () {
+                $selectedButton.classList.remove('selected');
+                $selectedBody.classList.remove('selected');
+                $selectedBody = $bodyWrapper;
+                $selectedButton = $button;
+                $selectedBody.classList.add('selected');
+                $selectedButton.classList.add('selected');
+                click();
+            });
+
+            $modalBody.appendChild($bodyWrapper);
+            $menu.appendChild($button);
+        }
+
+        function close () {
+            $modal.classList.add('hidden');
+
+            if (onClose) {
+                onClose();
+            }
+        }
+
+        function open () {
+            $modal.classList.remove('hidden');
+        }
+
+        function toggle () {
+            if ($modal.classList.contains('hidden')) {
+                open();
+            } else {
+                close();
+            }
+        }
+
+        $close.addEventListener('click', close);
+
+        let dragging = false;
+        let startX;
+        let startY;
+
+        const dragEvent = function (event) {
+            if (dragging) {
+                $modal.style.left = startX + event.clientX + 'px';
+                $modal.style.top = startY + event.clientY + 'px';
+            }
+        };
+
+        $drag.addEventListener('mousedown', function (event) {
+            document.body.addEventListener('mousemove', dragEvent);
+
+            dragging = true;
+
+            const rect = $modal.getBoundingClientRect();
+
+            startX = rect.x - event.clientX;
+            startY = rect.y - event.clientY;
+        });
+
+        document.body.addEventListener('mouseup', function () {
+            dragging = false;
+            document.body.removeEventListener('mousemove', dragEvent);
+        });
+
+        document.body.appendChild($modal);
+
+        return {
+            close,
+            open,
+            toggle,
+            $modal
+        };
+    }
+
+    const setupRanking = async () => {
+        const $rankingToggle = document.querySelector('#ranking-toggle');
+        const $rankingPlayers = document.querySelector('#ranking-players').content.cloneNode(true).children[0];
+        const $rankingTribes = document.querySelector('#ranking-tribes').content.cloneNode(true).children[0];
+
+        const modalItems = [{
+            label: 'Players',
+            $body: $rankingPlayers,
+            click: function () {
+                console.log('click players');
+            }
+        }, {
+            label: 'Tribes',
+            $body: $rankingTribes,
+            click: function () {
+                console.log('click tribes');
+            }
+        }];
+
+        await loader.loadInfo;
+
+        const itemsLimit = 15;
+        const modal = createFloatingModal('ranking', modalItems);
+
+        for (const $ranking of [$rankingPlayers, $rankingTribes]) {
+            const type = $ranking.dataset.type;
+            const $body = $ranking.querySelector('tbody');
+            const $pagination = $ranking.querySelector('.pagination');
+            const $paginationPages = $pagination.querySelector('.pages');
+            const $paginationFirst = $pagination.querySelector('.first');
+            const $paginationPrev = $pagination.querySelector('.prev');
+            const $paginationLast = $pagination.querySelector('.last');
+            const $paginationNext = $pagination.querySelector('.next');
+
+            let page = 1;
+            const data = Array.from(loader[type].entries());
+            const lastPage = Math.max(1, Math.ceil(data.length / itemsLimit));
+
+            const renderRankingPage = function () {
+                while ($body.firstChild) {
+                    $body.removeChild($body.lastChild);
+                }
+
+                const offset = (page - 1) * itemsLimit;
+                let i = offset + 1;
+
+                for (const [id, subject] of data.slice(offset, offset + itemsLimit)) {
+                    const $row = document.createElement('tr');
+                    $row.classList.add('quick-highlight');
+                    $row.dataset.id = id;
+                    $row.dataset.type = type;
+
+                    let name;
+                    let tag;
+                    let points;
+                    let villages;
+                    let avg_coords;
+                    let bash_points_off;
+                    let bash_points_def;
+
+                    if (type === 'players') {
+                        ([
+                            name,
+                            tribe_id,
+                            points,
+                            villages,
+                            avg_coords,
+                            bash_points_off,
+                            bash_points_def
+                        ] = subject);
+                    } else {
+                        ([
+                            name,
+                            tag,
+                            points,
+                            villages,
+                            avg_coords,
+                            bash_points_off,
+                            bash_points_def
+                        ] = subject);
+                    }
+
+                    const $rank = document.createElement('td');
+                    $rank.innerText = i++;
+
+                    const $name = document.createElement('td');
+                    $name.innerText = type === 'players' ? name : `${name} [${tag}]`;
+
+                    const $points = document.createElement('td');
+                    $points.innerText = shortifyPoints(points);
+
+                    const $villages = document.createElement('td');
+                    $villages.innerText = villages;
+
+                    const $bash = document.createElement('td');
+                    $bash.innerText = shortifyPoints(bash_points_off) + ' / ' + shortifyPoints(bash_points_def);
+
+                    $row.appendChild($rank);
+                    $row.appendChild($name);
+                    $row.appendChild($points);
+                    $row.appendChild($villages);
+                    $row.appendChild($bash);
+
+                    $body.appendChild($row);
+                }
+
+                updatePagination();
+                setTemporaryHighlights();
+            };
+
+            const updatePagination = function () {
+                const start = Math.max(1, page - 3);
+                const end = Math.min(lastPage, page + 3);
+
+                while ($paginationPages.firstChild) {
+                    $paginationPages.removeChild($paginationPages.lastChild);
+                }
+
+                for (let i = start; i <= end; i++) {
+                    let $page;
+
+                    if (i === page) {
+                        $page = document.createElement('span');
+                        $page.classList.add('current');
+                    } else {
+                        $page = document.createElement('a');
+                        $page.addEventListener('click', function () {
+                            page = i;
+                            renderRankingPage();
+                        });
+                    }
+
+                    $page.innerText = i;
+                    $page.classList.add('page');
+                    $paginationPages.appendChild($page);
+                }
+            };
+
+            $paginationFirst.addEventListener('click', function () {
+                page = 1;
+                renderRankingPage();
+            });
+
+            $paginationLast.addEventListener('click', function () {
+                page = lastPage;
+                renderRankingPage();
+            });
+
+            $paginationNext.addEventListener('click', function () {
+                page = Math.min(lastPage, page + 1);
+                renderRankingPage();
+            });
+
+            $paginationPrev.addEventListener('click', function () {
+                page = Math.max(1, page - 1);
+                renderRankingPage();
+            });
+
+            renderRankingPage();
+        }
+        
+        $rankingToggle.addEventListener('click', async function () {
+            modal.toggle();
+        });
+    };
+
+    function shortifyPoints (points) {
+        if (points >= 1000000) {
+            return parseFloat((points / 1000 / 1000).toFixed(1)) + 'kk';
+        } else {
+            return parseFloat((points / 1000).toFixed(1)) + 'k';
+        }
+    }
+
+    function averagePositionFor (type, id) {
+        let averageX;
+        let averageY;
+
+        switch (type) {
+            case TW2Map.highlightTypes.TRIBES: {
+                [averageX, averageY] = loader.tribes.get(id)[4];
+                break;
+            }
+            case TW2Map.highlightTypes.PLAYERS: {
+                [averageX, averageY] = loader.players.get(id)[4];
+                break;
+            }
+            case TW2Map.highlightTypes.VILLAGES: {
+                averageX = loader.villagesById[id].x;
+                averageY = loader.villagesById[id].y;
+                break;
+            }
+            default: {
+                throw new Error('averagePositionFor: Invalid type.');
+            }
+        }
+
+        return [averageX, averageY];
+    }
+
+    function setTemporaryHighlights () {
+        const $elements = document.querySelectorAll('.quick-highlight');
+
+        if (!$elements.length) {
+            return false;
+        }
+
+        for (const $elem of $elements) {
+            $elem.addEventListener('mouseenter', () => {
+                const id = parseInt($elem.dataset.id, 10);
+
+                if ($elem.dataset.type === 'conquest') {
+                    const newOwner = parseInt($elem.dataset.newOwner, 10);
+                    const oldOwner = parseInt($elem.dataset.oldOwner, 10);
+
+                    if (oldOwner) {
+                        map.quickHighlight('players', oldOwner, TW2Map.colorPaletteTopThree[2]);
+                    }
+
+                    map.quickHighlight('players', newOwner, TW2Map.colorPaletteTopThree[1]);
+                    map.quickHighlight('villages', id);
+                    map.moveTo(...averagePositionFor('villages', id));
+                } else {
+                    map.quickHighlight($elem.dataset.type, id);
+                    map.moveTo(...averagePositionFor($elem.dataset.type, id));
+                }
+            });
+
+            $elem.addEventListener('mouseleave', () => {
+                map.quickHighlightOff();
+            });
+        }
+    }
+
     function updateStoredHighlights () {
         localStorage.setItem(HIGHLIGHTS_STORE_KEY, JSON.stringify({highlights: map.getHighlights()}));
     }
@@ -893,6 +1230,7 @@ require([
     setupMapShare();
     setupPanelToggle();
     setupStoredHighlights();
+    setupRanking();
     // setupAbout()
 
     map.init();

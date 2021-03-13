@@ -25,13 +25,30 @@ a {
     font-weight: bold;
 }
 
-#map-page header {
-    background: initial;
-    height: initial;
-    width: initial;
-    filter: initial;
+#side-panel header {
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+#side-panel header > div {
+    margin: 3px 0px;
+}
+
+#side-panel footer button {
+    margin: 4px 0px;
+}
+
+#side-panel .world-name {
+    text-align: center;
+    font-size: 1.3em;
+}
+
+#side-panel button {
+    margin: 1px 0px;
+}
+
+#ranking-toggle {
+    width: 136px;
 }
 
 #map-page header a {
@@ -43,11 +60,6 @@ a {
     padding: initial;
     background: initial;
     text-align: initial;
-}
-
-#map-page td,
-#map-page th {
-    text-align: left;
 }
 
 a:hover {
@@ -150,6 +162,8 @@ button.red:focus {
                 hsl(23, 25%, 20%);
     position: relative;
     float: left;
+    padding-right: 9px;
+    padding-left: 2px;
 }
 
 #map {
@@ -202,9 +216,8 @@ button.red:focus {
 }
 
 #quick-jump-coords {
-    margin-left: 4px;
     color: hsl(29, 37%, 31%);
-    width: 88px;
+    width: 91px;
     height: 22px;
     padding-top: 2px;
     padding-bottom: 0px;
@@ -212,6 +225,7 @@ button.red:focus {
     position: relative;
     text-align: center;
     display: inline-block;
+    margin: 1px 0px;
 }
 
 #quick-jump-x,
@@ -227,12 +241,12 @@ button.red:focus {
 
 #quick-jump-go {
     font-size: 11px;
-    margin-left: 2px;
     outline: none;
     cursor: pointer;
     width: 42px;
     display: inline-block;
     vertical-align: top;
+    margin: 0px;
 }
 
 
@@ -243,8 +257,7 @@ button.red:focus {
 }
 
 #highlight-id {
-    margin-left: 4px;
-    width: 135px;
+    width: 136px;
     height: 22px;
     padding-left: 8px;
     padding-right: 8px;
@@ -258,7 +271,7 @@ button.red:focus {
 }
 
 #highlight-items {
-    width: calc(100% - 11px);
+    width: calc(100% - 4px);
     margin-top: 5px;
     margin-left: 2px;
     text-shadow: 1px 1px 0px hsl(0deg 0% 0%);
@@ -458,11 +471,6 @@ div.text-container {
     float: left;
 }
 
-#world-name {
-    text-align: center;
-    padding: 0 2px;
-}
-
 #current-world {
     margin-left: 4px;
     width: 60px;
@@ -543,22 +551,14 @@ div.text-container {
 }
 
 #change-settings {
-    margin-left: 2px;
-    width: 70px;
+    width: 73px;
 }
 
 #settings {
     position: absolute;
     width: 200px;
-    background: url(/images/noise.png) hsl(23, 48%, 29%);
-    color: hsl(0, 35%, 81%);
-    padding: 3px;
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
     z-index: 7;
-    transition: visibility 0.02s linear, opacity 0.02s linear;
-    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
-    border: 1px solid hsl(23, 55%, 24%);
-    border-radius: 1px;
+    padding: 3px;
 }
 
 #settings.hidden {
@@ -724,6 +724,94 @@ div.text-container {
     cursor: pointer;
 }
 
+#ranking {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 500px;
+}
+
+.floating-modal {
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+    color: hsl(0, 35%, 81%);
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    transition: opacity 0.1s;
+    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
+    border: 1px solid hsl(23, 55%, 24%);
+    border-radius: 1px;
+}
+
+.floating-modal .floating-modal-body {
+    padding: 5px;
+}
+
+.floating-modal .floating-modal-body > * {
+    display: none;
+}
+
+.floating-modal .floating-modal-body > div.selected {
+    display: initial;
+}
+
+.floating-modal .floating-modal-menu {
+}
+
+.floating-modal .floating-modal-menu button {
+    margin: 0px 2px 3px 2px;
+}
+
+.floating-modal .floating-modal-drag {
+    margin: 0px 5px;
+    flex: 1;
+    cursor: move;
+    user-select: none;
+    background-image: linear-gradient(130deg,
+        hsl(0deg 0% 0% / 15%) 16.67%,
+        hsl(0 0% 0% / 0%) 16.67%,
+        hsl(0 0% 0% / 0%) 50%,
+        hsl(0deg 0% 0% / 15%) 50%,
+        hsl(0deg 0% 0% / 15%) 66.67%,
+        hsl(0 0% 0% / 0%) 66.67%,
+        hsl(0 0% 0% / 0%) 100%);
+    background-size: 7.83px 9.33px;
+}
+
+.floating-modal .floating-modal-close {
+    width: 22px;
+    height: 22px;
+}
+
+.floating-modal .floating-modal-header {
+    margin: initial;
+    padding: 5px;
+    display: flex;
+    overflow: auto;
+}
+
+.floating-modal.hidden,
+.floating-modal .hidden {
+    display: none;
+}
+
+.floating-modal .floating-modal-menu button.selected {
+    background: url(/images/noise.png), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 36%));
+}
+
+.pagination .pages {
+    display: inline;
+}
+
+.pagination .pages > * {
+    padding: 2px 5px;
+}
+
+table.ranking {
+    border: 1px solid hsl(23, 48%, 18%);
+    border-radius: 3px;
+    width: 470px;
+    margin: 5px;
+}
+
 .loading {
     margin: auto;
     text-align: center;
@@ -748,6 +836,82 @@ div.text-container {
 
 .loading .b2 {
     animation-delay: -0.1s;
+}
+
+table {
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+    width: 100%;
+    border-spacing: 0px;
+}
+
+th {
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+}
+
+
+tr:nth-child(even) {
+    background: inherit;
+}
+
+tr:nth-child(odd) {
+    background: url(/images/noise.png) hsl(23, 48%, 32%);
+}
+
+table tbody tr:hover td {
+    background: url(/images/noise.png) hsl(23, 48%, 38%);
+}
+
+td, th {
+    text-align: center;
+    height: 20px;
+    white-space: nowrap;
+    margin: 0px;
+}
+
+td {
+    border-top: none;
+    border-bottom: 1px solid hsl(23deg 42% 27%);
+}
+
+th {
+    border: none;
+}
+
+tr:last-child td {
+}
+
+th a,
+th a:hover {
+    color: inherit;
+}
+
+th {
+    background: hsl(0 0% 0% / 20%);
+    padding: 5px 0px;
+}
+
+.pagination {
+    background: inherit;
+    width: 100%;
+    text-align: center;
+    padding: 5px 0px;
+    border-top: 1px solid hsl(23deg 42% 24%);
+    user-select: none;
+}
+
+.pagination .page {
+    color: #dea37d;
+    font-weight: normal;
+}
+
+.pagination .page.current {
+    color: hsl(24deg 60% 58%);
+    background: hsl(0 0% 0% / 20%);
+    font-weight: bold;
+}
+
+.pagination .hidden {
+    display: none;
 }
 
 @keyframes sk-bouncedelay {

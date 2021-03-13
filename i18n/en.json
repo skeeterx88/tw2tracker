@@ -75,6 +75,9 @@
         "column_domination": "%",
         "column_domination_full": "World Domination Percentage",
         "column_villages": "Villages",
+        "column_bash_points": "Bash",
+        "column_bash_points_offense": "Bash Off",
+        "column_bash_points_defense": "Bash Def",
         "abandoned_village": "Abandoned",
         "view_tribes_ranking": "View complete tribes ranking",
         "view_players_ranking": "View complete players ranking",
@@ -438,7 +441,10 @@
         "error_world_not_found": "World does not exist",
         "error_invalid_highlights": "Invalid highlights data",
         "error_no_highlights_input": "No highlights specified",
-        "error_map_share_no_highlights": "No highlights to create a share"
+        "error_map_share_no_highlights": "No highlights to create a share",
+        "ranking_menu_players": "Players",
+        "ranking_menu_tribes": "Tribes",
+        "button_ranking": "Ranking"
     },
     "maps_tooltip": {
         "village": "Village",

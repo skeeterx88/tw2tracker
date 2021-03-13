@@ -26,11 +26,11 @@ require([
 
         switch (type) {
             case TW2Map.highlightTypes.TRIBES: {
-                [averageX, averageY] = loader.tribes[id][4];
+                [averageX, averageY] = loader.tribes.get(id)[4];
                 break;
             }
             case TW2Map.highlightTypes.PLAYERS: {
-                [averageX, averageY] = loader.players[id][4];
+                [averageX, averageY] = loader.players.get(id)[4];
                 break;
             }
             case TW2Map.highlightTypes.VILLAGES: {
