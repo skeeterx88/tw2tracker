@@ -1069,8 +1069,10 @@ async function commitDataFilesystem (worldId) {
                 player.villages,
                 player.avg_coords,
                 player.bash_points_off,
-                player.bash_points_def
-            ]]);
+                    player.bash_points_off,
+                    player.bash_points_def,
+                    player.victory_points || 0,
+                    player.rank
         }
 
         for (const village of villages) {
@@ -1117,8 +1119,10 @@ async function commitDataFilesystem (worldId) {
                 tribe.villages,
                 tribe.avg_coords,
                 tribe.bash_points_off,
-                tribe.bash_points_def
-            ]]);
+                    tribe.bash_points_off,
+                    tribe.bash_points_def,
+                    tribe.victory_points || 0,
+                    tribe.rank
         }
 
         for (const {name} of provinces) {
