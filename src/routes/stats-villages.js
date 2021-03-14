@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const {db} = require('../db.js');
 const sql = require('../sql.js');
-const utils = require('../utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
 

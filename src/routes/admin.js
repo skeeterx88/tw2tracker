@@ -8,7 +8,6 @@ const i18n = require('../i18n.js');
 const syncCommands = require('../sync-commands.json');
 const privilegeTypes = require('../privileges.json');
 const privilegeTypesValue = Object.values(privilegeTypes);
-const debug = require('../debug.js');
 const pgArray = require('pg').types.arrayParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;

@@ -3,7 +3,6 @@ const createError = require('http-errors');
 const router = express.Router();
 const {db} = require('../db.js');
 const sql = require('../sql.js');
-const utils = require('../utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
 
@@ -107,7 +106,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('search', 'navigation', res.locals.lang), replaces: [rawQuery]},
+            {label: i18n('search', 'navigation', res.locals.lang), replaces: [rawQuery]}
         ])
     });
 });

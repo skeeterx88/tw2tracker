@@ -1,5 +1,4 @@
 const express = require('express');
-const createError = require('http-errors');
 const router = express.Router();
 const config = require('../config.js');
 const i18n = require('../i18n.js');

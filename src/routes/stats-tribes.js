@@ -78,7 +78,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]}
         ])
     });
 });
@@ -218,7 +218,7 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n('members', 'navigation', res.locals.lang)},
+            {label: i18n('members', 'navigation', res.locals.lang)}
         ])
     });
 });
@@ -269,7 +269,7 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n('villages', 'navigation', res.locals.lang)},
+            {label: i18n('villages', 'navigation', res.locals.lang)}
         ])
     });
 });
@@ -330,7 +330,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n('member_changes', 'navigation', res.locals.lang)},
+            {label: i18n('member_changes', 'navigation', res.locals.lang)}
         ])
     });
 });
@@ -408,7 +408,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
-            {label: i18n('achievements', 'navigation', res.locals.lang)},
+            {label: i18n('achievements', 'navigation', res.locals.lang)}
         ])
     });
 });

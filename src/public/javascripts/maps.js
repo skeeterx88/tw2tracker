@@ -227,7 +227,7 @@ require([
 
             const matches = [];
 
-            for (const [id, [name]] of Object.entries(loader.players)) {
+            for (const [name] of Object.values(loader.players)) {
                 matches.push({
                     search: name.toLowerCase(),
                     id: name,
@@ -1010,17 +1010,16 @@ require([
                     let tag;
                     let points;
                     let villages;
-                    let avg_coords;
                     let bash_points_off;
                     let bash_points_def;
 
                     if (type === 'players') {
                         ([
                             name,
-                            tribe_id,
+                            ,
                             points,
                             villages,
-                            avg_coords,
+                            ,
                             bash_points_off,
                             bash_points_def
                         ] = subject);
@@ -1030,7 +1029,7 @@ require([
                             tag,
                             points,
                             villages,
-                            avg_coords,
+                            ,
                             bash_points_off,
                             bash_points_def
                         ] = subject);

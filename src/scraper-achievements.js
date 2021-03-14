@@ -1,5 +1,3 @@
-/*global debug*/
-
 /**
  * This function is evaluated inside the game's page context via puppeteer's page.evaluate()
  */

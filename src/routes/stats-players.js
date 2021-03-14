@@ -94,7 +94,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]}
         ])
     });
 });
@@ -139,7 +139,7 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n('villages', 'navigation', res.locals.lang)},
+            {label: i18n('villages', 'navigation', res.locals.lang)}
         ])
     });
 });
@@ -234,7 +234,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
-            {label: navigationTitle},
+            {label: navigationTitle}
         ])
     });
 });
@@ -292,7 +292,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n('tribe_changes', 'navigation', res.locals.lang)},
+            {label: i18n('tribe_changes', 'navigation', res.locals.lang)}
         ])
     });
 });
@@ -465,8 +465,8 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
             {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n('achievements', 'navigation', res.locals.lang)},
-        ]),
+            {label: i18n('achievements', 'navigation', res.locals.lang)}
+        ])
     });
 });
 

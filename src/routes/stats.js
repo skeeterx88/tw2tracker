@@ -2,10 +2,9 @@ const express = require('express');
 const createError = require('http-errors');
 const router = express.Router();
 const config = require('../config.js');
-const {db, pgp} = require('../db.js');
+const {db} = require('../db.js');
 const sql = require('../sql.js');
 const i18n = require('../i18n.js');
-const rankingSortTypes = require('../ranking-sort-types.json');
 
 const {
     paramWorld,
@@ -215,7 +214,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: world.open ? i18n('world', 'navigation', res.locals.lang) : i18n('world_closed', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/`, replaces: [world.name]},
+            {label: world.open ? i18n('world', 'navigation', res.locals.lang) : i18n('world_closed', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/`, replaces: [world.name]}
         ])
     });
 });
