@@ -1359,7 +1359,7 @@ define('TW2DataLoader', [
                 }
             }
 
-            for (const [id, tribe] in this.tribes.entries()) {
+            for (const [id, tribe] of this.tribes.entries()) {
                 const [name, tag] = tribe;
                 this.tribesByName[name.toLowerCase()] = id;
                 this.tribesByTag[tag.toLowerCase()] = id;
