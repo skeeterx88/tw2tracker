@@ -20,9 +20,13 @@ button {
 }
 
 a {
-    color: hsl(197, 100%, 50%);
+    color: hsl(0, 35%, 80%);
     text-decoration: none;
     font-weight: bold;
+}
+
+a:hover {
+    color: hsl(0, 35%, 90%);
 }
 
 #side-panel header {
@@ -36,6 +40,10 @@ a {
 
 #side-panel footer button {
     margin: 4px 0px;
+}
+
+#side-panel footer a {
+    color: hsl(197, 100%, 50%);
 }
 
 #side-panel .world-name {
@@ -901,8 +909,7 @@ th {
 }
 
 .pagination .page {
-    color: #dea37d;
-    font-weight: normal;
+    color: hsl(22deg 42% 63%);
 }
 
 .pagination .page.current {

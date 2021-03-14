@@ -1043,6 +1043,7 @@ require([
 
                     const $rank = document.createElement('td');
                     const $name = document.createElement('td');
+                    const $nameA = document.createElement('a');
                     const $points = document.createElement('td');
                     const $villages = document.createElement('td');
                     const $bashOff = document.createElement('td');
@@ -1053,18 +1054,25 @@ require([
                     if (type === 'players') {
                         if (loader.tribes.has(tribeId)) {
                             const tribeTag = loader.tribes.get(tribeId)[1];
-                            $name.innerText = `${name} [${tribeTag}]`;
+                            $nameA.innerText = `${name} [${tribeTag}]`;
                         } else {
-                            $name.innerText = name;
+                            $nameA.innerText = name;
                         }
                     } else {
-                        $name.innerText = `${name} [${tag}]`;
+                        $nameA.innerText = `${name} [${tag}]`;
                     }
 
                     $points.innerText = points.toLocaleString('pt-BR');
                     $villages.innerText = (type === 'tribes' && rank < 11 && !loader.config.victory_points) ? `${villages} (${domination[rank - 1]}%)` : villages;
                     $bashOff.innerText = bashOff.toLocaleString('pt-BR');
                     $bashDef.innerText = bashDef.toLocaleString('pt-BR');
+
+                    $nameA.href = '#';
+                    $nameA.addEventListener('click', function () {
+                        const color = utils.arrayRandom(TW2Map.colorPalette.flat());
+                        map.addHighlight(type, id, color);
+                    });
+                    $name.appendChild($nameA);
 
                     $row.appendChild($rank);
                     $row.appendChild($name);
