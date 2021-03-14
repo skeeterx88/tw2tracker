@@ -26,6 +26,8 @@ require([
     const HIGHLIGHTS_STORE_KEY = 'tw2_tracker_map_highlights_' + marketId + worldNumber;
     const IGNORE_HIGHLIGHT_STORAGE = 'ignore_highlight_storage';
 
+    const VILLAGES = 3;
+
     const setupQuickJump = () => {
         const $quickJumpX = document.querySelector('#quick-jump-x');
         const $quickJumpY = document.querySelector('#quick-jump-y');
@@ -177,10 +179,10 @@ require([
 
             if (highlightType === TW2Map.highlightTypes.PLAYERS) {
                 realId = typeof id === 'number' ? id : loader.playersByName[id.toLowerCase()];
-                villages = loader.players.get(realId)[3];
+                villages = loader.players.get(realId)[VILLAGES];
             } else if (highlightType === TW2Map.highlightTypes.TRIBES) {
                 realId = typeof id === 'number' ? id : loader.tribesByName[id.toLowerCase()] || loader.tribesByTag[id.toLowerCase()];
-                villages = loader.tribes[realId][3];
+                villages = loader.tribes.get(realId)[VILLAGES];
             }
 
             $villages.classList.add('villages');
@@ -975,6 +977,11 @@ require([
 
         await loader.loadInfo;
 
+        if (loader.config.victory_points) {
+            $rankingPlayers.querySelector('.victory-points').classList.remove('hidden');
+            $rankingTribes.querySelector('.victory-points').classList.remove('hidden');
+        }
+
         const itemsLimit = 15;
         const modal = createFloatingModal('ranking', modalItems);
 
@@ -988,9 +995,22 @@ require([
             const $paginationLast = $pagination.querySelector('.last');
             const $paginationNext = $pagination.querySelector('.next');
 
+            const data = Array.from(loader[type].entries()).filter(([id, subject]) => subject[VILLAGES]);
             let page = 1;
-            const data = Array.from(loader[type].entries());
             const lastPage = Math.max(1, Math.ceil(data.length / itemsLimit));
+            const domination = [];
+
+            if (type === 'tribes' && !loader.config.victory_points) {
+                let topTenVillages = 0;
+
+                for (let i = 0; i < 10; i++) {
+                    topTenVillages += data[i][1][VILLAGES];
+                }
+
+                for (let i = 0; i < 10; i++) {
+                    domination.push(Math.round((data[i][1][VILLAGES] / topTenVillages * 100)));
+                }
+            }
 
             const renderRankingPage = function () {
                 while ($body.firstChild) {
@@ -998,7 +1018,6 @@ require([
                 }
 
                 const offset = (page - 1) * itemsLimit;
-                let i = offset + 1;
 
                 for (const [id, subject] of data.slice(offset, offset + itemsLimit)) {
                     const $row = document.createElement('tr');
@@ -1010,51 +1029,43 @@ require([
                     let tag;
                     let points;
                     let villages;
-                    let bash_points_off;
-                    let bash_points_def;
+                    let bashOff;
+                    let bashDef;
+                    let VP;
+                    let rank;
 
                     if (type === 'players') {
-                        ([
-                            name,
-                            ,
-                            points,
-                            villages,
-                            ,
-                            bash_points_off,
-                            bash_points_def
-                        ] = subject);
+                        ([name, , points, villages, , bashOff, bashDef, VP, rank] = subject);
                     } else {
-                        ([
-                            name,
-                            tag,
-                            points,
-                            villages,
-                            ,
-                            bash_points_off,
-                            bash_points_def
-                        ] = subject);
+                        ([name, tag, points, villages, , bashOff, bashDef, VP, rank] = subject);
                     }
 
                     const $rank = document.createElement('td');
-                    $rank.innerText = i++;
-
                     const $name = document.createElement('td');
-                    $name.innerText = type === 'players' ? name : `${name} [${tag}]`;
-
                     const $points = document.createElement('td');
-                    $points.innerText = shortifyPoints(points);
-
                     const $villages = document.createElement('td');
-                    $villages.innerText = villages;
+                    const $bashOff = document.createElement('td');
+                    const $bashDef = document.createElement('td');
 
-                    const $bash = document.createElement('td');
-                    $bash.innerText = shortifyPoints(bash_points_off) + ' / ' + shortifyPoints(bash_points_def);
+                    $rank.innerText = rank;
+                    $name.innerText = type === 'players' ? name : `${name} [${tag}]`;
+                    $points.innerText = points.toLocaleString('en-US');
+                    $villages.innerText = (type === 'tribes' && rank < 11 && !loader.config.victory_points) ? `${villages} (${domination[rank - 1]}%)` : villages;
+                    $bashOff.innerText = bashOff.toLocaleString('en-US');
+                    $bashDef.innerText = bashDef.toLocaleString('en-US');
 
                     $row.appendChild($rank);
                     $row.appendChild($name);
                     $row.appendChild($points);
                     $row.appendChild($villages);
-                    $row.appendChild($bash);
+                    $row.appendChild($bashOff);
+                    $row.appendChild($bashDef);
+
+                    if (loader.config.victory_points) {
+                        const $VP = document.createElement('td');
+                        $VP.innerText = VP;
+                        $row.appendChild($VP);
+                    }
 
                     $body.appendChild($row);
                 }

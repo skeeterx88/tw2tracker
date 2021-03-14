@@ -728,7 +728,7 @@ div.text-container {
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 500px;
+    width: 600px;
 }
 
 .floating-modal {
@@ -809,7 +809,7 @@ div.text-container {
 table.ranking {
     border: 1px solid hsl(23, 48%, 18%);
     border-radius: 3px;
-    width: 470px;
+    width: calc(100% - 10px);
     margin: 5px;
 }
 

@@ -690,7 +690,7 @@ define('TW2Map', [
                 for (const y in villages[x]) {
                     const [, , , character_id] = villages[x][y];
 
-                    const tribeId = loader.players && character_id ? loader.players.get(character_id)[1] : false;
+                    const tribeId = loader.players && loader.players.has(character_id) ? loader.players.get(character_id)[1] : false;
 
                     if (forceColor) {
                         context.fillStyle = forceColor;
