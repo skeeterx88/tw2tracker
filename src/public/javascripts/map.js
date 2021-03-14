@@ -958,6 +958,8 @@ define('TW2Map', [
         };
 
         this.moveTo = (x, y) => {
+            clearOverlay();
+
             animationStartTime = Date.now();
             animationStartX = positionX;
             animationStartY = positionY;
