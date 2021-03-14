@@ -1039,10 +1039,19 @@ async function commitDataFilesystem (worldId) {
     debug.sync('world:%s commit fs data', worldId);
 
     try {
-        const players = await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'rank'});
-        const villages = await db.any(sql.getWorldData, {worldId, table: 'villages', sort: 'points'});
-        const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'rank'});
-        const provinces = await db.any(sql.getWorldData, {worldId, table: 'provinces', sort: 'id'});
+        const [
+            world,
+            players,
+            villages,
+            tribes,
+            provinces
+        ] = await db.task(async (db) => [
+            await db.one(sql.getWorld, {worldId}),
+            await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'rank'}),
+            await db.any(sql.getWorldData, {worldId, table: 'villages', sort: 'points'}),
+            await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'rank'}),
+            await db.any(sql.getWorldData, {worldId, table: 'provinces', sort: 'id'})
+        ]);
 
         const parsedPlayers = [];
         const parsedTribes = [];
@@ -1117,6 +1126,7 @@ async function commitDataFilesystem (worldId) {
         }
 
         const info = {
+            config: world.config,
             players: parsedPlayers,
             tribes: parsedTribes,
             provinces: parsedProvinces

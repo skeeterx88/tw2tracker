@@ -1348,6 +1348,7 @@ define('TW2DataLoader', [
             this.players = new Map(info.players);
             this.tribes = new Map(info.tribes);
             this.provinces = info.provinces;
+            this.config = info.config;
 
             for (const [id, player] of this.players.entries()) {
                 const [name, tribeId] = player;
