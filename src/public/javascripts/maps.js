@@ -1026,6 +1026,7 @@ require([
                     $row.dataset.type = type;
 
                     let name;
+                    let tribeId;
                     let tag;
                     let points;
                     let villages;
@@ -1035,7 +1036,7 @@ require([
                     let rank;
 
                     if (type === 'players') {
-                        ([name, , points, villages, , bashOff, bashDef, VP, rank] = subject);
+                        ([name, tribeId, points, villages, , bashOff, bashDef, VP, rank] = subject);
                     } else {
                         ([name, tag, points, villages, , bashOff, bashDef, VP, rank] = subject);
                     }
@@ -1048,7 +1049,18 @@ require([
                     const $bashDef = document.createElement('td');
 
                     $rank.innerText = rank;
-                    $name.innerText = type === 'players' ? name : `${name} [${tag}]`;
+
+                    if (type === 'players') {
+                        if (loader.tribes.has(tribeId)) {
+                            const tribeTag = loader.tribes.get(tribeId)[1];
+                            $name.innerText = `${name} [${tribeTag}]`;
+                        } else {
+                            $name.innerText = name;
+                        }
+                    } else {
+                        $name.innerText = `${name} [${tag}]`;
+                    }
+
                     $points.innerText = points.toLocaleString('pt-BR');
                     $villages.innerText = (type === 'tribes' && rank < 11 && !loader.config.victory_points) ? `${villages} (${domination[rank - 1]}%)` : villages;
                     $bashOff.innerText = bashOff.toLocaleString('pt-BR');
