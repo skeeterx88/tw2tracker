@@ -132,7 +132,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const {
         playerRankingSortField,

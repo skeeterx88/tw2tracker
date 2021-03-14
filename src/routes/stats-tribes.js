@@ -38,7 +38,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const conquestCount = (await db.one(sql.getTribeConquestsCount, {worldId, tribeId})).count;
     const conquestGainCount = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count;
@@ -99,7 +99,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config.ui.ranking_page_items_per_page;
@@ -195,7 +195,7 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
     const members = await db.any(sql.getTribeMembers, {worldId, tribeId});
 
     mergeBackendLocals(res, {
@@ -239,7 +239,7 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config.ui.ranking_page_items_per_page;
@@ -290,7 +290,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const playersName = {};
     const memberChangesRaw = await db.any(sql.getTribeMemberChanges, {worldId, id: tribeId});
@@ -351,7 +351,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const subCategory = req.params.subCategory;
 

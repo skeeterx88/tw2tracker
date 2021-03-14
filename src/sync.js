@@ -245,7 +245,7 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
 
     running.data.add(worldId);
 
-    const world = await getWorld(marketId, worldNumber);
+    const world = await getWorld(worldId);
     const marketAccounts = await db.any(sql.getMarketAccounts, {marketId});
 
     if (!marketAccounts.length) {
@@ -377,7 +377,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
 
     running.achievements.add(worldId);
 
-    const world = await getWorld(marketId, worldNumber);
+    const world = await getWorld(worldId);
     const marketAccounts = await db.any(sql.getMarketAccounts, {marketId});
 
     if (!marketAccounts.length) {
@@ -751,7 +751,8 @@ Sync.tasks = async function () {
 };
 
 Sync.toggle = async function (marketId, worldNumber) {
-    const world = await getWorld(marketId, worldNumber);
+    const worldId = marketId + worldNumber;
+    const world = await getWorld(worldId);
     const enabled = !world.sync_enabled;
 
     await db.query(sql.syncToggleWorld, {
@@ -1163,17 +1164,17 @@ async function createPuppeteerPage () {
     return page;
 }
 
-async function getWorld (marketId, worldNumber) {
+async function getWorld (worldId) {
     let world;
 
     try {
-        world = await db.one(sql.getWorld, [marketId, worldNumber]);
+        world = await db.one(sql.getWorld, {worldId});
     } catch (e) {
-        throw new Error(`World ${marketId + worldNumber} not found.`);
+        throw new Error(`World ${worldId} not found.`);
     }
 
     if (!world.open) {
-        throw new Error(`World ${marketId + worldNumber} is closed`);
+        throw new Error(`World ${worldId} is closed`);
     }
 
     return world;

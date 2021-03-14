@@ -63,7 +63,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config.ui.ranking_page_items_per_page;

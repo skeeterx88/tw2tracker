@@ -1,4 +1,2 @@
-SELECT *
-FROM public.worlds
-WHERE market = $1
-AND num = $2
+SELECT * FROM public.worlds
+WHERE world_id = ${worldId};

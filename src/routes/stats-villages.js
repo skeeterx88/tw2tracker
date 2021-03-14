@@ -30,7 +30,7 @@ const villageRouter = asyncRouter(async function (req, res, next) {
         village
     } = await paramVillageParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
 

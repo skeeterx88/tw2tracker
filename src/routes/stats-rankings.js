@@ -53,7 +53,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     const limit = parseInt(config.ui.ranking_page_items_per_page, 10);
     const offset = limit * (page - 1);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const {
         playerRankingSortField,

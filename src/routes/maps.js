@@ -34,7 +34,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
     }
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
 
     mergeBackendLocals(res, {
@@ -60,11 +60,12 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
 
     const {
         marketId,
+        worldId,
         worldNumber
     } = await paramWorldParse(req);
 
     const mapShareId = req.params.mapShareId;
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
     const [mapShare] = await db.any(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber]);
 

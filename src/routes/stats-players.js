@@ -39,7 +39,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     } = await paramPlayerParse(req, worldId);
 
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const conquestCount = (await db.one(sql.getPlayerConquestsCount, {worldId, playerId})).count;
     const conquestGainCount = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count;
@@ -115,7 +115,7 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
     const villages = await getPlayerVillages(worldId, playerId);
 
     mergeBackendLocals(res, {
@@ -160,7 +160,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config.ui.ranking_page_items_per_page;
@@ -255,7 +255,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const tribeChanges = await db.any(sql.getPlayerTribeChanges, {worldId, id: playerId});
     const tribeTags = {};
@@ -313,7 +313,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, [marketId, worldNumber]);
+    const world = await db.one(sql.getWorld, {worldId});
 
     const selectedCategory = req.params.category;
     const subCategory = req.params.subCategory;
