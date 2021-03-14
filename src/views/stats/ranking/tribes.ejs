@@ -1,14 +1,4 @@
 <table>
-    <colgroup>
-        <col width="50px">
-        <col width="*">
-        <col width="50px">
-        <col width="50px">
-        <% if (world.config.victory_points) { -%>
-            <col width="40px">
-        <% } -%>
-        <col width="50px">
-    </colgroup>
     <thead>
         <tr>
             <th><a href="?tsort=rank"><%= i18n('column_rank', 'world_ranking', lang) %> <span class="icon-sort <% if (sortField === 'rank') __append('selected') %>"></span></a></th>
