@@ -1043,23 +1043,24 @@ require([
 
                     const $rank = document.createElement('td');
                     const $name = document.createElement('td');
-                    const $nameA = document.createElement('a');
+                    const $nameSpan = document.createElement('span');
                     const $points = document.createElement('td');
                     const $villages = document.createElement('td');
                     const $bashOff = document.createElement('td');
                     const $bashDef = document.createElement('td');
+                    const $actions = document.createElement('td');
 
                     $rank.innerText = rank;
 
                     if (type === 'players') {
                         if (loader.tribes.has(tribeId)) {
                             const tribeTag = loader.tribes.get(tribeId)[1];
-                            $nameA.innerText = `${name} [${tribeTag}]`;
+                            $nameSpan.innerText = `${name} [${tribeTag}]`;
                         } else {
-                            $nameA.innerText = name;
+                            $nameSpan.innerText = name;
                         }
                     } else {
-                        $nameA.innerText = `${name} [${tag}]`;
+                        $nameSpan.innerText = `${name} [${tag}]`;
                     }
 
                     $points.innerText = points.toLocaleString('pt-BR');
@@ -1067,12 +1068,17 @@ require([
                     $bashOff.innerText = bashOff.toLocaleString('pt-BR');
                     $bashDef.innerText = bashDef.toLocaleString('pt-BR');
 
-                    $nameA.href = '#';
-                    $nameA.addEventListener('click', function () {
+                    $nameSpan.classList.add('highlight');
+                    $nameSpan.addEventListener('click', function () {
                         const color = utils.arrayRandom(TW2Map.colorPalette.flat());
                         map.addHighlight(type, id, color);
                     });
-                    $name.appendChild($nameA);
+                    $name.appendChild($nameSpan);
+
+                    const $stats = document.createElement('a');
+                    $stats.href = `/stats/${marketId}/${worldNumber}/${type}/${id}`;
+                    $stats.innerText = i18n('button_open_stats', 'maps');
+                    $actions.appendChild($stats);
 
                     $row.appendChild($rank);
                     $row.appendChild($name);
@@ -1087,6 +1093,7 @@ require([
                         $row.appendChild($VP);
                     }
 
+                    $row.appendChild($actions);
                     $body.appendChild($row);
                 }
 

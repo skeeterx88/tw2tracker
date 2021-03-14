@@ -739,6 +739,28 @@ div.text-container {
     width: 600px;
 }
 
+#ranking tbody a {
+    box-shadow: none;
+    border: 1px solid hsl(28deg 62% 16%);
+    border-radius: 3px;
+    height: initial;
+    padding: 1px 5px;
+    background: url(/images/external-link.png) 97% center no-repeat, url(/images/noise.png), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    padding-right: 13px;
+    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 10%);
+    text-decoration: none;
+    display: inline-block;
+}
+
+#ranking tbody a:hover {
+    border: 1px solid hsl(28deg 92% 10%);
+}
+
+#ranking .highlight {
+    font-weight: bold;
+    cursor: pointer;
+}
+
 .floating-modal {
     background: url(/images/noise.png) hsl(23, 48%, 29%);
     color: hsl(0, 35%, 81%);
