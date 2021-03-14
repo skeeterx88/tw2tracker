@@ -328,7 +328,6 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
             const data = await page.evaluate(scraperData, {
                 loadContinentTimeout: humanInterval(config.sync_timeouts.load_continent),
                 loadContinentSectionTimeout: humanInterval(config.sync_timeouts.load_continent_section)
-
             });
             await commitRawDataFilesystem(data, worldId);
             await commitDataDatabase(data, worldId);
@@ -1062,17 +1061,19 @@ async function commitDataFilesystem (worldId) {
 
         await fs.promises.mkdir(dataPath, {recursive: true});
         for (const player of players) {
-            parsedPlayers.push([player.id, [
-                player.name,
-                player.tribe_id || 0,
-                player.points,
-                player.villages,
-                player.avg_coords,
-                player.bash_points_off,
+            if (!player.archived) {
+                parsedPlayers.push([player.id, [
+                    player.name,
+                    player.tribe_id || 0,
+                    player.points,
+                    player.villages,
+                    player.avg_coords,
                     player.bash_points_off,
                     player.bash_points_def,
                     player.victory_points || 0,
                     player.rank
+                ]]);
+            }
         }
 
         for (const village of villages) {
@@ -1112,17 +1113,19 @@ async function commitDataFilesystem (worldId) {
         }
 
         for (const tribe of tribes) {
-            parsedTribes.push([tribe.id, [
-                tribe.name,
-                tribe.tag,
-                tribe.points,
-                tribe.villages,
-                tribe.avg_coords,
-                tribe.bash_points_off,
+            if (!tribe.archived) {
+                parsedTribes.push([tribe.id, [
+                    tribe.name,
+                    tribe.tag,
+                    tribe.points,
+                    tribe.villages,
+                    tribe.avg_coords,
                     tribe.bash_points_off,
                     tribe.bash_points_def,
                     tribe.victory_points || 0,
                     tribe.rank
+                ]]);
+            }
         }
 
         for (const {name} of provinces) {
