@@ -1049,10 +1049,10 @@ require([
 
                     $rank.innerText = rank;
                     $name.innerText = type === 'players' ? name : `${name} [${tag}]`;
-                    $points.innerText = points.toLocaleString('en-US');
+                    $points.innerText = points.toLocaleString('pt-BR');
                     $villages.innerText = (type === 'tribes' && rank < 11 && !loader.config.victory_points) ? `${villages} (${domination[rank - 1]}%)` : villages;
-                    $bashOff.innerText = bashOff.toLocaleString('en-US');
-                    $bashDef.innerText = bashDef.toLocaleString('en-US');
+                    $bashOff.innerText = bashOff.toLocaleString('pt-BR');
+                    $bashDef.innerText = bashDef.toLocaleString('pt-BR');
 
                     $row.appendChild($rank);
                     $row.appendChild($name);
