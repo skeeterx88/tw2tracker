@@ -26,7 +26,30 @@ require([
     const HIGHLIGHTS_STORE_KEY = 'tw2_tracker_map_highlights_' + marketId + worldNumber;
     const IGNORE_HIGHLIGHT_STORAGE = 'ignore_highlight_storage';
 
-    const VILLAGES = 3;
+    const dataIndex = {
+        players: {
+            name: 0,
+            tribe: 1,
+            points: 2,
+            villages: 3,
+            avg_coords: 4,
+            bash_off: 5,
+            bash_def: 6,
+            victory_points: 7,
+            rank: 8
+        },
+        tribes: {
+            name: 0,
+            tag: 1,
+            points: 2,
+            villages: 3,
+            avg_coords: 4,
+            bash_off: 5,
+            bash_def: 6,
+            victory_points: 7,
+            rank: 8
+        }
+    };
 
     const setupQuickJump = () => {
         const $quickJumpX = document.querySelector('#quick-jump-x');
@@ -179,10 +202,10 @@ require([
 
             if (highlightType === TW2Map.highlightTypes.PLAYERS) {
                 realId = typeof id === 'number' ? id : loader.playersByName[id.toLowerCase()];
-                villages = loader.players.get(realId)[VILLAGES];
+                villages = loader.players.get(realId)[dataIndex.players.villages];
             } else if (highlightType === TW2Map.highlightTypes.TRIBES) {
                 realId = typeof id === 'number' ? id : loader.tribesByName[id.toLowerCase()] || loader.tribesByTag[id.toLowerCase()];
-                villages = loader.tribes.get(realId)[VILLAGES];
+                villages = loader.tribes.get(realId)[dataIndex.tribes.villages];
             }
 
             $villages.classList.add('villages');
@@ -1001,14 +1024,15 @@ require([
         }]);
 
         const columnsType = {
-            players: ['rank', 'name', 'name', 'tribe', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'actions'],
-            tribes: ['rank', 'name', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'actions']
+            players: ['rank', 'name', 'name', 'tribe', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'victory_points', 'actions'],
+            tribes: ['rank', 'name', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'victory_points', 'actions']
         };
 
         for (const $ranking of [$rankingPlayers, $rankingTribes]) {
             const type = $ranking.dataset.type;
             const $body = $ranking.querySelector('tbody');
             const $pagination = $ranking.querySelector('.pagination');
+            const $sortColumns = $ranking.querySelectorAll('.sort');
 
             const pagination = {
                 pages: $pagination.querySelector('.pages'),
@@ -1020,7 +1044,7 @@ require([
 
             let page = 1;
 
-            const fullData = Array.from(loader[type].entries()).filter(([id, subject]) => subject[VILLAGES]);
+            let fullData = Array.from(loader[type].entries()).filter(([id, subject]) => subject[dataIndex[type].villages]);
             const lastPage = Math.max(1, Math.ceil(fullData.length / itemsLimit));
             const domination = [];
 
@@ -1028,12 +1052,49 @@ require([
                 let topTenVillages = 0;
 
                 for (let i = 0; i < 10; i++) {
-                    topTenVillages += fullData[i][1][VILLAGES];
+                    topTenVillages += fullData[i][1][dataIndex[type].villages];
                 }
 
                 for (let i = 0; i < 10; i++) {
-                    domination.push(Math.round((fullData[i][1][VILLAGES] / topTenVillages * 100)));
+                    domination.push(Math.round((fullData[i][1][dataIndex[type].villages] / topTenVillages * 100)));
                 }
+            }
+
+            let selectedSort = 'rank';
+
+            const sortingHandlers = {
+                rank: function (a, b) {
+                    return a[1][dataIndex[type][selectedSort]] - b[1][dataIndex[type][selectedSort]];
+                },
+                bash_total: function (a, b) {
+                    return (b[1][dataIndex[type].bash_off] + b[1][dataIndex[type].bash_def]) - (a[1][dataIndex[type].bash_off] + a[1][dataIndex[type].bash_def]);
+                },
+                generic: function (a, b) {
+                    return b[1][dataIndex[type][selectedSort]] - a[1][dataIndex[type][selectedSort]];
+                }
+            };
+
+            for (const $column of $sortColumns) {
+                $column.addEventListener('click', function () {
+                    for (const $column of $sortColumns) {
+                        $column.classList.remove('selected');
+                    }
+
+                    $column.classList.add('selected');
+
+                    if (selectedSort === $column.dataset.sort) {
+                        $column.classList.toggle('reverse');
+                        fullData = fullData.reverse();
+                    } else {
+                        $column.classList.remove('reverse');
+                        selectedSort = $column.dataset.sort;
+                        fullData = fullData.sort(sortingHandlers[selectedSort] || sortingHandlers.generic);
+                    }
+
+                    page = 1;
+                    renderRankingPage();
+                    updatePagination();
+                });
             }
 
             const renderRankingPage = function () {
@@ -1084,9 +1145,9 @@ require([
                     $columns.actions.appendChild($stats);
 
                     if (loader.config.victory_points) {
-                        const $vp = document.createElement('td');
-                        $vp.innerText = data.victory_points;
-                        $row.appendChild($vp);
+                        $columns.victory_points.innerText = data.victory_points;
+                    } else {
+                        $columns.victory_points.style.display = 'none';
                     }
 
                     for (const $elem of Object.values($columns)) {

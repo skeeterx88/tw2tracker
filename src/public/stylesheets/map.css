@@ -768,6 +768,42 @@ div.text-container {
     color: white;
 }
 
+#ranking th {
+    color: hsl(22deg 38% 58%);
+}
+
+#ranking .sort {
+    color: hsl(22deg 58% 58%);
+    cursor: pointer;
+}
+
+#ranking .sort:hover {
+    color: hsl(22deg 80% 58%);
+}
+
+#ranking .sort.selected::after {
+    opacity: 1;
+}
+
+#ranking .sort.reverse::after {
+    transform: rotate(180deg);
+}
+
+#ranking .sort::after {
+    content: '';
+    opacity: 0;
+    background-image: url(/images/icons/down-arrow.svg);
+    background-repeat: no-repeat;
+    background-size: 8px;
+    display: inline-block;
+    height: 9px;
+    width: 8px;
+    margin-top: 3px;
+    position: absolute;
+    margin-left: 2px;
+    transform: rotate(0deg);
+}
+
 .floating-modal {
     background: url(/images/noise.png) hsl(23, 48%, 29%);
     color: hsl(0, 35%, 81%);
