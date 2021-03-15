@@ -393,9 +393,19 @@ const accountsCreateRouter = asyncRouter(async function (req, res) {
 });
 
 const modsRouter = asyncRouter(async function (req, res) {
-    const mods = await db.map(sql.getMods, [], function (mod) {
+    const rawMods = await db.map(sql.getMods, [], function (mod) {
         mod.privileges = pgArray.create(mod.privileges, String).parse();
         return mod;
+    });
+
+    const mods = rawMods.filter(function (mod) {
+        if (res.locals.user.super_admin) {
+            return true;
+        } else if (mod.super_admin) {
+            return false;
+        } else {
+            return true;
+        }
     });
 
     const subPage = 'mods';
