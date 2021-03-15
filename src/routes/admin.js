@@ -518,6 +518,8 @@ const modsDeleteRouter = asyncRouter(async function (req, res) {
 
     if (!mod) {
         req.flash('error', i18n('error_mod_account_not_exists', 'admin', res.locals.lang));
+    } else if (mod.id === req.session.passport.user.id) {
+        req.flash('error', i18n('error_can_not_delete_yourself', 'admin', res.locals.lang));
     } else {
         req.flash('messages', i18n('message_mod_account_deleted', 'admin', res.locals.lang));
         await db.query(sql.deleteModAccount, {id});

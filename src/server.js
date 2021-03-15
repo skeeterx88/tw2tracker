@@ -124,6 +124,7 @@ module.exports = function () {
         res.locals.lang = req.session.lang || config.lang;
         res.locals.tribeRankingSortField = req.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;
         res.locals.playerRankingSortField = req.session.playerRankingSortField || rankingSortTypes.VICTORY_POINTS;
+        res.locals.user = req.session.passport.user;
 
         res.locals.backendValues = {
             selectedLanguage: res.locals.lang,
