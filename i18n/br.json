@@ -64,6 +64,7 @@
         "accessibility_search_label": "campo de pesquisa",
         "column_rank": "Posição",
         "column_tribe": "Tribo",
+        "column_tribe_tag": "Tag",
         "column_player": "Jogador",
         "column_village": "Aldeia",
         "column_old_owner": "Antigo dono",
@@ -84,7 +85,12 @@
         "no_weekly_achievements": "Sem conquistas semanais.",
         "stats_players": "%{count} jogadores",
         "stats_tribes": "%{count} tribos",
-        "stats_villages": "%{count} aldeias"
+        "stats_villages": "%{count} aldeias",
+        "column_bash_points": "Impacto",
+        "column_bash_points_offense": "Impacto Att",
+        "column_bash_points_defense": "Impacto Def",
+        "column_bash_points_total": "Impacto Total",
+        "column_actions": "Ações"
     },
     "world_ranking": {
         "header_players": "Classificação de Jogadores",
@@ -373,7 +379,9 @@
         "last_time": "Última vez:",
         "last_status": "Último status:",
         "closed": "Fechado",
-        "never": "nunca"
+        "never": "nunca",
+        "sync_data_queue": "Fila sync de dados:",
+        "sync_achievements_queue": "Fila sync de conquistas:"
     },
     "admin_sync_status": {
         "success": "Sucesso",
@@ -436,7 +444,11 @@
         "error_world_not_found": "Mundo não existe",
         "error_invalid_highlights": "Dados de marcação inválido",
         "error_no_highlights_input": "Nenhuma marcação especificada",
-        "error_map_share_no_highlights": "Sem marcações para criar compatilhamento"
+        "error_map_share_no_highlights": "Sem marcações para criar compatilhamento",
+        "button_open_stats": "Stats",
+        "ranking_menu_players": "Jogadores",
+        "ranking_menu_tribes": "Tribos",
+        "button_ranking": "Classificação"
     },
     "maps_tooltip": {
         "village": "Aldeia",
@@ -572,7 +584,9 @@
         "map_share_not_found": "Dados de compartilhamento não encontrados",
         "router_missing_sub_page": "Essa sub-página não existe",
         "router_missing_category": "Essa categoria não existe",
-        "router_missing_sub_category": "Essa sub-categoria não existe"
+        "router_missing_sub_category": "Essa sub-categoria não existe",
+        "contact_us": "Se você acredita que não deveria ver esta mensagem, nos manda um e-mail",
+        "header_error": "Erro %{error}"
     },
     "navigation": {
         "maps": "Mapas",

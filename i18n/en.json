@@ -64,6 +64,7 @@
         "accessibility_search_label": "search field",
         "column_rank": "Rank",
         "column_tribe": "Tribe",
+        "column_tribe_tag": "Tag",
         "column_player": "Player",
         "column_village": "Village",
         "column_old_owner": "Old owner",
