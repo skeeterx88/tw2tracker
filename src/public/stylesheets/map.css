@@ -777,6 +777,9 @@ div.text-container {
 #ranking th {
     color: hsl(22deg 38% 58%);
     padding: 5px 8px;
+    max-width: 80px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 #ranking .sort {
