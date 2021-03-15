@@ -875,7 +875,7 @@ require([
         }
     };
 
-    function createFloatingModal (id, items, onClose) {
+    function createFloatingModal ({id, items, onClose, position = {}}) {
         const $template = document.querySelector('#floating-modal');
         const $modal = $template.content.cloneNode(true).children[0];
         const $header = $modal.querySelector('header');
@@ -890,6 +890,14 @@ require([
         const buttonSelector = {};
 
         $modal.id = id;
+
+        position = {
+            ...position,
+            ...{left: 170, top: 20}
+        };
+
+        $modal.style.top = position.top + 'px';
+        $modal.style.left = position.left + 'px';
 
         let firstItem = true;
 
@@ -1013,15 +1021,18 @@ require([
 
         const itemsLimit = 15;
 
-        const modal = createFloatingModal('ranking', [{
-            label: 'Players',
-            $body: $rankingPlayers,
-            click: function () {}
-        }, {
-            label: 'Tribes',
-            $body: $rankingTribes,
-            click: function () {}
-        }]);
+        const modal = createFloatingModal({
+            id: 'ranking',
+            items: [{
+                label: 'Players',
+                $body: $rankingPlayers,
+                click: function () {}
+            }, {
+                label: 'Tribes',
+                $body: $rankingTribes,
+                click: function () {}
+            }]
+        });
 
         const columnsType = {
             players: ['rank', 'name', 'name', 'tribe', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'victory_points', 'actions'],

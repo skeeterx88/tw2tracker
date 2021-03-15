@@ -736,9 +736,6 @@ div.text-container {
 
 #ranking {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 650px;
 }
 
 #ranking tbody a {
