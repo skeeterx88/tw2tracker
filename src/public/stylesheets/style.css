@@ -859,16 +859,19 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip td > div > div {
-    /* background: red; */
     display: inline-block;
     height: 24px;
-    /* margin: 2px; */
     vertical-align: top;
+    width: 141px;
 }
 
 #map-tooltip .title {
     display: block;
     color: hsla(0, 0%, 0%, 95%);
+}
+
+#map-tooltip .overflow {
+    max-width: 100%;
 }
 
 #map-tooltip.left {
@@ -885,12 +888,15 @@ a.achievement-subject:last-child:after {
     line-height: 13px;
 }
 
-#map-tooltip .village-name {
+#map-tooltip .overflow {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: calc(100% - 54px);
     display: inline-block;
     vertical-align: top;
+}
+
+#map-tooltip .village-name {
+    max-width: calc(100% - 50px);
 }
 
 #map-tooltip .tribe-villages,

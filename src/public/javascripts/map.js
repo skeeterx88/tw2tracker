@@ -1429,12 +1429,12 @@ define('TW2Tooltip', [], function () {
         const $villageY = $tooltip.querySelector('.village-y');
         const $villagePoints = $tooltip.querySelector('.village-points');
         const $playerName = $tooltip.querySelector('.player-name');
-        const $playerVillages = $tooltip.querySelector('.player-villages');
+        // const $playerVillages = $tooltip.querySelector('.player-villages');
         const $playerPoints = $tooltip.querySelector('.player-points');
         const $tribeName = $tooltip.querySelector('.tribe-name');
-        const $tribeTag = $tooltip.querySelector('.tribe-tag');
+        // const $tribeTag = $tooltip.querySelector('.tribe-tag');
         const $tribePoints = $tooltip.querySelector('.tribe-points');
-        const $tribeVillages = $tooltip.querySelector('.tribe-villages');
+        // const $tribeVillages = $tooltip.querySelector('.tribe-villages');
         const $provinceName = $tooltip.querySelector('.province-name');
 
         const {
@@ -1489,11 +1489,10 @@ define('TW2Tooltip', [], function () {
             $villagePoints.innerHTML = villagePoints.toLocaleString('pt-BR');
             $playerName.innerHTML = playerName || '-';
             $playerPoints.innerHTML = playerPoints ? playerPoints.toLocaleString('pt-BR') : 0;
-            $playerVillages.innerHTML = playerVillages ? `(${playerVillages.toLocaleString('pt-BR')} <span class='village mini-icon'></span>)` : '';
-            $tribeName.innerHTML = tribeName || '-';
-            $tribeTag.innerHTML = tribeTag || '-';
+            // $playerVillages.innerHTML = playerVillages ? `(${playerVillages.toLocaleString('pt-BR')} <span class='village mini-icon'></span>)` : '';
+            $tribeName.innerHTML = tribeName ? `${tribeTag} ${tribeName}` : '-';
             $tribePoints.innerHTML = tribePoints ? tribePoints.toLocaleString('pt-BR') : 0;
-            $tribeVillages.innerHTML = tribeVillages ? `(${tribeVillages.toLocaleString('pt-BR')} <span class='village mini-icon'></span>)` : '';
+            // $tribeVillages.innerHTML = tribeVillages ? `(${tribeVillages.toLocaleString('pt-BR')} <span class='village mini-icon'></span>)` : '';
             $provinceName.innerHTML = provinceName;
         };
 
