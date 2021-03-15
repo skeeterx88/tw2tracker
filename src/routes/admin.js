@@ -341,6 +341,8 @@ const accountsDeleteRouter = asyncRouter(async function (req, res) {
 
     if (!account.length) {
         req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang, [accountId]));
+    } else if (account.id === req.user.id) {
+        req.flash('error', i18n('error_sync_account_delete_own', 'admin', res.locals.lang));
     } else {
         req.flash('messages', i18n('message_sync_account_deleted', 'admin', res.locals.lang));
         await db.query(sql.deleteAccount, {accountId});
