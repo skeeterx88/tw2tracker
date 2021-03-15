@@ -40,7 +40,13 @@
         "open_worlds": "Open Werelden",
         "closed_worlds": "Gesloten Werelden",
         "button_stats": "Statistieken",
-        "button_map": "Map"
+        "button_map": "Map",
+        "column_tribe_tag": "Tag",
+        "column_bash_points": "Gevechtspunten",
+        "column_bash_points_offense": "Offensieve gevechtspunten",
+        "column_bash_points_defense": "Deffensieve gevechtspunten",
+        "column_bash_points_total": "Totale gevechtspunten",
+        "column_actions": "Acties"
     },
     "stats_map": {
         "header_map": "Wereld Kaart",
@@ -374,7 +380,9 @@
         "last_time": "Laatste tijd:",
         "last_status": "Laatste status:",
         "closed": "Gesloten",
-        "never": "Nooit"
+        "never": "Nooit",
+        "sync_data_queue": "Synchronisatiegegevens in de wachtrij:",
+        "sync_achievements_queue": "Synchronisatiegegevens van achievements:"
     },
     "admin_sync_status": {
         "success": "Success",
@@ -437,7 +445,11 @@
         "error_world_not_found": "Wereld bestaat niet",
         "error_invalid_highlights": "Ongeldige highlights data",
         "error_no_highlights_input": "Geen highlights gespecificeerd",
-        "error_map_share_no_highlights": "Geen highlights om een share te creëren"
+        "error_map_share_no_highlights": "Geen highlights om een share te creëren",
+        "button_open_stats": "Statistieken",
+        "ranking_menu_players": "Spelerss",
+        "ranking_menu_tribes": "Stammen",
+        "button_ranking": "Ranking"
     },
     "maps_tooltip": {
         "village": "Dorp",
@@ -573,7 +585,9 @@
         "map_share_not_found": "Gedeelde data niet gevonden",
         "router_missing_sub_page": "Deze subpagina bestaat niet",
         "router_missing_category": "Deze categorie bestaat niet",
-        "router_missing_sub_category": "Deze subcategorie bestaat niet"
+        "router_missing_sub_category": "Deze subcategorie bestaat niet",
+        "contact_us": "Als u denkt dat u deze pagina niet had mogen zien, stuur ons dan een bericht",
+        "header_error": "Error %{error}"
     },
     "navigation": {
         "maps": "Maps",
