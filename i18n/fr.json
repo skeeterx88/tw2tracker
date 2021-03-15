@@ -86,7 +86,13 @@
         "accessibility_search_label": "Champ recherche",
         "column_victory_points_full": "PDV",
         "column_domination": "%",
-        "column_domination_full": "Pourcentage Domination"
+        "column_domination_full": "Pourcentage Domination",
+        "column_tribe_tag": "Tag",
+        "column_bash_points": "Bash",
+        "column_bash_points_offense": "Bash Off",
+        "column_bash_points_defense": "Bash Def",
+        "column_bash_points_total": "Bash Total",
+        "column_actions": "Actions"
     },
     "world_ranking": {
         "header_players": "Classement Joueurs",
@@ -375,7 +381,9 @@
         "last_time": "Dernière sync:",
         "last_status": "Dernier statut:",
         "closed": "Fermé",
-        "never": "Jamais"
+        "never": "Jamais",
+        "sync_data_queue": "Queue de synchronisation des datas:",
+        "sync_achievements_queue": "Queue de synchronisation des succès:"
     },
     "admin_sync_status": {
         "success": "OK",
@@ -438,7 +446,11 @@
         "error_world_not_found": "Le monde n'existe pas",
         "error_invalid_highlights": "Informations de légendes invalide",
         "error_no_highlights_input": "Pas de légende specificée",
-        "error_map_share_no_highlights": "Impossible de partager la carte s'il n'a pas de légendes."
+        "error_map_share_no_highlights": "Impossible de partager la carte s'il n'a pas de légendes.",
+        "button_open_stats": "Stats",
+        "ranking_menu_players": "Joueurs",
+        "ranking_menu_tribes": "Tribus",
+        "button_ranking": "Rangs"
     },
     "maps_tooltip": {
         "village": "Village",
@@ -574,7 +586,9 @@
         "map_share_not_found": "Informations de partage introuvables",
         "router_missing_sub_page": "Cette sous-page n'existe pas",
         "router_missing_category": "Cette catégorie n'existe pas",
-        "router_missing_sub_category": "Cette sous-catégorie n'existe pas"
+        "router_missing_sub_category": "Cette sous-catégorie n'existe pas",
+        "contact_us": "Si vous poussez que vous ne devriez pas voir cette page, envoyez nous un message",
+        "header_error": "Erreur %{error}"
     },
     "navigation": {
         "maps": "Cartes",
