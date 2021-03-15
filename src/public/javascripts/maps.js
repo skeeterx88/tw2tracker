@@ -1020,7 +1020,7 @@ require([
 
             let page = 1;
 
-            const fullData = Array.from(loader[type].entries());
+            const fullData = Array.from(loader[type].entries()).filter(([id, subject]) => subject[VILLAGES]);
             const lastPage = Math.max(1, Math.ceil(fullData.length / itemsLimit));
             const domination = [];
 
