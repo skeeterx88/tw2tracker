@@ -45,12 +45,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <% let i = 0; %>
                         <% for (let tribe of tribes) { %>
                             <tr class="quick-highlight" data-id="<%= tribe.id %>" data-type="tribes">
                                 <td><%= tribe.rank %></td>
                                 <td>
                                     <a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= tribe.id %>"><%= tribe.name %></a>
-                                    <% if (tribe.rank < 4) { %>
+                                    <% if (i++ < 3) { %>
                                         <div class="top-colors"></div>
                                     <% } %>
                                 </td>
