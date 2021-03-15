@@ -768,6 +768,11 @@ div.text-container {
     color: white;
 }
 
+#ranking td {
+    max-width: 110px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
 
 #ranking th {
     color: hsl(22deg 38% 58%);
