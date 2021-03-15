@@ -95,7 +95,8 @@ module.exports = function () {
         callback(null, {
             id: account.id,
             name: account.name,
-            privileges: privilegeObject
+            privileges: privilegeObject,
+            super_admin: account.super_admin
         });
     });
 

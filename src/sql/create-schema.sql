@@ -32,7 +32,8 @@ CREATE TABLE public.mods (
     pass VARCHAR (255) NOT NULL,
     privileges public.mod_privilege_types[] DEFAULT '{start_sync}',
     email VARCHAR (255) NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT TRUE
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    super_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE INDEX ON public.mods ((LOWER(name)));
