@@ -773,7 +773,7 @@ div.text-container {
 
 #ranking th {
     color: hsl(22deg 38% 58%);
-    padding: 5px 8px;
+    padding: 5px 0px 5px 10px;
     max-width: 80px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -788,16 +788,16 @@ div.text-container {
     color: hsl(22deg 80% 58%);
 }
 
-#ranking .sort.selected::after {
+#ranking .sort.selected::before {
     opacity: 1;
 }
 
-#ranking .sort.reverse::after {
+#ranking .sort.reverse::before {
     transform: rotate(180deg);
 }
 
-#ranking .sort::after {
-    content: '';
+#ranking .sort::before {
+    content: ''; 
     opacity: 0;
     background-image: url(/images/icons/down-arrow.svg);
     background-repeat: no-repeat;
@@ -807,7 +807,7 @@ div.text-container {
     width: 8px;
     margin-top: 3px;
     position: absolute;
-    margin-left: 2px;
+    margin-left: -9px;
     transform: rotate(0deg);
 }
 
