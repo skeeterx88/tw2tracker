@@ -768,8 +768,10 @@ div.text-container {
     color: white;
 }
 
+
 #ranking th {
     color: hsl(22deg 38% 58%);
+    padding: 5px 8px;
 }
 
 #ranking .sort {
@@ -882,8 +884,6 @@ div.text-container {
 table.ranking {
     border: 1px solid hsl(23, 48%, 18%);
     border-radius: 3px;
-    width: calc(100% - 10px);
-    margin: 5px;
 }
 
 .loading {

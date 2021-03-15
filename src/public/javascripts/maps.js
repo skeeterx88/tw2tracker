@@ -1025,7 +1025,7 @@ require([
 
         const columnsType = {
             players: ['rank', 'name', 'name', 'tribe', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'victory_points', 'actions'],
-            tribes: ['rank', 'name', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'victory_points', 'actions']
+            tribes: ['rank', 'name', 'tag', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'victory_points', 'actions']
         };
 
         for (const $ranking of [$rankingPlayers, $rankingTribes]) {
@@ -1127,7 +1127,10 @@ require([
                             $columns.tribe.innerText = '-';
                         }
                     } else {
-                        $columns.name.innerText = `${data.name} [${data.tag}]`;
+                        $columns.name.innerText = data.name;
+                        $columns.tag.innerText = data.tag;
+                        $columns.tag.classList.add('highlight');
+                        $columns.tag.addEventListener('click', () => map.addHighlight(type, id));
                     }
 
                     $columns.rank.innerText = data.rank;
