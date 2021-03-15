@@ -85,7 +85,13 @@
         "column_domination": "%",
         "column_domination_full": "Vorherrschaft in Prozent",
         "accessibility_search_label": "Suchfeld",
-        "column_victory_points_full": "Siegpunkte"
+        "column_victory_points_full": "Siegpunkte",
+        "column_tribe_tag": "Stammeskürzel",
+        "column_bash_points": "Kampfpunktr",
+        "column_bash_points_offense": "Offensive Kampfpunkte",
+        "column_bash_points_defense": "Defensive Kampfpunkte",
+        "column_bash_points_total": "Kampfpunkte insgesamt",
+        "column_actions": "Aktionen"
     },
     "world_ranking": {
         "header_players": "Spieler Rangliste",
@@ -374,7 +380,9 @@
         "last_time": "Letzte Zeit:",
         "last_status": "Letzter Status:",
         "closed": "geschlossen",
-        "never": "nie"
+        "never": "nie",
+        "sync_data_queue": "Schlage der synchronisierenden Daten:",
+        "sync_achievements_queue": "Schlange der synchronisierenden Erfolge:"
     },
     "admin_sync_status": {
         "success": "Erfolgreich",
@@ -437,7 +445,11 @@
         "error_world_not_found": "Die Welt existiert nicht",
         "error_invalid_highlights": "ungültige Daten zum Hervorheben",
         "error_no_highlights_input": "nichts zum Hervorheben spezifiziert",
-        "error_map_share_no_highlights": "Keine Highlights um die Karte zu teilen"
+        "error_map_share_no_highlights": "Keine Highlights um die Karte zu teilen",
+        "button_open_stats": "Statistiken",
+        "ranking_menu_players": "Spieler",
+        "ranking_menu_tribes": "Stämme",
+        "button_ranking": "Rangliste"
     },
     "maps_tooltip": {
         "village": "Dorf",
@@ -573,7 +585,9 @@
         "map_share_not_found": "Geteilte karte nicht gefunden",
         "router_missing_sub_page": "Diese Seite existiert nicht",
         "router_missing_category": "Diese Kategorie existiert nicht",
-        "router_missing_sub_category": "Diese Unterkategorie existiert nicht"
+        "router_missing_sub_category": "Diese Unterkategorie existiert nicht",
+        "contact_us": "Wenn du findest, dass dir diese Seite nicht angezeigt werden sollte, melde dich bei uns ",
+        "header_error": "Fehler %{error}"
     },
     "navigation": {
         "maps": "Karten",
