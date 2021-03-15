@@ -26,14 +26,14 @@ INSERT INTO public.accounts (name, pass, markets) VALUES ('tribalwarstracker', '
 
 CREATE TYPE public.mod_privilege_types AS ENUM ('start_sync', 'control_sync', 'modify_accounts', 'modify_mods', 'modify_settings');
 
+
 CREATE TABLE public.mods (
     id SERIAL PRIMARY KEY,
     name VARCHAR (25) UNIQUE NOT NULL,
     pass VARCHAR (255) NOT NULL,
     privileges public.mod_privilege_types[] DEFAULT '{start_sync}',
     email VARCHAR (255) NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT TRUE,
-    super_admin BOOLEAN NOT NULL DEFAULT FALSE
+    enabled BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE INDEX ON public.mods ((LOWER(name)));

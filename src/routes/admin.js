@@ -393,19 +393,9 @@ const accountsCreateRouter = asyncRouter(async function (req, res) {
 });
 
 const modsRouter = asyncRouter(async function (req, res) {
-    const rawMods = await db.map(sql.getMods, [], function (mod) {
+    const mods = await db.map(sql.getMods, [], function (mod) {
         mod.privileges = pgArray.create(mod.privileges, String).parse();
         return mod;
-    });
-
-    const mods = rawMods.filter(function (mod) {
-        if (res.locals.user.super_admin) {
-            return true;
-        } else if (mod.super_admin) {
-            return false;
-        } else {
-            return true;
-        }
     });
 
     const subPage = 'mods';
@@ -438,6 +428,7 @@ const modsEditRouter = asyncRouter(async function (req, res) {
         privileges = [privileges];
     }
 
+    const me = req.session.passport.user;
     const [mod] = await db.any(sql.getMod, {id});
     const [accountName] = await db.any(sql.getModAccountByName, {name});
     const [accountEmail] = await db.any(sql.getModAccountByEmail, {email});
@@ -445,9 +436,6 @@ const modsEditRouter = asyncRouter(async function (req, res) {
     // TODO: add values to config.json
     if (!mod) {
         req.flash('error', i18n('error_mod_account_not_exists', 'admin', res.locals.lang));
-        return res.redirect('/admin/mods');
-    } else if (mod.super_admin && !req.session.passport.user.super_admin) {
-        req.flash('error', i18n('error_can_not_modify_super_admin', 'admin', res.locals.lang));
         return res.redirect('/admin/mods');
     } else if (name.length < 3) {
         req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [3]));
@@ -464,6 +452,9 @@ const modsEditRouter = asyncRouter(async function (req, res) {
     } else if (privileges.some(type => !privilegeTypesValue.includes(type))) {
         req.flash('error', i18n('error_invalid_privilege', 'admin', res.locals.lang));
         return res.redirect('/admin/mods');
+    } else if (me.id === mod.id && me.privileges[privilegeTypes.MODIFY_MODS] && !privileges.includes(privilegeTypes.MODIFY_MODS)) {
+        req.flash('error', i18n('error_can_not_remove_self_modify_mods_priv', 'admin', res.locals.lang));
+        return res.redirect('/admin/mods');
     } else {
         if (pass) {
             const hash = await bcrypt.hash(pass, saltRounds);
@@ -476,15 +467,15 @@ const modsEditRouter = asyncRouter(async function (req, res) {
             req.logout();
             res.redirect('/admin/login');
 
-            // return req.logIn({id, name, privileges}, function (error) {
-            //     if (error) {
-            //         req.flash('error', error);
-            //     } else {
-            //         req.flash('messages', i18n('message_mod_account_altered', 'admin', res.locals.lang));
-            //     }
+            return req.logIn({id, name, privileges}, function (error) {
+                if (error) {
+                    req.flash('error', error);
+                } else {
+                    req.flash('messages', i18n('message_mod_account_altered', 'admin', res.locals.lang));
+                }
 
-            //     res.redirect(`/admin/mods#mod-${id}`);
-            // });
+                res.redirect(`/admin/mods#mod-${id}`);
+            });
         } else {
             req.flash('messages', i18n('message_mod_account_altered', 'admin', res.locals.lang));
             res.redirect(`/admin/mods#mod-${id}`);
