@@ -53,6 +53,8 @@ a:hover {
 
 #side-panel button {
     margin: 1px 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #ranking-toggle {
@@ -736,7 +738,7 @@ div.text-container {
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 600px;
+    width: 650px;
 }
 
 #ranking tbody a {
@@ -759,6 +761,11 @@ div.text-container {
 #ranking .highlight {
     font-weight: bold;
     cursor: pointer;
+    user-select: none;
+}
+
+#ranking .highlight:hover {
+    color: white;
 }
 
 .floating-modal {

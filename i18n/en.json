@@ -78,6 +78,7 @@
         "column_bash_points": "Bash",
         "column_bash_points_offense": "Bash Off",
         "column_bash_points_defense": "Bash Def",
+        "column_bash_points_total": "Bash Total",
         "column_actions": "Actions",
         "abandoned_village": "Abandoned",
         "view_tribes_ranking": "View complete tribes ranking",

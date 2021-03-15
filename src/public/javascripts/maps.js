@@ -864,11 +864,14 @@ require([
         let $selectedBody;
         let $selectedButton;
 
+        const buttonSelector = {};
+
         $modal.id = id;
 
         let firstItem = true;
 
         for (const {label, $body, click} of items) {
+            const buttonId = label.toLowerCase();
             const $button = document.createElement('button');
             const $bodyWrapper = document.createElement('div');
 
@@ -882,8 +885,7 @@ require([
                 firstItem = false;
             }
 
-            $button.innerText = label;
-            $button.addEventListener('click', function () {
+            buttonSelector[buttonId] = function () {
                 $selectedButton.classList.remove('selected');
                 $selectedBody.classList.remove('selected');
                 $selectedBody = $bodyWrapper;
@@ -891,7 +893,10 @@ require([
                 $selectedBody.classList.add('selected');
                 $selectedButton.classList.add('selected');
                 click();
-            });
+            };
+
+            $button.innerText = label;
+            $button.addEventListener('click', buttonSelector[buttonId]);
 
             $modalBody.appendChild($bodyWrapper);
             $menu.appendChild($button);
@@ -915,6 +920,10 @@ require([
             } else {
                 close();
             }
+        }
+
+        function select (buttonId) {
+            buttonSelector[buttonId]();
         }
 
         $close.addEventListener('click', close);
@@ -952,28 +961,25 @@ require([
             close,
             open,
             toggle,
+            select,
             $modal
         };
+    }
+
+    function extractSubjectData (type, subject) {
+        if (type === 'players') {
+            const [name, tribe_id, points, villages, , bash_off, bash_def, victory_points, rank] = subject;
+            return {name, tribe_id, points, villages, bash_off, bash_def, victory_points, rank};
+        } else {
+            const [name, tag, points, villages, , bash_off, bash_def, victory_points, rank] = subject;
+            return {name, tag, points, villages, bash_off, bash_def, victory_points, rank};
+        }
     }
 
     const setupRanking = async () => {
         const $rankingToggle = document.querySelector('#ranking-toggle');
         const $rankingPlayers = document.querySelector('#ranking-players').content.cloneNode(true).children[0];
         const $rankingTribes = document.querySelector('#ranking-tribes').content.cloneNode(true).children[0];
-
-        const modalItems = [{
-            label: 'Players',
-            $body: $rankingPlayers,
-            click: function () {
-                console.log('click players');
-            }
-        }, {
-            label: 'Tribes',
-            $body: $rankingTribes,
-            click: function () {
-                console.log('click tribes');
-            }
-        }];
 
         await loader.loadInfo;
 
@@ -983,32 +989,50 @@ require([
         }
 
         const itemsLimit = 15;
-        const modal = createFloatingModal('ranking', modalItems);
+
+        const modal = createFloatingModal('ranking', [{
+            label: 'Players',
+            $body: $rankingPlayers,
+            click: function () {}
+        }, {
+            label: 'Tribes',
+            $body: $rankingTribes,
+            click: function () {}
+        }]);
+
+        const columnsType = {
+            players: ['rank', 'name', 'name', 'tribe', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'actions'],
+            tribes: ['rank', 'name', 'points', 'villages', 'bash_off', 'bash_def', 'bash_total', 'actions']
+        };
 
         for (const $ranking of [$rankingPlayers, $rankingTribes]) {
             const type = $ranking.dataset.type;
             const $body = $ranking.querySelector('tbody');
             const $pagination = $ranking.querySelector('.pagination');
-            const $paginationPages = $pagination.querySelector('.pages');
-            const $paginationFirst = $pagination.querySelector('.first');
-            const $paginationPrev = $pagination.querySelector('.prev');
-            const $paginationLast = $pagination.querySelector('.last');
-            const $paginationNext = $pagination.querySelector('.next');
 
-            const data = Array.from(loader[type].entries()).filter(([id, subject]) => subject[VILLAGES]);
+            const pagination = {
+                pages: $pagination.querySelector('.pages'),
+                first: $pagination.querySelector('.first'),
+                prev: $pagination.querySelector('.prev'),
+                last: $pagination.querySelector('.last'),
+                next: $pagination.querySelector('.next')
+            };
+
             let page = 1;
-            const lastPage = Math.max(1, Math.ceil(data.length / itemsLimit));
+
+            const fullData = Array.from(loader[type].entries());
+            const lastPage = Math.max(1, Math.ceil(fullData.length / itemsLimit));
             const domination = [];
 
             if (type === 'tribes' && !loader.config.victory_points) {
                 let topTenVillages = 0;
 
                 for (let i = 0; i < 10; i++) {
-                    topTenVillages += data[i][1][VILLAGES];
+                    topTenVillages += fullData[i][1][VILLAGES];
                 }
 
                 for (let i = 0; i < 10; i++) {
-                    domination.push(Math.round((data[i][1][VILLAGES] / topTenVillages * 100)));
+                    domination.push(Math.round((fullData[i][1][VILLAGES] / topTenVillages * 100)));
                 }
             }
 
@@ -1019,81 +1043,56 @@ require([
 
                 const offset = (page - 1) * itemsLimit;
 
-                for (const [id, subject] of data.slice(offset, offset + itemsLimit)) {
+                for (const [id, subjectData] of fullData.slice(offset, offset + itemsLimit)) {
+                    const data = extractSubjectData(type, subjectData);
+
                     const $row = document.createElement('tr');
                     $row.classList.add('quick-highlight');
                     $row.dataset.id = id;
                     $row.dataset.type = type;
 
-                    let name;
-                    let tribeId;
-                    let tag;
-                    let points;
-                    let villages;
-                    let bashOff;
-                    let bashDef;
-                    let VP;
-                    let rank;
+                    const $columns = Object.fromEntries(columnsType[type].map(function (column) {
+                        return [column, document.createElement('td')];
+                    }));
 
                     if (type === 'players') {
-                        ([name, tribeId, points, villages, , bashOff, bashDef, VP, rank] = subject);
-                    } else {
-                        ([name, tag, points, villages, , bashOff, bashDef, VP, rank] = subject);
-                    }
+                        $columns.name.innerText = data.name;
 
-                    const $rank = document.createElement('td');
-                    const $name = document.createElement('td');
-                    const $nameSpan = document.createElement('span');
-                    const $points = document.createElement('td');
-                    const $villages = document.createElement('td');
-                    const $bashOff = document.createElement('td');
-                    const $bashDef = document.createElement('td');
-                    const $actions = document.createElement('td');
-
-                    $rank.innerText = rank;
-
-                    if (type === 'players') {
-                        if (loader.tribes.has(tribeId)) {
-                            const tribeTag = loader.tribes.get(tribeId)[1];
-                            $nameSpan.innerText = `${name} [${tribeTag}]`;
+                        if (loader.tribes.has(data.tribe_id)) {
+                            $columns.tribe.innerText = loader.tribes.get(data.tribe_id)[1];
+                            $columns.tribe.classList.add('highlight');
+                            $columns.tribe.addEventListener('click', () => map.addHighlight('tribes', data.tribe_id));
                         } else {
-                            $nameSpan.innerText = name;
+                            $columns.tribe.innerText = '-';
                         }
                     } else {
-                        $nameSpan.innerText = `${name} [${tag}]`;
+                        $columns.name.innerText = `${data.name} [${data.tag}]`;
                     }
 
-                    $points.innerText = points.toLocaleString('pt-BR');
-                    $villages.innerText = (type === 'tribes' && rank < 11 && !loader.config.victory_points) ? `${villages} (${domination[rank - 1]}%)` : villages;
-                    $bashOff.innerText = bashOff.toLocaleString('pt-BR');
-                    $bashDef.innerText = bashDef.toLocaleString('pt-BR');
-
-                    $nameSpan.classList.add('highlight');
-                    $nameSpan.addEventListener('click', function () {
-                        const color = utils.arrayRandom(TW2Map.colorPalette.flat());
-                        map.addHighlight(type, id, color);
-                    });
-                    $name.appendChild($nameSpan);
+                    $columns.rank.innerText = data.rank;
+                    $columns.points.innerText = data.points.toLocaleString('pt-BR');
+                    $columns.villages.innerText = (type === 'tribes' && data.rank < 11 && !loader.config.victory_points) ? `${data.villages} (${domination[data.rank - 1]}%)` : data.villages;
+                    $columns.bash_off.innerText = data.bash_off.toLocaleString('pt-BR');
+                    $columns.bash_def.innerText = data.bash_def.toLocaleString('pt-BR');
+                    $columns.bash_total.innerText = (data.bash_off + data.bash_def).toLocaleString('pt-BR');
+                    $columns.name.classList.add('highlight');
+                    $columns.name.addEventListener('click', () => map.addHighlight(type, id));
 
                     const $stats = document.createElement('a');
                     $stats.href = `/stats/${marketId}/${worldNumber}/${type}/${id}`;
                     $stats.innerText = i18n('button_open_stats', 'maps');
-                    $actions.appendChild($stats);
-
-                    $row.appendChild($rank);
-                    $row.appendChild($name);
-                    $row.appendChild($points);
-                    $row.appendChild($villages);
-                    $row.appendChild($bashOff);
-                    $row.appendChild($bashDef);
+                    $columns.actions.appendChild($stats);
 
                     if (loader.config.victory_points) {
-                        const $VP = document.createElement('td');
-                        $VP.innerText = VP;
-                        $row.appendChild($VP);
+                        const $vp = document.createElement('td');
+                        $vp.innerText = data.victory_points;
+                        $row.appendChild($vp);
                     }
 
-                    $row.appendChild($actions);
+                    for (const $elem of Object.values($columns)) {
+                        $row.appendChild($elem);
+                    }
+
                     $body.appendChild($row);
                 }
 
@@ -1105,8 +1104,8 @@ require([
                 const start = Math.max(1, page - 3);
                 const end = Math.min(lastPage, page + 3);
 
-                while ($paginationPages.firstChild) {
-                    $paginationPages.removeChild($paginationPages.lastChild);
+                while (pagination.pages.firstChild) {
+                    pagination.pages.removeChild(pagination.pages.lastChild);
                 }
 
                 for (let i = start; i <= end; i++) {
@@ -1125,26 +1124,26 @@ require([
 
                     $page.innerText = i;
                     $page.classList.add('page');
-                    $paginationPages.appendChild($page);
+                    pagination.pages.appendChild($page);
                 }
             };
 
-            $paginationFirst.addEventListener('click', function () {
+            pagination.first.addEventListener('click', function () {
                 page = 1;
                 renderRankingPage();
             });
 
-            $paginationLast.addEventListener('click', function () {
+            pagination.last.addEventListener('click', function () {
                 page = lastPage;
                 renderRankingPage();
             });
 
-            $paginationNext.addEventListener('click', function () {
+            pagination.next.addEventListener('click', function () {
                 page = Math.min(lastPage, page + 1);
                 renderRankingPage();
             });
 
-            $paginationPrev.addEventListener('click', function () {
+            pagination.prev.addEventListener('click', function () {
                 page = Math.max(1, page - 1);
                 renderRankingPage();
             });
