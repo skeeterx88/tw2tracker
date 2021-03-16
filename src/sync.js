@@ -235,6 +235,61 @@ Sync.trigger = function (msg) {
     }
 };
 
+Sync.createAccounts = async function (name, pass, mail) {
+    const markets = await db.any(sql.getMarkets);
+
+    for (const market of markets) {
+        const urlId = market.id === 'zz' ? 'beta' : market.id;
+        const page = await createPuppeteerPage();
+        await page.goto(`https://${urlId}.tribalwars2.com/page`, {
+            waitUntil: ['domcontentloaded', 'networkidle2']
+        });
+
+        const created = await page.evaluate(function (name, mail, pass, marketId) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    const socketService = injector.get('socketService');
+                    const routeProvider = injector.get('routeProvider');
+
+                    debug('market:%s emit create account command', marketId);
+
+                    const timeout = setTimeout(function () {
+                        resolve(false);
+                    }, 20000);
+
+                    socketService.emit(routeProvider.REGISTER, {
+                        name,
+                        mail,
+                        pass,
+                        pass_wh: pass,
+                        agb: true,
+                        invite_key: '',
+                        newsletter: false,
+                        platform: 'browser',  
+                        portal_data: `portal_tid=${Date.now()}-${Math.round(Math.random() * 100000)}`,
+                        start_page_type: 'game_v1'
+                    }, function () {
+                        clearTimeout(timeout);
+                        resolve(true);
+                    });
+                }, 1000);
+            });
+        }, name, mail, pass, market.id);
+
+        await page.close();
+
+        if (created) {
+            debug.sync('market:%s account "%s" created', market.id, name);
+
+            const [exists] = await db.any(sql.getAccountByName, {name});
+            const {id} = exists ? exists : await db.one(sql.addAccount, {name, pass});
+            await db.query(sql.addAccountMarket, {accountId: id, marketId: market.id});
+        } else {
+            debug.sync('market:%s fail creating account "%s"', market.id, name);
+        }
+    }
+};
+
 Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) {
     const worldId = marketId + worldNumber;
 

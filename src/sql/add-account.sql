@@ -5,3 +5,4 @@ INSERT INTO public.accounts (
     ${name},
     ${pass}
 )
+RETURNING id;
