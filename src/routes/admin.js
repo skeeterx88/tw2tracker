@@ -579,7 +579,8 @@ const settingsEditRouter = asyncRouter(async function (req, res) {
                 const parsed = parseInt(value, 10);
 
                 if (isNaN(value)) {
-
+                    req.flash('error', i18n('error_invalid_not_a_number', 'admin_settings', res.locals.lang, [category + ':' + configId]));
+                    newConfig[category][configId] = config[category][configId];
                 } else if (parsed < map.min || parsed > map.max) {
                     req.flash('error', i18n('error_invalid_number_range', 'admin_settings', res.locals.lang, [category + ':' + configId, map.min, map.max]));
                     newConfig[category][configId] = config[category][configId];
