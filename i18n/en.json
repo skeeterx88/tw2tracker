@@ -415,8 +415,8 @@
     "admin_mod_accounts_privileges": {
         "start_sync": "Start Sync",
         "control_sync": "Control Sync",
-        "modify_accounts": "Modify Accounts",
-        "modify_mods": "Modify Mods",
+        "modify_accounts": "Modify Sync Accounts",
+        "modify_mods": "Modify Mod Accounts",
         "modify_settings": "Modify Settings"
     },
     "maps": {
