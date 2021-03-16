@@ -69,6 +69,10 @@ table {
     border-spacing: 0px;
 }
 
+table td.limit-size {
+     
+}
+
 code {
     background: hsla(19, 58%, 41%, 38%);
     padding: 3px;
@@ -261,6 +265,8 @@ td, th {
     margin: 0px;
     border-top: 1px solid hsl(40deg 44% 65%);
     border-bottom: 1px solid hsl(40deg 44% 58%);
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 tr:first-child td {
@@ -1086,6 +1092,18 @@ span[class^="flag-"] {
 
     .content > * + * {
         margin-left: initial;
+    }
+
+    table td.limit-size {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 24vw;
+    }
+
+    table th {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 20vw;
     }
 
     #main-menu {

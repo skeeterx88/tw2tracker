@@ -66,6 +66,7 @@
         "column_tribe": "Stamm",
         "column_player": "Spieler",
         "column_village": "Dörfer",
+        "column_coords": "Koordinaten",
         "column_old_owner": "Alter Besitzer",
         "column_new_owner": "Neuer Besitzer",
         "column_members": "Mitglieder",

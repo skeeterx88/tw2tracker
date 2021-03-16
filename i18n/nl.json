@@ -72,6 +72,7 @@
         "column_tribe": "Stam",
         "column_player": "Speler",
         "column_village": "Dorp",
+        "column_coords": "Coordinaten",
         "column_old_owner": "Oude eigenaar",
         "column_new_owner": "Nieuwe eigenaar",
         "column_members": "Leden",

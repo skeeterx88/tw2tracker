@@ -67,6 +67,7 @@
         "column_tribe_tag": "Tag",
         "column_player": "Player",
         "column_village": "Village",
+        "column_coords": "Coords",
         "column_old_owner": "Old owner",
         "column_new_owner": "New owner",
         "column_members": "Members",

@@ -58,6 +58,7 @@
         "column_tribe": "Tribù",
         "column_player": "Giocatore",
         "column_village": "Villaggio",
+        "column_coords": "Coords",
         "column_old_owner": "Vecchio Proprietario",
         "column_new_owner": "Nuovo Proprietario",
         "column_members": "Membri",

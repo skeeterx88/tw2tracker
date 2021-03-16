@@ -65,6 +65,7 @@
         "column_tribe": "Kmen",
         "column_player": "Hráč",
         "column_village": "Vesnice",
+        "column_coords": "Souřadnice",
         "column_old_owner": "Původní vlastník",
         "column_new_owner": "Nový vlastník",
         "column_members": "Členové",

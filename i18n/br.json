@@ -67,6 +67,7 @@
         "column_tribe_tag": "Tag",
         "column_player": "Jogador",
         "column_village": "Aldeia",
+        "column_coords": "Localização",
         "column_old_owner": "Antigo dono",
         "column_new_owner": "Novo dono",
         "column_members": "Membros",

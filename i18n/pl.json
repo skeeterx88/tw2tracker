@@ -67,6 +67,7 @@
         "column_tribe": "Plemię",
         "column_player": "Gracz",
         "column_village": "Wioska",
+        "column_coords": "Koordynaty",
         "column_old_owner": "Poprzedni Właściciel",
         "column_new_owner": "Nowy Właściciel",
         "column_members": "Członkowie",
