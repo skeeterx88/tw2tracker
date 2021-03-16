@@ -6,7 +6,7 @@
             <div id="side-panel" class="hidden">
                 <header>
                     <div class="world-name">
-                        <a href="/stats/<%= marketId %>/<%= world.num %>"><%= world.name %></a>
+                        <a href="/stats/<%= marketId %>/<%= world.num %>"><h1><%= world.name %></h1></a>
                     </div>
                     <div>
                         <button id="current-world"><span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span></button>
@@ -81,7 +81,7 @@
 
         <div id="notif" class="hidden">
             <span id="notif-close"></span>
-            <h1 id="notif-title"></h1>
+            <h3 id="notif-title"></h3>
             <div id="notif-wrapper">
                 <p id="notif-content"></p>
                 <a id="notif-link"></a>

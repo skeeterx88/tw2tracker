@@ -1,5 +1,6 @@
 html {
     overflow: hidden;
+    font-size: 11px;
 }
 
 body#map-page {
@@ -8,7 +9,6 @@ body#map-page {
     height: 100%;
     margin: 0;
     padding: 0;
-    font: 11px Arial, Helvetica, sans-serif;
     overflow: hidden;
     position: relative;
 }
@@ -16,7 +16,6 @@ body#map-page {
 input,
 button {
     outline: none;
-    font: 11px Arial, Helvetica, sans-serif;
 }
 
 a {
@@ -52,7 +51,7 @@ a:hover {
 }
 
 #side-panel button {
-    margin: 1px 0px;
+    margin: 0px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -76,30 +75,10 @@ a:hover {
     text-decoration: underline;
 }
 
-li {
-    list-style: none;
-}
-
-ul {
-    margin: 0;
-    padding: 0;
-}
-
 ::placeholder {
     color: hsl(0, 0%, 20%);
+    opacity: 0.7;
     text-shadow: none;
-}
-
-h1 {
-    font-size: 14px;
-}
-
-h2 {
-    font-size: 12px;
-}
-
-h3 {
-    font-size: 11px;
 }
 
 h1, h2, h3 {
@@ -201,12 +180,11 @@ button.red:focus {
 
 #panel-toggle:after,
 #panel-toggle.hide:after {
-    bottom: 0px;
     width: 100%;
     margin-top: 10px;
     text-align: center;
     display: inline-block;
-    font-size: 25px;
+    font-size: 2rem;
     font-weight: bold;
     color: hsl(36, 13%, 59%);
     cursor: pointer;
@@ -229,13 +207,10 @@ button.red:focus {
     color: hsl(29, 37%, 31%);
     width: 91px;
     height: 22px;
-    padding-top: 2px;
-    padding-bottom: 0px;
-    font-weight: bold;
     position: relative;
     text-align: center;
     display: inline-block;
-    margin: 1px 0px;
+    line-height: 22px;
 }
 
 #quick-jump-x,
@@ -244,13 +219,9 @@ button.red:focus {
     width: 24px;
     background: none;
     text-align: center;
-    padding: 0px;
-    padding-top: 2px;
-    text-shadow: 0px 0px 1px hsla(0, 0%, 0%, 70%);
 }
 
 #quick-jump-go {
-    font-size: 11px;
     outline: none;
     cursor: pointer;
     width: 42px;
@@ -340,7 +311,7 @@ button.red:focus {
     color: hsl(38, 28%, 64%);
     line-height: 0px;
     padding-left: 19px;
-    font-size: 9px;
+    font-size: 0.9rem;
 }
 
 #highlight-items .item .color:hover {
@@ -385,7 +356,6 @@ button.red:focus {
     width: 136px;
     margin-left: 3px;
     margin-top: 5px;
-    font-size: 11px;
     display: block;
 }
 
@@ -692,7 +662,6 @@ div.text-container {
 }
 
 #notif-title {
-    font-size: 13px;
     text-align: center;
     margin: 3px;
     text-shadow: 1px 1px 3px hsl(0, 0%, 0%);
@@ -721,7 +690,7 @@ div.text-container {
 }
 
 #site-info {
-    font-size: 9px;
+    font-size: 0.9rem;
     text-align: center;
     margin-bottom: 5px;
 }
@@ -1001,10 +970,6 @@ th {
 }
 
 @media (max-width: 800px) {
-    html {
-        font-size: 12px;
-    }
-
     #panel-toggle {
         visibility: visible;
     }

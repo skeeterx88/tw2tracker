@@ -35,7 +35,6 @@ html {
     font-size: 14px;
     font-family: 'Trebuchet MS', 'Lucida Grande', Helvetica, Arial, sans-serif;
     background: url(/images/background-scene.webp) top no-repeat, url(/images/noise.webp), hsl(37, 18%, 45%);
-    margin: 0px;
     color: hsl(24, 47%, 21%);
     box-sizing: border-box;
 }
@@ -87,22 +86,22 @@ a:hover {
     text-decoration: underline;
 }
 
-ul {
-    margin: 0px;
-    padding: 0px;
-}
-
 li {
     list-style: none;
 }
 
+ul {
+    margin: 0;
+    padding: 0;
+}
+
 h1 {
-    font-size: 1.5em;
-    margin: 5px 0;
+    font-size: 1.5rem;
+    margin: 5px 0px;
 }
 
 h2 {
-    font-size: 1.3em;
+    font-size: 1.3rem;
     margin: 5px 0;
 }
 
@@ -153,7 +152,7 @@ section {
     display: flex;
     position: relative;
     padding: 0px 10px;
-    font-size: 0.9em;
+    font-size: 1.1rem;
 }
 
 #main-menu a {
@@ -229,7 +228,7 @@ footer {
 
 small {
     padding: 2px 0px;
-    font-size: 0.8em;
+    font-size: 0.8rem;
 }
 
 table.vertical th,
@@ -823,7 +822,7 @@ a.achievement-subject:last-child:after {
 }
 
 #map-tooltip {
-    font-size: 11px;
+    font-size: 12px;
     opacity: 0;
     visibility: hidden;
     position: fixed;
@@ -899,24 +898,12 @@ a.achievement-subject:last-child:after {
     max-width: calc(100% - 50px);
 }
 
-#map-tooltip .tribe-villages,
-#map-tooltip .player-villages {
-    font-size: 10px;
-    color: hsla(0, 0%, 0%, 95%);
-}
-
 #map-tooltip .icon {
     width: 26px;
     height: 25px;
-    /* line-height: 24px; */
-    /* margin: 2px; */
     display: inline-block;
     border: 1px solid hsl(0, 13%, 15%);
-    /* position: absolute; */
-    /* left: 0px; */
-    /* top: 0px; */
-    background: linear-gradient(hsla(180, 20%, 1%, 73%), hsla(180, 20%, 1%, 00%)),
-                url(/images/background-icon-black.webp);
+    background: linear-gradient(hsla(180, 20%, 1%, 73%), hsla(180, 20%, 1%, 00%)), url(/images/background-icon-black.webp);
 }
 
 #map-tooltip .icon:before {
@@ -1081,17 +1068,13 @@ span[class^="flag-"] {
 .flag-mx {background-position: 0 -1184px}
 
 @media (max-width: 800px) {
-    html {
-        font-size: 12px;
-    }
-
     body {
         width: 96vw;
         padding: 1px 0px;
     }
 
     #main-header {
-        height: 8em;
+        height: 8rem;
         background-size: 25em;
         margin-bottom: 10px;
         filter: drop-shadow(10px 10px 12px hsla(0, 0%, 0%, 90%));
