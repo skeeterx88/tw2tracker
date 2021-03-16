@@ -19,13 +19,12 @@ CREATE TABLE public.accounts (
     id SERIAL PRIMARY KEY,
     name VARCHAR (255) UNIQUE NOT NULL,
     pass VARCHAR (255) NOT NULL,
-    markets VARCHAR[] DEFAULT '{}'
+    markets VARCHAR[] DEFAULT ARRAY[]::text[]
 );
 
 INSERT INTO public.accounts (name, pass, markets) VALUES ('tribalwarstracker', '7FONlraMpdnvrNIVE8aOgSGISVW00A', '{br,cz,de,en,es,fr,gr,hu,it,nl,pl,pt,ro,ru,sk,tr,us,zz}');
 
 CREATE TYPE public.mod_privilege_types AS ENUM ('start_sync', 'control_sync', 'modify_accounts', 'modify_mods', 'modify_settings');
-
 
 CREATE TABLE public.mods (
     id SERIAL PRIMARY KEY,
