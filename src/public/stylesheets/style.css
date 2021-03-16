@@ -627,12 +627,12 @@ div.world-title {
 
 fieldset {
     border: none;
-    padding: 0px;
 }
 
 fieldset legend {
     font-weight: bold;
     color: hsl(20, 39%, 5%);
+    /* margin-left: -10px; */
 }
 
 .pagination {

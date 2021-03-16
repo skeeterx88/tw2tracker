@@ -88,7 +88,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/ranking',
-        title: i18n('stats_ranking', 'page_titles', res.locals.lang, [capitalizedCategory, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_ranking', 'page_titles', res.locals.lang, [capitalizedCategory, marketId.toUpperCase(), world.name, config.general.site_name]),
         marketId,
         worldNumber,
         worldName: world.name,

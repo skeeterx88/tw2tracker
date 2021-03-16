@@ -1,6 +1,8 @@
 {
-    "site_name": "Tw2-Tracker",
-    "lang": "en",
+    "general": {
+        "site_name": "Tw2-Tracker",
+        "lang": "en"
+    },
     "ui": {
         "ranking_page_items_per_page": 20,
         "world_page_maximum_ranking_items": 10,
@@ -47,12 +49,8 @@
     },
     "emails": {
         "issues": "issue@tw2-tracker.com",
-        "contact": "contact@tw2-tracker.com"
-    },
-    "email_notification": {
-        "warn_sync_mods_on_fails": 3
-    },
-    "email_notification_auth": {
+        "contact": "contact@tw2-tracker.com",
+        "warn_sync_mods_on_fails": 3,
         "user": "EMAIL",
         "pass": "PASSWORD"
     }

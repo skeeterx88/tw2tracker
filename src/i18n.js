@@ -2,7 +2,7 @@ const config = require('./config.js');
 const utils = require('./utils.js');
 const languages = require('./languages.js');
 
-module.exports = function (key, namespace, language = config.lang, tokens) {
+module.exports = function (key, namespace, language = config.general.lang, tokens) {
     try {
         if (!languages[language][namespace][key]) {
             return '[' + key + ', ' + namespace + ']';

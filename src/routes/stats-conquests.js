@@ -43,7 +43,7 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/conquests',
-        title: i18n('stats_world_conquests', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_world_conquests', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.general.site_name]),
         marketId,
         worldNumber,
         world,

@@ -7,12 +7,15 @@ const config = require('../config.js');
 const i18n = require('../i18n.js');
 const syncCommands = require('../sync-commands.json');
 const privilegeTypes = require('../privileges.json');
+const configMap = require('../config-map.json');
 const privilegeTypesValue = Object.values(privilegeTypes);
 const pgArray = require('pg').types.arrayParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const createError = require('http-errors');
 const passport = require('passport');
+const humanInterval = require('human-interval');
+const fs = require('fs');
 
 const {
     mergeBackendLocals,
@@ -56,12 +59,16 @@ function createAdminMenu (user, selected) {
             selected: selected === 'sync'
         }],
         ['accounts', {
-            enabled: user.privileges.modify_accounts,
+            enabled: user.privileges[privilegeTypes.MODIFY_ACCOUNTS],
             selected: selected === 'accounts'
         }],
         ['mods', {
-            enabled: user.privileges.modify_mods,
+            enabled: user.privileges[privilegeTypes.MODIFY_MODS],
             selected: selected === 'mods'
+        }],
+        ['settings', {
+            enabled: user.privileges[privilegeTypes.MODIFY_SETTINGS],
+            selected: selected === 'settings'
         }]
     ];
 
@@ -90,7 +97,7 @@ function createAuthorization (privilege, denyType) {
 
 const loginRouter = function (req, res) {
     res.render('admin', {
-        title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config.site_name]),
+        title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config.general.site_name]),
         subPage: 'login',
         menu: false,
         errors: req.flash('error'),
@@ -144,7 +151,7 @@ const syncRouter = asyncRouter(async function (req, res) {
     });
 
     res.render('admin', {
-        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config.site_name]),
+        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config.general.site_name]),
         menu,
         subPage,
         openWorlds,
@@ -285,7 +292,7 @@ const accountsRouter = asyncRouter(async function (req, res) {
     });
 
     res.render('admin', {
-        title: i18n('admin_panel_sync_accounts', 'page_titles', res.locals.lang, [config.site_name]),
+        title: i18n('admin_panel_sync_accounts', 'page_titles', res.locals.lang, [config.general.site_name]),
         menu,
         subPage,
         accounts,
@@ -406,7 +413,7 @@ const modsRouter = asyncRouter(async function (req, res) {
     });
 
     res.render('admin', {
-        title: i18n('admin_panel_mod_accounts', 'page_titles', res.locals.lang, [config.site_name]),
+        title: i18n('admin_panel_mod_accounts', 'page_titles', res.locals.lang, [config.general.site_name]),
         menu,
         subPage,
         mods,
@@ -534,12 +541,88 @@ const modsDeleteRouter = asyncRouter(async function (req, res) {
     res.redirect('/admin/mods');
 });
 
+const settingsRouter = asyncRouter(async function (req, res) {
+    const subPage = 'settings';
+    const menu = createAdminMenu(req.user, subPage);
+
+    mergeBackendLocals(res, {
+        subPage,
+        accountPrivileges: req.user.privileges,
+        privilegeTypes
+    });
+
+    res.render('admin', {
+        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config.general.site_name]),
+        menu,
+        subPage,
+        privilegeTypes,
+        user: req.user,
+        config,
+        configMap,
+        errors: req.flash('error'),
+        messages: req.flash('messages')
+    });
+});
+
+const settingsEditRouter = asyncRouter(async function (req, res) {
+    const newConfig = {};
+    let updated = false;
+
+    for (const [id, value] of Object.entries(req.body)) {
+        const [category, configId] = id.split('/');
+        newConfig[category] = newConfig[category] || {};
+
+        const map = configMap[category][configId];
+
+        switch (map.type) {
+            case 'number': {
+                const parsed = parseInt(value, 10);
+
+                if (isNaN(value)) {
+
+                } else if (parsed < map.min || parsed > map.max) {
+                    req.flash('error', i18n('error_invalid_number_range', 'admin_settings', res.locals.lang, [category + ':' + configId, map.min, map.max]));
+                    newConfig[category][configId] = config[category][configId];
+                } else {
+                    updated = true;
+                    newConfig[category][configId] = parsed;
+                }
+                break;
+            }
+            case 'time': {
+                const parsed = humanInterval(value);
+
+                if (isNaN(parsed)) {
+                    req.flash('error', i18n('error_invalid_time_format', 'admin_settings', res.locals.lang, category + ':' + configId));
+                    newConfig[category][configId] = config[category][configId];
+                } else {
+                    updated = true;
+                    newConfig[category][configId] = value;
+                }
+                break;
+            }
+            default: {
+                updated = true;
+                newConfig[category][configId] = value;
+                break;
+            }
+        }
+    }
+
+    if (updated) {
+        req.flash('messages', i18n('message_settings_changed', 'admin_settings', res.locals.lang));
+        fs.writeFileSync('./config.json', JSON.stringify(newConfig, null, 4), 'utf-8');
+    }
+
+    res.redirect('/admin/settings');
+});
+
 const {
     CONTROL_SYNC,
     START_SYNC,
     MODIFY_ACCOUNTS,
-    MODIFY_MODS
-    // MODIFY_SETTINGS
+    MODIFY_MODS,
+    MODIFY_SETTINGS
 } = privilegeTypes;
 
 const authControlSyncAction = createAuthorization(CONTROL_SYNC, 'action');
@@ -548,8 +631,8 @@ const authModifyAccountsAccess = createAuthorization(MODIFY_ACCOUNTS, 'access');
 const authModifyAccountsAction = createAuthorization(MODIFY_ACCOUNTS, 'action');
 const authModifyModsAccess = createAuthorization(MODIFY_MODS, 'access');
 const authModifyModsAction = createAuthorization(MODIFY_MODS, 'action');
-// const authModifySettingsAccess = createAuthorization(MODIFY_SETTINGS, 'access');
-// const authModifySettingsAction = createAuthorization(MODIFY_SETTINGS, 'action');
+const authModifySettingsAccess = createAuthorization(MODIFY_SETTINGS, 'access');
+const authModifySettingsAction = createAuthorization(MODIFY_SETTINGS, 'action');
 
 const router = Router();
 
@@ -579,5 +662,8 @@ router.get('/mods', authModifyModsAccess, modsRouter);
 router.post('/mods/edit', authModifyModsAction, modsEditRouter);
 router.post('/mods/create', authModifyModsAction, modsCreateRouter);
 router.get('/mods/delete/:id', authModifyModsAction, modsDeleteRouter);
+
+router.get('/settings', authModifySettingsAccess, settingsRouter);
+router.post('/settings/edit', authModifySettingsAction, settingsEditRouter);
 
 module.exports = router;

@@ -57,7 +57,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/market-list',
-        title: i18n('stats_servers', 'page_titles', res.locals.lang, [config.site_name]),
+        title: i18n('stats_servers', 'page_titles', res.locals.lang, [config.general.site_name]),
         pageType: 'stats',
         marketStats,
         worldsByMarket,
@@ -108,7 +108,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/world-list',
-        title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config.site_name]),
+        title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config.general.site_name]),
         marketId,
         worlds,
         marketStats,
@@ -201,7 +201,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/world',
-        title: i18n('stats_world', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_world', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.general.site_name]),
         marketId,
         worldNumber,
         players,

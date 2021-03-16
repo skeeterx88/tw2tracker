@@ -95,7 +95,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
 
     return res.render('stats', {
         page: 'stats/search',
-        title: i18n('stats_search', 'page_titles', res.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config.site_name]),
+        title: i18n('stats_search', 'page_titles', res.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config.general.site_name]),
         marketId,
         worldNumber,
         category,

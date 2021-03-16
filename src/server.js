@@ -120,7 +120,7 @@ module.exports = function () {
         res.locals.formatSince = utils.formatSince;
         res.locals.capitalize = utils.ejsHelpers.capitalize;
         res.locals.sprintf = utils.sprintf;
-        res.locals.lang = req.session.lang || config.lang;
+        res.locals.lang = req.session.lang || config.general.lang;
         res.locals.tribeRankingSortField = req.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;
         res.locals.playerRankingSortField = req.session.playerRankingSortField || rankingSortTypes.VICTORY_POINTS;
         res.locals.user = req.session.passport ? req.session.passport.user : {};
@@ -154,7 +154,7 @@ module.exports = function () {
         const status = err.status || 500;
         res.locals.error = err;
         res.locals.status = status;
-        res.locals.title = i18n('header_error', 'errors', req.session.lang, [status]) + ' - ' + config.site_name;
+        res.locals.title = i18n('header_error', 'errors', req.session.lang, [status]) + ' - ' + config.general.site_name;
         res.locals.config = config;
         res.locals.development = development;
 
