@@ -87,7 +87,13 @@
         "accessibility_search_label": "szukaj pola",
         "column_victory_points_full": "Punkty Zwycięstwa",
         "column_domination": "%",
-        "column_domination_full": "Procent dominacji Świata"
+        "column_domination_full": "Procent dominacji Świata",
+        "column_tribe_tag": "Tag",
+        "column_bash_points": "Punkty",
+        "column_bash_points_offense": "Punkty Off",
+        "column_bash_points_defense": "Punkty Def",
+        "column_bash_points_total": "Punkty Ogólnie",
+        "column_actions": "Akcje"
     },
     "world_ranking": {
         "header_players": "Ranking Graczy",
@@ -376,7 +382,9 @@
         "last_time": "Ostatnio:",
         "last_status": "Ostatni status:",
         "closed": "Zamknięte",
-        "never": "Nigdy"
+        "never": "Nigdy",
+        "sync_data_queue": "Dane kolejek:",
+        "sync_achievements_queue": "Dane kolejek osiagnieć:"
     },
     "admin_sync_status": {
         "success": "Sukces",
@@ -414,6 +422,52 @@
         "modify_mods": "Modyfikuj Moderatorów",
         "modify_settings": "Modyfikuj ustawienia"
     },
+    "admin_settings": {
+        "header_settings": "Ustawienia",
+        "category_general": "Ustawienia Główne",
+        "category_ui": "Ustawienia Interejsu",
+        "category_search": "Ustawienia Szukania",
+        "category_sync": "Ustawienia Synchronizacji",
+        "category_sync_timeouts": "Ustawienia końca czasu",
+        "category_sync_intervals": "Ustawienia Interwału",
+        "category_emails": "Ustawienia E-mail",
+        "label_general_site_name": "Nazwa strony:",
+        "label_general_lang": "Domyślny język Strony:",
+        "label_ui_ranking_page_items_per_page": "Ranking graczy/plemion na stronę:",
+        "label_ui_world_page_maximum_ranking_items": "Pokaż ranking graczy/plemion na stronie startowej Świata:",
+        "label_ui_world_page_maximum_last_conquests": "Pokaż ilosc podbojów na stronie startowej Świata:",
+        "label_ui_navigation_separator": "Separator Nawigacji:",
+        "label_search_min_search_characters": "Minimalna ilosć znaków szukania:",
+        "label_search_max_search_characters": "Maksymalna ilosc znaków szukania:",
+        "label_sync_static_share_expire_time": " Czas wygaśnięcia udostępnienia mapy:",
+        "label_sync_parallel_achievements_sync": "Limit równoległuch synchronizacji osiągniec:",
+        "label_sync_parallel_data_sync": "Limit rownoległych synchronizacji danych:",
+        "label_sync_task_check_interval": "Interwał między sprawdzeniem zadań:",
+        "label_sync_max_sync_attempts": "Limit ponownych prób:",
+        "label_sync_max_login_attempts": "Limit ponownych prób logowania:",
+        "label_sync_min_time_between_data_syncs": "Minimalny czas miedzy synchronizacja danych:",
+        "label_sync_min_time_between_achievement_syncs": "Minimalny czas między synchronizacja osiagnięć:",
+        "label_sync_max_sync_data_running_time": "Limit czasu dla synchronizacji pojedyńczych danych:",
+        "label_sync_max_sync_achievements_running_time": "Limit czasu dla synchronizacji pojedyńczych osiągnięć:",
+        "label_sync_timeouts_ready_state": "Jak długo trwa stan gotowości:",
+        "label_sync_timeouts_load_continent_section": "Limit czasu ładowania prowincji kontynentu:",
+        "label_sync_timeouts_load_continent": "Limit czasu ladowania kontynentu:",
+        "label_sync_timeouts_auth_socket_emit": "Limit czasu logowania konta:",
+        "label_sync_intervals_data_all": "Dodaj wszystkie dane Światów do kolejki co:",
+        "label_sync_intervals_achievements_all": "Dodaj wszystkie Światy do kolejki osiągnięc co:",
+        "label_sync_intervals_worlds": "Synchronizacja interwału Swiatów co:",
+        "label_sync_intervals_clean_shares": "Sprawdzenie przedawnionych udostępnień mapy co:",
+        "label_emails_issues": "Problemy związane z e-mailem:",
+        "label_emails_contact": "E-mail kontaktowy:",
+        "label_emails_warn_sync_mods_on_fails": "Powiadom moderatorów jeśli synchronizacja nieudana razy:",
+        "label_emails_user": "Powiadomienie e-mail nazwa gracza:",
+        "label_emails_pass": "Powiadomienie e-mail hasło:",
+        "save_settings": "Zapisz ustawienia",
+        "error_invalid_number_range": "Ustawienie %{setting} waha się od %{min} do %{max}.",
+        "error_invalid_time_format": "Ustawienie %{setting} ma nieprawidłowy format czasu.",
+        "error_invalid_not_a_number": "Ustawienie %{setting} musi być liczbą.",
+        "message_settings_changed": "Settings changed."
+    },
     "maps": {
         "header_highlights": "Najważniejsze",
         "button_settings": "Ustawienia",
@@ -439,7 +493,11 @@
         "error_world_not_found": "Świat nie istnieje",
         "error_invalid_highlights": "Nieprawidłowe najważniejsze dane",
         "error_no_highlights_input": "Nie określono najważniejszych danych",
-        "error_map_share_no_highlights": "Brak zaznaczeń mapy do udostępnienia"
+        "error_map_share_no_highlights": "Brak zaznaczeń mapy do udostępnienia",
+        "button_open_stats": "Staty",
+        "ranking_menu_players": "Gracze",
+        "ranking_menu_tribes": "Plemiona",
+        "button_ranking": "Ranking"
     },
     "maps_tooltip": {
         "village": "Wioska",
@@ -575,7 +633,9 @@
         "map_share_not_found": "Udostępnianie danych nie znalezione",
         "router_missing_sub_page": "Ta podstrona nie istnieje",
         "router_missing_category": "Ta kategoria nie istnieje",
-        "router_missing_sub_category": "Ta podkategoria nie istnieje"
+        "router_missing_sub_category": "Ta podkategoria nie istnieje",
+        "contact_us": "Jeśli twierdzisz że nie powinieneś widzieć tej strony,napisz do Nas",
+        "header_error": "Błąd %{error}"
     },
     "navigation": {
         "maps": "Mapy",
