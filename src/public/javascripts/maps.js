@@ -111,16 +111,18 @@ require([
 
             for (const [name] of loader.players.values()) {
                 matches.push({
-                    search: name.toLowerCase(),
+                    search: name,
                     id: name,
+                    display: name,
                     highlightType: TW2Map.highlightTypes.PLAYERS
                 });
             }
 
             for (const [name, tag] of loader.tribes.values()) {
                 matches.push({
-                    search: (tag + name).toLowerCase(),
+                    search: tag + name,
                     id: tag,
+                    display: tag + ' (' + name + ')',
                     highlightType: TW2Map.highlightTypes.TRIBES
                 });
             }
@@ -134,12 +136,13 @@ require([
 
             for (const item of results) {
                 const $item = document.createElement('p');
+                const $icon = document.createElement('span');
+                $icon.className = 'icon icon-' + item.highlightType;
+                $icon.innerText = item.display;
+                $item.appendChild($icon);
                 $item.classList.add('result');
-                $item.innerText = item.id;
+                $item.addEventListener('click', () => onSelect(item));
                 $results.appendChild($item);
-                $item.addEventListener('click', function (event) {
-                    onSelect(item);
-                });
             }
 
             $noResults.classList.add('hidden');
@@ -213,30 +216,21 @@ require([
                 }
             }
 
-            const value = $input.value.toLowerCase();
+            const value = $input.value;
 
             if (!value.length) {
                 return resetSearch();
             }
 
-            // const newResults = [];
+            const newResults = (await data)
+                .map(target => ({rating: compareTwoStrings(value, target.search), target}))
+                .sort((a, b) => b.rating - a.rating)
+                .slice(0, 10);
 
-            const newResults = findBestMatches(value, await data);
-
-            // for (const item of await data) {
-            //     if (item.search.includes(value)) {
-            //         newResults.push(item);
-
-            //         if (newResults.length >= maxResults) {
-            //             break;
-            //         }
-            //     }
-            // }
-
-            if (newResults.length) {
-                onResults(newResults);
-            } else {
+            if (newResults.every(result => !result.rating)) {
                 onNoResults();
+            } else {
+                onResults(newResults.map(result => result.target));
             }
         });
 
@@ -1362,18 +1356,6 @@ require([
         }
 
         return (2.0 * intersectionSize) / (first.length + second.length - 2);
-    }
-
-    function findBestMatches (search, targets) {
-        const ratings = [{rating: 0}];
-
-        for (const target of targets) {
-            const rating = compareTwoStrings(search, target.search);
-            const method = rating >= ratings[0].rating ? 'unshift' : 'push';
-            ratings[method]({target, rating});
-        }
-
-        return ratings.slice(0, 5).map(item => item.target);
     }
 
     const loader = new TW2DataLoader(marketId, worldNumber);

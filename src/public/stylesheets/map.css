@@ -333,14 +333,14 @@ button.red:focus {
     box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 34%, 77%);
 }
 
-#highlight-items .item .icon-players {
+.icon-players {
     background: url(/images/player.png) left center no-repeat;
     padding-left: 17px;
 }
 
-#highlight-items .item .icon-tribes {
+.icon-tribes {
     background: url(/images/tribe.png) left center no-repeat;
-    padding-left: 17px;
+    padding-left: 20px;
 }
 
 #highlight-items::-webkit-scrollbar {
@@ -601,16 +601,27 @@ div.text-container {
 #search-results .result {
     cursor: pointer;
     margin: 0px;
+    padding: 2px 0px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-#search-results .result:hover {
+#search-results .result .icon {
+    display: inline-block;
+    height: 18px;
+    line-height: 18px;
+}
+
+#search-results .result:hover,
+#search-results .result.selected:hover {
     color: hsl(31, 100%, 25%);
     background-color: hsla(31, 68%, 87%, 66%);
 }
 
 #search-results .result.selected {
     color: hsl(31, 100%, 25%);
-    font-weight: bold;
+    background-color: hsla(31, 68%, 87%, 36%);
 }
 
 #notif {
