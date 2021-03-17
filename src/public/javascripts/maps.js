@@ -104,7 +104,32 @@ require([
         let selectedIndex = 0;
         let results = [];
 
+        const data = new Promise(async function (resolve) {
+            await loader.loadInfo;
+
+            const matches = [];
+
+            for (const [name] of loader.players.values()) {
+                matches.push({
+                    search: name.toLowerCase(),
+                    id: name,
+                    highlightType: TW2Map.highlightTypes.PLAYERS
+                });
+            }
+
+            for (const [name, tag] of loader.tribes.values()) {
+                matches.push({
+                    search: (tag + name).toLowerCase(),
+                    id: tag,
+                    highlightType: TW2Map.highlightTypes.TRIBES
+                });
+            }
+
+            resolve(matches);
+        });
+
         function onResults (newResults) {
+            removeResultItems();
             results = newResults;
 
             for (const item of results) {
@@ -125,6 +150,7 @@ require([
         }
 
         function onNoResults () {
+            removeResultItems();
             results = [];
             $noResults.classList.remove('hidden');
             $results.classList.remove('hidden');
@@ -159,7 +185,58 @@ require([
             results = [];
             $noResults.classList.add('hidden');
             $results.classList.add('hidden');
+            removeResultItems();
         }
+
+        function removeResultItems () {
+            for (const $oldResult of $results.querySelectorAll('.result')) {
+                $oldResult.remove();
+            }
+        }
+
+        $input.addEventListener('keydown', function (event) {
+            if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
+                event.preventDefault();
+            }
+        });
+
+        $input.addEventListener('keyup', async function (event) {
+            if (event.code === 'ArrowDown') {
+                return onMove(1);
+            } else if (event.code === 'ArrowUp') {
+                return onMove(-1);
+            } else if (event.code === 'Escape') {
+                return resetSearch();
+            } else if (event.code === 'Enter') {
+                if (results.length) {
+                    return onSelect(results[selectedIndex]);
+                }
+            }
+
+            const value = $input.value.toLowerCase();
+
+            if (!value.length) {
+                return resetSearch();
+            }
+
+            const newResults = [];
+
+            for (const item of await data) {
+                if (item.search.includes(value)) {
+                    newResults.push(item);
+
+                    if (newResults.length >= maxResults) {
+                        break;
+                    }
+                }
+            }
+
+            if (newResults.length) {
+                onResults(newResults);
+            } else {
+                onNoResults();
+            }
+        });
 
         map.on('add highlight', (highlightType, id, display, color, flag) => {
             const $item = document.createElement('li');
@@ -245,80 +322,6 @@ require([
             }
 
             updateStoredHighlights();
-        });
-
-        const data = await (async () => {
-            await loader.loadInfo;
-
-            const matches = [];
-
-            for (const [name] of Object.values(loader.players)) {
-                matches.push({
-                    search: name.toLowerCase(),
-                    id: name,
-                    highlightType: TW2Map.highlightTypes.PLAYERS
-                });
-            }
-
-            for (const [name, tag] of Object.values(loader.tribes)) {
-                matches.push({
-                    search: (tag + name).toLowerCase(),
-                    id: tag,
-                    highlightType: TW2Map.highlightTypes.TRIBES
-                });
-            }
-
-            return matches;
-        })();
-
-        $input.addEventListener('keydown', function (event) {
-            if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
-                event.preventDefault();
-            }
-        });
-
-        $input.addEventListener('keyup', function (event) {
-            if (event.code === 'ArrowDown') {
-                return onMove(1);
-            } else if (event.code === 'ArrowUp') {
-                return onMove(-1);
-            } else if (event.code === 'Escape') {
-                return resetSearch();
-            } else if (event.code === 'Enter') {
-                if (results.length) {
-                    return onSelect(results[selectedIndex]);
-                }
-            }
-
-            const value = $input.value.toLowerCase();
-
-            if (!value.length) {
-                return resetSearch();
-            }
-
-            if (results.length) {
-                for (const $oldResult of $results.querySelectorAll('.result')) {
-                    $oldResult.remove();
-                }
-            }
-
-            const newResults = [];
-
-            for (const item of data) {
-                if (item.search.includes(value)) {
-                    newResults.push(item);
-
-                    if (newResults.length >= maxResults) {
-                        break;
-                    }
-                }
-            }
-
-            if (newResults.length) {
-                onResults(newResults);
-            } else {
-                onNoResults();
-            }
         });
     };
 
