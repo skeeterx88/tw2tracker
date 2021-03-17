@@ -859,6 +859,10 @@ require([
     };
 
     const setupStoredHighlights = async () => {
+        if (mapShare) {
+            return;
+        }
+
         await loader.loadInfo;
 
         const stored = localStorage.getItem(HIGHLIGHTS_STORE_KEY);
@@ -1300,6 +1304,10 @@ require([
     }
 
     function updateStoredHighlights () {
+        if (mapShare) {
+            return false;
+        }
+
         localStorage.setItem(HIGHLIGHTS_STORE_KEY, JSON.stringify({highlights: map.getHighlights()}));
     }
 
