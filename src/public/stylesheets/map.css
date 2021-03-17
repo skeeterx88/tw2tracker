@@ -28,40 +28,29 @@ a:hover {
     color: hsl(0, 35%, 90%);
 }
 
-#side-panel header {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-#side-panel header > div {
-    margin: 3px 0px;
-}
-
-#side-panel footer button {
-    margin: 4px 0px;
-}
-
 #side-panel footer a {
     color: hsl(197, 100%, 50%);
 }
 
 #side-panel .world-name {
     text-align: center;
-    font-size: 1.3em;
+    margin: 3px 0px;
 }
 
 #side-panel button {
     margin: 0px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #ranking-toggle {
-    width: 136px;
+    flex: 1;
 }
 
 #map-page header a {
     color: hsl(38, 100%, 90%);
+    width: 100%;
 }
 
 #map-page footer {
@@ -151,8 +140,25 @@ button.red:focus {
                 hsl(23, 25%, 20%);
     position: relative;
     float: left;
-    padding-right: 9px;
+    padding-right: 7px;
     padding-left: 2px;
+    display: flex;
+    flex-direction: column;
+}
+
+#side-panel > * {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 4px;
+}
+
+#side-panel .element {
+    margin-right: 4px;
 }
 
 #map {
@@ -199,18 +205,18 @@ button.red:focus {
 }
 
 #quick-jump {
-    margin-top: 5px;
-    margin-bottom: 5px;
+    flex-direction: row;
+    margin-top: 3px;
 }
 
 #quick-jump-coords {
     color: hsl(29, 37%, 31%);
-    width: 91px;
     height: 22px;
     position: relative;
     text-align: center;
     display: inline-block;
     line-height: 22px;
+    flex: 1;
 }
 
 #quick-jump-x,
@@ -224,26 +230,24 @@ button.red:focus {
 #quick-jump-go {
     outline: none;
     cursor: pointer;
-    width: 42px;
+    width: 25%;
     display: inline-block;
     vertical-align: top;
-    margin: 0px;
 }
 
-
-
 #highlights {
-    height: calc(100% - 170px);
-    position: relative;
+    overflow-y: hidden;
+    padding-bottom: 5px;
+    flex: 1;
 }
 
 #highlight-id {
-    width: 136px;
     height: 22px;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 0px 8px;
     position: relative;
     text-shadow: 0px 0px 1px hsla(0, 0%, 0%, 70%);
+    flex: 1;
+    line-height: 22px;
 }
 
 #highlights-title {
@@ -341,22 +345,17 @@ button.red:focus {
 }
 
 #side-panel footer {
-    position: absolute;
-    bottom: 0px;
     box-shadow: none;
     border: none;
 }
 
 #map-share-wrapper {
-    margin-bottom: 10px;
+    flex-direction: column;
 }
 
 #map-share,
 #map-save {
-    width: 136px;
-    margin-left: 3px;
-    margin-top: 5px;
-    display: block;
+    flex: 1;
 }
 
 #map-share .hidden,
@@ -451,11 +450,6 @@ div.text-container {
     float: left;
 }
 
-#current-world {
-    margin-left: 4px;
-    width: 60px;
-}
-
 #all-worlds {
     position: absolute;
     width: 200px;
@@ -531,7 +525,7 @@ div.text-container {
 }
 
 #change-settings {
-    width: 73px;
+    flex: 1;
 }
 
 #settings {
@@ -692,7 +686,7 @@ div.text-container {
 #site-info {
     font-size: 0.9rem;
     text-align: center;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 #site-info p {

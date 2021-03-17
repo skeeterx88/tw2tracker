@@ -5,31 +5,27 @@
         <div id="map-wrapper">
             <div id="side-panel" class="hidden">
                 <header>
-                    <div class="world-name">
-                        <a href="/stats/<%= marketId %>/<%= world.num %>"><h1><%= world.name %></h1></a>
+                    <a href="/stats/br/51"><h1 class="world-name">York Castle</h1></a>
+                    <div class="flex">
+                        <button class="element" id="current-world"><span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span></button>
+                        <button class="element" id="change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
                     </div>
-                    <div>
-                        <button id="current-world"><span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span></button>
-                        <button id="change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
-                    </div>
-                    <div>
-                        <button id="ranking-toggle"><%= i18n('button_ranking', 'maps', lang) %></button>
+                    <div class="flex">
+                        <button class="element" id="ranking-toggle"><%= i18n('button_ranking', 'maps', lang) %></button>
                     </div>
                 </header>
 
                 <div id="quick-jump">
-                    <div id="quick-jump-coords" class="input">
+                    <div id="quick-jump-coords" class="input element">
                         <label>x:<input type="text" id="quick-jump-x" placeholder="500"></label>
                         <label>y:<input type="text" id="quick-jump-y" placeholder="500"></label>
                     </div>
-                    <button id="quick-jump-go" class="red">Go</button>
+                    <button id="quick-jump-go" class="element red">Go</button>
                 </div>
 
                 <div id="highlights">
-                    <label>
-                        <h2 id="highlights-title"><%= i18n('header_highlights', 'maps', lang) %></h2>
-                        <input type="text" id="highlight-id" class="input" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
-                    </label>
+                    <h2 id="highlights-title"><%= i18n('header_highlights', 'maps', lang) %></h2>
+                    <input type="text" id="highlight-id" class="input element" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
                     <ul id="highlight-items"></ul>
 
                     <div id="search-results" class="hidden">
@@ -38,19 +34,17 @@
                 </div>
 
                 <footer>
-                    <div id="map-share-wrapper">
-                        <div>
-                            <button id="map-share">
-                                <span><%= i18n('button_gen_dynamic_map', 'maps', lang) %></span>
-                                <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
-                            </button>
-                        </div>
-                        <div>
-                            <button id="map-save">
-                                <span><%= i18n('button_gen_static_map', 'maps', lang) %></span>
-                                <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
-                            </button>
-                        </div>
+                    <div class="flex">
+                        <button id="map-share" class="element">
+                            <span><%= i18n('button_gen_dynamic_map', 'maps', lang) %></span>
+                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                        </button>
+                    </div>
+                    <div class="flex">
+                        <button id="map-save" class="element">
+                            <span><%= i18n('button_gen_static_map', 'maps', lang) %></span>
+                            <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
+                        </button>
                     </div>
 
                     <div id="site-info">
