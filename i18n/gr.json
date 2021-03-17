@@ -85,7 +85,13 @@
         "stats_tribes": "%{count} Φυλές",
         "column_domination": "%",
         "accessibility_search_label": "Πεδίο αναζήτησης",
-        "column_domination_full": "Ποσοστό παγκόσμιας κυριαρχίας"
+        "column_domination_full": "Ποσοστό παγκόσμιας κυριαρχίας",
+        "column_tribe_tag": "Ετικέτα",
+        "column_bash_points": "Χτυπήματα",
+        "column_bash_points_offense": "Επιθετικές απώλειες",
+        "column_bash_points_defense": "Αμυντικές απώλειες",
+        "column_bash_points_total": "Συνολικές απώλειες",
+        "column_actions": "Ενέργειες"
     },
     "world_ranking": {
         "header_players": "Κατάταξη παιχτών",
@@ -376,7 +382,9 @@
         "last_time": "Τελευταία φορά:",
         "last_status": "Τελευταία κατάσταση:",
         "closed": "Κλειστό",
-        "never": "Ποτέ"
+        "never": "Ποτέ",
+        "sync_data_queue": "Δεδομένα συγχ/σμού σε ουρά:",
+        "sync_achievements_queue": "Επιτεύγματα συγχ/σμού σε ουρά:"
     },
     "admin_sync_status": {
         "success": "Επιτυχία",
@@ -415,6 +423,52 @@
         "modify_mods": "Τροποποίηση συντονιστών",
         "modify_settings": "Τροποποίηση ρυθμίσεων"
     },
+    "admin_settings": {
+        "header_settings": "Ρυθμίσεις",
+        "category_general": "Γενικές ρυθμίσεις",
+        "category_ui": "Ρυθμίσεις διεπαφής",
+        "category_search": "Ρυθμίσεις αναζήτησης",
+        "category_sync": "Ρυθμίσεις συγχ/σμού",
+        "category_sync_timeouts": "Ρυθμίσεις χρονικού ορίου συγχ/σμού",
+        "category_sync_intervals": "Ρυθμίσεις διαστήματος συγχ/σμού",
+        "category_emails": "Ρυθμίσεις E-mail",
+        "label_general_site_name": "Όνομα σελίδας:",
+        "label_general_lang": "Προεπιλεγμένη γλώσσα ιστότοπων:",
+        "label_ui_ranking_page_items_per_page": "Κατάταξη παικτών / φυλών ανά σελίδα:",
+        "label_ui_world_page_maximum_ranking_items": "Εμφάνιση πόσων παικτών κατάταξης/φυλών στην αρχική σελίδα του κόσμου:",
+        "label_ui_world_page_maximum_last_conquests": "Προβολή των τελευταίων κατακτήσεων του κόσμου στην αρχική σελίδα:",
+        "label_ui_navigation_separator": "Διαχωριστικό πλοήγησης:",
+        "label_search_min_search_characters": "Ελάχιστοι χαρακτήρες αναζήτησης:",
+        "label_search_max_search_characters": "Μέγιστοι χαρακτήρες αναζήτησης:",
+        "label_sync_static_share_expire_time": "Χρόνος λήξης μεριδίου στατικού χάρτη:",
+        "label_sync_parallel_achievements_sync": "Όριο συγχ/σμού παράλληλων επιτευγμάτων:",
+        "label_sync_parallel_data_sync": "Όριο παράλληλων συγχ/σμών δεδομένων:",
+        "label_sync_task_check_interval": "Διάστημα μεταξύ ελέγχων εργασιών:",
+        "label_sync_max_sync_attempts": "Όριο επαναλήψεων συγχ/σμού:",
+        "label_sync_max_login_attempts": "Όριο επαναλαμβανόμενων προσπαθειών σύνδεσης:",
+        "label_sync_min_time_between_data_syncs": "Ελάχιστος χρόνος μεταξύ συγχ/σμού δεδομένων:",
+        "label_sync_min_time_between_achievement_syncs": "Ελάχιστος χρόνος μεταξύ συγχ/σμού επιτευγμάτων:",
+        "label_sync_max_sync_data_running_time": "Προθεσμία για έναν συγχ/σμό δεδομένων:",
+        "label_sync_max_sync_achievements_running_time": "Προθεσμία για έναν συγχ/σμό επιτευγμάτων:",
+        "label_sync_timeouts_ready_state": "Περιμένετε να ολοκληρωθεί η κατάσταση για κάποιο χρονικό όριο:",
+        "label_sync_timeouts_load_continent_section": "Προθεσμία φόρτωσης τμημάτων ηπείρου:",
+        "label_sync_timeouts_load_continent": "Προθεσμία για τη φόρτωση μιας ηπείρου:",
+        "label_sync_timeouts_auth_socket_emit": "Προθεσμία για τον έλεγχο ταυτότητας λογαριασμού:",
+        "label_sync_intervals_data_all": "Προσθέστε όλους τους κόσμους στην ουρά συγχ/σμού δεδομένων:",
+        "label_sync_intervals_achievements_all": "Προσθέστε όλους τους κόσμους στην ουρά συγχ/σμού επιτευγμάτων:",
+        "label_sync_intervals_worlds": "Συγχρονίστε την κάθε παγκόσμια λίστα:",
+        "label_sync_intervals_clean_shares": "Ελέγξτε για λήξη του στατικού χάρτη:",
+        "label_emails_issues": "Σχετικά με θέματα ηλεκτρονικού ταχυδρομείου:",
+        "label_emails_contact": "Επικοινωνία μέσω email:",
+        "label_emails_warn_sync_mods_on_fails": "Ειδοποιήστε τους συντονιστές εάν ο συγχρονισμός αποτύχει αρκετές φορές:",
+        "label_emails_user": "Όνομα χρήστη email ειδοποίησης:",
+        "label_emails_pass": "Κωδικός email ειδοποίησης:",
+        "save_settings": "Αποθήκευση ρυθμίσεων",
+        "error_invalid_number_range": "Η ρύθμιση %{setting} κυμαίνεται από %{min} εως %{max}.",
+        "error_invalid_time_format": "Η ρύθμιση %{setting} έχει μη έγκυρη μορφή ώρας.",
+        "error_invalid_not_a_number": "Η ρύθμιση %{setting} πρέπει να είναι ένας αριθμός.",
+        "message_settings_changed": "Οι ρυθμίσεις άλλαξαν."
+    },
     "maps": {
         "header_highlights": "Καλύτερες στιγμές",
         "button_settings": "Ρυθμίσεις",
@@ -440,7 +494,11 @@
         "error_world_not_found": "Ο κόσμος δεν υπάρχει",
         "error_invalid_highlights": "Μη έγκυρα δεδομένα επισημάνσεων",
         "error_no_highlights_input": "Δεν έχουν καθοριστεί επισημάνσεις",
-        "error_map_share_no_highlights": "Δεν υπάρχουν επισημάνσεις για τη δημιουργία κοινής χρήσης"
+        "error_map_share_no_highlights": "Δεν υπάρχουν επισημάνσεις για τη δημιουργία κοινής χρήσης",
+        "button_open_stats": "Στατιστικά",
+        "ranking_menu_players": "Παίχτες",
+        "ranking_menu_tribes": "Φυλές",
+        "button_ranking": "Σειρά κατάταξης"
     },
     "maps_tooltip": {
         "village": "Χωριό",
@@ -576,7 +634,9 @@
         "map_share_not_found": "Δεν βρέθηκε κοινή χρήση δεδομένων",
         "router_missing_sub_page": "Αυτή η δευτερεύουσα σελίδα δεν υπάρχει",
         "router_missing_category": "Αυτή η κατηγορία δεν υπάρχει",
-        "router_missing_sub_category": "Αυτή η υποκατηγορία δεν υπάρχει"
+        "router_missing_sub_category": "Αυτή η υποκατηγορία δεν υπάρχει",
+        "contact_us": "Εάν πιστεύετε ότι δεν έπρεπε να βλέπετε αυτήν τη σελίδα, στείλτε μας ένα μήνυμα",
+        "header_error": "Σφάλμα %{error}"
     },
     "navigation": {
         "maps": "Χάρτες",
