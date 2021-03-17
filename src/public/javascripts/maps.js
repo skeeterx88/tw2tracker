@@ -882,6 +882,20 @@ require([
         }
     };
 
+    const setupTopThreeHighlighes = async () => {
+        if (mapShare) {
+            return;
+        }
+
+        await loader.loadInfo;
+        const top3 = Array.from(loader.tribes.keys()).slice(0, 3);
+
+        for (let i = 0; i < 3; i++) {
+            const color = TW2Map.colorPaletteTopThree[i];
+            map.addHighlight(TW2Map.highlightTypes.TRIBES, top3[i], color, IGNORE_HIGHLIGHT_STORAGE);
+        }
+    };
+
     function createFloatingModal ({id, items, onClose, position = {}}) {
         const $template = document.querySelector('#floating-modal');
         const $modal = $template.content.cloneNode(true).children[0];
@@ -1353,6 +1367,7 @@ require([
     setupPanelToggle();
     setupStoredHighlights();
     setupRanking();
+    setupTopThreeHighlighes();
     // setupAbout()
 
     map.init();
