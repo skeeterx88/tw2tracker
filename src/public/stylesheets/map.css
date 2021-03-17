@@ -255,10 +255,7 @@ button.red:focus {
 #highlight-id {
     height: 22px;
     padding: 0px 8px;
-    position: relative;
     text-shadow: 0px 0px 1px hsla(0, 0%, 0%, 70%);
-    flex: 1;
-    line-height: 22px;
 }
 
 #highlights-title {
@@ -267,15 +264,14 @@ button.red:focus {
 }
 
 #highlight-items {
-    width: calc(100% - 4px);
     margin-top: 5px;
-    margin-left: 2px;
     text-shadow: 1px 1px 0px hsl(0deg 0% 0%);
-    height: calc(100% - 50px);
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: hsl(27, 21%, 41%) transparent;
+    flex: 1;
+    margin-right: 1px;
 }
 
 #highlight-items .item {
