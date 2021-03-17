@@ -28,22 +28,6 @@ a:hover {
     color: hsl(0, 35%, 90%);
 }
 
-#side-panel footer a {
-    color: hsl(197, 100%, 50%);
-}
-
-#side-panel .world-name {
-    text-align: center;
-    margin: 3px 0px;
-}
-
-#side-panel button {
-    margin: 0px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 #ranking-toggle {
     flex: 1;
 }
@@ -151,15 +135,42 @@ button.red:focus {
     flex-direction: column;
 }
 
-.flex {
+#side-panel .element {
+    margin-right: 4px;
+}
+
+#side-panel .flex {
     display: flex;
     flex-direction: row;
     margin-bottom: 4px;
 }
 
-#side-panel .element {
-    margin-right: 4px;
+#side-panel footer {
+    box-shadow: none;
+    border: none;
 }
+
+#side-panel footer a {
+    color: hsl(197, 100%, 50%);
+}
+
+#side-panel .world-name {
+    text-align: center;
+    margin: 3px 0px;
+}
+
+#side-panel button {
+    margin: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#side-panel .flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
 
 #map {
     touch-action: none;
@@ -342,11 +353,6 @@ button.red:focus {
 
 #highlight-items::-webkit-scrollbar-thumb {
   background-color: hsl(27, 21%, 41%);
-}
-
-#side-panel footer {
-    box-shadow: none;
-    border: none;
 }
 
 #map-share-wrapper {
@@ -576,11 +582,11 @@ div.text-container {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 3px;
-    width: 134px;
     z-index: 10;
     position: absolute;
-    top: 45px;
-    left: 5px;
+    left: 2px;
+    right: 6px;
+    margin-top: 27px;
 }
 
 #search-results.hidden,
@@ -699,7 +705,6 @@ div.text-container {
 
 #ranking {
     position: fixed;
-    min-width: 600px;
 }
 
 #ranking tbody a {

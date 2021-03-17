@@ -25,12 +25,16 @@
 
                 <div id="highlights">
                     <h2 id="highlights-title"><%= i18n('header_highlights', 'maps', lang) %></h2>
-                    <input type="text" id="highlight-id" class="input element" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
+                    
+                    <div id="highlights-search" class="flex-column">
+                        <input type="text" id="highlight-id" class="input element" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
+                        <div id="search-results" class="hidden element">
+                            <div id="search-no-results" class="hidden"><%= i18n('search_no_results', 'maps', lang) %></div>
+                        </div>
+                    </div>
+
                     <ul id="highlight-items"></ul>
 
-                    <div id="search-results" class="hidden">
-                        <div id="search-no-results" class="hidden"><%= i18n('search_no_results', 'maps', lang) %></div>
-                    </div>
                 </div>
 
                 <footer>
