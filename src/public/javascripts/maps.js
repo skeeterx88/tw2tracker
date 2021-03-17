@@ -219,17 +219,19 @@ require([
                 return resetSearch();
             }
 
-            const newResults = [];
+            // const newResults = [];
 
-            for (const item of await data) {
-                if (item.search.includes(value)) {
-                    newResults.push(item);
+            const newResults = findBestMatches(value, await data);
 
-                    if (newResults.length >= maxResults) {
-                        break;
-                    }
-                }
-            }
+            // for (const item of await data) {
+            //     if (item.search.includes(value)) {
+            //         newResults.push(item);
+
+            //         if (newResults.length >= maxResults) {
+            //             break;
+            //         }
+            //     }
+            // }
 
             if (newResults.length) {
                 onResults(newResults);
@@ -1328,26 +1330,51 @@ require([
         localStorage.setItem(HIGHLIGHTS_STORE_KEY, JSON.stringify({highlights: map.getHighlights()}));
     }
 
-    // const setupAbout = () => {
-    //     const $contact = document.querySelector('#contact')
-    //     const $about = document.querySelector('#about')
+    // adapted from https://github.com/aceakash/string-similarity
+    function compareTwoStrings (first, second) {
+        first = first.replace(/\s+/g, '');
+        second = second.replace(/\s+/g, '');
 
-    //     $contact.addEventListener('click', () => {
-    //         notif({
-    //             title: 'Contact',
-    //             content: 'contact@tw2-tracker.com',
-    //             timeout: 0
-    //         })
-    //     })
+        if (first === second) {
+            return 1;
+        }
+        
+        if (first.length < 2 || second.length < 2) {
+            return 0;
+        }
 
-    //     $about.addEventListener('click', () => {
-    //         notif({
-    //             title: 'About',
-    //             content: 'This site is an interactive world map for Tribal Wars 2 created in 2020 by <i>anonymous</i>.',
-    //             timeout: 0
-    //         })
-    //     })
-    // }
+        const firstBigrams = new Map();
+        for (let i = 0; i < first.length - 1; i++) {
+            const bigram = first.substring(i, i + 2);
+            const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) + 1 : 1;
+            firstBigrams.set(bigram, count);
+        }
+
+        let intersectionSize = 0;
+        for (let i = 0; i < second.length - 1; i++) {
+            const bigram = second.substring(i, i + 2);
+            const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) : 0;
+
+            if (count > 0) {
+                firstBigrams.set(bigram, count - 1);
+                intersectionSize++;
+            }
+        }
+
+        return (2.0 * intersectionSize) / (first.length + second.length - 2);
+    }
+
+    function findBestMatches (search, targets) {
+        const ratings = [{rating: 0}];
+
+        for (const target of targets) {
+            const rating = compareTwoStrings(search, target.search);
+            const method = rating >= ratings[0].rating ? 'unshift' : 'push';
+            ratings[method]({target, rating});
+        }
+
+        return ratings.slice(0, 5).map(item => item.target);
+    }
 
     const loader = new TW2DataLoader(marketId, worldNumber);
     const tooltip = new TW2Tooltip('#map-tooltip');
@@ -1368,7 +1395,6 @@ require([
     setupStoredHighlights();
     setupRanking();
     setupTopThreeHighlighes();
-    // setupAbout()
 
     map.init();
 });
