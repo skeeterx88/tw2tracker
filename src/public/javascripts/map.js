@@ -813,6 +813,7 @@ define('TW2Map', [
                 renderViewport();
                 renderVisibleDemarcations();
                 renderVisibleContinents();
+                updateCenter();
             }
 
             requestAnimationFrame(continuousRender);
