@@ -47,16 +47,27 @@ module.exports = function () {
     app.use(express.urlencoded({extended: false}));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
+
+    const sessionSecret = process.env.TW2TRACKER_SESSION_SECRET;
+
+    if (!sessionSecret) {
+        throw new Error('Missing environment session secret TW2TRACKER_SESSION_SECRET');
+    }
+
     app.use(session({
         store: new (connectPgSimple(session))({
             pgPromise: db,
             schemaName: 'public',
             tableName: 'session'
         }),
-        secret: 'neko loli pantsu',
+        secret: sessionSecret,
         resave: false,
         saveUninitialized: false,
-        cookie: {maxAge: 30 * 24 * 60 * 60 * 1000}
+        cookie: {
+            secure: !development,
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        },
+        name: 'tw2tracker-session'
     }));
 
     passport.use(new passportLocal.Strategy({
