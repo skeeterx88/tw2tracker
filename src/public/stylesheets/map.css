@@ -1,47 +1,26 @@
 html {
-    overflow: hidden;
     font-size: 11px;
+    overflow: hidden;
 }
 
-body#map-page {
-    width: 100%;
-    max-width: initial;
+body {
     height: 100%;
     margin: 0;
-    padding: 0;
+    max-width: initial;
     overflow: hidden;
+    padding: 0;
     position: relative;
-}
-
-input,
-button {
-    outline: none;
+    width: 100%;
 }
 
 a {
     color: hsl(0, 35%, 80%);
-    text-decoration: none;
     font-weight: bold;
+    text-decoration: none;
 }
 
 a:hover {
     color: hsl(0, 35%, 90%);
-}
-
-#ranking-toggle {
-    flex: 1;
-}
-
-#map-page header a {
-    color: hsl(38, 100%, 90%);
-    width: 100%;
-}
-
-#map-page footer {
-    margin: initial;
-    padding: initial;
-    background: initial;
-    text-align: initial;
 }
 
 a:hover {
@@ -59,21 +38,18 @@ h1, h2, h3 {
 }
 
 button {
-    height: 22px;
-    padding: 0px 3px;
-    outline: none;
-    cursor: pointer;
-    color: hsl(0, 35%, 81%);
-    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
-    border-radius: 1px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: hsl(24, 49%, 32%);
     background: url(/images/noise.png), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                2px 2px 2px hsl(0, 0%, 0%),
-                inset -1px -1px 2px hsl(0, 0%, 0%);
+    border-color: hsl(24, 49%, 32%);
+    border-radius: 1px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset -1px -1px 2px hsl(0, 0%, 0%);
+    color: hsl(0, 35%, 81%);
+    cursor: pointer;
+    height: 22px;
+    outline: none;
+    padding: 0px 3px;
+    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
 }
 
 button:hover,
@@ -82,8 +58,8 @@ button:focus {
 }
 
 button.red {
-    border-color: hsl(8, 49%, 38%);
     background-image: linear-gradient(hsl(0, 47%, 51%), hsl(0, 70%, 29%));
+    border-color: hsl(8, 49%, 38%);
 }
 
 button.red:hover,
@@ -91,43 +67,265 @@ button.red:focus {
     background-image: linear-gradient(hsl(0, 48%, 58%), hsl(0, 70%, 29%));
 }
 
+table {
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+    border-spacing: 0px;
+    width: 100%;
+}
+
+th {
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+}
+
+
+tr:nth-child(even) {
+    background: inherit;
+}
+
+tr:nth-child(odd) {
+    background: url(/images/noise.png) hsl(23, 48%, 32%);
+}
+
+table tbody tr:hover td {
+    background: url(/images/noise.png) hsl(23, 48%, 38%);
+}
+
+td, th {
+    height: 20px;
+    margin: 0px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+td {
+    border-bottom: 1px solid hsl(23deg 42% 27%);
+    border-top: none;
+}
+
+th {
+    border: none;
+}
+
+tr:last-child td {
+}
+
+th a,
+th a:hover {
+    color: inherit;
+}
+
+th {
+    background: hsl(0 0% 0% / 20%);
+    padding: 5px 0px;
+}
+
+.text-container {
+    background: url(/images/noise.png) hsl(23, 25%, 20%);
+    border-radius: 1px;
+    border: 1px solid hsl(23, 6%, 39%);
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%);
+    padding: 2px 6px;
+}
+
 .input {
+    background: url(/images/noise.png) hsl(29, 39%, 45%);
     border-radius: 1px;
     border: 1px solid hsl(24, 42%, 39%);
-    background: url(/images/noise.png) hsl(29, 39%, 45%);
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                2px 2px 2px hsl(0, 0%, 0%),
-                inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
 }
 
 .input:focus-within {
     border: 1px solid hsl(24, 37%, 51%);
 }
 
-#map-wrapper {
-    width: 100%;
-    height: 100%;
+.icon-players {
+    background: url(/images/player.png) left center no-repeat;
+    padding-left: 17px;
+}
+
+.icon-tribes {
+    background: url(/images/tribe.png) left center no-repeat;
+    padding-left: 20px;
+}
+
+.mini-icon {
+    background-size: 12px;
+    display: inline-block;
+    height: 12px;
+    left: 0px;
+    line-height: 12px;
+    margin-top: 1px;
+    top: 0px;
+    vertical-align: top;
+    width: 12px;
+}
+
+.mini-icon.village {
+    background-image: url(/images/village-icon.png);
+}
+
+.mini-icon.points {
+    background-image: url(/images/points-icon.png);
+}
+
+.floating-modal {
+    background: url(/images/noise.png) hsl(23, 48%, 29%);
+    border-radius: 1px;
+    border: 1px solid hsl(23, 55%, 24%);
+    box-shadow: 0px 0px 0px 1px hsl(0, 0%, 0%), 0px 0px 0px 2px hsl(23, 55%, 24%), 0px 0px 0px 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
+    color: hsl(0, 35%, 81%);
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    transition: opacity 0.1s;
+    z-index: 15;
+}
+
+.floating-modal .floating-modal-body {
+    padding: 5px;
+}
+
+.floating-modal .floating-modal-body > * {
+    display: none;
+}
+
+.floating-modal .floating-modal-body > div.selected {
+    display: initial;
+}
+
+.floating-modal .floating-modal-menu {
+}
+
+.floating-modal .floating-modal-menu button {
+    margin: 0px 2px 3px 2px;
+}
+
+.floating-modal .floating-modal-drag {
+    background-image: linear-gradient(130deg, hsl(0deg 0% 0% / 15%) 16.67%, hsl(0deg 0% 0% / 0%) 16.67%, hsl(0deg 0% 0% / 0%) 50%, hsl(0deg 0% 0% / 15%) 50%, hsl(0deg 0% 0% / 15%) 66.67%, hsl(0deg 0% 0% / 0%) 66.67%, hsl(0deg 0% 0% / 0%) 100%);
+    background-size: 7.83px 9.33px;
+    cursor: move;
+    flex: 1;
+    margin: 0px 5px;
+    user-select: none;
+}
+
+.floating-modal .floating-modal-close {
+    height: 22px;
+    width: 22px;
+}
+
+.floating-modal .floating-modal-header {
     display: flex;
+    margin: initial;
+    overflow: auto;
+    padding: 5px;
+}
+
+.floating-modal.hidden,
+.floating-modal .hidden {
+    display: none;
+}
+
+.floating-modal .floating-modal-menu button.selected {
+    background: url(/images/noise.png), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 36%));
+}
+
+.pagination .pages {
+    display: inline;
+}
+
+.pagination .pages > * {
+    padding: 2px 5px;
+}
+
+.ranking {
+    border-radius: 3px;
+    border: 1px solid hsl(23, 48%, 18%);
+}
+
+.loading {
+    margin: auto;
+    text-align: center;
+}
+
+.loading.hidden {
+    display: none;
+}
+
+.loading > div {
+    animation: sk-bouncedelay 1s infinite ease-in-out both;
+    background-color: hsl(30, 35%, 45%);
+    border-radius: 100%;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+}
+
+.loading .b1 {
+    animation-delay: -0.25s;
+}
+
+.loading .b2 {
+    animation-delay: -0.1s;
+}
+
+.pagination {
+    background: inherit;
+    border-top: 1px solid hsl(23deg 42% 24%);
+    padding: 5px 0px;
+    text-align: center;
+    user-select: none;
+    width: 100%;
+}
+
+.pagination .page {
+    color: hsl(22deg 42% 63%);
+}
+
+.pagination .page.current {
+    background: hsl(0 0% 0% / 20%);
+    color: hsl(24deg 60% 58%);
+    font-weight: bold;
+}
+
+.pagination .hidden {
+    display: none;
+}
+
+#map-wrapper {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+#ranking-toggle {
+    flex: 1;
+}
+
+#map-page header a {
+    color: hsl(38, 100%, 90%);
+    width: 100%;
+}
+
+#map-page footer {
+    background: initial;
+    margin: initial;
+    padding: initial;
+    text-align: initial;
 }
 
 #side-panel {
-    width: 150px;
-    flex-shrink: 0;
-    height: 100%;
+    background: url(/images/side-bar-left.jpg) left repeat-y, url(/images/side-bar-right.jpg) right repeat-y, url(/images/side-bar-middle.jpg), hsl(23, 25%, 20%);
     box-shadow: 5px 0px 6px hsla(0, 0%, 0%, 80%);
-    z-index: 5;
     color: hsl(38, 100%, 90%);
-    background: url(/images/side-bar-left.jpg) left repeat-y,
-                url(/images/side-bar-right.jpg) right repeat-y,
-                url(/images/side-bar-middle.jpg),
-                hsl(23, 25%, 20%);
-    position: relative;
-    float: left;
-    padding-right: 7px;
-    padding-left: 2px;
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    float: left;
+    height: 100%;
+    padding-left: 2px;
+    padding-right: 7px;
+    position: relative;
+    width: 150px;
+    z-index: 5;
 }
 
 #side-panel > * {
@@ -146,8 +344,8 @@ button.red:focus {
 }
 
 #side-panel footer {
-    box-shadow: none;
     border: none;
+    box-shadow: none;
 }
 
 #side-panel footer a {
@@ -155,8 +353,8 @@ button.red:focus {
 }
 
 #side-panel .world-name {
-    text-align: center;
     margin: 3px 0px;
+    text-align: center;
 }
 
 #side-panel button {
@@ -173,38 +371,38 @@ button.red:focus {
 
 
 #map {
-    touch-action: none;
-    width: 100%;
-    height: 100%;
-    user-select: none;
     background-color: hsl(84, 68%, 23%);
+    height: 100%;
+    touch-action: none;
+    user-select: none;
+    width: 100%;
 }
 
 #panel-toggle {
-    visibility: hidden;
-    width: 22px;
-    height: 50px;
-    position: absolute;
-    margin: auto;
-    right: -28px;
-    top: 0;
-    bottom: 0;
+    background: url(/images/noise.png) hsl(23, 25%, 20%);
     border-radius: 0px 5px 5px 0px;
     border: 1px solid hsl(23, 6%, 39%);
-    background: url(/images/noise.png) hsl(23, 25%, 20%);
+    bottom: 0;
     box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 5px 0px 6px hsla(0, 0%, 0%, 80%);
+    height: 50px;
+    margin: auto;
+    position: absolute;
+    right: -28px;
+    top: 0;
+    visibility: hidden;
+    width: 22px;
 }
 
 #panel-toggle:after,
 #panel-toggle.hide:after {
-    width: 100%;
-    margin-top: 10px;
-    text-align: center;
+    color: hsl(36, 13%, 59%);
+    cursor: pointer;
     display: inline-block;
     font-size: 2rem;
     font-weight: bold;
-    color: hsl(36, 13%, 59%);
-    cursor: pointer;
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
 }
 
 #panel-toggle:after {
@@ -222,34 +420,34 @@ button.red:focus {
 
 #quick-jump-coords {
     color: hsl(29, 37%, 31%);
+    display: inline-block;
+    flex: 1;
     height: 22px;
+    line-height: 22px;
     position: relative;
     text-align: center;
-    display: inline-block;
-    line-height: 22px;
-    flex: 1;
 }
 
 #quick-jump-x,
 #quick-jump-y {
-    border: none;
-    width: 24px;
     background: none;
+    border: none;
     text-align: center;
+    width: 24px;
 }
 
 #quick-jump-go {
-    outline: none;
     cursor: pointer;
-    width: 25%;
     display: inline-block;
+    outline: none;
     vertical-align: top;
+    width: 25%;
 }
 
 #highlights {
+    flex: 1;
     overflow-y: hidden;
     padding-bottom: 5px;
-    flex: 1;
 }
 
 #highlight-id {
@@ -259,24 +457,24 @@ button.red:focus {
 }
 
 #highlights-title {
-    text-align: center;
     padding: 0 2px;
+    text-align: center;
 }
 
 #highlight-items {
-    margin-top: 5px;
-    text-shadow: 1px 1px 0px hsl(0deg 0% 0%);
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: hsl(27, 21%, 41%) transparent;
     flex: 1;
     margin-right: 1px;
+    margin-top: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-color: hsl(27, 21%, 41%) transparent;
+    scrollbar-width: thin;
+    text-shadow: 1px 1px 0px hsl(0deg 0% 0%);
 }
 
 #highlight-items .item {
-    line-height: 16px;
     height: 26px;
+    line-height: 16px;
 }
 
 #highlight-items .item.tribes {
@@ -288,12 +486,12 @@ button.red:focus {
 }
 
 #highlight-items .item .name {
+    cursor: pointer;
     display: inline-block;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;
     width: 96px;
-    cursor: pointer;
 }
 
 #highlight-items .item .name:hover {
@@ -301,42 +499,30 @@ button.red:focus {
 }
 
 #highlight-items .item .color {
-    padding: 1px;
-    margin-top: 5px;
-    margin-right: 3px;
-    float: right;
-    width: 11px;
-    height: 10px;
-    position: relative;
+    background: url(/images/noise.png) hsl(29, 39%, 45%);
     border-radius: 1px;
     border: 1px solid hsl(24, 42%, 39%);
-    background: url(/images/noise.png) hsl(29, 39%, 45%);
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                1px 1px 2px hsl(0, 0%, 0%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
     cursor: pointer;
+    float: right;
+    height: 10px;
+    margin-right: 3px;
+    margin-top: 5px;
+    padding: 1px;
+    position: relative;
+    width: 11px;
 }
 
 #highlight-items .item .villages {
-    width: 100%;
     color: hsl(38, 28%, 64%);
+    font-size: 0.9rem;
     line-height: 0px;
     padding-left: 19px;
-    font-size: 0.9rem;
+    width: 100%;
 }
 
 #highlight-items .item .color:hover {
     box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 34%, 77%);
-}
-
-.icon-players {
-    background: url(/images/player.png) left center no-repeat;
-    padding-left: 17px;
-}
-
-.icon-tribes {
-    background: url(/images/tribe.png) left center no-repeat;
-    padding-left: 20px;
 }
 
 #highlight-items::-webkit-scrollbar {
@@ -365,80 +551,44 @@ button.red:focus {
     display: none;
 }
 
-.mini-icon {
-    width: 12px;
-    height: 12px;
-    line-height: 12px;
-    display: inline-block;
-    left: 0px;
-    top: 0px;
-    vertical-align: top;
-    background-size: 12px;
-    margin-top: 1px;
-}
-
-.mini-icon.village {
-    background-image: url(/images/village-icon.png);
-}
-
-.mini-icon.points {
-    background-image: url(/images/points-icon.png);
-}
-
 #color-picker {
-    visibility: hidden;
-    opacity: 0;
-
-    border-collapse:separate;
-    display:inline-block;
-    border-spacing:1px;
-    transition: opacity .2s;
-
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    z-index: 10;
-    
     background: url(/images/tooltip-background.png) hsl(31, 44%, 67%);
+    border-collapse:separate;
+    border-spacing:1px;
+    display:inline-block;
+    left: 0px;
+    opacity: 0;
+    position: absolute;
+    top: 0px;
+    transition: opacity .2s;
+    visibility: hidden;
+    z-index: 10;
 }
 
 #color-picker td {
-    padding:0;
     border:1px solid hsl(0, 0%, 0%);
+    padding:0;
 }
 
 #color-picker .color {
     display:inline-block;
     float:left;
+    height:20px;
     margin:1px;
     width:20px;
-    height:20px;
 }
 
 #color-picker .active {
-    box-shadow: inset 0px 0px 0px 1px hsla(120, 100%, 50%, 80%),
-                inset 0px 0px 0px 2px hsla(0, 0%, 0%, 80%),
-                inset 0px 0px 0px 3px hsla(120, 100%, 50%, 80%),
-                inset 0px 0px 0px 4px hsla(0, 0%, 0%, 80%);
-}
-
-div.text-container {
-    border-radius: 1px;
-    border: 1px solid hsl(23, 6%, 39%);
-    background: url(/images/noise.png) hsl(23, 25%, 20%);
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                2px 2px 2px hsl(0, 0%, 0%);
-    padding: 2px 6px;
+    box-shadow: inset 0px 0px 0px 1px hsla(120, 100%, 50%, 80%), inset 0px 0px 0px 2px hsla(0, 0%, 0%, 80%), inset 0px 0px 0px 3px hsla(120, 100%, 50%, 80%), inset 0px 0px 0px 4px hsla(0, 0%, 0%, 80%);
 }
 
 #map-info {
-    position: absolute;
     bottom: 5px;
-    margin-left: 5px;
-    z-index: 10;
     color: hsl(36, 13%, 59%);
+    margin-left: 5px;
+    position: absolute;
     text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    z-index: 10;
 }
 
 #map-info .hidden {
@@ -446,29 +596,29 @@ div.text-container {
 }
 
 #map-info > div {
-    margin: 4px 0px;
-    display: inline-block;
     clear: both;
+    display: inline-block;
     float: left;
+    margin: 4px 0px;
 }
 
 #all-worlds {
-    position: absolute;
-    width: 200px;
     background: url(/images/noise.png) hsl(23, 48%, 29%);
+    border-radius: 1px;
+    border: 1px solid hsl(23, 55%, 24%);
+    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
     color: hsl(38, 100%, 90%);
     padding: 3px;
+    position: absolute;
     text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
-    z-index: 7;
     transition: visibility 0.02s linear, opacity 0.02s linear;
-    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
-    border: 1px solid hsl(23, 55%, 24%);
-    border-radius: 1px;
+    width: 200px;
+    z-index: 7;
 }
 
 #all-worlds.hidden {
-    visibility: hidden;
     opacity: 0;
+    visibility: hidden;
 }
 
 #all-worlds a {
@@ -476,24 +626,24 @@ div.text-container {
 }
 
 #all-worlds h2 {
-    width: 100%;
-    text-align: center;
     margin: 5px;
+    text-align: center;
+    width: 100%;
 }
 
 #all-market-worlds {
-    width: 67%;
     float: left;
+    width: 67%;
 }
 
 #all-market-worlds .world {
+    display: block;
+    margin: 5px 1px;
+    max-width: 131px;
+    overflow: hidden;
+    padding: 0 5px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: block;
-    overflow: hidden;
-    max-width: 131px;
-    margin: 5px 1px;
-    padding: 0 5px;
 }
 
 #all-market-worlds .world.selected {
@@ -503,9 +653,9 @@ div.text-container {
 }
 
 #all-markets {
-    width: 30%;
     float: left;
     margin-right: 5px;
+    width: 30%;
 }
 
 #all-markets li {
@@ -513,8 +663,8 @@ div.text-container {
 }
 
 #all-markets div.market {
-    text-align: center;
     margin: 1px 2px;
+    text-align: center;
 }
 
 #all-markets div.market.selected {
@@ -531,15 +681,15 @@ div.text-container {
 }
 
 #settings {
+    padding: 3px;
     position: absolute;
     width: 200px;
     z-index: 7;
-    padding: 3px;
 }
 
 #settings.hidden {
-    visibility: hidden;
     opacity: 0;
+    visibility: hidden;
 }
 
 #settings .color-option {
@@ -548,20 +698,18 @@ div.text-container {
 }
 
 #settings .color {
-    float: right;
-    display: inline-block;
-    padding: 1px;
-    width: 11px;
-    height: 10px;
-    position: relative;
+    background: url(/images/noise.png) hsl(29, 39%, 45%);
     border-radius: 1px;
     border: 1px solid hsl(24, 42%, 39%);
-    background: url(/images/noise.png) hsl(29, 39%, 45%);
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                1px 1px 2px hsl(0, 0%, 0%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
     cursor: pointer;
+    display: inline-block;
+    float: right;
+    height: 10px;
+    padding: 1px;
+    position: relative;
     vertical-align: top;
+    width: 11px;
 }
 
 #settings .color:hover {
@@ -569,20 +717,18 @@ div.text-container {
 }
 
 #search-results {
-    color: hsl(0, 0%, 0%);
-    line-height: 15px;
     background: url(/images/noise-3.png) top left hsl(32, 43%, 66%);
-    box-shadow: inset 0 0 0 1px hsl(31, 46%, 22%),
-                inset 0 0 0 2px hsl(32, 51%, 72%),
-                5px 5px 5px hsla(0, 0%, 0%, 80%);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 3px;
-    z-index: 10;
-    position: absolute;
+    box-shadow: inset 0 0 0 1px hsl(31, 46%, 22%), inset 0 0 0 2px hsl(32, 51%, 72%), 5px 5px 5px hsla(0, 0%, 0%, 80%);
+    color: hsl(0, 0%, 0%);
     left: 2px;
-    right: 6px;
+    line-height: 15px;
     margin-top: 27px;
+    overflow: hidden;
+    padding: 3px;
+    position: absolute;
+    right: 6px;
+    text-overflow: ellipsis;
+    z-index: 10;
 }
 
 #search-results.hidden,
@@ -597,10 +743,10 @@ div.text-container {
 #search-results .result {
     cursor: pointer;
     margin: 0px;
-    padding: 2px 0px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     overflow: hidden;
+    padding: 2px 0px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #search-results .result .icon {
@@ -611,40 +757,32 @@ div.text-container {
 
 #search-results .result:hover,
 #search-results .result.selected:hover {
-    color: hsl(31, 100%, 25%);
     background-color: hsla(31, 68%, 87%, 66%);
+    color: hsl(31, 100%, 25%);
 }
 
 #search-results .result.selected {
-    color: hsl(31, 100%, 25%);
     background-color: hsla(31, 68%, 87%, 36%);
+    color: hsl(31, 100%, 25%);
 }
 
 #notif {
-    position: absolute;
-    bottom: 40px;
-    right: 40px;
-    min-width: 300px;
-    max-width: 400px;
-    max-height: 200px;
-    padding-bottom: 10px;
-    z-index: 15;
+    background: url(/images/noise.png) hsl(23, 74%, 12%);
     border-radius: 1px;
     border: 1px solid hsl(23, 6%, 39%);
-    background: url(/images/noise.png) hsl(23, 74%, 12%);
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%),
-                inset 0 0 0 1px hsl(23, 67%, 17%),
-                2px 2px 5px hsl(0, 0%, 0%),
-                inset 3px 3px 2px hsla(0, 0%, 100%, 10%),
-                inset -3px -3px 2px hsla(0, 0%, 0%, 10%);
-    padding: 2px 6px;
+    bottom: 40px;
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 5px hsl(0, 0%, 0%), inset 3px 3px 2px hsla(0, 0%, 100%, 10%), inset -3px -3px 2px hsla(0, 0%, 0%, 10%);
     color: hsl(38, 100%, 90%);
+    max-height: 200px;
+    max-width: 400px;
+    min-width: 300px;
+    padding-bottom: 10px;
+    padding: 2px 6px;
+    position: absolute;
+    right: 40px;
     text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
-
-
-    transition: visibility 0.1s linear,
-                opacity 0.1s linear,
-                right 0.15s ease-out;
+    transition: visibility 0.1s linear, opacity 0.1s linear, right 0.15s ease-out;
+    z-index: 15;
 }
 
 #notif-wrapper {
@@ -652,9 +790,9 @@ div.text-container {
 }
 
 #notif.hidden {
-    visibility: hidden;
     opacity: 0;
     right: -240px;
+    visibility: hidden;
 }
 
 #notif-link.hidden,
@@ -663,43 +801,43 @@ div.text-container {
 }
 
 #notif-content {
+    margin: 0px;
     text-align: center;
     word-break: break-word;
-    margin: 0px;
 }
 
 #notif-title {
-    text-align: center;
-    margin: 3px;
-    text-shadow: 1px 1px 3px hsl(0, 0%, 0%);
     border-bottom: 1px solid hsla(38, 100%, 90%, 50%);
-    padding-bottom: 5px;
     margin-bottom: 0px;
+    margin: 3px;
+    padding-bottom: 5px;
+    text-align: center;
+    text-shadow: 1px 1px 3px hsl(0, 0%, 0%);
 }
 
 #notif-link {
-    width: 100%;
-    text-align: center;
     display: inline-block;
     margin-top: 2px;
+    text-align: center;
+    width: 100%;
     word-break: break-word;
 }
 
 #notif-close {
+    background: url(/images/close.png);
+    cursor: pointer;
+    display: inline-block;
+    height: 11px;
     position: absolute;
     right: 7px;
     top: 7px;
     width: 11px;
-    height: 11px;
-    background: url(/images/close.png);
-    display: inline-block;
-    cursor: pointer;
 }
 
 #site-info {
     font-size: 0.9rem;
-    text-align: center;
     margin-bottom: 2px;
+    text-align: center;
 }
 
 #site-info p {
@@ -711,21 +849,21 @@ div.text-container {
 }
 
 #ranking {
-    position: fixed;
     min-width: 600px;
+    position: fixed;
 }
 
 #ranking tbody a {
-    box-shadow: none;
-    border: 1px solid hsl(28deg 62% 16%);
-    border-radius: 3px;
-    height: initial;
-    padding: 1px 5px;
     background: url(/images/external-link.png) 97% center no-repeat, url(/images/noise.png), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
-    padding-right: 13px;
+    border-radius: 3px;
+    border: 1px solid hsl(28deg 62% 16%);
     box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 10%);
-    text-decoration: none;
+    box-shadow: none;
     display: inline-block;
+    height: initial;
+    padding-right: 13px;
+    padding: 1px 5px;
+    text-decoration: none;
 }
 
 #ranking tbody a:hover {
@@ -733,8 +871,8 @@ div.text-container {
 }
 
 #ranking .highlight {
-    font-weight: bold;
     cursor: pointer;
+    font-weight: bold;
     user-select: none;
 }
 
@@ -744,16 +882,16 @@ div.text-container {
 
 #ranking td {
     max-width: 110px;
-    text-overflow: ellipsis;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #ranking th {
     color: hsl(22deg 38% 58%);
-    padding: 5px 0px 5px 10px;
     max-width: 80px;
-    text-overflow: ellipsis;
     overflow: hidden;
+    padding: 5px 0px 5px 10px;
+    text-overflow: ellipsis;
 }
 
 #ranking .sort {
@@ -774,199 +912,18 @@ div.text-container {
 }
 
 #ranking .sort::before {
-    content: ''; 
-    opacity: 0;
     background-image: url(/images/icons/down-arrow.svg);
     background-repeat: no-repeat;
     background-size: 8px;
+    content: ''; 
     display: inline-block;
     height: 9px;
-    width: 8px;
-    margin-top: 3px;
-    position: absolute;
     margin-left: -9px;
+    margin-top: 3px;
+    opacity: 0;
+    position: absolute;
     transform: rotate(0deg);
-}
-
-.floating-modal {
-    background: url(/images/noise.png) hsl(23, 48%, 29%);
-    color: hsl(0, 35%, 81%);
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
-    transition: opacity 0.1s;
-    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
-    border: 1px solid hsl(23, 55%, 24%);
-    border-radius: 1px;
-    z-index: 15;
-}
-
-.floating-modal .floating-modal-body {
-    padding: 5px;
-}
-
-.floating-modal .floating-modal-body > * {
-    display: none;
-}
-
-.floating-modal .floating-modal-body > div.selected {
-    display: initial;
-}
-
-.floating-modal .floating-modal-menu {
-}
-
-.floating-modal .floating-modal-menu button {
-    margin: 0px 2px 3px 2px;
-}
-
-.floating-modal .floating-modal-drag {
-    margin: 0px 5px;
-    flex: 1;
-    cursor: move;
-    user-select: none;
-    background-image: linear-gradient(130deg,
-        hsl(0deg 0% 0% / 15%) 16.67%,
-        hsl(0 0% 0% / 0%) 16.67%,
-        hsl(0 0% 0% / 0%) 50%,
-        hsl(0deg 0% 0% / 15%) 50%,
-        hsl(0deg 0% 0% / 15%) 66.67%,
-        hsl(0 0% 0% / 0%) 66.67%,
-        hsl(0 0% 0% / 0%) 100%);
-    background-size: 7.83px 9.33px;
-}
-
-.floating-modal .floating-modal-close {
-    width: 22px;
-    height: 22px;
-}
-
-.floating-modal .floating-modal-header {
-    margin: initial;
-    padding: 5px;
-    display: flex;
-    overflow: auto;
-}
-
-.floating-modal.hidden,
-.floating-modal .hidden {
-    display: none;
-}
-
-.floating-modal .floating-modal-menu button.selected {
-    background: url(/images/noise.png), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 36%));
-}
-
-.pagination .pages {
-    display: inline;
-}
-
-.pagination .pages > * {
-    padding: 2px 5px;
-}
-
-table.ranking {
-    border: 1px solid hsl(23, 48%, 18%);
-    border-radius: 3px;
-}
-
-.loading {
-    margin: auto;
-    text-align: center;
-}
-
-.loading.hidden {
-    display: none;
-}
-
-.loading > div {
-    width: 10px;
-    height: 10px;
-    background-color: hsl(30, 35%, 45%);
-    border-radius: 100%;
-    display: inline-block;
-    animation: sk-bouncedelay 1s infinite ease-in-out both;
-}
-
-.loading .b1 {
-    animation-delay: -0.25s;
-}
-
-.loading .b2 {
-    animation-delay: -0.1s;
-}
-
-table {
-    background: url(/images/noise.png) hsl(23, 48%, 29%);
-    width: 100%;
-    border-spacing: 0px;
-}
-
-th {
-    background: url(/images/noise.png) hsl(23, 48%, 29%);
-}
-
-
-tr:nth-child(even) {
-    background: inherit;
-}
-
-tr:nth-child(odd) {
-    background: url(/images/noise.png) hsl(23, 48%, 32%);
-}
-
-table tbody tr:hover td {
-    background: url(/images/noise.png) hsl(23, 48%, 38%);
-}
-
-td, th {
-    text-align: center;
-    height: 20px;
-    white-space: nowrap;
-    margin: 0px;
-}
-
-td {
-    border-top: none;
-    border-bottom: 1px solid hsl(23deg 42% 27%);
-}
-
-th {
-    border: none;
-}
-
-tr:last-child td {
-}
-
-th a,
-th a:hover {
-    color: inherit;
-}
-
-th {
-    background: hsl(0 0% 0% / 20%);
-    padding: 5px 0px;
-}
-
-.pagination {
-    background: inherit;
-    width: 100%;
-    text-align: center;
-    padding: 5px 0px;
-    border-top: 1px solid hsl(23deg 42% 24%);
-    user-select: none;
-}
-
-.pagination .page {
-    color: hsl(22deg 42% 63%);
-}
-
-.pagination .page.current {
-    color: hsl(24deg 60% 58%);
-    background: hsl(0 0% 0% / 20%);
-    font-weight: bold;
-}
-
-.pagination .hidden {
-    display: none;
+    width: 8px;
 }
 
 @keyframes sk-bouncedelay {

@@ -1,3 +1,31 @@
+.world-label {
+    background: url(/images/noise.webp), var(--bg-button);
+    border-radius: 2px;
+    border: 1px solid hsl(24, 49%, 32%);
+    box-shadow: inset 0 0 0 1px hsl(23, 67%, 17%);
+    color: hsl(0, 35%, 81%);
+    cursor: default;
+    display: inline-block;
+    margin: 1px 1px;
+    padding: 0px 3px;
+    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
+}
+
+.align-checkbox label {
+    display: inline-block;
+    padding-left: 22px;
+    padding-right: 10px;
+    text-indent: -22px;
+}
+
+.align-checkbox input {
+    vertical-align: middle;
+}
+
+.align-checkbox label span {
+    vertical-align: middle;
+}
+
 #sync-summary {
     position: sticky;
     top: 0px;
@@ -12,25 +40,12 @@
 }
 
 #sync-summary .summary-block label {
-    font-weight: bold;
     display: block;
+    font-weight: bold;
 }
 
 #sync-summary .value {
     font-weight: bold;
-}
-
-.world-label {
-    border: 1px solid hsl(24, 49%, 32%);
-    border-radius: 2px;
-    background: url(/images/noise.webp), var(--bg-button);
-    box-shadow: inset 0 0 0 1px hsl(23, 67%, 17%);
-    color: hsl(0, 35%, 81%);
-    padding: 0px 3px;
-    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
-    margin: 1px 1px;
-    cursor: default;
-    display: inline-block;
 }
 
 #sync-panel ul {
@@ -39,8 +54,8 @@
 }
 
 #sync-worlds .world-id {
-    font-weight: bold;
     display: inline-block;
+    font-weight: bold;
     vertical-align: top;
 }
 
@@ -62,8 +77,8 @@
 }
 
 #sync-worlds .world .in-progress {
-    box-shadow: 0 0 0 1px green, inset 0 0 0 1px green, 2px 2px 2px hsl(0, 0%, 0%);
     border-color: hsl(108, 32%, 61%);
+    box-shadow: 0 0 0 1px green, inset 0 0 0 1px green, 2px 2px 2px hsl(0, 0%, 0%);
 }
 
 #sync-worlds .relax-button {
@@ -78,13 +93,6 @@
     font-weight: bold;
 }
 
-#sync-worlds .field {
-    
-}
-
-#sync-worlds .type {
-}
-
 #sync-worlds .world {
     flex-wrap: wrap;
     margin: 7px 3px;
@@ -96,8 +104,8 @@
 
 #accounts p span {
     display: inline-block;
-    width: 10%;
     text-align: right;
+    width: 10%;
 }
 
 #accounts .relax-container > * {
@@ -108,40 +116,24 @@
     display: flex;
 }
 
-
 #admin .actions .relax-button.right {
     margin-left: auto;
 }
 
 #admin section .content-border {
-    padding: 5px;
     background: var(--color-content);
+    padding: 5px;
 }
 
 #admin .world-container {
-    padding: 3px 5px;
-    margin: 10px 5px;
     display: block;
-}
-
-.align-checkbox label {
-    display: inline-block;
-    padding-right: 10px;
-    padding-left: 22px;
-    text-indent: -22px;
-}
-
-.align-checkbox input {
-    vertical-align: middle;
-}
-
-.align-checkbox label span {
-    vertical-align: middle;
+    margin: 10px 5px;
+    padding: 3px 5px;
 }
 
 #admin .relax-input {
-    width: 80%;
     font-family: monospace;
+    width: 80%;
 }
 
 #admin form label.input {
@@ -151,8 +143,8 @@
 
 #admin form label.input span {
     display: inline-block;
-    width: 50px;
     text-align: right;
+    width: 50px;
 }
 
 #settings fieldset {
@@ -174,9 +166,9 @@
 
 #settings input,
 #settings select {
-    outline: none;
     margin: 5px 0px;
     max-width: 50%;
+    outline: none;
 }
 
 @media (max-width: 860px) {
