@@ -3,23 +3,31 @@
     --bg-button-red-hover: linear-gradient(hsl(0, 48%, 58%), hsl(0, 70%, 29%));
     --bg-button-red: linear-gradient(hsl(0, 47%, 51%), hsl(0, 70%, 29%));
     --bg-button: linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
-    --color-content-layer-2: url(/images/noise.webp) hsl(43, 52%, 75%);
-    --color-content: url(/images/noise.webp) hsl(40deg 53% 66%);
+    --color-content-layer-2: var(--noise) hsl(43, 52%, 75%);
+    --color-content: var(--noise) hsl(40deg 53% 66%);
     --color-highlight: hsl(39deg 35% 53%);
-    --color-table-header: url(/images/noise.webp) hsl(40deg 53% 60%);
-    --color-table-row-even: url(/images/noise.webp) hsl(40deg 53% 64%);
-    --color-table-row-hover: url(/images/noise.webp) hsl(40deg 53% 69%);
+    --color-table-header: var(--noise) hsl(40deg 53% 60%);
+    --color-table-row-even: var(--noise) hsl(40deg 53% 64%);
+    --color-table-row-hover: var(--noise) hsl(40deg 53% 69%);
     --content-inner-shadow: inset -2px -2px 3px hsl(0, 0%, 0%, 30%);
     --content-menu-shadow: 2px 2px 3px hsl(0, 0%, 0%, 35%);
     --main-background: hsl(43deg 59% 78%);
+    --noise: url(/images/noise.webp);
     --shadow-border-1: 0px 0px 0px 1px hsl(23, 55%, 24%), 0px 0px 0px 2px hsl(23, 47%, 36%), 2px 2px 4px hsla(0, 0%, 0%, 50%);
-    --shadow-border-2: 0 0 0 1px hsl(23deg 67% 17%), inset 0 0 0 1px hsl(23deg 67% 17%), 2px 2px 2px hsl(0deg 0% 0%), inset -1px -1px 2px hsl(0, 0%, 0%);
-    --shadow-border-input: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
-    --shadow-button-1: 0 0 0 1px hsl(23deg 67% 17%), inset 0 0 0 1px hsl(23deg 67% 17%), 2px 2px 2px hsl(0deg 0% 0% / 50%), inset -1px -1px 2px hsl(0deg 0% 0%);
+    --shadow-border-2: 0px 0px 0px 1px hsl(23deg 67% 17%), inset 0px 0px 0px 1px hsl(23deg 67% 17%), 2px 2px 2px hsl(0deg 0% 0%), inset -1px -1px 2px hsl(0, 0%, 0%);
+    --shadow-border-input: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
+    --shadow-button-1: 0px 0px 0px 1px hsl(23deg 67% 17%), inset 0px 0px 0px 1px hsl(23deg 67% 17%), 2px 2px 2px hsl(0deg 0% 0% / 50%), inset -1px -1px 2px hsl(0deg 0% 0%);
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+    outline: none;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 html {
-    background: url(/images/background-scene.webp) top no-repeat, url(/images/noise.webp), hsl(37, 18%, 45%);
+    background: url(/images/background-scene.webp) top no-repeat, var(--noise), hsl(37, 18%, 45%);
     box-sizing: border-box;
     color: hsl(24, 47%, 21%);
     font-family: 'Trebuchet MS', 'Lucida Grande', Helvetica, Arial, sans-serif;
@@ -28,34 +36,93 @@ html {
     width: 100%;
 }
 
-*, *:before, *:after {
-    box-sizing: inherit;
-}
-
-textarea,
-input,
-button,
-select {
-    font-family: inherit;
-    font-size: inherit;
+html.map-page {
+    background: none;
+    font-size: 11px;
+    overflow: hidden;
 }
 
 body {
     margin: auto;
     max-width: 1100px;
-    padding: 10px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
 }
 
-input,
-button,
-textarea {
-    outline: none;
+.map-page body {
+    max-width: initial;
+}
+
+::placeholder {
+    color: hsl(0, 0%, 20%);
+    opacity: 0.7;
+    text-shadow: none;
 }
 
 table {
-    background: var(--color-content);
     border-spacing: 0px;
     width: 100%;
+}
+
+th {
+    background: var(--color-table-header);
+}
+
+.map-page th {
+    background: hsl(0 0% 0% / 20%);
+    padding: 5px 0px;
+}
+
+td, th {
+    border-bottom: 1px solid hsl(40deg 44% 58%);
+    border-top: 1px solid hsl(40deg 44% 65%);
+    height: 20px;
+    margin: 0px;
+    overflow: hidden;
+    padding: 2px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.map-page td {
+    border-top: 1px solid hsl(23, 48%, 31%);
+    border-bottom: 1px solid hsl(23, 48%, 25%);
+}
+
+.map-page th {
+    border: none;
+}
+
+tbody tr:first-child td {
+    border-top: none;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+tr:nth-child(even) {
+    background: hsl(0 0% 0% / 03%);
+}
+
+tr:hover td {
+    background: hsl(0 100% 100% / 20%);
+}
+
+.map-page tr:hover td {
+    background: hsl(0 100% 100% / 05%);
+}
+
+table.vertical th,
+table.vertical td {
+    text-align: left;
+    white-space: normal;
+}
+
+table.vertical .right {
+    float: right;
 }
 
 code {
@@ -72,6 +139,17 @@ a {
 
 a:hover {
     color: hsl(19, 57%, 47%);
+    text-decoration: underline;
+}
+
+.map-page a {
+    color: hsl(38, 100%, 90%);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.map-page a:hover {
+    color: hsl(31, 87%, 65%);
     text-decoration: underline;
 }
 
@@ -110,11 +188,11 @@ sup {
 }
 
 main, footer {
-    background: url(/images/noise.webp), url(/images/content-border-left.webp) left repeat-y, url(/images/content-border-right.webp) right repeat-y, url(/images/content-border-top.webp) top repeat-x, url(/images/content-border-bottom.webp) bottom repeat-x, var(--main-background);
+    background: var(--noise), url(/images/content-border-left.webp) left repeat-y, url(/images/content-border-right.webp) right repeat-y, url(/images/content-border-top.webp) top repeat-x, url(/images/content-border-bottom.webp) bottom repeat-x, var(--main-background);
     border-radius: 2px;
     border: 1px solid hsl(174, 16%, 26%);
     box-shadow: var(--shadow-border-1);
-    margin: 0 auto;
+    margin: 0px auto;
     padding: 10px;
     position: relative;
 }
@@ -145,62 +223,11 @@ fieldset legend {
 
 form input[type="submit"]:hover,
 form input[type="submit"]:focus {
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 26%));
-}
-
-table tbody tr:hover td {
-    background: var(--color-table-row-hover);
-}
-
-table.vertical th,
-table.vertical td {
-    text-align: left;
-    white-space: normal;
-}
-
-table.vertical th {
-    background: var(--color-table-header);
-}
-
-table.vertical .right {
-    float: right;
-}
-
-th {
-    background: var(--color-table-header);
-}
-
-tr:nth-child(even) {
-    background: var(--color-table-row-even);
-}
-
-td, th {
-    border-bottom: 1px solid hsl(40deg 44% 58%);
-    border-top: 1px solid hsl(40deg 44% 65%);
-    height: 20px;
-    margin: 0px;
-    overflow: hidden;
-    padding: 2px;
-    text-align: center;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-tr:first-child td {
-    border-top: none;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-th a,
-th a:hover {
-    color: inherit;
+    background: var(--noise), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 26%));
 }
 
 div.modal {
-    background: url(/images/noise.webp) hsl(23, 48%, 29%);
+    background: var(--noise) hsl(23, 48%, 29%);
     color: hsl(0, 35%, 81%);
     margin: 0 auto;
     padding: 3px;
@@ -231,7 +258,7 @@ div.world-title {
 }
 
 #main-menu a {
-    background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, hsl(204, 47%, 65%) 0%, hsl(205, 21%, 31%) 70%, hsl(204, 20%, 37%) 70%);
+    background: var(--noise), radial-gradient(ellipse farthest-corner at 0 140%, hsl(204, 47%, 65%) 0%, hsl(205, 21%, 31%) 70%, hsl(204, 20%, 37%) 70%);
     border-radius: 1px 1px 0px 0px;
     box-shadow: 0px 0px 0px 1px hsl(28, 62%, 16%), 0px 0px 0px 2px hsl(24, 49%, 52%), 0px 0px 0px 3px hsl(23, 48%, 38%), 0px 0px 0px 4px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 40%), inset -1px -1px 1px hsla(0, 0%, 0%, 40%);
     color: white;
@@ -246,15 +273,15 @@ div.world-title {
 }
 
 #main-menu a:hover {
-    background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, hsl(204, 47%, 65%) 20%, hsl(205, 21%, 31%) 70%, hsl(204, 20%, 37%) 70%);
+    background: var(--noise), radial-gradient(ellipse farthest-corner at 0 140%, hsl(204, 47%, 65%) 20%, hsl(205, 21%, 31%) 70%, hsl(204, 20%, 37%) 70%);
 }
 
 #main-menu a.red {
-    background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, hsl(0, 47%, 65%) 0%, hsl(0, 21%, 31%) 70%, hsl(0, 20%, 37%) 70%);
+    background: var(--noise), radial-gradient(ellipse farthest-corner at 0 140%, hsl(0, 47%, 65%) 0%, hsl(0, 21%, 31%) 70%, hsl(0, 20%, 37%) 70%);
 }
 
 #main-menu a.red:hover {
-    background: url(/images/noise.webp), radial-gradient(ellipse farthest-corner at 0 140%, hsl(0, 47%, 65%) 20%, hsl(0, 21%, 31%) 70%, hsl(0, 20%, 37%) 70%);
+    background: var(--noise), radial-gradient(ellipse farthest-corner at 0 140%, hsl(0, 47%, 65%) 20%, hsl(0, 21%, 31%) 70%, hsl(0, 20%, 37%) 70%);
 }
 
 #main-menu .left {
@@ -332,7 +359,7 @@ div.world-title {
 }
 
 .content-menu li {
-    background: url(/images/noise.webp), var(--bg-button);
+    background: var(--noise), var(--bg-button);
     border-color: hsl(24, 49%, 32%);
     border-radius: 1px;
     border-style: solid;
@@ -349,7 +376,7 @@ div.world-title {
 }
 
 .content-menu li:hover {
-    background: url(/images/noise.webp), var(--bg-button-hover);
+    background: var(--noise), var(--bg-button-hover);
 }
 
 .content-menu li.selected {
@@ -362,12 +389,12 @@ div.world-title {
 }
 
 .relax-input {
-    background: url(/images/noise.webp) hsl(29, 39%, 45%);
+    background: var(--noise) hsl(29, 39%, 45%);
     border-radius: 1px;
     border: 1px solid hsl(24, 42%, 39%);
     box-shadow: var(--shadow-border-input);
     height: 25px;
-    padding: 1px 5px;
+    padding: 0px 5px;
 }
 
 .relax-input:focus {
@@ -383,8 +410,12 @@ div.world-title {
     border: 1px solid hsl(5, 48%, 50%);
 }
 
+.relax-input:focus-within {
+    border: 1px solid hsl(24, 37%, 51%);
+}
+
 .relax-button {
-    background: url(/images/noise.webp), var(--bg-button);
+    background: var(--noise), var(--bg-button);
     border-color: hsl(24, 49%, 32%);
     border-radius: 1px;
     border-style: solid;
@@ -395,7 +426,7 @@ div.world-title {
     display: inline-block;
     font-weight: bold;
     height: 25px;
-    line-height: 25px;
+    line-height: 23px;
     margin: 5px 5px;
     outline: none;
     padding: 0px 5px;
@@ -407,30 +438,46 @@ div.world-title {
 }
 
 .relax-button:hover {
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 26%));
+    background: var(--noise), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 26%));
     color: hsl(0, 35%, 81%);
     text-decoration: none;
 }
 
+.map-page .relax-button {
+    height: 22px;
+    line-height: 21px;
+    padding: 0px 3px;
+}
+
+.map-page .relax-input {
+    height: 22px;
+    line-height: 21px;
+    padding: 0px 3px;
+}
+
 .relax-button.disabled {
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    background: var(--noise), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
     filter: contrast(70%);
 }
 
+.relax-button.disabled:hover {
+    cursor: default;
+}
+
 .relax-button.red {
-    background: url(/images/noise.webp), linear-gradient(hsl(0, 50%, 47%), hsl(0, 40%, 37%));
+    background: var(--noise), linear-gradient(hsl(0, 50%, 47%), hsl(0, 40%, 37%));
 }
 
 .relax-button.red:hover {
-    background: url(/images/noise.webp), linear-gradient(hsl(0, 53%, 55%), hsl(0, 40%, 37%));
+    background: var(--noise), linear-gradient(hsl(0, 53%, 55%), hsl(0, 40%, 37%));
 }
 
 .relax-button.green {
-    background: url(/images/noise.webp), linear-gradient(hsl(112, 48%, 43%), hsl(121, 56%, 23%));
+    background: var(--noise), linear-gradient(hsl(112, 48%, 43%), hsl(121, 56%, 23%));
 }
 
 .relax-button.green:hover {
-    background: url(/images/noise.webp), linear-gradient(hsl(112, 58%, 48%), hsl(121, 56%, 23%));
+    background: var(--noise), linear-gradient(hsl(112, 58%, 48%), hsl(121, 56%, 23%));
 }
 
 .section-content {
@@ -470,7 +517,7 @@ div.world-title {
 
 .market-list .toggle-list-worlds {
     height: 30px;
-    line-height: 30px;
+    line-height: 29px;
 }
 
 .market-list p,
@@ -480,10 +527,6 @@ div.world-title {
 
 .world-list {
     width: 100%;
-}
-
-.world-list.hidden {
-    display: none;
 }
 
 .world-list .label,
@@ -497,7 +540,7 @@ div.world-title {
 
 .world-list .world {
     align-items: center;
-    background: url(/images/noise.webp) hsl(41, 67%, 86%);
+    background: var(--noise) hsl(41, 67%, 86%);
     border-color: hsl(41, 45%, 81%);
     border-radius: 5px;
     border-style: inset;
@@ -516,7 +559,7 @@ div.world-title {
 }
 
 .world-list .relax-button {
-    background: url(/images/noise.webp), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    background: var(--noise), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
     border-color: hsl(24, 49%, 32%);
     border-radius: 1px;
     border-style: solid;
@@ -527,7 +570,7 @@ div.world-title {
 }
 
 .modal-container {
-    background: url(/images/noise.png) hsl(23, 48%, 29%);
+    background: var(--noise) hsl(23, 48%, 29%);
     border-radius: 1px;
     border: 1px solid hsl(23, 55%, 24%);
     box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
@@ -540,10 +583,6 @@ div.world-title {
     transform: translate(-50%, -50%);
     transition: visibility 0.02s linear, opacity 0.02s linear;
     z-index: 10;
-}
-
-.modal-container.hidden {
-    display: none;
 }
 
 .modal-container header {
@@ -571,54 +610,98 @@ div.world-title {
     vertical-align: middle;
 }
 
-.floating-container {
-    background: url(/images/noise.png) hsl(23, 48%, 29%);
+.floating-modal {
+    background: var(--noise) hsl(23, 48%, 29%);
     border-radius: 1px;
     border: 1px solid hsl(23, 55%, 24%);
-    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
+    box-shadow: 0px 0px 0px 1px hsl(0, 0%, 0%), 0px 0px 0px 2px hsl(23, 55%, 24%), 0px 0px 0px 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
     color: hsl(0, 35%, 81%);
-    padding: 3px;
-    position: absolute;
+    position: fixed;
     text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
-    transition: visibility 0.02s linear, opacity 0.02s linear;
-    z-index: 7;
+    transition: opacity 0.1s;
+    z-index: 15;
 }
 
-.floating-container.hidden {
-    opacity: 0;
-    visibility: hidden;
+.floating-modal .floating-modal-body {
+    padding: 5px;
 }
 
-.absolute-hidden {
+.floating-modal .floating-modal-body > * {
     display: none;
 }
 
+.floating-modal .floating-modal-body > div.selected {
+    display: initial;
+}
+
+.floating-modal .floating-modal-menu {
+}
+
+.floating-modal .floating-modal-menu button {
+    margin: 5px;
+}
+
+.floating-modal .floating-modal-drag {
+    background-image: linear-gradient(130deg, hsl(0deg 0% 0% / 15%) 16.67%, hsl(0deg 0% 0% / 0%) 16.67%, hsl(0deg 0% 0% / 0%) 50%, hsl(0deg 0% 0% / 15%) 50%, hsl(0deg 0% 0% / 15%) 66.67%, hsl(0deg 0% 0% / 0%) 66.67%, hsl(0deg 0% 0% / 0%) 100%);
+    background-size: 7.83px 9.33px;
+    cursor: move;
+    flex: 1;
+    margin: 0px 5px;
+    user-select: none;
+}
+
+.floating-modal .floating-modal-close {
+    height: 22px;
+    width: 22px;
+}
+
+.floating-modal .floating-modal-header {
+    display: flex;
+    margin: initial;
+    overflow: auto;
+    padding: 5px;
+}
+
+.floating-modal .floating-modal-menu button.selected {
+    background: var(--noise), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 36%));
+}
+
 .pagination {
-    background: var(--color-content);
-    border-top: 1px solid hsl(23, 55%, 24%);
-    padding: 3px 0px;
+    border-top: 1px solid hsl(40deg 44% 50%);
+    padding: 5px 0px;
     text-align: center;
     user-select: none;
-    width: 100%;
+}
+
+.map-page .pagination {
+    border-top: 1px solid hsl(40deg 44% 20%);
+}
+
+.pagination .pages {
+    display: inline;
 }
 
 .pagination .page {
     cursor: pointer;
-    padding: 0px 5px;
+    padding: 2px 7px;
 }
 
 .pagination .current {
-    background: var(--color-highlight);
-    border-radius: 3px;
+    background: hsl(0 0% 0% / 10%);
+    font-weight: bold;
 }
 
-.pagination .page.next,
-.pagination .page.last {
+.map-page .pagination .current {
+    background: hsl(0 0% 0% / 20%);
+}
+
+.pagination .next,
+.pagination .last {
     float: right;
 }
 
-.pagination .page.prev,
-.pagination .page.first {
+.pagination .prev,
+.pagination .first {
     float: left;
 }
 
@@ -656,7 +739,7 @@ div.world-title {
 }
 
 .sub-menu .item {
-    background: url(/images/noise.webp), linear-gradient(hsl(34, 73%, 31%), hsl(36, 48%, 65%));
+    background: var(--noise), linear-gradient(hsl(34, 73%, 31%), hsl(36, 48%, 65%));
     box-shadow: 0px 0px 0px 1px hsl(28deg 62% 16%), 0px 0px 0px 2px hsl(24deg 49% 52%), 0px 0px 0px 3px hsl(17deg 28% 10%), inset 1px 1px 3px hsl(0deg 0% 100% / 40%), inset -1px -1px 1px hsl(0deg 0% 0% / 40%), 1px 1px 2px 3px hsl(0deg 0% 0% / 20%);
     color: hsl(27, 22%, 8%);
     display: inline-block;
@@ -670,7 +753,7 @@ div.world-title {
 }
 
 .sub-menu .item.selected {
-    background: url(/images/noise.webp), linear-gradient(hsl(34, 73%, 31%), hsl(36, 55%, 55%));
+    background: var(--noise), linear-gradient(hsl(34, 73%, 31%), hsl(36, 55%, 55%));
     box-shadow: 0px 0px 0px 1px hsl(28, 62%, 16%), 0px 0px 0px 2px hsl(24, 79%, 64%), 0px 0px 0px 3px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 40%), inset -1px -1px 1px hsla(0, 0%, 0%, 40%), 1px 1px 2px 3px hsla(0, 0%, 0%, 70%);
     color: hsl(25, 26%, 9%);
     text-shadow: 1px 1px 1px hsla(0, 0%, 0%, 20%);
@@ -694,7 +777,7 @@ div.world-title {
 }
 
 .progress-bar-wrapper {
-    background: url(/images/noise.webp), linear-gradient(hsl(74, 49%, 16%), hsl(73, 49%, 19%));
+    background: var(--noise), linear-gradient(hsl(74, 49%, 16%), hsl(73, 49%, 19%));
     border-radius: 2px;
     border: 1px solid hsl(0, 0%, 4%);
     display: inline-block;
@@ -706,7 +789,7 @@ div.world-title {
 }
 
 .progress-bar {
-    background: url(/images/noise.webp), linear-gradient(hsl(74, 58%, 25%), hsl(75, 58%, 28%));
+    background: var(--noise), linear-gradient(hsl(74, 58%, 25%), hsl(75, 58%, 28%));
     height: 100%;
     left: 0;
     position: absolute;
@@ -732,7 +815,7 @@ div.world-title {
 }
 
 .message {
-    background: url(/images/noise.webp) hsl(96deg 53% 77%);
+    background: var(--noise) hsl(96deg 53% 77%);
     border-radius: 3px;
     border: 2px solid hsl(107deg 28% 49%);
     padding: 10px;
@@ -772,6 +855,557 @@ div.world-title {
 
 .icon-sort.selected {
     opacity: 1;
+}
+
+.notif {
+    background: var(--noise) hsl(23, 74%, 12%);
+    border-radius: 1px;
+    border: 1px solid hsl(23, 6%, 39%);
+    bottom: 40px;
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 5px hsl(0, 0%, 0%), inset 3px 3px 2px hsla(0, 0%, 100%, 10%), inset -3px -3px 2px hsla(0, 0%, 0%, 10%);
+    color: hsl(38, 100%, 90%);
+    max-height: 200px;
+    max-width: 400px;
+    min-width: 300px;
+    padding-bottom: 10px;
+    padding: 2px 6px;
+    position: absolute;
+    right: 40px;
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    transition: visibility 0.1s linear, opacity 0.1s linear, right 0.15s ease-out;
+    z-index: 15;
+}
+
+.notif.invisible {
+    right: -240px;
+}
+
+.notif .body {
+    margin: 5px;
+}
+
+.notif .content {
+    margin: 0px;
+    text-align: center;
+    word-break: break-word;
+}
+
+.notif .title {
+    border-bottom: 1px solid hsla(38, 100%, 90%, 50%);
+    margin-bottom: 0px;
+    margin: 3px;
+    padding-bottom: 5px;
+    text-align: center;
+    text-shadow: 1px 1px 3px hsl(0, 0%, 0%);
+}
+
+.notif .link {
+    display: inline-block;
+    margin-top: 2px;
+    text-align: center;
+    width: 100%;
+    word-break: break-word;
+}
+
+.notif .close {
+    background: url(/images/close.png);
+    cursor: pointer;
+    display: inline-block;
+    height: 11px;
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    width: 11px;
+}
+
+.map-panel {
+    background: url(/images/side-bar-left.jpg) left repeat-y, url(/images/side-bar-right.jpg) right repeat-y, url(/images/side-bar-middle.jpg), hsl(23, 25%, 20%);
+    box-shadow: 5px 0px 6px hsla(0, 0%, 0%, 80%);
+    color: hsl(38, 100%, 90%);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    float: left;
+    height: 100%;
+    padding-left: 2px;
+    padding-right: 7px;
+    position: relative;
+    width: 150px;
+    z-index: 5;
+}
+
+.map-panel > * {
+    display: flex;
+    flex-direction: column;
+}
+
+.map-panel section {
+    display: flex;
+    margin-bottom: 4px;
+}
+
+.map-panel h1,
+.map-panel h2 {
+    text-align: center;
+}
+
+.map-panel .relax-button {
+    margin: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.map-panel .element {
+    margin-right: 4px;
+}
+
+.map-panel .toggle {
+    background: var(--noise) hsl(23, 25%, 20%);
+    border-radius: 0px 5px 5px 0px;
+    border: 1px solid hsl(23, 6%, 39%);
+    bottom: 0;
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 5px 0px 6px hsla(0, 0%, 0%, 80%);
+    height: 50px;
+    margin: auto;
+    position: absolute;
+    right: -28px;
+    top: 0;
+    visibility: hidden;
+    width: 22px;
+    z-index: 9999;
+}
+
+.map-panel .toggle:after,
+.map-panel .toggle.hide:after {
+    color: hsl(36, 13%, 59%);
+    cursor: pointer;
+    display: inline-block;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.map-panel .toggle:after {
+    content: '>';
+}
+
+.map-panel .toggle.hide:after {
+    content: '<';
+}
+
+.map-panel .jump {
+    flex-direction: row;
+    margin-top: 3px;
+}
+
+.map-panel .jump .coords {
+    color: hsl(29, 37%, 31%);
+    display: inline-block;
+    flex: 1;
+    height: 22px;
+    line-height: 22px;
+    position: relative;
+    text-align: center;
+}
+
+.map-panel .coords-x,
+.map-panel .coords-y {
+    background: none;
+    border: none;
+    text-align: center;
+    width: 24px;
+}
+
+.map-panel .coords-go {
+    display: inline-block;
+    outline: none;
+    vertical-align: top;
+    width: 25%;
+}
+
+.map-panel .highlights {
+    flex: 1;
+    overflow-y: hidden;
+    padding-bottom: 5px;
+}
+
+.map-panel .highlights-items {
+    flex: 1;
+    margin-right: 1px;
+    margin-top: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-color: hsl(27, 21%, 41%) transparent;
+    scrollbar-width: thin;
+    text-shadow: 1px 1px 0px hsl(0deg 0% 0%);
+}
+
+.map-panel .highlights-items .item {
+    height: 26px;
+    line-height: 16px;
+}
+
+.map-panel .highlights-items .item.tribes {
+    order: 1;
+}
+
+.map-panel .highlights-items .item.players {
+    order: 2;
+}
+
+.map-panel .highlights-items .item .name {
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 96px;
+}
+
+.map-panel .highlights-items .item .name:hover {
+    color: hsl(31, 87%, 65%);
+}
+
+.color-selector {
+    background: var(--noise) hsl(29, 39%, 45%);
+    border-radius: 1px;
+    border: 1px solid hsl(24, 42%, 39%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
+    cursor: pointer;
+    float: right;
+    height: 10px;
+    margin-right: 3px;
+    margin-top: 5px;
+    padding: 1px;
+    position: relative;
+    width: 11px;
+}
+
+.map-panel .highlights-items .item .villages {
+    color: hsl(38, 28%, 64%);
+    font-size: 0.9rem;
+    line-height: 0px;
+    padding-left: 19px;
+    width: 100%;
+}
+
+.map-panel .highlights-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.map-panel .highlights-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.map-panel .highlights-items::-webkit-scrollbar-thumb {
+  background-color: hsl(27, 21%, 41%);
+}
+
+.map-panel .search input {
+    padding: 0px 8px;
+}
+
+.map-panel .search .results {
+    background: url(/images/noise-3.png) top left hsl(32, 43%, 66%);
+    box-shadow: inset 0 0 0 1px hsl(31, 46%, 22%), inset 0 0 0 2px hsl(32, 51%, 72%), 5px 5px 5px hsla(0, 0%, 0%, 80%);
+    color: hsl(0, 0%, 0%);
+    left: 2px;
+    line-height: 15px;
+    margin-top: 27px;
+    overflow: hidden;
+    padding: 3px;
+    position: absolute;
+    right: 6px;
+    text-overflow: ellipsis;
+    z-index: 10;
+}
+
+.map-panel .search .no-results {
+    opacity: 0.5;
+}
+
+.map-panel .search .result {
+    cursor: pointer;
+    margin: 0px;
+    overflow: hidden;
+    padding: 2px 0px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.map-panel .search .result .icon {
+    display: inline-block;
+    height: 18px;
+    line-height: 18px;
+}
+
+.map-panel .search .result:hover,
+.map-panel .search .result.selected:hover {
+    background-color: hsla(31, 68%, 87%, 66%);
+    color: hsl(31, 100%, 25%);
+}
+
+.map-panel .search .result.selected {
+    background-color: hsla(31, 68%, 87%, 36%);
+    color: hsl(31, 100%, 25%);
+}
+
+.map-settings {
+    padding: 3px;
+    position: absolute;
+    width: 200px;
+    z-index: 7;
+}
+
+.map-settings .color-option {
+    display: block;
+    padding: 2px 0px;
+}
+
+.map-panel .info {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.map-panel .info p {
+    margin: 2px 0px;
+}
+
+.map-panel .info a {
+    cursor: pointer;
+}
+
+.map-page .ranking {
+    border-radius: 3px;
+    border: 1px solid hsl(23, 48%, 18%);
+}
+
+.map-page .wrapper {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.map-world-list {
+    width: 200px;
+    z-index: 7;
+}
+
+.map-world-list a {
+    text-decoration: none;
+}
+
+.map-world-list h2 {
+    margin: 5px;
+    text-align: center;
+    width: 100%;
+}
+
+.map-market-list {
+    float: left;
+    width: 67%;
+}
+
+.map-market-list .world {
+    display: block;
+    margin: 5px 1px;
+    max-width: 131px;
+    overflow: hidden;
+    padding: 0 5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.map-market-list .world.selected {
+    background: var(--noise), linear-gradient(hsl(23, 22%, 35%), hsl(25, 57%, 16%));
+    border-color: hsl(25, 22%, 44%);
+    font-weight: bold;
+}
+
+.map-market-list {
+    float: left;
+    margin-right: 5px;
+    width: 30%;
+}
+
+.map-market-list li {
+    cursor: pointer;
+}
+
+.map-market-list div.market {
+    margin: 1px 2px;
+    text-align: center;
+}
+
+.map-market-list div.market.selected {
+    background: hsl(23, 22%, 35%);
+    border-color: hsl(24, 27%, 58%);
+}
+
+.map-market-list li:hover {
+    background: hsl(23, 45%, 36%);
+}
+
+.flex {
+    display: flex;
+}
+
+.stretch {
+    flex: 1;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.hidden {
+    display: none;
+}
+
+.invisible {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+}
+
+.loading {
+    margin: auto;
+    text-align: center;
+}
+
+.loading > div {
+    animation: sk-bouncedelay 1s infinite ease-in-out both;
+    background-color: hsl(30, 35%, 45%);
+    border-radius: 100%;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+}
+
+.loading .b1 {
+    animation-delay: -0.25s;
+}
+
+.loading .b2 {
+    animation-delay: -0.1s;
+}
+
+.icon-players {
+    background: url(/images/player.png) left center no-repeat;
+    padding-left: 20px;
+}
+
+.icon-tribes {
+    background: url(/images/tribe.png) left center no-repeat;
+    padding-left: 20px;
+}
+
+.color-picker {
+    background: hsl(31deg 44% 34%);
+    left: 0px;
+    position: absolute;
+    top: 0px;
+    z-index: 10;
+}
+
+.color-picker td {
+    padding: 0px;
+    border: none;
+}
+
+.color-picker .color {
+    border-radius: 1px;
+    border: 1px solid hsl(24, 42%, 39%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
+    cursor: pointer;
+    height: 20px;
+    margin: 1px;
+    width: 20px;
+}
+
+.color-picker .active {
+    box-shadow: inset 0px 0px 0px 1px hsla(120, 100%, 50%, 80%), inset 0px 0px 0px 2px hsla(0, 0%, 0%, 80%), inset 0px 0px 0px 3px hsla(120, 100%, 50%, 80%), inset 0px 0px 0px 4px hsla(0, 0%, 0%, 80%);
+}
+
+.floating-ranking {
+    min-width: 600px;
+}
+
+.floating-ranking tbody a {
+    background: url(/images/external-link.png) 97% center no-repeat, var(--noise), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    border-radius: 3px;
+    border: 1px solid hsl(28deg 62% 16%);
+    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 10%);
+    box-shadow: none;
+    display: inline-block;
+    height: initial;
+    padding-right: 13px;
+    padding: 1px 5px;
+    text-decoration: none;
+}
+
+.floating-ranking tbody a:hover {
+    border: 1px solid hsl(28deg 92% 10%);
+}
+
+.floating-ranking .highlight {
+    cursor: pointer;
+    font-weight: bold;
+    user-select: none;
+}
+
+.floating-ranking .highlight:hover {
+    color: white;
+}
+
+.floating-ranking td {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.floating-ranking th {
+    color: hsl(22deg 38% 58%);
+    max-width: 80px;
+    overflow: hidden;
+    padding: 5px 0px 5px 10px;
+    text-overflow: ellipsis;
+}
+
+.floating-ranking .sort {
+    color: hsl(22deg 58% 58%);
+    cursor: pointer;
+}
+
+.floating-ranking .sort:hover {
+    color: hsl(22deg 80% 58%);
+}
+
+.floating-ranking .sort.selected::before {
+    opacity: 1;
+}
+
+.floating-ranking .sort.reverse::before {
+    transform: rotate(180deg);
+}
+
+.floating-ranking .sort::before {
+    background-image: url(/images/icons/down-arrow.svg);
+    background-repeat: no-repeat;
+    background-size: 8px;
+    content: ''; 
+    display: inline-block;
+    height: 9px;
+    margin-left: -9px;
+    margin-top: 3px;
+    opacity: 0;
+    position: absolute;
+    transform: rotate(0deg);
+    width: 8px;
 }
 
 span[class^="flag-"] {
@@ -937,18 +1571,45 @@ span[class^="flag-"] {
     background-position: 0 -1184px;
 }
 
-#map {
+.map-page .map {
+    height: 100%;
+    width: 100%;
+}
+
+.map {
     background: hsl(84, 68%, 23%);
     box-shadow: 0px 0px 0px 1px hsl(23deg 55% 24%), 0px 0px 0px 2px hsl(23deg 47% 36%), 2px 2px 4px hsl(0deg 0% 0% / 50%);
     height: 481px;
     touch-action: none;
+    user-select: none;
+}
+
+.map .map-info {
+    bottom: 2px;
+    left: 4px;
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.map .map-info > div {
+    background: var(--noise) hsl(23, 25%, 20%);
+    border-radius: 1px;
+    border: 1px solid hsl(23, 6%, 39%);
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%);
+    color: hsl(36, 13%, 59%);
+    margin: 2px 0px;
+    padding: 1px 4px;
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
 }
 
 #tribes .top-colors {
-    background-image: url(/images/noise.webp);
+    background-image: var(--noise);
     border-radius: 1px;
     border: 1px solid hsl(24, 42%, 39%);
-    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
     display: inline-block;
     height: 8px;
     position: relative;
@@ -972,7 +1633,7 @@ span[class^="flag-"] {
 }
 
 #map-tooltip table {
-    background: url(/images/noise.webp) hsl(31, 45%, 67%);
+    background: var(--noise) hsl(31, 45%, 67%);
     border-collapse: separate;
     border-spacing: 1px;
     box-shadow: 0 0 0 2px hsla(26, 100%, 24%, 66%);
@@ -980,7 +1641,7 @@ span[class^="flag-"] {
 }
 
 #map-tooltip td {
-    background: url(/images/noise.webp) hsl(30deg 36% 60%);
+    background: var(--noise) hsl(30deg 36% 60%);
     border: 1px solid hsl(32deg 33% 48%);
     box-shadow: none;
     padding: 1px;
@@ -1123,10 +1784,34 @@ span[class^="flag-"] {
     margin: 0px;
 }
 
+@keyframes sk-bouncedelay {
+    0%, 80%, 100% { 
+        transform: scale(0);
+    } 40% { 
+        transform: scale(1.0);
+    }
+}
+
 @media (max-width: 800px) {
     body {
-        width: 96vw;
         padding: 1px 0px;
+    }
+
+    .map-page body {
+        width: 100%;
+        padding: 0px 0px;
+    }
+
+    .map-panel .toggle {
+        visibility: visible;
+    }
+
+    .map-panel.away {
+        margin-left: -150px;
+    }
+
+    .map.full {
+        margin-left: 0px;
     }
 
     #main-header {
@@ -1142,6 +1827,10 @@ span[class^="flag-"] {
 
     .content > * + * {
         margin-left: initial;
+    }
+
+    main {
+        padding: 5px;
     }
 
     table td.limit-size {
@@ -1199,5 +1888,16 @@ span[class^="flag-"] {
 
     .relax-container > * {
         margin: 0px 1px;
+    }
+
+    .color-picker {
+        transform: initial !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 366px;
+        height: 132px;
     }
 }

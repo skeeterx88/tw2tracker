@@ -1,106 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="map-page">
     <%- include('head.ejs') %>
-    <body id="map-page">
-        <div id="map-wrapper">
-            <div id="side-panel" class="hidden">
-                <header>
-                    <a href="/stats/br/51"><h1 class="world-name">York Castle</h1></a>
-                    <div class="flex">
-                        <button class="element" id="current-world"><span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span></button>
-                        <button class="element" id="change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
-                    </div>
-                    <div class="flex">
-                        <button class="element" id="ranking-toggle"><%= i18n('button_ranking', 'maps', lang) %></button>
-                    </div>
-                </header>
-
-                <div id="quick-jump">
-                    <div id="quick-jump-coords" class="input element">
-                        <label>x:<input type="text" id="quick-jump-x" placeholder="500"></label>
-                        <label>y:<input type="text" id="quick-jump-y" placeholder="500"></label>
-                    </div>
-                    <button id="quick-jump-go" class="element red">Go</button>
+    <body>
+        <div class="wrapper">
+            <div class="map-panel away">
+                <div>
+                    <a href="/stats/br/51"><h1><%= world.name %></h1></a>
+                    <section>
+                        <button class="element relax-button" id="current-world"><span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span></button>
+                        <button class="element relax-button flex change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
+                    </section>
+                    <section>
+                        <button class="element relax-button stretch" id="ranking-toggle"><%= i18n('button_ranking', 'maps', lang) %></button>
+                    </section>
                 </div>
 
-                <div id="highlights">
-                    <h2 id="highlights-title"><%= i18n('header_highlights', 'maps', lang) %></h2>
-                    
-                    <div id="highlights-search" class="flex-column">
-                        <input type="text" id="highlight-id" class="input element" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
-                        <div id="search-results" class="hidden element">
-                            <div id="search-no-results" class="hidden"><%= i18n('search_no_results', 'maps', lang) %></div>
+                <div class="jump">
+                    <div class="coords relax-input element">
+                        <label>x:<input type="text" class="coords-x" placeholder="500"></label>
+                        <label>y:<input type="text" class="coords-y" placeholder="500"></label>
+                    </div>
+                    <button class="coords-go element relax-button red">Go</button>
+                </div>
+
+                <div class="highlights">
+                    <h2><%= i18n('header_highlights', 'maps', lang) %></h2>
+
+                    <section class="search column">
+                        <input type="text" class="relax-input element" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
+                        <div class="results hidden element">
+                            <div class="no-results hidden"><%= i18n('search_no_results', 'maps', lang) %></div>
                         </div>
-                    </div>
+                    </section>
 
-                    <ul id="highlight-items"></ul>
-
+                    <ul class="highlights-items"></ul>
                 </div>
 
-                <footer>
-                    <div class="flex">
-                        <button id="map-share" class="element">
+                <div>
+                    <section>
+                        <button id="map-share" class="element stretch relax-button">
                             <span><%= i18n('button_gen_dynamic_map', 'maps', lang) %></span>
                             <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
                         </button>
-                    </div>
-                    <div class="flex">
-                        <button id="map-save" class="element">
+                    </section>
+                    <section>
+                        <button id="map-save" class="element stretch relax-button">
                             <span><%= i18n('button_gen_static_map', 'maps', lang) %></span>
                             <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
                         </button>
-                    </div>
+                    </section>
 
-                    <div id="site-info">
+                    <div class="info">
                         <p>&copy; 2020-2021 <a href="https://www.tw2-tracker.com">Tw2-Tracker</a></p>
                     </div>
-                </footer>
+                </div>
 
-                <div id="panel-toggle"></div>
+                <div class="toggle"></div>
             </div>
-            <div id="map" class="full">
-                <div id="map-info">
-                    <div id="display-position" class="text-container">
-                        <span id="display-position-x">500</span>|<span id="display-position-y">500</span>
+            <div class="map full">
+                <div class="map-info">
+                    <div>
+                        <span class="position-x">500</span>|<span class="position-y">500</span>
                     </div>
 
-                    <div id="last-sync" class="text-container hidden">
+                    <div class="last-sync hidden">
                         <span><%= i18n('last_update', 'maps', lang) %></span>
-                        <span id="last-sync-date"></span>
+                        <span class="date"></span>
                     </div>
 
-                    <div id="share-date" class="text-container hidden">
+                    <div class="share-date hidden">
                         <span><%= i18n('share_date', 'maps', lang) %></span>
-                        <span id="share-date-date"></span>
+                        <span class="date"></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="notif" class="hidden">
-            <span id="notif-close"></span>
-            <h3 id="notif-title"></h3>
-            <div id="notif-wrapper">
-                <p id="notif-content"></p>
-                <a id="notif-link"></a>
+        <div class="notif hidden">
+            <span class="close"></span>
+            <h3 class="title"></h3>
+            <div class="body">
+                <p class="content"></p>
+                <a class="link"></a>
             </div>
         </div>
 
         <%- include('tooltip.ejs') %>
 
-        <div id="color-picker" class="box-border">
+        <div class="color-picker box-border invisible">
             <span class="close"></span>
             <table></table>
         </div>
 
-        <div id="all-worlds" class="hidden">
+        <div class="map-world-list floating-modal invisible">
             <h2><%= i18n('open_worlds', 'maps', lang) %></h2>
             <div class="loading"><div class="b1"></div><div class="b2"></div><div></div></div>
-            <ul id="all-markets"></ul>
-            <ul id="all-market-worlds"></ul>
+            <ul class="map-market-list"></ul>
+            <ul class="map-market-worlds"></ul>
         </div>
 
-        <div id="settings" class="floating-modal hidden">
+        <div class="map-settings floating-modal invisible">
             <div class="color-option" data-setting-id="backgroundColor"><label><%= i18n('settings_bg_color', 'maps', lang) %></label></div>
             <div class="color-option" data-setting-id="neutralColor"><label><%= i18n('settings_neutral_color', 'maps', lang) %></label></div>
             <div class="color-option" data-setting-id="barbarianColor"><label><%= i18n('settings_barbarian_color', 'maps', lang) %></label></div>
@@ -109,12 +108,12 @@
         </div>
 
         <template id="floating-modal">
-            <div class="floating-modal hidden">
+            <div class="floating-modal invisible">
                 <header class="floating-modal-header">
                     <div class="floating-modal-menu"></div>
                     <div class="floating-modal-drag"></div>
                     <div class="modal-actions">
-                        <button class="floating-modal-close red">x</button>
+                        <button class="floating-modal-close relax-button red">x</button>
                     </div>
                 </header>
                 <div class="floating-modal-body"></div>
@@ -122,7 +121,7 @@
         </template>
 
         <template id="ranking-players">
-            <table class="ranking ranking-players" data-type="players">
+            <table class="floating-ranking" data-type="players">
                 <thead>
                     <tr>
                         <th data-sort="rank" class="sort selected"><%= i18n('column_rank', 'world', lang) %></th>
@@ -155,7 +154,7 @@
         </template>
 
         <template id="ranking-tribes">
-            <table class="ranking ranking-tribes" data-type="tribes">
+            <table class="floating-ranking" data-type="tribes">
                 <thead>
                     <tr>
                         <th data-sort="rank" class="sort selected" title="<%= i18n('column_rank', 'world', lang) %>"><%= i18n('column_rank', 'world', lang) %></th>

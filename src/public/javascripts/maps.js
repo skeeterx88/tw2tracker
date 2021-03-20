@@ -52,9 +52,9 @@ require([
     };
 
     const setupQuickJump = () => {
-        const $quickJumpX = document.querySelector('#quick-jump-x');
-        const $quickJumpY = document.querySelector('#quick-jump-y');
-        const $quickJumpGo = document.querySelector('#quick-jump-go');
+        const $quickJumpX = document.querySelector('.map-panel .coords-x');
+        const $quickJumpY = document.querySelector('.map-panel .coords-y');
+        const $quickJumpGo = document.querySelector('.map-panel .coords-go');
 
         const onInput = function (event) {
             if (event.inputType === 'insertFromPaste' || event.inputType === 'insertFromDrag') {
@@ -96,10 +96,11 @@ require([
     };
 
     const setupCustomHighlights = async () => {
-        const $input = document.getElementById('highlight-id');
-        const $results = document.getElementById('search-results');
-        const $noResults = document.getElementById('search-no-results');
-        const $highlightItems = document.getElementById('highlight-items');
+        const $search = document.querySelector('.search');
+        const $input = $search.querySelector('input');
+        const $results = $search.querySelector('.results');
+        const $noResults = $search.querySelector('.no-results');
+        const $highlightItems = document.querySelector('.highlights-items');
         const maxResults = 5;
         let selectedIndex = 0;
         let results = [];
@@ -257,7 +258,7 @@ require([
             
             $icon.classList.add(`icon-${highlightType}`);
 
-            $color.classList.add('color');
+            $color.classList.add('color-selector');
             $color.classList.add('open-color-picker');
             $color.style.backgroundColor = color;
             $color.dataset.color = color;
@@ -302,7 +303,7 @@ require([
                 return false;
             }
 
-            const $color = $item.querySelector('.color');
+            const $color = $item.querySelector('.color-selector');
 
             $color.style.background = color;
             $item.dataset.color = color;
@@ -324,7 +325,7 @@ require([
     const setupColorPicker = () => {
         let activeColorPicker = false;
 
-        const $colorPicker = document.querySelector('#color-picker');
+        const $colorPicker = document.querySelector('.color-picker');
         const $colorPickerTable = $colorPicker.querySelector('table');
 
         for (const colorsRow of TW2Map.colorPalette) {
@@ -374,8 +375,7 @@ require([
 
             const {x, y} = utils.getElemPosition($reference);
 
-            $colorPicker.style.visibility = 'visible';
-            $colorPicker.style.opacity = 1;
+            $colorPicker.classList.remove('invisible');
             $colorPicker.style.transform = `translate3d(${x}px, ${y}px, 0px)`;
 
             const index = TW2Map.colorPalette.flat().indexOf(selectedColor);
@@ -383,9 +383,6 @@ require([
             if (index !== -1) {
                 $colors[index].classList.add('active');
             }
-
-            $colorPicker.style.visibility = 'visible';
-            $colorPicker.style.opacity = 1;
 
             activeColorPicker = (event) => {
                 if (event.target.classList.contains('color')) {
@@ -406,13 +403,12 @@ require([
 
         const closeColorPicker = () => {
             $colorPicker.removeEventListener('mouseup', activeColorPicker);
-            $colorPicker.style.visibility = 'hidden';
-            $colorPicker.style.opacity = 0;
+            $colorPicker.classList.add('invisible');
             activeColorPicker = false;
         };
 
         addEventListener('mousedown', (event) => {
-            if (activeColorPicker && !event.target.classList.contains('open-color-picker') && !event.target.closest('#color-picker')) {
+            if (activeColorPicker && !event.target.classList.contains('open-color-picker') && !event.target.closest('.color-picker')) {
                 closeColorPicker();
             }
         });
@@ -423,8 +419,8 @@ require([
             return;
         }
 
-        const $lastSync = document.querySelector('#last-sync');
-        const $lastSyncDate = document.querySelector('#last-sync-date');
+        const $lastSync = document.querySelector('.map .map-info .last-sync');
+        const $lastSyncDate = $lastSync.querySelector('.date');
 
         if (!lastDataSyncDate) {
             $lastSyncDate.innerHTML = 'never';
@@ -441,20 +437,21 @@ require([
             return;
         }
 
-        const $shareDate = document.querySelector('#share-date');
-        const $shareDateDate = document.querySelector('#share-date-date');
+        const $shareDate = document.querySelector('.map .map-info .share-date');
+        const $shareDateDate = $shareDate.querySelector('.date');
 
         $shareDateDate.innerHTML = utils.formatSince(mapShare.creation_date);
         $shareDate.classList.remove('hidden');
     };
 
     const setupDisplayPosition = () => {
-        const $displayPositionX = document.querySelector('#display-position-x');
-        const $displayPositionY = document.querySelector('#display-position-y');
+        const $mapInfo = document.querySelector('.map .map-info');
+        const $posX = $mapInfo.querySelector('.position-x');
+        const $posY = $mapInfo.querySelector('.position-y');
 
         map.on('center coords update', (x, y) => {
-            $displayPositionX.innerHTML = x;
-            $displayPositionY.innerHTML = y;
+            $posX.innerText = x;
+            $posY.innerText = y;
         });
     };
 
@@ -486,17 +483,17 @@ require([
     const setupSettings = () => {
         let visible = false;
 
-        const $settings = document.querySelector('#settings');
-        const $changeSettings = document.querySelector('#change-settings');
-        const $colorOptions = document.querySelectorAll('#settings .color-option');
+        const $settings = document.querySelector('.map-settings');
+        const $changeSettings = document.querySelector('.change-settings');
+        const $colorOptions = $settings.querySelectorAll('.color-option');
 
         const closeHandler = function (event) {
-            const keep = ['#color-picker', '#settings', '#change-settings'].some((selector) => {
+            const keep = ['.color-picker', '.map-settings', '.change-settings'].some((selector) => {
                 return event.target.closest(selector);
             });
 
             if (!keep) {
-                $settings.classList.add('hidden');
+                $settings.classList.add('invisible');
                 removeEventListener('mousedown', closeHandler);
                 visible = false;
             }
@@ -504,12 +501,12 @@ require([
 
         $changeSettings.addEventListener('mouseup', () => {
             if (visible) {
-                $settings.classList.add('hidden');
+                $settings.classList.add('invisible');
                 visible = false;
                 return;
             }
 
-            $settings.classList.toggle('hidden');
+            $settings.classList.toggle('invisible');
             visible = !visible;
 
             if (visible) {
@@ -526,7 +523,7 @@ require([
             const color = map.getSetting(id);
 
             const $color = document.createElement('div');
-            $color.classList.add('color');
+            $color.classList.add('color-selector');
             $color.classList.add('open-color-picker');
             $color.dataset.color = color;
             $color.style.backgroundColor = color;
@@ -665,15 +662,15 @@ require([
     };
 
     const setupNotif = () => {
-        const $notif = document.querySelector('#notif');
-        const $notifTitle = $notif.querySelector('#notif-title');
-        const $notifContent = $notif.querySelector('#notif-content');
-        const $notifLink = $notif.querySelector('#notif-link');
-        const $notifClose = $notif.querySelector('#notif-close');
+        const $notif = document.querySelector('.notif');
+        const $notifTitle = $notif.querySelector('.title');
+        const $notifContent = $notif.querySelector('.content');
+        const $notifLink = $notif.querySelector('.link');
+        const $notifClose = $notif.querySelector('.close');
 
         let activeTimeout;
 
-        $notifClose.addEventListener('click', () => $notif.classList.add('hidden'));
+        $notifClose.addEventListener('click', () => $notif.classList.add('invisible'));
 
         notif = ({title = '', content = '', timeout = 3000, link = false}) => {
             clearTimeout(activeTimeout);
@@ -682,9 +679,9 @@ require([
 
             if (title.length) {
                 $notifTitle.innerText = title;
-                $notifTitle.classList.remove('hidden');
+                $notifTitle.classList.remove('invisible');
             } else {
-                $notifTitle.classList.add('hidden');
+                $notifTitle.classList.add('invisible');
             }
 
             if (link) {
@@ -720,11 +717,11 @@ require([
         let allWorlds = null;
         let allMarkets = null;
 
-        const $allWorlds = document.querySelector('#all-worlds');
-        const $allMarkets = document.querySelector('#all-markets');
+        const $worldList = document.querySelector('.map-world-list');
+        const $marketList = document.querySelector('.map-market-list');
         const $currentWorld = document.querySelector('#current-world');
-        const $allMarketWorlds = document.querySelector('#all-market-worlds');
-        const $loading = $allWorlds.querySelector('.loading');
+        const $marketWorlds = document.querySelector('.map-market-worlds');
+        const $loading = $worldList.querySelector('.loading');
 
         const loadWorlds = () => {
             if (loadWorldsPromise) {
@@ -766,7 +763,7 @@ require([
                 $button.appendChild($flag);
 
                 $button.addEventListener('mouseenter', function () {
-                    const $selectedmarket = $allWorlds.querySelector('.market.selected');
+                    const $selectedmarket = $worldList.querySelector('.market.selected');
 
                     if ($selectedmarket) {
                         $selectedmarket.classList.remove('selected');
@@ -778,15 +775,15 @@ require([
                 });
 
                 $marketContainer.appendChild($button);
-                $allMarkets.appendChild($marketContainer);
+                $marketList.appendChild($marketContainer);
             }
         };
 
         const changeWorldList = function (newMarket) {
             const marketWorlds = allWorlds.filter((world) => world.market === newMarket);
 
-            while ($allMarketWorlds.firstChild) {
-                $allMarketWorlds.removeChild($allMarketWorlds.lastChild);
+            while ($marketWorlds.firstChild) {
+                $marketWorlds.removeChild($marketWorlds.lastChild);
             }
 
             for (const {market, num, name} of marketWorlds) {
@@ -806,7 +803,7 @@ require([
 
                 $archor.appendChild($button);
                 $world.appendChild($archor);
-                $allMarketWorlds.appendChild($world);
+                $marketWorlds.appendChild($world);
             }
         };
 
@@ -816,7 +813,7 @@ require([
             });
 
             if (!keep) {
-                $allWorlds.classList.add('hidden');
+                $worldList.classList.add('invisible');
                 removeEventListener('mousedown', closeHandler);
                 visible = false;
             }
@@ -826,18 +823,18 @@ require([
             await loadWorlds();
 
             if (visible) {
-                $allWorlds.classList.add('hidden');
+                $worldList.classList.add('invisible');
                 visible = false;
                 return;
             }
 
-            $allWorlds.classList.toggle('hidden');
+            $worldList.classList.toggle('invisible');
             visible = !visible;
 
             if (visible) {
                 const {x, y} = utils.getElemPosition($currentWorld);
-                $allWorlds.style.left = `${x}px`;
-                $allWorlds.style.top = `${y}px`;
+                $worldList.style.left = `${x}px`;
+                $worldList.style.top = `${y}px`;
 
                 addEventListener('mousedown', closeHandler);
             }
@@ -845,14 +842,14 @@ require([
     };
 
     const setupPanelToggle = () => {
-        const $panelToggle = document.querySelector('#panel-toggle');
-        const $sidePanel = document.querySelector('#side-panel');
-        const $map = document.querySelector('#map');
+        const $mapPanel = document.querySelector('.map-panel');
+        const $toggle = $mapPanel.querySelector('.map-panel .toggle');
+        const $map = document.querySelector('.map');
 
-        $panelToggle.addEventListener('click', function (event) {
-            $sidePanel.classList.toggle('hidden');
+        $toggle.addEventListener('click', function (event) {
+            $mapPanel.classList.toggle('away');
             $map.classList.toggle('full');
-            $panelToggle.classList.toggle('hide');
+            $toggle.classList.toggle('hide');
             map.recalcSize();
         });
     };
@@ -892,7 +889,7 @@ require([
         }
     };
 
-    function createFloatingModal ({id, items, onClose, position = {}}) {
+    function createFloatingModal ({className, items, onClose, position = {}}) {
         const $template = document.querySelector('#floating-modal');
         const $modal = $template.content.cloneNode(true).children[0];
         const $header = $modal.querySelector('header');
@@ -906,7 +903,9 @@ require([
 
         const buttonSelector = {};
 
-        $modal.id = id;
+        if (className) {
+            $modal.classList.add(className);
+        }
 
         position = {
             ...position,
@@ -923,6 +922,7 @@ require([
             const $button = document.createElement('button');
             const $bodyWrapper = document.createElement('div');
 
+            $button.classList.add('relax-button');
             $bodyWrapper.appendChild($body);
 
             if (firstItem) {
@@ -951,7 +951,7 @@ require([
         }
 
         function close () {
-            $modal.classList.add('hidden');
+            $modal.classList.add('invisible');
 
             if (onClose) {
                 onClose();
@@ -959,11 +959,11 @@ require([
         }
 
         function open () {
-            $modal.classList.remove('hidden');
+            $modal.classList.remove('invisible');
         }
 
         function toggle () {
-            if ($modal.classList.contains('hidden')) {
+            if ($modal.classList.contains('invisible')) {
                 open();
             } else {
                 close();
@@ -1039,7 +1039,6 @@ require([
         const itemsLimit = 15;
 
         const modal = createFloatingModal({
-            id: 'ranking',
             items: [{
                 label: 'Players',
                 $body: $rankingPlayers,
@@ -1360,7 +1359,7 @@ require([
 
     const loader = new TW2DataLoader(marketId, worldNumber);
     const tooltip = new TW2Tooltip('#map-tooltip');
-    const map = new TW2Map('#map', loader, tooltip, {});
+    const map = new TW2Map('.map', loader, tooltip, {});
 
     setupQuickJump();
     setupCustomHighlights();

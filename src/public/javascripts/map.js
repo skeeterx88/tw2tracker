@@ -186,7 +186,7 @@ define('TW2Map', [
         };
 
         settingTriggers.backgroundColor = (flag) => {
-            $container.style.backgroundColor = settings.backgroundColor;
+            $viewport.style.backgroundColor = settings.backgroundColor;
         };
 
         settingTriggers.demarcationsColor = (flag) => {
@@ -475,7 +475,7 @@ define('TW2Map', [
                     } else if (event.deltaY > 0) {
                         this.zoomOut();
                     }
-                });
+                }, {passive: true});
             }
         };
 
