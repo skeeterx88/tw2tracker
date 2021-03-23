@@ -417,12 +417,12 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
 
         for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
-                achievementsRepeatableLastEarned[type] = utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only');
+                achievementsRepeatableLastEarned[type] = utils.formatDate(time_last_level, world.time_offset, 'day-only');
             }
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || [];
-                achievementsRepeatableDetailed[type].push(utils.ejsHelpers.formatDate(time_last_level, world.time_offset, 'day-only'));
+                achievementsRepeatableDetailed[type].push(utils.formatDate(time_last_level, world.time_offset, 'day-only'));
             }
 
             achievementsRepeatableCount[type] = achievementsRepeatableCount[type] ?? 0;

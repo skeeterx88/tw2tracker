@@ -126,10 +126,10 @@ module.exports = function () {
     app.use(function (req, res, next) {
         res.locals.i18n = i18n;
         res.locals.availableLanguages = availableLanguages;
-        res.locals.formatNumbers = utils.ejsHelpers.formatNumbers;
-        res.locals.formatDate = utils.ejsHelpers.formatDate;
+        res.locals.formatNumbers = utils.formatNumbers;
+        res.locals.formatDate = utils.formatDate;
         res.locals.formatSince = utils.formatSince;
-        res.locals.capitalize = utils.ejsHelpers.capitalize;
+        res.locals.capitalize = utils.capitalize;
         res.locals.sprintf = utils.sprintf;
         res.locals.lang = req.session.lang || config.general.lang;
         res.locals.tribeRankingSortField = req.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;

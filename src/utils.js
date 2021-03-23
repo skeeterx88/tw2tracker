@@ -135,46 +135,43 @@ function sprintf (string, tokens = []) {
     return string.replace(/%{[^}]*}/g, () => tokens[i++]);
 }
 
-// TODO: move utils.ejsHelpers functions to utils obj.
-const ejsHelpers = {
-    formatNumbers: function (value) {
-        return typeof value === 'number'
-            ? value.toLocaleString('pt-BR')
-            : value;
-    },
-    formatDate: function (dateObject, timeOffset, flag = false) {
-        if (dateObject instanceof Date) {
-            if (typeof timeOffset === 'number') {
-                dateObject = new Date(dateObject.getTime() + timeOffset);
-            } else if (typeof timeOffset === 'string') {
-                flag = timeOffset;
-            }
+function formatNumbers (value) {
+    return typeof value === 'number'
+        ? value.toLocaleString('pt-BR')
+        : value;
+}
 
-            const date = [
-                dateObject.getFullYear(),
-                (dateObject.getMonth() + 1).toString().padStart(2, 0),
-                dateObject.getDate().toString().padStart(2, 0)
-            ];
-
-            const time = [];
-
-            if (flag === 'hours-only') {
-                time.push(dateObject.getHours().toString().padStart(2, 0) + 'h');
-            } else if (flag === 'day-only') {
-                return date.join('/');
-            } else {
-                time.push(dateObject.getHours().toString().padStart(2, 0));
-                time.push(dateObject.getMinutes().toString().padStart(2, 0));
-                time.push(dateObject.getSeconds().toString().padStart(2, 0));
-            }
-
-            return date.join('/') + ' ' + time.join(':');
-        } else {
-            throw new Error('formatDate: dateObject is not of type Date');
+function formatDate (dateObject, timeOffset, flag = false) {
+    if (dateObject instanceof Date) {
+        if (typeof timeOffset === 'number') {
+            dateObject = new Date(dateObject.getTime() + timeOffset);
+        } else if (typeof timeOffset === 'string') {
+            flag = timeOffset;
         }
-    },
-    capitalize
-};
+
+        const date = [
+            dateObject.getFullYear(),
+            (dateObject.getMonth() + 1).toString().padStart(2, 0),
+            dateObject.getDate().toString().padStart(2, 0)
+        ];
+
+        const time = [];
+
+        if (flag === 'hours-only') {
+            time.push(dateObject.getHours().toString().padStart(2, 0) + 'h');
+        } else if (flag === 'day-only') {
+            return date.join('/');
+        } else {
+            time.push(dateObject.getHours().toString().padStart(2, 0));
+            time.push(dateObject.getMinutes().toString().padStart(2, 0));
+            time.push(dateObject.getSeconds().toString().padStart(2, 0));
+        }
+
+        return date.join('/') + ' ' + time.join(':');
+    } else {
+        throw new Error('formatDate: dateObject is not of type Date');
+    }
+}
 
 const UTC = function () {
     const now = new Date();
@@ -229,9 +226,10 @@ module.exports = {
     sha1sum,
     timeout,
     hasOwn,
-    ejsHelpers,
     capitalize,
     sprintf,
     UTC,
-    formatSince
+    formatSince,
+    formatNumbers,
+    formatDate
 };
