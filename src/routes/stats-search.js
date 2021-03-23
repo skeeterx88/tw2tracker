@@ -66,7 +66,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
-    const limit = config.ui.ranking_page_items_per_page;
+    const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
     const rawQuery = decodeURIComponent(req.params.query);
@@ -75,12 +75,12 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         throw createError(500, i18n('error_no_search', 'world_search', res.locals.lang));
     }
 
-    if (rawQuery.length < config.search.min_search_characters) {
-        throw createError(500, i18n('error_min_chars', 'world_search', res.locals.lang, [config.search.min_search_characters]));
+    if (rawQuery.length < config('search', 'min_search_characters')) {
+        throw createError(500, i18n('error_min_chars', 'world_search', res.locals.lang, [config('search', 'min_search_characters')]));
     }
 
-    if (rawQuery.length > config.search.max_search_characters) {
-        throw createError(500, i18n('error_max_chars', 'world_search', res.locals.lang, [config.search.max_search_characters]));
+    if (rawQuery.length > config('search', 'max_search_characters')) {
+        throw createError(500, i18n('error_max_chars', 'world_search', res.locals.lang, [config('search', 'max_search_characters')]));
     }
 
     const query = '%' + rawQuery + '%';
@@ -95,7 +95,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
 
     return res.render('stats', {
         page: 'stats/search',
-        title: i18n('stats_search', 'page_titles', res.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_search', 'page_titles', res.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         category,

@@ -57,7 +57,7 @@ const marketsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/market-list',
-        title: i18n('stats_servers', 'page_titles', res.locals.lang, [config.general.site_name]),
+        title: i18n('stats_servers', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         pageType: 'stats',
         marketStats,
         worldsByMarket,
@@ -108,7 +108,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/world-list',
-        title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config.general.site_name]),
+        title: i18n('stats_worlds', 'page_titles', res.locals.lang, [marketId.toUpperCase(), config('general', 'site_name')]),
         marketId,
         worlds,
         marketStats,
@@ -150,9 +150,9 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         lastDailyTribeAchievements,
         lastWeeklyTribeAchievements
     ] = await Promise.all([
-        db.any(sql.getWorldTopPlayers, {worldId, limit: config.ui.world_page_maximum_ranking_items, playerRankingSortField, playerRankingSortOrder}),
-        db.any(sql.getWorldTopTribes, {worldId, limit: config.ui.world_page_maximum_ranking_items, tribeRankingSortField, tribeRankingSortOrder}),
-        db.any(sql.getWorldLastConquests, {worldId, limit: config.ui.world_page_maximum_last_conquests}),
+        db.any(sql.getWorldTopPlayers, {worldId, limit: config('ui', 'world_page_maximum_ranking_items'), playerRankingSortField, playerRankingSortOrder}),
+        db.any(sql.getWorldTopTribes, {worldId, limit: config('ui', 'world_page_maximum_ranking_items'), tribeRankingSortField, tribeRankingSortOrder}),
+        db.any(sql.getWorldLastConquests, {worldId, limit: config('ui', 'world_page_maximum_last_conquests')}),
         db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-%-%'}),
         db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-W%'}),
         db.any(sql.getWorldLastTribeRepeatableAchievements, {worldId, period: '%-%-%'}),
@@ -201,7 +201,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/world',
-        title: i18n('stats_world', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_world', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         players,

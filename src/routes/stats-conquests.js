@@ -30,7 +30,7 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
     const page = req.params.page && !isNaN(req.params.page)
         ? Math.max(1, parseInt(req.params.page, 10))
         : 1;
-    const limit = config.ui.ranking_page_items_per_page;
+    const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
     const conquests = await db.any(sql.getWorldConquests, {worldId, offset, limit});
@@ -43,7 +43,7 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/conquests',
-        title: i18n('stats_world_conquests', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_world_conquests', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,

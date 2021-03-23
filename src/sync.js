@@ -64,7 +64,7 @@ Sync.initQueue = async function (type) {
         processingQueue[type] = true;
 
         while (queue[type].length) {
-            if (running[type].size < config.sync.parallel_data_sync) {
+            if (running[type].size < config('sync', 'parallel_data_sync')) {
                 const data = queue[type].shift();
 
                 Sync[type](data.market_id, data.world_number, null, function () {
@@ -175,7 +175,7 @@ Sync.init = async function () {
     tasks.add('clean_shares', async function () {
         const now = Date.now();
         const shares = await db.any(sql.maps.getShareLastAccess);
-        const expireTime = humanInterval(config.sync.static_share_expire_time);
+        const expireTime = humanInterval(config('sync', 'static_share_expire_time'));
 
         for (const {share_id, last_access} of shares) {
             if (now - last_access.getTime() < expireTime) {
@@ -328,7 +328,7 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
             if (flag !== syncFlags.IGNORE_LAST_SYNC && world.last_data_sync_date) {
                 const elapsedTime = utils.UTC() - world.last_data_sync_date;
 
-                if (elapsedTime < humanInterval(config.sync.min_time_between_data_syncs)) {
+                if (elapsedTime < humanInterval(config('sync', 'min_time_between_data_syncs'))) {
                     debug.sync('world:%s already sinced', worldId);
                     Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.ALREADY_SYNCED]);
                     running.data.delete(worldId);
@@ -363,7 +363,7 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
             debug.sync('world:%s waiting ready state', worldId);
 
             await page.evaluate(scraperReadyState, {
-                timeout: humanInterval(config.sync_timeouts.ready_state)
+                timeout: humanInterval(config('sync_timeouts', 'ready_state'))
             });
 
             if (!fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
@@ -381,8 +381,8 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
             debug.sync('world:%s fetching data', worldId);
 
             const data = await page.evaluate(scraperData, {
-                loadContinentTimeout: humanInterval(config.sync_timeouts.load_continent),
-                loadContinentSectionTimeout: humanInterval(config.sync_timeouts.load_continent_section)
+                loadContinentTimeout: humanInterval(config('sync_timeouts', 'load_continent')),
+                loadContinentSectionTimeout: humanInterval(config('sync_timeouts', 'load_continent_section'))
             });
             await commitRawDataFilesystem(data, worldId);
             await commitDataDatabase(data, worldId);
@@ -393,7 +393,7 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
             debug.sync('world:%s data sync finished', worldId);
             Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.SUCCESS]);
             running.data.delete(worldId);
-        }, humanInterval(config.sync.max_sync_data_running_time));
+        }, humanInterval(config('sync', 'max_sync_data_running_time')));
 
         if (callback) {
             callback(true);
@@ -408,7 +408,7 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
             await page.close();
         }
 
-        if (attempt < config.sync.max_sync_attempts) {
+        if (attempt < config('sync', 'max_sync_attempts')) {
             return await Sync.data(marketId, worldNumber, flag, callback, attempt + 1);
         } else {
             if (callback) {
@@ -459,7 +459,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
             if (flag !== syncFlags.IGNORE_LAST_SYNC && world.last_achievements_sync_date) {
                 const elapsedTime = utils.UTC() - world.last_achievements_sync_date;
 
-                if (elapsedTime < humanInterval(config.sync.min_time_between_achievement_syncs)) {
+                if (elapsedTime < humanInterval(config('sync', 'min_time_between_achievement_syncs'))) {
                     debug.sync('world:%s already sinced', worldId, attempt);
                     Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.ALREADY_SYNCED]);
                     running.data.delete(worldId);
@@ -479,7 +479,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
             page = await createPuppeteerPage();
             await page.goto(`https://${urlId}.tribalwars2.com/game.php?world=${marketId}${worldNumber}&character_id=${account.player_id}`, {waitFor: ['domcontentloaded', 'networkidle2']});
             await page.evaluate(scraperReadyState, {
-                timeout: humanInterval(config.sync_timeouts.ready_state)
+                timeout: humanInterval(config('sync_timeouts', 'ready_state'))
             });
 
             const achievements = await page.evaluate(scraperAchievements, marketId, worldNumber);
@@ -491,7 +491,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
             debug.sync('world:%s achievements sync finished', worldId);
             Events.trigger(syncEvents.ACHIEVEMENTS_FINISH, [worldId, syncStatus.SUCCESS]);
             running.achievements.delete(worldId);
-        }, humanInterval(config.sync.max_sync_achievements_running_time));
+        }, humanInterval(config('sync', 'max_sync_achievements_running_time')));
 
         if (callback) {
             callback(true);
@@ -506,7 +506,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
             await page.close();
         }
 
-        if (attempt < config.sync.max_sync_attempts) {
+        if (attempt < config('sync', 'max_sync_attempts')) {
             return await Sync.achievements(marketId, worldNumber, flag, callback, attempt + 1);
         } else {
             if (callback) {
@@ -684,7 +684,7 @@ Sync.auth = async function (marketId, attempt = 1) {
                     });
                 });
             }, marketId, credentials, {
-                authSocketEmitTimeout: humanInterval(config.sync_timeouts.auth_socket_emit)
+                authSocketEmitTimeout: humanInterval(config('sync_timeouts', 'auth_socket_emit'))
             });
 
             if (!account) {
@@ -741,7 +741,7 @@ Sync.auth = async function (marketId, attempt = 1) {
             await page.close();
         }
 
-        if (attempt < config.sync.max_login_attempts) {
+        if (attempt < config('sync', 'max_login_attempts')) {
             debug.auth('market:%s authentication failed (%s)', marketId, error.message);
             return await Sync.auth(marketId, attempt + 1);
         } else {
@@ -755,9 +755,9 @@ Sync.tasks = async function () {
     debug.tasks('initializing task system');
 
     const taskHandlers = new Map();
-    const intervalKeys = Object.keys(config.sync_intervals);
+    const intervalKeys = Object.keys(config('sync_intervals'));
     const presentTasks = await db.any(sql.getTasks);
-    const interval = humanInterval(config.sync.task_check_interval);
+    const interval = humanInterval(config('sync', 'task_check_interval'));
 
     for (const {id} of presentTasks) {
         if (!intervalKeys.includes(id)) {
@@ -771,9 +771,9 @@ Sync.tasks = async function () {
             taskHandlers.set(id, handler);
         },
         initChecker: function () {
-            debug.tasks('start task checker (interval: %s)', config.sync.task_check_interval);
+            debug.tasks('start task checker (interval: %s)', config('sync', 'task_check_interval'));
 
-            const intervalEntries = Object.entries(config.sync_intervals);
+            const intervalEntries = Object.entries(config('sync_intervals'));
             const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
             const mappedIntervals = new Map(parsedIntervals);
 

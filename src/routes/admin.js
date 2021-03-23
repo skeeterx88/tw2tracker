@@ -97,7 +97,7 @@ function createAuthorization (privilege, denyType) {
 
 const loginRouter = function (req, res) {
     res.render('admin', {
-        title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config.general.site_name]),
+        title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         subPage: 'login',
         menu: false,
         errors: req.flash('error'),
@@ -151,7 +151,7 @@ const syncRouter = asyncRouter(async function (req, res) {
     });
 
     res.render('admin', {
-        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config.general.site_name]),
+        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         openWorlds,
@@ -292,7 +292,7 @@ const accountsRouter = asyncRouter(async function (req, res) {
     });
 
     res.render('admin', {
-        title: i18n('admin_panel_sync_accounts', 'page_titles', res.locals.lang, [config.general.site_name]),
+        title: i18n('admin_panel_sync_accounts', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         accounts,
@@ -413,7 +413,7 @@ const modsRouter = asyncRouter(async function (req, res) {
     });
 
     res.render('admin', {
-        title: i18n('admin_panel_mod_accounts', 'page_titles', res.locals.lang, [config.general.site_name]),
+        title: i18n('admin_panel_mod_accounts', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         mods,
@@ -552,7 +552,7 @@ const settingsRouter = asyncRouter(async function (req, res) {
     });
 
     res.render('admin', {
-        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config.general.site_name]),
+        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         privilegeTypes,

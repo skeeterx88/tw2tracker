@@ -12,7 +12,7 @@
                 <pre><%= development ? error.stack : error.message %></pre>
             <% } -%>
 
-            <p><%= i18n('contact_us', 'errors', lang) %> <code><a href="mailto:<%= config.emails.issues %>"><%= config.emails.issues %></a></code></p>
+            <p><%= i18n('contact_us', 'errors', lang) %> <code><a href="mailto:<%= config('emails', 'issues') %>"><%= config('emails', 'issues') %></a></code></p>
         </main>
     </body>
 </html>

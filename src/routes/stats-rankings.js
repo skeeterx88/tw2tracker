@@ -50,7 +50,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     const page = req.params.page && !isNaN(req.params.page)
         ? Math.max(1, parseInt(req.params.page, 10))
         : 1;
-    const limit = parseInt(config.ui.ranking_page_items_per_page, 10);
+    const limit = parseInt(config('ui', 'ranking_page_items_per_page'), 10);
     const offset = limit * (page - 1);
 
     const world = await db.one(sql.getWorld, {worldId});
@@ -72,7 +72,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
 
     let displayDominationColumn = false;
 
-    if (!world.config.victory_points && offset < config.ui.ranking_page_items_per_page) {
+    if (!world.config.victory_points && offset < config('ui', 'ranking_page_items_per_page')) {
         displayDominationColumn = true;
         const topTenVillages = ranking.slice(0, 10).reduce((villages, tribe) => villages + tribe.villages, 0);
 
@@ -88,7 +88,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/ranking',
-        title: i18n('stats_ranking', 'page_titles', res.locals.lang, [capitalizedCategory, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_ranking', 'page_titles', res.locals.lang, [capitalizedCategory, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         worldName: world.name,

@@ -29,7 +29,7 @@ module.exports = function () {
     const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT;
     const app = express();
 
-    if (!development && config.force_https) {
+    if (!development && config('general', 'force_https')) {
         app.use(function (req, res, next) {
             if (req.headers['x-forwarded-proto'] === 'https') {
                 next();
@@ -131,7 +131,7 @@ module.exports = function () {
         res.locals.formatSince = utils.formatSince;
         res.locals.capitalize = utils.capitalize;
         res.locals.sprintf = utils.sprintf;
-        res.locals.lang = req.session.lang || config.general.lang;
+        res.locals.lang = req.session.lang || config('general', 'lang');
         res.locals.tribeRankingSortField = req.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;
         res.locals.playerRankingSortField = req.session.playerRankingSortField || rankingSortTypes.VICTORY_POINTS;
         res.locals.user = req.session.passport ? req.session.passport.user : {};
@@ -165,7 +165,7 @@ module.exports = function () {
         const status = err.status || 500;
         res.locals.error = err;
         res.locals.status = status;
-        res.locals.title = i18n('header_error', 'errors', req.session.lang, [status]) + ' - ' + config.general.site_name;
+        res.locals.title = i18n('header_error', 'errors', req.session.lang, [status]) + ' - ' + config('general', 'site_name');
         res.locals.config = config;
         res.locals.development = development;
 

@@ -4,7 +4,6 @@ const https = require('https');
 const crypto = require('crypto');
 const humanInterval = require('human-interval');
 const i18n = require('./i18n.js');
-const config = require('./config.js');
 
 const noop = function () {};
 
@@ -178,7 +177,7 @@ const UTC = function () {
     return now.getTime() + now.getTimezoneOffset() * 1000 * 60;
 };
 
-const formatSince = function (date, lang = config.general.lang) {
+const formatSince = function (date, lang) {
     const elapsedTime = UTC() - date;
 
     const seconds = elapsedTime / 1000;

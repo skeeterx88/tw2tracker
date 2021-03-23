@@ -75,7 +75,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player',
-        title: i18n('stats_player', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_player', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,
@@ -128,7 +128,7 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player-villages',
-        title: i18n('stats_player_villages', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_player_villages', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,
@@ -163,7 +163,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
-    const limit = config.ui.ranking_page_items_per_page;
+    const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
     const conquestsTypeMap = {
@@ -220,7 +220,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player-conquests',
-        title: i18n('stats_player_conquests', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_player_conquests', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,
@@ -280,7 +280,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player-tribe-changes',
-        title: i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,
@@ -441,7 +441,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player-achievements',
-        title: i18n('stats_player_achievements', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_player_achievements', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,

@@ -61,7 +61,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/tribe',
-        title: i18n('stats_tribe', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_tribe', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,
@@ -102,7 +102,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
-    const limit = config.ui.ranking_page_items_per_page;
+    const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
     const conquestsTypeMap = {
@@ -159,7 +159,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/tribe-conquests',
-        title: i18n('stats_tribe_conquests', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_tribe_conquests', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,
@@ -208,7 +208,7 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/tribe-members',
-        title: i18n('stats_tribe_members', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_tribe_members', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         tribe,
@@ -242,7 +242,7 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
     const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
-    const limit = config.ui.ranking_page_items_per_page;
+    const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
     const allVillages = await db.any(sql.getTribeVillages, {worldId, tribeId});
     const villages = allVillages.slice(offset, offset + limit);
@@ -258,7 +258,7 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/tribe-villages',
-        title: i18n('stats_tribe_villages', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_tribe_villages', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         tribe,
@@ -318,7 +318,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/tribe-member-changes',
-        title: i18n('stats_tribe_member_changes', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_tribe_member_changes', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         tribe,
@@ -393,7 +393,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/tribe-achievements',
-        title: i18n('stats_tribe_achievements', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_tribe_achievements', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         tribe,

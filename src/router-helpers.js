@@ -136,7 +136,7 @@ function createNavigation (items) {
         label = label.replace(/%{style_end}/g, '</span>');
         label = utils.sprintf(label, replaces);
         return url ? `<a href="${url}">${label}</a>` : label;
-    }).join(config.ui.navigation_separator);
+    }).join(config('ui', 'navigation_separator'));
 }
 
 function groupAchievements (achievements) {

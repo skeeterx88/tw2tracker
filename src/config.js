@@ -1,5 +1,7 @@
 const fs = require('fs');
 const defaults = require('../share/default-config.json');
+const hasOwn = Object.prototype.hasOwnProperty;
+let configObj;
 
 function isObject (item) {
     return (item && typeof item === 'object' && !Array.isArray(item));
@@ -30,10 +32,28 @@ function mergeDeep (target, ...sources) {
     return mergeDeep(target, ...sources);
 }
 
-if (fs.existsSync('./config.json')) {
-    const config = require('../config.json');
-    module.exports = mergeDeep(defaults, config);
-} else {
-    fs.promises.writeFile('./config.json', JSON.stringify(defaults));
-    module.exports = defaults;
+function config (namespace, key) {
+    if (!hasOwn.call(configObj, namespace)) {
+        throw new Error(`Config namespace "${namespace}" not found.`);
+    } else if (!key) {
+        return configObj[namespace];
+    } else if (!hasOwn.call(configObj[namespace], key)) {
+        throw new Error(`Config key "${key}" from namespace "${namespace}" not found.`);
+    }
+
+    return configObj[namespace][key];
 }
+
+function refresh () {
+    if (fs.existsSync('./config.json')) {
+        configObj = require('../config.json');
+        configObj = mergeDeep(defaults, configObj);
+    } else {
+        fs.promises.writeFile('./config.json', JSON.stringify(defaults));
+        configObj = defaults;
+    }
+}
+
+refresh();
+config.refresh = refresh;
+module.exports = config;

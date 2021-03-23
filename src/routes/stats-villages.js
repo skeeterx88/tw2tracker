@@ -44,7 +44,7 @@ const villageRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/village',
-        title: i18n('stats_village', 'page_titles', res.locals.lang, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('stats_village', 'page_titles', res.locals.lang, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,

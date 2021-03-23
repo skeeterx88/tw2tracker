@@ -42,12 +42,12 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         worldName: world.name,
         lastDataSyncDate,
-        staticMapExpireTime: config.sync.static_share_expire_time,
+        staticMapExpireTime: config('sync', 'static_share_expire_time'),
         mapShareTypes
     });
 
     res.render('maps/map', {
-        title: i18n('maps_world_map', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('maps_world_map', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         world
     });
@@ -88,7 +88,7 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
     });
 
     res.render('maps/map', {
-        title: i18n('maps_world_map_shared', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config.general.site_name]),
+        title: i18n('maps_world_map_shared', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         world
     });

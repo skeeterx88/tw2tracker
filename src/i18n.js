@@ -6,7 +6,7 @@ function sprintf (string, tokens = []) {
     return string.replace(/%{[^}]*}/g, () => tokens[i++]);
 }
 
-module.exports = function (key, namespace, language = config.general.lang, tokens) {
+module.exports = function (key, namespace, language = config('general', 'lang'), tokens) {
     try {
         if (!languages[language][namespace][key]) {
             return '[' + key + ', ' + namespace + ']';
