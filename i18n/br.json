@@ -586,7 +586,7 @@
         "router_missing_sub_page": "Essa sub-página não existe",
         "router_missing_category": "Essa categoria não existe",
         "router_missing_sub_category": "Essa sub-categoria não existe",
-        "contact_us": "Se você acredita que não deveria ver esta mensagem, nos manda um e-mail",
+        "contact_us": "Se você acredita que não deveria ver esta mensagem, nos mande um e-mail",
         "header_error": "Erro %{error}"
     },
     "navigation": {
