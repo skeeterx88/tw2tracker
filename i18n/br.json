@@ -2,6 +2,9 @@
     "meta": {
         "language": "Português"
     },
+    "general": {
+        "and": "e"
+    },
     "main_menu": {
         "home": "Página Inicial",
         "stats": "Estatística",
@@ -637,5 +640,13 @@
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
         "languages": "Linguagem - %{site_name}"
+    },
+    "time": {
+        "days": ["%{x} dia", "%{x} dias"],
+        "hours": ["%{x} hora", "%{x} horas"],
+        "minutes": ["%{x} minuto", "%{x} minutos"],
+        "seconds": ["%{x} segundo", "%{x} segundos"],
+        "now": "agora",
+        "ago": "atrás"
     }
 }

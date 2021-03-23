@@ -638,5 +638,11 @@
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
         "languages": "Talen - %{site_name}"
+    },
+    "time": {
+        "days": ["%{x} dag", "%{x} dagen"],
+        "hours": ["%{x} uur", "%{x} uren"],
+        "minutes": ["%{x} minuut", "%{x} minuten"],
+        "seconds": ["%{x} seconde", "%{x} seconden"]
     }
 }

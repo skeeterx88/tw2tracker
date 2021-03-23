@@ -688,5 +688,11 @@
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}"
+    },
+    "time": {
+        "days": ["%{x} giorno", "%{x} giorni"],
+        "hours": ["%{x} ora", "%{x} ore"],
+        "minutes": ["%{x} minuto", "%{x} minuti"],
+        "seconds": ["%{x} secondo", "%{x} secondi"]
     }
 }

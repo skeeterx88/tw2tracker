@@ -1,4 +1,8 @@
-define('utils', function () {
+define('utils', [
+    'i18n'
+], function (
+    i18n
+) {
     const hasOwn = function (obj, property) {
         return Object.prototype.hasOwnProperty.call(obj, property);
     };
@@ -48,33 +52,26 @@ define('utils', function () {
         let format = '';
 
         if (minutes <= 1) {
-            format = 'just now';
+            return i18n('now', 'time');
         } else if (hours <= 1) {
-            if (minutes < 2) {
-                format = '1 minute ago';
-            } else {
-                format = Math.floor(minutes) + ' minutes ago';
-            }
+            format = i18n('minutes', 'time', [Math.round(minutes)]);
         } else if (days <= 1) {
-            if (hours < 2) {
-                format = '1 hour ago';
-            } else {
-                format = Math.floor(hours) + ' hours ago';
-            }
+            format = i18n('hours', 'time', [Math.round(hours)]);
         } else {
             if (days > 2) {
-                format = Math.floor(days) + ' days ago';
+                format = i18n('days', 'time', [Math.round(days)]);
             } else {
                 const dayHours = hours % 24;
 
                 if (dayHours <= 2) {
-                    format = '1 day ago';
+                    format = i18n('days', 'time', [1]);
                 } else {
-                    format = '1 day and ' + Math.floor(dayHours) + ' hours ago';
+                    format = i18n('days', 'time', [1]) + ' ' + i18n('and', 'general') + ' ' + i18n('hours', 'time', [Math.round(hours)]);
                 }
-                
             }
         }
+
+        format += ' ' + i18n('ago', 'time');
 
         return format;
     };

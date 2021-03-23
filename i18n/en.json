@@ -2,6 +2,9 @@
     "meta": {
         "language": "English"
     },
+    "general": {
+        "and": "and"
+    },
     "main_menu": {
         "home": "Home",
         "stats": "Stats",
@@ -683,5 +686,13 @@
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
         "languages": "Languages - %{site_name}"
+    },
+    "time": {
+        "days": ["%{x} day", "%{x} days"],
+        "hours": ["%{x} hour", "%{x} hours"],
+        "minutes": ["%{x} minute", "%{x} minutes"],
+        "seconds": ["%{x} second", "%{x} seconds"],
+        "now": "just now",
+        "ago": "ago"
     }
 }

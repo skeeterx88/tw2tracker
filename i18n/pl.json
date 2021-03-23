@@ -685,5 +685,11 @@
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
         "languages": "Języki - %{site_name}"
+    },
+    "time": {
+        "days": ["%{x} dzień", "%{x} dni", "%{x} dni"],
+        "hours": ["%{x} godzina", "%{x} godziny"],
+        "minutes": ["%{x} minuta", "%{x} minuty"],
+        "seconds": ["%{x} sekunda", "%{x} sekundy"]
     }
 }

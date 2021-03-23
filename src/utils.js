@@ -3,6 +3,8 @@ const sql = require('./sql.js');
 const https = require('https');
 const crypto = require('crypto');
 const humanInterval = require('human-interval');
+const i18n = require('./i18n.js');
+const config = require('./config.js');
 
 const noop = function () {};
 
@@ -179,7 +181,7 @@ const UTC = function () {
     return now.getTime() + now.getTimezoneOffset() * 1000 * 60;
 };
 
-const formatSince = function (date) {
+const formatSince = function (date, lang = config.general.lang) {
     const elapsedTime = UTC() - date;
 
     const seconds = elapsedTime / 1000;
@@ -190,33 +192,26 @@ const formatSince = function (date) {
     let format = '';
 
     if (minutes <= 1) {
-        format = 'just now';
+        return i18n('now', 'time', lang);
     } else if (hours <= 1) {
-        if (minutes < 2) {
-            format = '1 minute ago';
-        } else {
-            format = Math.floor(minutes) + ' minutes ago';
-        }
+        format = i18n('minutes', 'time', lang, [Math.round(minutes)]);
     } else if (days <= 1) {
-        if (hours < 2) {
-            format = '1 hour ago';
-        } else {
-            format = Math.floor(hours) + ' hours ago';
-        }
+        format = i18n('hours', 'time', lang, [Math.round(hours)]);
     } else {
         if (days > 2) {
-            format = Math.floor(days) + ' days ago';
+            format = i18n('days', 'time', lang, [Math.round(days)]);
         } else {
             const dayHours = hours % 24;
 
             if (dayHours <= 2) {
-                format = '1 day ago';
+                format = i18n('days', 'time', lang, [1]);
             } else {
-                format = '1 day and ' + Math.floor(dayHours) + ' hours ago';
+                format = i18n('days', 'time', lang, [1]) + ' ' + i18n('and', 'general', lang) + ' ' + i18n('hours', 'time', lang, [Math.round(hours)]);
             }
-            
         }
     }
+
+    format += ' ' + i18n('ago', 'time', lang);
 
     return format;
 };
