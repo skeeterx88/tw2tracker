@@ -52,79 +52,6 @@ const queueEvents = {
     }
 };
 
-Sync.initQueue = async function (type) {
-    debug.queue('initializing sync queue:%s', type);
-
-    async function processQueue () {
-        if (processingQueue[type]) {
-            return false;
-        }
-
-        debug.queue('queue:%s starting', type);
-        processingQueue[type] = true;
-
-        while (queue[type].length) {
-            if (running[type].size < config('sync', 'parallel_data_sync')) {
-                const data = queue[type].shift();
-
-                Sync[type](data.market_id, data.world_number, null, function () {
-                    db.none(sql.removeSyncQueue, {
-                        id: data.id
-                    });
-                });
-
-                await db.none(sql.setQueueItemActive, {
-                    id: data.id,
-                    active: true
-                });
-            } else {
-                await Events.on(queueEvents[type].ITEM_FINISH);
-            }
-        }
-
-        debug.queue('queue:%s finished', type);
-        processingQueue[type] = false;
-    }
-
-    Events.on(queueEvents[type].START_QUEUE, processQueue);
-
-    await db.none(sql.resetQueueItems);
-    queue[type].push(...await db.any(sql.getSyncQueueType, {type}));
-
-    if (queue[type].length) {
-        processQueue();
-    }
-};
-
-Sync.addQueue = async function (type, worlds) {
-    debug.queue('add queue of type %s, worlds %s', type, worlds.map(({market_id, world_number}) => market_id + world_number).join(','));
-
-    if (!Array.isArray(worlds)) {
-        throw new Error('Sync addQueue: argument "worlds" is not of type "array"');
-    }
-
-    await db.tx(async function () {
-        for (const {market_id, world_number} of worlds) {
-            const data = await this.one(sql.addSyncQueue, {type, market_id, world_number});
-            queue[type].push(data);
-        }
-    });
-
-    if (!processingQueue[type]) {
-        Events.trigger(queueEvents[type].START_QUEUE);
-    }
-};
-
-Sync.all = async function (type, flag) {
-    const syncQueue = await db.map(sql.getSyncQueueNonActive, [], ({market_id, world_number}) => market_id + world_number);
-    const worlds = await db.map(sql.getSyncEnabledWorlds, [], function (world) {
-        return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
-    });
-    const uniqueWorlds = worlds.filter(world => world !== false);
-
-    Sync.addQueue(type, uniqueWorlds);
-};
-
 Sync.init = async function () {
     debug.sync('initializing sync system');
 
@@ -196,6 +123,69 @@ Sync.init = async function () {
     // await Sync.all('achievements');
 };
 
+Sync.initQueue = async function (type) {
+    debug.queue('initializing sync queue:%s', type);
+
+    async function processQueue () {
+        if (processingQueue[type]) {
+            return false;
+        }
+
+        debug.queue('queue:%s starting', type);
+        processingQueue[type] = true;
+
+        while (queue[type].length) {
+            if (running[type].size < config('sync', 'parallel_data_sync')) {
+                const data = queue[type].shift();
+
+                Sync[type](data.market_id, data.world_number, null, function () {
+                    db.none(sql.removeSyncQueue, {
+                        id: data.id
+                    });
+                });
+
+                await db.none(sql.setQueueItemActive, {
+                    id: data.id,
+                    active: true
+                });
+            } else {
+                await Events.on(queueEvents[type].ITEM_FINISH);
+            }
+        }
+
+        debug.queue('queue:%s finished', type);
+        processingQueue[type] = false;
+    }
+
+    Events.on(queueEvents[type].START_QUEUE, processQueue);
+
+    await db.none(sql.resetQueueItems);
+    queue[type].push(...await db.any(sql.getSyncQueueType, {type}));
+
+    if (queue[type].length) {
+        processQueue();
+    }
+};
+
+Sync.addQueue = async function (type, worlds) {
+    debug.queue('add queue of type %s, worlds %s', type, worlds.map(({market_id, world_number}) => market_id + world_number).join(','));
+
+    if (!Array.isArray(worlds)) {
+        throw new Error('Sync addQueue: argument "worlds" is not of type "array"');
+    }
+
+    await db.tx(async function () {
+        for (const {market_id, world_number} of worlds) {
+            const data = await this.one(sql.addSyncQueue, {type, market_id, world_number});
+            queue[type].push(data);
+        }
+    });
+
+    if (!processingQueue[type]) {
+        Events.trigger(queueEvents[type].START_QUEUE);
+    }
+};
+
 Sync.trigger = function (msg) {
     switch (msg.command) {
         case syncCommands.DATA_ALL: {
@@ -231,61 +221,6 @@ Sync.trigger = function (msg) {
         case syncCommands.TOGGLE: {
             Sync.toggle(msg.marketId, msg.worldNumber);
             break;
-        }
-    }
-};
-
-Sync.createAccounts = async function (name, pass, mail) {
-    const markets = await db.any(sql.getMarkets);
-
-    for (const market of markets) {
-        const urlId = market.id === 'zz' ? 'beta' : market.id;
-        const page = await createPuppeteerPage();
-        await page.goto(`https://${urlId}.tribalwars2.com/page`, {
-            waitUntil: ['domcontentloaded', 'networkidle2']
-        });
-
-        const created = await page.evaluate(function (name, mail, pass, marketId) {
-            return new Promise(function (resolve, reject) {
-                setTimeout(function () {
-                    const socketService = injector.get('socketService');
-                    const routeProvider = injector.get('routeProvider');
-
-                    debug('market:%s emit create account command', marketId);
-
-                    const timeout = setTimeout(function () {
-                        resolve(false);
-                    }, 20000);
-
-                    socketService.emit(routeProvider.REGISTER, {
-                        name,
-                        mail,
-                        pass,
-                        pass_wh: pass,
-                        agb: true,
-                        invite_key: '',
-                        newsletter: false,
-                        platform: 'browser',  
-                        portal_data: `portal_tid=${Date.now()}-${Math.round(Math.random() * 100000)}`,
-                        start_page_type: 'game_v1'
-                    }, function () {
-                        clearTimeout(timeout);
-                        resolve(true);
-                    });
-                }, 1000);
-            });
-        }, name, mail, pass, market.id);
-
-        await page.close();
-
-        if (created) {
-            debug.sync('market:%s account "%s" created', market.id, name);
-
-            const [exists] = await db.any(sql.getAccountByName, {name});
-            const {id} = exists ? exists : await db.one(sql.addAccount, {name, pass});
-            await db.query(sql.addAccountMarket, {accountId: id, marketId: market.id});
-        } else {
-            debug.sync('market:%s fail creating account "%s"', market.id, name);
         }
     }
 };
@@ -517,6 +452,16 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
             throw new Error(error.message);
         }
     }
+};
+
+Sync.all = async function (type, flag) {
+    const syncQueue = await db.map(sql.getSyncQueueNonActive, [], ({market_id, world_number}) => market_id + world_number);
+    const worlds = await db.map(sql.getSyncEnabledWorlds, [], function (world) {
+        return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
+    });
+    const uniqueWorlds = worlds.filter(world => world !== false);
+
+    Sync.addQueue(type, uniqueWorlds);
 };
 
 Sync.worlds = async function () {
@@ -818,6 +763,61 @@ Sync.toggle = async function (marketId, worldNumber) {
     Events.trigger(syncEvents.TOGGLE_WORLD, [marketId, worldNumber, enabled]);
 
     return true;
+};
+
+Sync.createAccounts = async function (name, pass, mail) {
+    const markets = await db.any(sql.getMarkets);
+
+    for (const market of markets) {
+        const urlId = market.id === 'zz' ? 'beta' : market.id;
+        const page = await createPuppeteerPage();
+        await page.goto(`https://${urlId}.tribalwars2.com/page`, {
+            waitUntil: ['domcontentloaded', 'networkidle2']
+        });
+
+        const created = await page.evaluate(function (name, mail, pass, marketId) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(function () {
+                    const socketService = injector.get('socketService');
+                    const routeProvider = injector.get('routeProvider');
+
+                    debug('market:%s emit create account command', marketId);
+
+                    const timeout = setTimeout(function () {
+                        resolve(false);
+                    }, 20000);
+
+                    socketService.emit(routeProvider.REGISTER, {
+                        name,
+                        mail,
+                        pass,
+                        pass_wh: pass,
+                        agb: true,
+                        invite_key: '',
+                        newsletter: false,
+                        platform: 'browser',  
+                        portal_data: `portal_tid=${Date.now()}-${Math.round(Math.random() * 100000)}`,
+                        start_page_type: 'game_v1'
+                    }, function () {
+                        clearTimeout(timeout);
+                        resolve(true);
+                    });
+                }, 1000);
+            });
+        }, name, mail, pass, market.id);
+
+        await page.close();
+
+        if (created) {
+            debug.sync('market:%s account "%s" created', market.id, name);
+
+            const [exists] = await db.any(sql.getAccountByName, {name});
+            const {id} = exists ? exists : await db.one(sql.addAccount, {name, pass});
+            await db.query(sql.addAccountMarket, {accountId: id, marketId: market.id});
+        } else {
+            debug.sync('market:%s fail creating account "%s"', market.id, name);
+        }
+    }
 };
 
 async function commitDataDatabase (data, worldId) {
