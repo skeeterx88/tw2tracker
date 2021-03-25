@@ -1347,13 +1347,12 @@ div.world-title {
     box-shadow: none;
     display: inline-block;
     height: initial;
-    padding-right: 13px;
-    padding: 1px 5px;
-    text-decoration: none;
+    padding: 1px 13px 1px 4px;
 }
 
 .floating-ranking tbody a:hover {
     border: 1px solid hsl(28deg 92% 10%);
+    text-decoration: none;
 }
 
 .floating-ranking .highlight {
