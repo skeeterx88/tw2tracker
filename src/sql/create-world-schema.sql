@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.tribes (
     victory_points INT,
     rank INT,
     first_seen TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
-    last_seen TIMESTAMP,
+    last_seen TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     members INT,
     level INT,
     archived BOOLEAN DEFAULT FALSE,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.players (
     rank INT,
     victory_points INT,
     first_seen TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
-    last_seen TIMESTAMP,
+    last_seen TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     archived BOOLEAN DEFAULT FALSE,
 
     best_rank INT,
