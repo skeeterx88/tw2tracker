@@ -1004,7 +1004,6 @@ div.world-title {
 .map-panel .jump .coords {
     color: hsl(29, 37%, 31%);
     display: inline-block;
-    flex: 1;
     height: 22px;
     line-height: 22px;
     position: relative;
