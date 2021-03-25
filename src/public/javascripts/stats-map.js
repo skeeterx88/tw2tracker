@@ -59,13 +59,13 @@ require([
     };
 
     const setupMapPreview = async () => {
-        if (!document.querySelector('.map')) {
+        if (!document.querySelector('.map-wrapper')) {
             return false;
         }
 
         loader = new TW2DataLoader(marketId, worldNumber);
         tooltip = new TW2Tooltip('#map-tooltip');
-        map = new TW2Map('.map', loader, tooltip, {
+        map = new TW2Map('.map-wrapper', loader, tooltip, {
             allowZoom: true,
             zoomWithShift: true,
             zoomLevel: 2,
