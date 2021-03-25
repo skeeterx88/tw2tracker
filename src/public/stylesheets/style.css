@@ -74,7 +74,7 @@ th {
     padding: 5px 0px;
 }
 
-td, th {
+tbody td, thead th {
     border-bottom: 1px solid hsl(40deg 44% 58%);
     border-top: 1px solid hsl(40deg 44% 65%);
     height: 20px;
@@ -103,15 +103,15 @@ tbody tr:last-child td {
     border-bottom: none;
 }
 
-tr:nth-child(even) {
-    background: hsl(0 0% 0% / 03%);
+tbody tr:nth-child(even) {
+    background: hsl(40deg 84% 33% / 5%);
 }
 
-tr:hover td {
+tbody tr:hover td {
     background: hsl(0 100% 100% / 20%);
 }
 
-.map-page tr:hover td {
+.map-page tbody tr:hover td {
     background: hsl(0 100% 100% / 05%);
 }
 
@@ -667,14 +667,14 @@ div.world-title {
 }
 
 .pagination {
-    border-top: 1px solid hsl(40deg 44% 50%);
-    padding: 5px 0px;
+    border-top: 1px solid hsl(40deg 44% 55%);
+    padding: 3px 0px;
     text-align: center;
     user-select: none;
 }
 
 .map-page .pagination {
-    border-top: 1px solid hsl(40deg 44% 20%);
+    border-top: none;
 }
 
 .pagination .pages {
@@ -683,16 +683,17 @@ div.world-title {
 
 .pagination .page {
     cursor: pointer;
-    padding: 2px 7px;
+    padding: 0px 7px;
 }
 
 .pagination .current {
-    background: hsl(0 0% 0% / 10%);
     font-weight: bold;
+     border: 1px solid hsl(40deg 44% 44%); 
+    border-radius: 2px;
 }
 
 .map-page .pagination .current {
-    background: hsl(0 0% 0% / 20%);
+    border: 1px solid hsl(23deg 43% 40%);
 }
 
 .pagination .next,
@@ -703,6 +704,10 @@ div.world-title {
 .pagination .prev,
 .pagination .first {
     float: left;
+}
+
+.pagination tr:hover td {
+    background: initial;
 }
 
 .world-map {
