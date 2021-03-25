@@ -823,227 +823,271 @@ Sync.createAccounts = async function (name, pass, mail) {
 async function commitDataDatabase (data, worldId) {
     debug.db('world:%s commit db data', worldId);
 
-    const playersOld = new Map(await db.map(sql.worldActivePlayers, {worldId}, player => [player.id, player]));
+    const [
+        entriesPlayersOld,
+        entriesTribesOld,
+        entriesVillagesOld,
+        entriesPlayerRecordsOld, 
+        entriesTribeRecordsOld
+    ] = await db.task(async db => [
+        await db.map(sql.getActiveSubjects, {worldId, type: 'players'}, subject => [subject.id, subject]),
+        await db.map(sql.getActiveSubjects, {worldId, type: 'tribes'}, subject => [subject.id, subject]),
+        await db.map(sql.getWorldVillages, {worldId}, subject => [subject.id, subject]),
+        await db.map(sql.getSubjectRecords, {worldId, type: 'players'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]),
+        await db.map(sql.getSubjectRecords, {worldId, type: 'tribes'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]])
+    ]);
+
+    const playersOld = new Map(entriesPlayersOld);
+    const playersNew = new Map(data.players);
+    const tribesOld = new Map(entriesTribesOld);
+    const tribesNew = new Map(data.tribes);
+    const villagesOld = new Map(entriesVillagesOld);
+    const villagesNew = new Map(data.villages);
+    const playerRecordsOld = new Map(entriesPlayerRecordsOld);
+    const tribeRecordsOld = new Map(entriesTribeRecordsOld);
+
     const playersOldIds = Array.from(playersOld.keys());
-    const tribesOld = new Map(await db.map(sql.worldActiveTribes, {worldId}, tribe => [tribe.id, tribe]));
+    const playersNewIds = Array.from(playersNew.keys());
     const tribesOldIds = Array.from(tribesOld.keys());
-    const villagesOld = new Map(await db.map(sql.worldVillages, {worldId}, village => [village.id, village]));
-    const oldRecords = {};
-    oldRecords.tribes = new Map(await db.map(sql.getTribesRecords, {worldId}, (tribe) => [tribe.id, [tribe.best_rank, tribe.best_points, tribe.best_villages]]));
-    oldRecords.players = new Map(await db.map(sql.getPlayersRecords, {worldId}, (player) => [player.id, [player.best_rank, player.best_points, player.best_villages]]));
+    const tribesNewIds = Array.from(tribesNew.keys());
+    const villagesNewIds = Array.from(villagesNew.keys());
+    const villagesOldIds = Array.from(villagesOld.keys());
 
-    db.tx(function (tx) {
-        const log = {};
+    const missingPlayersIds = playersOldIds.filter(tribeId => !playersNewIds.includes(tribeId));
+    const missingTribesIds = tribesOldIds.filter(tribeId => !tribesNewIds.includes(tribeId));
+    const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId));
 
-        const playersNew = new Map(data.players);
-        const playersNewIds = Array.from(playersNew.keys());
-        const missingPlayersIds = playersOldIds.filter(tribeId => !playersNewIds.includes(tribeId));
-        const newPlayersIds = playersNewIds.filter(tribeId => !playersOldIds.includes(tribeId));
+    const newPlayersIds = playersNewIds.filter(tribeId => !playersOldIds.includes(tribeId));
+    const newTribesIds = tribesNewIds.filter(tribeId => !tribesOldIds.includes(tribeId));
+    const newVillagesIds = villagesOldIds.filter(villageId => !villagesNewIds.includes(villageId));
 
-        const tribesNew = new Map(data.tribes);
-        const tribesNewIds = Array.from(tribesNew.keys());
-        
-        const missingTribesIds = tribesOldIds.filter(tribeId => !tribesNewIds.includes(tribeId));
-        const newTribesIds = tribesNewIds.filter(tribeId => !tribesOldIds.includes(tribeId));
-
-        const villagesNew = new Map(data.villages);
-        const villagesNewIds = Array.from(villagesNew.keys());
-        const villagesOldIds = Array.from(villagesOld.keys());
-        const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId));
-        const newVillagesIds = villagesOldIds.filter(villageId => !villagesNewIds.includes(villageId));
-
+    await db.tx(async function (db) {
         let conquestsCount = 0;
         let tribeChangesCount = 0;
 
-        const sqlSubjectMap = {
-            players: {
-                updateData: sql.updatePlayer,
-                updateRecordRank: sql.updatePlayerRecordRank,
-                updateRecordPoints: sql.updatePlayerRecordPoints,
-                updateRecordVillages: sql.updatePlayerRecordVillages
-            },
-            tribes: {
-                updateData: sql.updateTribe,
-                updateRecordRank: sql.updateTribeRecordRank,
-                updateRecordPoints: sql.updateTribeRecordPoints,
-                updateRecordVillages: sql.updateTribeRecordVillages
+        async function updateSubjectsData () {
+            for (const [id, subject] of data.tribes) {
+                await db.query(sql.updateTribe, {worldId, id, ...subject});
             }
-        };
 
-        for (const id of missingPlayersIds) {
-            tx.none(sql.archivePlayer, {worldId, id});
+            for (const [id, subject] of data.players) {
+                await db.query(sql.updatePlayer, {worldId, id, ...subject});
+            }
         }
 
-        for (const id of missingTribesIds) {
-            tx.none(sql.archiveTribe, {worldId, id});
+        async function updateConquests () {
+            for (const [village_id, village] of villagesNew.entries()) {
+                const oldVillage = villagesOld.has(village_id)
+                    ? villagesOld.get(village_id)
+                    : {village_id, ...village};
+
+                if (village.character_id !== oldVillage.character_id && village.character_id) {
+                    const newOwnerId = village.character_id;
+                    const newOwner = playersNew.get(newOwnerId);
+                    const oldOwner = missingVillagesIds.includes(village_id) ? null : playersNew.get(oldVillage.character_id);
+                    const oldOwnerId = oldOwner ? oldVillage.character_id : null;
+
+                    const tribeData = {
+                        new_owner_tribe_id: null,
+                        new_owner_tribe_tag_then: null,
+                        old_owner_tribe_id: null,
+                        old_owner_tribe_tag_then: null
+                    };
+
+                    if (newOwner.tribe_id) {
+                        tribeData.new_owner_tribe_id = newOwner.tribe_id;
+                        tribeData.new_owner_tribe_tag_then = tribesNew.get(newOwner.tribe_id).tag;
+                    }
+
+                    if (oldOwner && oldOwner.tribe_id) {
+                        tribeData.old_owner_tribe_id = oldOwner.tribe_id;
+                        tribeData.old_owner_tribe_tag_then = tribesNew.get(oldOwner.tribe_id).tag;
+                    }
+
+                    await db.query(sql.addConquest, {
+                        worldId,
+                        village_id,
+                        newOwner: newOwnerId,
+                        oldOwner: oldOwnerId,
+                        village_points_then: village.points,
+                        ...tribeData
+                    });
+
+                    conquestsCount++;
+                }
+            }
         }
 
-        for (const type of ['tribes', 'players']) {
-            for (const [id, subject] of data[type]) {
-                tx.none(sqlSubjectMap[type].updateData, {worldId, id, ...subject});
+        async function updateMissingSubjects () {
+            for (const id of missingPlayersIds) {
+                await db.query(sql.archivePlayer, {worldId, id});
+            }
 
-                const [best_rank, best_points, best_villages] = oldRecords[type].get(id) || [];
+            for (const id of missingTribesIds) {
+                await db.query(sql.archiveTribe, {worldId, id});
+            }
+        }
 
-                if (!best_rank || subject.rank <= best_rank) {
-                    tx.none(sqlSubjectMap[type].updateRecordRank, {worldId, rank: subject.rank, id});
+        async function updateSubjectsRecords () {
+            const oldRecords = {
+                players: playerRecordsOld,
+                tribes: tribeRecordsOld
+            };
+
+            for (const type of ['tribes', 'players']) {
+                for (const [id, subject] of data[type]) {
+                    const [bestRank, bestPoints, bestVillages] = oldRecords[type].get(id) || [];
+
+                    if (!bestRank || subject.rank <= bestRank) {
+                        await db.query(sql.updateSubjectRecord, {worldId, type, recordType: 'rank', id, value: subject.rank});
+                    }
+
+                    if (!bestPoints || subject.points >= bestPoints) {
+                        await db.query(sql.updateSubjectRecord, {worldId, type, recordType: 'points', id, value: subject.points});
+                    }
+
+                    if (!bestVillages || subject.villages >= bestVillages) {
+                        await db.query(sql.updateSubjectRecord, {worldId, type, recordType: 'villages', id, value: subject.villages});
+                    }
+                }
+            }
+        }
+
+        async function updateProvinces () {
+            for (const [province_name, province_id] of data.provinces) {
+                await db.query(sql.addProvince, {worldId, province_id, province_name});
+            }
+        }
+
+        async function updateVillages () {
+            for (const [village_id, village] of data.villages) {
+                await db.query(sql.addVillage, {worldId, village_id, ...village});
+            }
+        }
+
+        async function updateTribeMemberChanges () {
+            for (const [character_id, playerNewData] of playersNew.entries()) {
+                const playerOldData = playersOld.get(character_id);
+
+                const oldTribeId = playerOldData ? playerOldData.tribe_id : null;
+                const newTribeId = playerNewData.tribe_id;
+
+                if (oldTribeId !== newTribeId) {
+                    const oldTribe = tribesOld.get(oldTribeId);
+                    const newTribe = tribesOld.get(newTribeId);
+
+                    await db.query(sql.addTribeMemberChange, {
+                        worldId,
+                        character_id,
+                        old_tribe: oldTribeId,
+                        new_tribe: newTribeId,
+                        old_tribe_tag_then: oldTribe ? oldTribe.tag : null,
+                        new_tribe_tag_then: newTribe ? newTribe.tag : null
+                    });
+
+                    tribeChangesCount++;
+                }
+            }
+        }
+
+        async function updatePlayerVillages () {
+            for (const [character_id, villages_id] of data.villagesByPlayer) {
+                await db.query(sql.updatePlayerVillages, {worldId, character_id, villages_id});
+            }
+        }
+
+        async function updateSubjectAvgCoords () {
+            const players = {};
+            const tribes = {};
+
+            for (const [playerId, villageIds] of data.villagesByPlayer) {
+                if (!villageIds.length) {
+                    continue;
                 }
 
-                if (!best_points || subject.points >= best_points) {
-                    tx.none(sqlSubjectMap[type].updateRecordPoints, {worldId, points: subject.points, id});
-                }
+                let sumX = 0;
+                let sumY = 0;
 
-                if (!best_villages || subject.villages >= best_villages) {
-                    tx.none(sqlSubjectMap[type].updateRecordVillages, {worldId, villages: subject.villages, id});
-                }
-            }
-        }
-
-        for (const [province_name, province_id] of data.provinces) {
-            tx.none(sql.addProvince, {worldId, province_id, province_name});
-        }
-
-        for (const [village_id, village] of data.villages) {
-            tx.none(sql.addVillage, {worldId, village_id, ...village});
-        }
-
-        for (const [village_id, village] of villagesNew.entries()) {
-            const oldVillage = villagesOld.has(village_id)
-                ? villagesOld.get(village_id)
-                : {village_id, ...village};
-
-            if (village.character_id !== oldVillage.character_id && village.character_id) {
-                const newOwnerId = village.character_id;
-                const newOwner = playersNew.get(newOwnerId);
-                const oldOwner = missingVillagesIds.includes(village_id) ? null : playersNew.get(oldVillage.character_id);
-                const oldOwnerId = oldOwner ? oldVillage.character_id : null;
-
-                const tribeData = {
-                    new_owner_tribe_id: null,
-                    new_owner_tribe_tag_then: null,
-                    old_owner_tribe_id: null,
-                    old_owner_tribe_tag_then: null
-                };
-
-                if (newOwner.tribe_id) {
-                    tribeData.new_owner_tribe_id = newOwner.tribe_id;
-                    tribeData.new_owner_tribe_tag_then = tribesNew.get(newOwner.tribe_id).tag;
-                }
-
-                if (oldOwner && oldOwner.tribe_id) {
-                    tribeData.old_owner_tribe_id = oldOwner.tribe_id;
-                    tribeData.old_owner_tribe_tag_then = tribesNew.get(oldOwner.tribe_id).tag;
-                }
-
-                tx.none(sql.addConquest, {
-                    worldId,
-                    village_id,
-                    newOwner: newOwnerId,
-                    oldOwner: oldOwnerId,
-                    village_points_then: village.points,
-                    ...tribeData
-                });
-
-                conquestsCount++;
-            }
-        }
-
-        for (const [character_id, playerNewData] of playersNew.entries()) {
-            const playerOldData = playersOld.get(character_id);
-
-            const oldTribeId = playerOldData ? playerOldData.tribe_id : null;
-            const newTribeId = playerNewData.tribe_id;
-
-            if (oldTribeId !== newTribeId) {
-                const oldTribe = tribesOld.get(oldTribeId);
-                const newTribe = tribesOld.get(newTribeId);
-
-                tx.none(sql.addTribeMemberChange, {
-                    worldId,
-                    character_id,
-                    old_tribe: oldTribeId,
-                    new_tribe: newTribeId,
-                    old_tribe_tag_then: oldTribe ? oldTribe.tag : null,
-                    new_tribe_tag_then: newTribe ? newTribe.tag : null
-                });
-
-                tribeChangesCount++;
-            }
-        }
-
-        for (const [character_id, villages_id] of data.villagesByPlayer) {
-            tx.none(sql.updatePlayerVillages, {worldId, character_id, villages_id});
-        }
-
-        const playersAvgPosition = {};
-
-        for (const [playerId, villageIds] of data.villagesByPlayer) {
-            if (!villageIds.length) {
-                continue;
-            }
-
-            let sumX = 0;
-            let sumY = 0;
-
-            villageIds.forEach(function (vid) {
-                const {x, y} = villagesNew.get(vid);
-                sumX += x;
-                sumY += y;
-            });
-
-            const avgX = Math.floor(sumX / villageIds.length);
-            const avgY = Math.floor(sumY / villageIds.length);
-            const avg = [avgX, avgY];
-
-            playersAvgPosition[playerId] = avg;
-            tx.none(sql.updatePlayerAvgCoords, {worldId, playerId, avg});
-        }
-
-        for (const [tribeId, tribeMembers] of data.playersByTribe) {
-            if (!tribeMembers.length) {
-                continue;
-            }
-
-            let count = 0;
-            let sumX = 0;
-            let sumY = 0;
-
-            tribeMembers.forEach(function (pid) {
-                if (playersAvgPosition[pid]) {
-                    const [x, y] = playersAvgPosition[pid];
+                for (const vid of villageIds) {
+                    const {x, y} = villagesNew.get(vid);
                     sumX += x;
                     sumY += y;
-                    count++;
                 }
-            });
 
-            if (!count) {
-                continue;
+                const avgX = Math.floor(sumX / villageIds.length);
+                const avgY = Math.floor(sumY / villageIds.length);
+                const avg = [avgX, avgY];
+
+                players[playerId] = avg;
             }
 
-            const avgX = Math.floor(sumX / count);
-            const avgY = Math.floor(sumY / count);
-            const avg = [avgX, avgY];
+            for (const [tribeId, tribeMembers] of data.playersByTribe) {
+                if (!tribeMembers.length) {
+                    continue;
+                }
 
-            tx.none(sql.updateTribeAvgCoords, {worldId, tribeId, avg});
+                let count = 0;
+                let sumX = 0;
+                let sumY = 0;
+
+                for (const pid of tribeMembers) {
+                    if (players[pid]) {
+                        const [x, y] = players[pid];
+                        sumX += x;
+                        sumY += y;
+                        count++;
+                    }
+                }
+
+                if (!count) {
+                    continue;
+                }
+
+                const avgX = Math.floor(sumX / count);
+                const avgY = Math.floor(sumY / count);
+                const avg = [avgX, avgY];
+
+                tribes[tribeId] = avg;
+            }
+
+            for (const [id, avg] of Object.entries(players)) {
+                await db.query(sql.updateSubjectAvgCoords, {worldId, type: 'players', id, avg});
+            }
+
+            for (const [id, avg] of Object.entries(tribes)) {
+                await db.query(sql.updateSubjectAvgCoords, {worldId, type: 'tribes', id, avg});
+            }
         }
 
-        const worldStats = {
-            villages: data.villages.length,
-            players: data.players.length,
-            tribes: data.tribes.length
-        };
+        async function updateWorldStats () {
+            await db.query(sql.updateWorldStats, {
+                worldId,
+                villages: data.villages.length,
+                players: data.players.length,
+                tribes: data.tribes.length
+            });
+        }
 
-        tx.none(sql.updateWorldStats, {worldId, ...worldStats});
+        await updateSubjectsData();
+        await updateMissingSubjects();
+        await updateSubjectsRecords();
+        await updateProvinces();
+        await updateVillages();
+        await updatePlayerVillages();
+        await updateConquests();
+        await updateTribeMemberChanges();
+        await updateSubjectAvgCoords();
+        await updateWorldStats();
 
-        log['archived players'] = missingPlayersIds.length;
-        log['added players'] = newPlayersIds.length;
-        log['archived tribes'] = missingTribesIds.length;
-        log['added tribes'] = newTribesIds.length;
-        log['added villages'] = newVillagesIds.length;
-        log['new conquests'] = conquestsCount;
-        log['new tribe changes'] = tribeChangesCount;
-
-        debug.db('world:%s commit db data result %o', worldId, log);
+        debug.db('world:%s commit db data result %o', worldId, {
+            'new players': newPlayersIds.length,
+            'new tribes': newTribesIds.length,
+            'new villages': newVillagesIds.length,
+            'archived players': missingPlayersIds.length,
+            'archived tribes': missingTribesIds.length,
+            'new conquests': conquestsCount,
+            'new tribe changes': tribeChangesCount
+        });
     });
 }
 
