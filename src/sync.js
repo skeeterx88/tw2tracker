@@ -867,11 +867,19 @@ async function commitDataDatabase (data, worldId) {
 
         async function updateSubjectsData () {
             for (const [id, subject] of data.tribes) {
-                await db.query(sql.updateTribe, {worldId, id, ...subject});
+                if (tribesOld.has(id)) {
+                    await db.query(sql.updateTribe, {worldId, id, ...subject});
+                } else {
+                    await db.query(sql.addTribe, {worldId, id, ...subject});
+                }
             }
 
             for (const [id, subject] of data.players) {
-                await db.query(sql.updatePlayer, {worldId, id, ...subject});
+                if (playersOld.has(id)) {
+                    await db.query(sql.updatePlayer, {worldId, id, ...subject});
+                } else {
+                    await db.query(sql.addPlayer, {worldId, id, ...subject});
+                }
             }
         }
 
