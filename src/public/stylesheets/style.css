@@ -75,7 +75,7 @@ th {
     padding: 5px 0px;
 }
 
-tbody td, thead th {
+tbody td, thead th, table.vertical th {
     border-bottom: 1px solid hsl(40deg 44% 58%);
     border-top: 1px solid hsl(40deg 44% 65%);
     height: 20px;
@@ -109,7 +109,11 @@ tbody tr:nth-child(even) {
 }
 
 tbody tr:hover td {
-    background: hsl(0 100% 100% / 20%);
+    background: hsl(0 100% 100% / 10%);
+}
+
+table.vertical tr:hover th {
+    background: hsl(0 100% 100% / 5%);
 }
 
 .map-page tbody tr:hover td {
