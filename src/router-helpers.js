@@ -201,10 +201,8 @@ function parseRankingSort (req, victoryPointSystem) {
 
 function getHistoryChangeType (type, currentItem, lastItem) {
     if (!lastItem || currentItem[type] === lastItem[type]) {
-        console.log(type, historyChangeTypes.EQUAL);
         return historyChangeTypes.EQUAL;
     } else {
-        console.log(type, currentItem[type] > lastItem[type] ? historyChangeTypes.INCREASE : historyChangeTypes.DECREASE);
         return currentItem[type] > lastItem[type] ? historyChangeTypes.INCREASE : historyChangeTypes.DECREASE;
     }
 }
