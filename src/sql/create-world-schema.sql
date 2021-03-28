@@ -143,3 +143,31 @@ CREATE TABLE IF NOT EXISTS ${worldId:name}.tribe_changes (
     old_tribe_tag_then VARCHAR (3) NULL,
     new_tribe_tag_then VARCHAR (3) NULL
 );
+
+CREATE TABLE IF NOT EXISTS ${worldId:name}.players_history (
+    id SERIAL PRIMARY KEY,
+    character_id INT REFERENCES ${worldId:name}.players(id) NULL,
+    tribe_id INT REFERENCES ${worldId:name}.tribes(id) NULL,
+    points INT NOT NULL,
+    villages INT DEFAULT 0,
+    rank INT NOT NULL,
+    victory_points INT,
+    bash_points_off INT NOT NULL,
+    bash_points_def INT NOT NULL,
+    bash_points_total INT NOT NULL,
+    date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);
+
+CREATE TABLE IF NOT EXISTS ${worldId:name}.tribes_history (
+    id SERIAL PRIMARY KEY,
+    tribe_id INT REFERENCES ${worldId:name}.tribes(id) NULL,
+    points INT NOT NULL,
+    members INT NOT NULL,
+    villages INT DEFAULT 0,
+    rank INT NOT NULL,
+    victory_points INT,
+    bash_points_off INT NOT NULL,
+    bash_points_def INT NOT NULL,
+    bash_points_total INT NOT NULL,
+    date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);

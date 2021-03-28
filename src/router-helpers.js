@@ -6,6 +6,7 @@ const config = require('./config.js');
 const i18n = require('./i18n.js');
 const rankingSortTypes = require('./ranking-sort-types.json');
 const rankingSortTypesValues = Object.values(rankingSortTypes);
+const historyChangeTypes = require('./history-change-types.json');
 
 async function getPlayer (worldId, playerId) {
     const player = await db.any(sql.getPlayer, {worldId, playerId});
@@ -198,6 +199,16 @@ function parseRankingSort (req, victoryPointSystem) {
     };
 }
 
+function getHistoryChangeType (type, currentItem, lastItem) {
+    if (!lastItem || currentItem[type] === lastItem[type]) {
+        console.log(type, historyChangeTypes.EQUAL);
+        return historyChangeTypes.EQUAL;
+    } else {
+        console.log(type, currentItem[type] > lastItem[type] ? historyChangeTypes.INCREASE : historyChangeTypes.DECREASE);
+        return currentItem[type] > lastItem[type] ? historyChangeTypes.INCREASE : historyChangeTypes.DECREASE;
+    }
+}
+
 module.exports = {
     getPlayer,
     getPlayerVillages,
@@ -213,5 +224,6 @@ module.exports = {
     createNavigation,
     mergeBackendLocals,
     asyncRouter,
-    parseRankingSort
+    parseRankingSort,
+    getHistoryChangeType
 };

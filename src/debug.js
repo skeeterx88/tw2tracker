@@ -10,5 +10,6 @@ module.exports = {
     socket: debug('tw2tracker:socket'),
     comm: debug('tw2tracker:comm'),
     puppeteer: debug('tw2tracker:puppeteer'),
-    queue: debug('tw2tracker:queue')
+    queue: debug('tw2tracker:queue'),
+    history: debug('tw2tracker:history')
 };

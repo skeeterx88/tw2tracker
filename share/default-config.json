@@ -23,7 +23,8 @@
         "min_time_between_data_syncs": "5 minutes",
         "min_time_between_achievement_syncs": "5 minutes",
         "max_sync_data_running_time": "5 minutes",
-        "max_sync_achievements_running_time": "30 minutes"
+        "max_sync_achievements_running_time": "30 minutes",
+        "maximum_history_days": 30
     },
     "sync_timeouts": {
         "ready_state": "20 seconds",
@@ -35,7 +36,8 @@
         "data_all": "60 minutes",
         "achievements_all": "6 hours",
         "worlds": "3 hours",
-        "clean_shares": "24 hours"
+        "clean_shares": "24 hours",
+        "save_history": "24 hours"
     },
     "database": {
         "user": "postgres",

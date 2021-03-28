@@ -1796,6 +1796,26 @@ span[class^="flag-"] {
     margin: 0px;
 }
 
+.history-change-type {
+    display: inline-block;
+    width: 11px;
+}
+
+.history-change-type.equal::after {
+    content: '=';
+    color: hsl(39deg 25% 45%);
+}
+
+.history-change-type.increase::after {
+    content: '+';
+    color: hsl(120deg 63% 35%);
+}
+
+.history-change-type.decrease::after {
+    content: '−';
+    color: hsl(0deg 100% 50%);
+}
+
 @keyframes sk-bouncedelay {
     0%, 80%, 100% { 
         transform: scale(0);

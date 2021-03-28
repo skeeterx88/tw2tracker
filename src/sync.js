@@ -112,6 +112,8 @@ Sync.init = async function () {
         }
     });
 
+    tasks.add('save_history', saveHistory);
+
     if (process.env.NODE_ENV !== 'development') {
         tasks.initChecker();
     }
@@ -1489,6 +1491,82 @@ async function fetchWorldTimeOffset (page, worldId) {
     } catch (error) {
         debug.sync('world:%s error fetching timezone (%s)', worldId, error.message);
     }
+}
+
+async function saveHistory () {
+    await db.task(async function (db) {
+        const worlds = await db.any(sql.getOpenWorlds);
+        const historyLimit = config('sync', 'maximum_history_days');
+
+        for (const world of worlds) {
+            const worldId = world.world_id;
+
+            debug.history('updating world %s', worldId);
+
+            const players = await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'id'});
+            const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'id'});
+
+            for (const player of players) {
+                if (player.archived) {
+                    continue;
+                }
+
+                const history = await db.any(sql.getPlayerHistory, {worldId, playerId: player.id});
+
+                if (history.length >= historyLimit) {
+                    let exceeding = history.length - historyLimit + 1;
+
+                    while (exceeding--) {
+                        const {id} = history.pop();
+                        await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'players', id});
+                    }
+                }
+
+                await db.query(sql.addPlayerHistoryItem, {
+                    worldId,
+                    id: player.id,
+                    tribe_id: player.tribe_id,
+                    points: player.points,
+                    villages: player.villages,
+                    rank: player.rank,
+                    victory_points: world.config.victory_points ? player.victory_points : null,
+                    bash_points_off: player.bash_points_off,
+                    bash_points_def: player.bash_points_def,
+                    bash_points_total: player.bash_points_total
+                });
+            }
+
+            for (const tribe of tribes) {
+                if (tribe.archived) {
+                    continue;
+                }
+
+                const history = await db.any(sql.getTribeHistory, {worldId, tribeId: tribe.id});
+
+                if (history.length >= historyLimit) {
+                    let exceeding = history.length - historyLimit + 1;
+
+                    while (exceeding--) {
+                        const {id} = history.pop();
+                        await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'tribes', id});
+                    }
+                }
+
+                await db.query(sql.addTribeHistoryItem, {
+                    worldId,
+                    id: tribe.id,
+                    members: tribe.members,
+                    points: tribe.points,
+                    villages: tribe.villages,
+                    rank: tribe.rank,
+                    victory_points: world.config.victory_points ? tribe.victory_points : null,
+                    bash_points_off: tribe.bash_points_off,
+                    bash_points_def: tribe.bash_points_def,
+                    bash_points_total: tribe.bash_points_total
+                });
+            }
+        }
+    });
 }
 
 module.exports = Sync;

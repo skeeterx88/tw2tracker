@@ -35,7 +35,8 @@
         "data_all": { "type": "time" },
         "achievements_all": { "type": "time" },
         "worlds": { "type": "time" },
-        "clean_shares": { "type": "time" }
+        "clean_shares": { "type": "time" },
+        "save_history": { "type": "time" }
     },
     "emails": {
         "issues": { "type": "string" },

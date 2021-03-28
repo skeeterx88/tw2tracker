@@ -17,7 +17,8 @@ const {
     createPagination,
     createNavigation,
     mergeBackendLocals,
-    asyncRouter
+    asyncRouter,
+    getHistoryChangeType
 } = require('../router-helpers.js');
 
 const conquestCategories = ['gain', 'loss', 'all', 'self'];
@@ -413,6 +414,63 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
     });
 });
 
+const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
+    if (!paramWorld(req)) {
+        return next();
+    }
+
+    const {
+        marketId,
+        worldId,
+        worldNumber
+    } = await paramWorldParse(req);
+
+    const {
+        tribeId,
+        tribe
+    } = await paramTribeParse(req, worldId);
+
+    let lastItem;
+
+    const world = await db.one(sql.getWorld, {worldId});
+    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId}, function (currentItem) {
+        currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
+        currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
+        currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
+        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem);
+        currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
+        currentItem.bash_points_off_change = getHistoryChangeType('bash_points_off', currentItem, lastItem);
+        currentItem.bash_points_def_change = getHistoryChangeType('bash_points_def', currentItem, lastItem);
+        currentItem.bash_points_total_change = getHistoryChangeType('bash_points_total', currentItem, lastItem);
+        lastItem = currentItem;
+        return currentItem;
+    });
+
+    const history = reversedHistory.reverse();
+
+    mergeBackendLocals(res, {
+        marketId,
+        worldNumber
+    });
+
+    res.render('stats', {
+        page: 'stats/tribe-history',
+        title: i18n('stats_tribe_history', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        marketId,
+        worldNumber,
+        world,
+        tribe,
+        history,
+        navigation: createNavigation([
+            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('tribe', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/tribes/${tribeId}`, replaces: [tribe.tag]},
+            {label: i18n('history', 'navigation', res.locals.lang)}
+        ])
+    });
+});
+
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId', tribeRouter);
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:category?', tribeConquestsRouter);
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:category?/page/:page', tribeConquestsRouter);
@@ -421,5 +479,6 @@ router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages', tribeVillag
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/villages/page/:page', tribeVillagesRouter);
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/member-changes', tribeMembersChangeRouter);
 router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/achievements/:subCategory?', tribeAchievementsRouter);
+router.get('/stats/:marketId/:worldNumber/tribes/:tribeId/history', tribeHistoryRouter);
 
 module.exports = router;

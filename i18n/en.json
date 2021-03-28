@@ -219,6 +219,18 @@
         "category_no_achievements": "No achievements on this category yet.",
         "no_recent_achievements": "No recent achievements."
     },
+    "tribe_profile_history": {
+        "header_tribe_history": "Tribe History",
+        "column_date": "Date",
+        "column_rank": "Rank",
+        "column_members": "Members",
+        "column_points": "Points",
+        "column_villages": "Villages",
+        "column_victory_points": "Victory Points",
+        "column_bash_points_offense": "Bash Off",
+        "column_bash_points_defense": "Bash Def",
+        "column_bash_points_total": "Bash Total"
+    },
     "player_profile": {
         "header_player_profile": "Player Profile",
         "header_last_achievements": "Player's Latest Achievement",
@@ -289,6 +301,18 @@
         "category_no_achievements": "No achievements on this category yet.",
         "never": "Never",
         "detailed": "Detailed"
+    },
+    "player_profile_history": {
+        "header_player_history": "Player History",
+        "column_date": "Date",
+        "column_tribe": "Tribe",
+        "column_rank": "Rank",
+        "column_points": "Points",
+        "column_villages": "Villages",
+        "column_victory_points": "Victory Points",
+        "column_bash_points_offense": "Bash Off",
+        "column_bash_points_defense": "Bash Def",
+        "column_bash_points_total": "Bash Total"
     },
     "village_profile": {
         "header_village_profile": "Village Profile",
@@ -656,7 +680,8 @@
         "member_changes": "Member Changes",
         "achievements": "Achievements",
         "ranking": "Ranking / %{category}",
-        "search": "Search \"%{query}\""
+        "search": "Search \"%{query}\"",
+        "history": "History"
     },
     "page_titles": {
         "admin_panel": "Admin Panel - %{site_name}",
@@ -685,7 +710,9 @@
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
-        "languages": "Languages - %{site_name}"
+        "languages": "Languages - %{site_name}",
+        "stats_tribe_history": "Tribe %{tribe_tag} - History - %{market_id}/%{world_name} - %{site_name}",
+        "stats_player_history": "Player %{player_name} - History - %{market_id}/%{world_name} - %{site_name}"
     },
     "time": {
         "days": ["%{x} day", "%{x} days"],

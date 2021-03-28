@@ -1,0 +1,44 @@
+<div class="content">
+    <div class="single">
+        <section id="tribe-history">
+            <h2><%= i18n('header_tribe_history', 'tribe_profile_history', lang) %></h2>
+
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><%= i18n('column_date', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_rank', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_members', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_points', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_villages', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_bash_points_offense', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_bash_points_defense', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_bash_points_total', 'tribe_profile_history', lang) %></th>
+                            <% if (world.config.victory_points) { -%>
+                                <th><%= i18n('column_victory_points', 'tribe_profile_history', lang) %></th>
+                            <% } -%>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (let item of history) { %>
+                            <tr>
+                                <td><%= formatDate(item.date, world.time_offset, 'hours-only') %></td>
+                                <td><span class="history-change-type <%= item.rank_change %>"></span><%= formatNumbers(item.rank) %></td>
+                                <td><span class="history-change-type <%= item.members_change %>"></span><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= item.tribe_id %>/member-changes"><%= formatNumbers(item.members) %></a></td>
+                                <td><span class="history-change-type <%= item.points_change %>"></span><%= formatNumbers(item.points) %></td>
+                                <td><span class="history-change-type <%= item.villages_change %>"></span><%= formatNumbers(item.villages) %></td>
+                                <td><span class="history-change-type <%= item.bash_points_off_change %>"></span><%= formatNumbers(item.bash_points_off) %></td>
+                                <td><span class="history-change-type <%= item.bash_points_def_change %>"></span><%= formatNumbers(item.bash_points_def) %></td>
+                                <td><span class="history-change-type <%= item.bash_points_total_change %>"></span><%= formatNumbers(item.bash_points_total) %></td>
+                                <% if (world.config.victory_points) { -%>
+                                    <td><span class="history-change-type <%= item.victory_points_change %>"></span><%= formatNumbers(item.victory_points) %></td>
+                                <% } -%>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
