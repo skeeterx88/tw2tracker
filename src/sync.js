@@ -26,6 +26,8 @@ const ACHIEVEMENT_COMMIT_UPDATE = 'achievement_commit_update';
 const auths = {};
 const Sync = {};
 
+const historyQueue = new GenericSyncQueue();
+
 let browser = null;
 
 const running = {
@@ -112,14 +114,13 @@ Sync.init = async function () {
         }
     });
 
-    tasks.add('save_history', saveHistory);
-
     if (process.env.NODE_ENV !== 'development') {
         tasks.initChecker();
     }
 
     await Sync.initQueue('data');
     await Sync.initQueue('achievements');
+    await initHistoryProcessing();
 
     // await Sync.all('data');
     // await Sync.all('achievements');
@@ -1494,80 +1495,145 @@ async function fetchMarketTimeOffset (page, marketId) {
     }
 }
 
-async function saveHistory () {
+async function initHistoryProcessing (marketId) {
+    const markets = marketId
+        ? await db.any(sql.getMarket, {marketId})
+        : await db.any(sql.getMarkets);
+
+    for (const market of markets) {
+        const untilMidnight = getTimeUntilMidnight(market.time_offset);
+
+        debug.history('market:%s history process starts in %i hours', market.id, Math.floor(untilMidnight / 1000 / 60 / 60));
+
+        setTimeout(async function () {
+            historyQueue.add(async function () {
+                const marketWorlds = await db.any(sql.getMarketWorlds, {market: market.id});
+                const openWorlds = marketWorlds.filter(world => world.open);
+
+                for (const world of openWorlds) {
+                    await processWorldHistory(world.world_id);
+                }
+            });
+        }, untilMidnight);
+    }
+}
+
+function getTimeUntilMidnight (timeOffset) {
+    const now = utils.UTC() + timeOffset;
+    const then = new Date(now);
+    then.setHours(24, 0, 0, 0);
+    return then - now;
+}
+
+async function processWorldHistory (worldId) {
+    const historyLimit = config('sync', 'maximum_history_days');
+
     await db.task(async function (db) {
-        const worlds = await db.any(sql.getOpenWorlds);
-        const historyLimit = config('sync', 'maximum_history_days');
+        debug.history('world:%s processing history', worldId);
 
-        for (const world of worlds) {
-            const worldId = world.world_id;
+        const players = await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'id'});
+        const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'id'});
 
-            debug.history('updating world %s', worldId);
-
-            const players = await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'id'});
-            const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'id'});
-
-            for (const player of players) {
-                if (player.archived) {
-                    continue;
-                }
-
-                const history = await db.any(sql.getPlayerHistory, {worldId, playerId: player.id});
-
-                if (history.length >= historyLimit) {
-                    let exceeding = history.length - historyLimit + 1;
-
-                    while (exceeding--) {
-                        const {id} = history.pop();
-                        await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'players', id});
-                    }
-                }
-
-                await db.query(sql.addPlayerHistoryItem, {
-                    worldId,
-                    id: player.id,
-                    tribe_id: player.tribe_id,
-                    points: player.points,
-                    villages: player.villages,
-                    rank: player.rank,
-                    victory_points: world.config.victory_points ? player.victory_points : null,
-                    bash_points_off: player.bash_points_off,
-                    bash_points_def: player.bash_points_def,
-                    bash_points_total: player.bash_points_total
-                });
+        for (const player of players) {
+            if (player.archived) {
+                continue;
             }
 
-            for (const tribe of tribes) {
-                if (tribe.archived) {
-                    continue;
+            const history = await db.any(sql.getPlayerHistory, {worldId, playerId: player.id});
+
+            if (history.length >= historyLimit) {
+                let exceeding = history.length - historyLimit + 1;
+
+                while (exceeding--) {
+                    const {id} = history.pop();
+                    await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'players', id});
                 }
-
-                const history = await db.any(sql.getTribeHistory, {worldId, tribeId: tribe.id});
-
-                if (history.length >= historyLimit) {
-                    let exceeding = history.length - historyLimit + 1;
-
-                    while (exceeding--) {
-                        const {id} = history.pop();
-                        await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'tribes', id});
-                    }
-                }
-
-                await db.query(sql.addTribeHistoryItem, {
-                    worldId,
-                    id: tribe.id,
-                    members: tribe.members,
-                    points: tribe.points,
-                    villages: tribe.villages,
-                    rank: tribe.rank,
-                    victory_points: world.config.victory_points ? tribe.victory_points : null,
-                    bash_points_off: tribe.bash_points_off,
-                    bash_points_def: tribe.bash_points_def,
-                    bash_points_total: tribe.bash_points_total
-                });
             }
+
+            await db.query(sql.addPlayerHistoryItem, {
+                worldId,
+                id: player.id,
+                tribe_id: player.tribe_id,
+                points: player.points,
+                villages: player.villages,
+                rank: player.rank,
+                victory_points: player.victory_points || null,
+                bash_points_off: player.bash_points_off,
+                bash_points_def: player.bash_points_def,
+                bash_points_total: player.bash_points_total
+            });
+        }
+
+        for (const tribe of tribes) {
+            if (tribe.archived) {
+                continue;
+            }
+
+            const history = await db.any(sql.getTribeHistory, {worldId, tribeId: tribe.id});
+
+            if (history.length >= historyLimit) {
+                let exceeding = history.length - historyLimit + 1;
+
+                while (exceeding--) {
+                    const {id} = history.pop();
+                    await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'tribes', id});
+                }
+            }
+
+            await db.query(sql.addTribeHistoryItem, {
+                worldId,
+                id: tribe.id,
+                members: tribe.members,
+                points: tribe.points,
+                villages: tribe.villages,
+                rank: tribe.rank,
+                victory_points: tribe.victory_points || null,
+                bash_points_off: tribe.bash_points_off,
+                bash_points_def: tribe.bash_points_def,
+                bash_points_total: tribe.bash_points_total
+            });
         }
     });
+}
+
+function GenericSyncQueue () {
+    const queue = [];
+    let processing = false;
+    let onFinish = async function () {};
+    let onStart = async function () {};
+
+    async function process () {
+        processing = true;
+        await onStart();
+        while (queue.length) {
+            const handler = queue.shift();
+            await handler();
+        }
+        processing = false;
+        await onFinish();
+    }
+
+    this.add = function (handler) {
+        if (typeof handler === 'function') {
+            queue.push(handler);
+        }
+
+        if (!processing) {
+            process();
+        }
+    };
+
+    this.onFinish = function (handler) {
+        if (typeof handler === 'function') {
+            onFinish = handler;
+        }
+    };
+
+    this.onStart = function (handler) {
+        if (typeof handler === 'function') {
+            onStart = handler;
+        }
+    };
 }
 
 module.exports = Sync;
