@@ -12,7 +12,8 @@ CREATE TABLE public.tasks (
 );
 
 CREATE TABLE public.markets (
-    id VARCHAR (10) PRIMARY KEY
+    id VARCHAR (10) PRIMARY KEY,
+    time_offset INT NULL
 );
 
 CREATE TABLE public.accounts (
@@ -55,7 +56,6 @@ CREATE TABLE public.worlds (
     player_count INT DEFAULT 0,
     village_count INT DEFAULT 0,
     tribe_count INT DEFAULT 0,
-    time_offset INT,
     close_date TIMESTAMP NULL,
     open_date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW()),
     incomplete_data BOOLEAN DEFAULT FALSE,

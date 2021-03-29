@@ -40,6 +40,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     } = await paramPlayerParse(req, worldId);
 
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const conquestCount = (await db.one(sql.getPlayerConquestsCount, {worldId, playerId})).count;
@@ -77,6 +78,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/player',
         title: i18n('stats_player', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
@@ -161,6 +163,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
@@ -222,6 +225,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/player-conquests',
         title: i18n('stats_player_conquests', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
@@ -256,6 +260,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const tribeChanges = await db.any(sql.getPlayerTribeChanges, {worldId, id: playerId});
@@ -282,6 +287,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/player-tribe-changes',
         title: i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
@@ -314,6 +320,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const selectedCategory = req.params.category;
@@ -418,12 +425,12 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
 
         for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
-                achievementsRepeatableLastEarned[type] = utils.formatDate(time_last_level, world.time_offset, 'day-only');
+                achievementsRepeatableLastEarned[type] = utils.formatDate(time_last_level, market.time_offset, 'day-only');
             }
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || [];
-                achievementsRepeatableDetailed[type].push(utils.formatDate(time_last_level, world.time_offset, 'day-only'));
+                achievementsRepeatableDetailed[type].push(utils.formatDate(time_last_level, market.time_offset, 'day-only'));
             }
 
             achievementsRepeatableCount[type] = achievementsRepeatableCount[type] ?? 0;
@@ -489,7 +496,9 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
 
     let lastItem;
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
+
     const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId}, function (currentItem) {
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
@@ -512,6 +521,7 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/player-history',
         title: i18n('stats_tribe_history', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,

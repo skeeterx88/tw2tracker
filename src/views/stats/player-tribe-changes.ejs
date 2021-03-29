@@ -18,7 +18,7 @@
                 <% if (tribeChanges.length) { -%>
                     <% for (let change of tribeChanges) { %>
                         <tr>
-                            <td><%= formatDate(change.date, world.time_offset, 'hours-only') %></td>
+                            <td><%= formatDate(change.date, market.time_offset, 'hours-only') %></td>
 
                             <% if (change.old_tribe) { -%>
                                 <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>

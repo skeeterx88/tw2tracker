@@ -243,6 +243,7 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
 
     running.data.add(worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await getWorld(worldId);
     const marketAccounts = await db.any(sql.getMarketAccounts, {marketId});
 
@@ -317,8 +318,8 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
                 await fetchWorldConfig(page, worldId);
             }
 
-            if (world.time_offset === null) {
-                await fetchWorldTimeOffset(page, worldId);
+            if (market.time_offset === null) {
+                await fetchMarketTimeOffset(page, worldId);
             }
 
             debug.sync('world:%s fetching data', worldId);
@@ -1476,16 +1477,16 @@ async function fetchWorldConfig (page, worldId) {
     }
 }
 
-async function fetchWorldTimeOffset (page, worldId) {
+async function fetchMarketTimeOffset (page, marketId) {
     try {
-        debug.sync('world:%s fetch timezone', worldId);
+        debug.sync('world:%s fetch timezone', marketId);
 
         const timeOffset = await page.evaluate(function () {
             return require('helper/time').getGameTimeOffset();
         });
 
-        await db.none(sql.updateWorldTimeOffset, {
-            worldId,
+        await db.none(sql.updateMarketTimeOffset, {
+            marketId,
             timeOffset
         });
     } catch (error) {

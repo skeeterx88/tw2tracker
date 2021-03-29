@@ -39,6 +39,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const conquestCount = (await db.one(sql.getTribeConquestsCount, {worldId, tribeId})).count;
@@ -63,6 +64,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/tribe',
         title: i18n('stats_tribe', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
@@ -100,6 +102,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
@@ -161,6 +164,7 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/tribe-conquests',
         title: i18n('stats_tribe_conquests', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
@@ -291,6 +295,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const playersName = {};
@@ -320,6 +325,7 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/tribe-member-changes',
         title: i18n('stats_tribe_member_changes', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         tribe,
@@ -352,6 +358,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const subCategory = req.params.subCategory;
@@ -370,11 +377,11 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
     for (const {period, type, time_last_level} of achievements) {
         if (period) {
             if (!achievementsRepeatableLastEarned[type]) {
-                achievementsRepeatableLastEarned[type] = utils.formatDate(time_last_level, world.time_offset, 'day-only');
+                achievementsRepeatableLastEarned[type] = utils.formatDate(time_last_level, market.time_offset, 'day-only');
             }
 
             achievementsRepeatable[type] = achievementsRepeatable[type] || [];
-            achievementsRepeatable[type].push(utils.formatDate(time_last_level, world.time_offset, 'day-only'));
+            achievementsRepeatable[type].push(utils.formatDate(time_last_level, market.time_offset, 'day-only'));
 
             achievementsRepeatableCategoryCount[type] = achievementsRepeatableCategoryCount[type] ?? 0;
             achievementsRepeatableCategoryCount[type]++;
@@ -382,7 +389,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || [];
-                achievementsRepeatableDetailed[type].push(utils.formatDate(time_last_level, world.time_offset, 'day-only'));
+                achievementsRepeatableDetailed[type].push(utils.formatDate(time_last_level, market.time_offset, 'day-only'));
             }
         }
     }
@@ -432,7 +439,9 @@ const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
 
     let lastItem;
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
+
     const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId}, function (currentItem) {
         currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
@@ -456,6 +465,7 @@ const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/tribe-history',
         title: i18n('stats_tribe_history', 'page_titles', res.locals.lang, [tribe.tag, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,

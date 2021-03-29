@@ -25,6 +25,7 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const page = req.params.page && !isNaN(req.params.page)
@@ -44,6 +45,7 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/conquests',
         title: i18n('stats_world_conquests', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
