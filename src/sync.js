@@ -1507,7 +1507,7 @@ async function initHistoryProcessing (marketId) {
 
         setTimeout(function () {
             historyQueue.add(async function () {
-                const marketWorlds = await db.any(sql.getMarketWorlds, {market: market.id});
+                const marketWorlds = await db.any(sql.getMarketWorlds, {marketId: market.id});
                 const openWorlds = marketWorlds.filter(world => world.open);
 
                 for (const world of openWorlds) {
