@@ -1505,7 +1505,7 @@ async function initHistoryProcessing (marketId) {
 
         debug.history('market:%s history process starts in %i hours', market.id, Math.floor(untilMidnight / 1000 / 60 / 60));
 
-        setTimeout(async function () {
+        setTimeout(function () {
             historyQueue.add(async function () {
                 const marketWorlds = await db.any(sql.getMarketWorlds, {market: market.id});
                 const openWorlds = marketWorlds.filter(world => world.open);
