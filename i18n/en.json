@@ -234,6 +234,7 @@
     "player_profile": {
         "header_player_profile": "Player Profile",
         "header_last_achievements": "Player's Latest Achievement",
+        "header_last_conquests": "Player's Latest Conquests",
         "player_rank": "Rank:",
         "player_name": "Name:",
         "player_tribe": "Tribe:",
@@ -251,8 +252,13 @@
         "achievement_name": "Name",
         "achievement_date_time": "Date/Hour",
         "view_player_achievements": "View player's achievements",
+        "view_player_conquests": "View player's conquests",
         "no_tribe": "No tribe",
-        "no_recent_achievements": "No recent achievements."
+        "no_recent_achievements": "No recent achievements.",
+        "column_village": "Village",
+        "column_points": "Points",
+        "column_date_hour": "Date/Hour",
+        "no_conquests": "No conquests yet."
     },
     "player_profile_villages": {
         "header": "Player Villages",
