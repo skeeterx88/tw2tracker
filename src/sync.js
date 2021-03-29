@@ -1503,7 +1503,7 @@ async function initHistoryProcessing (marketId) {
     for (const market of markets) {
         const untilMidnight = getTimeUntilMidnight(market.time_offset);
 
-        debug.history('market:%s history process starts in %i hours', market.id, Math.floor(untilMidnight / 1000 / 60 / 60));
+        debug.history('market:%s history process starts in %i minutes', market.id, untilMidnight / 1000 / 60);
 
         setTimeout(function () {
             historyQueue.add(async function () {
