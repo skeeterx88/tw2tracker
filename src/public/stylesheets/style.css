@@ -484,6 +484,21 @@ div.world-title {
     background: var(--noise), linear-gradient(hsl(112, 58%, 48%), hsl(121, 56%, 23%));
 }
 
+.flat-button {
+    background: var(--noise) hsl(23, 25%, 20%);
+    border-radius: 1px;
+    border: 1px solid hsl(23, 6%, 39%);
+    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%);
+    color: hsl(36, 13%, 59%);
+    margin: 2px 0px;
+    padding: 1px 4px;
+    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+}
+
+.flat-button.selected {
+    background: var(--noise) hsl(23, 25%, 20%);
+}
+
 .section-content {
     background: var(--color-content);
     border-radius: 2px;
@@ -1199,8 +1214,14 @@ div.world-title {
 }
 
 .map-world-list {
-    width: 200px;
+    min-width: 260px;
     z-index: 7;
+    padding-bottom: 10px;
+}
+
+.map-world-list .wrapper {
+    display: flex;
+    justify-content: space-around;
 }
 
 .map-world-list a {
@@ -1235,9 +1256,8 @@ div.world-title {
 }
 
 .map-market-list {
-    float: left;
-    margin-right: 5px;
-    width: 30%;
+    width: 60px;
+    text-transform: uppercase;
 }
 
 .map-market-list li {
@@ -1245,7 +1265,7 @@ div.world-title {
 }
 
 .map-market-list div.market {
-    margin: 1px 2px;
+    margin: 3px 2px;
     text-align: center;
 }
 
@@ -1256,6 +1276,16 @@ div.world-title {
 
 .map-market-list li:hover {
     background: hsl(23, 45%, 36%);
+}
+
+.map-market-worlds {
+    text-align: center;
+}
+
+.map-market-worlds .world {
+    width: 100%;
+    margin: 2px;
+    min-width: 150px;
 }
 
 .flex {
@@ -1604,17 +1634,6 @@ span[class^="flag-"] {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-}
-
-.map .map-info > div {
-    background: var(--noise) hsl(23, 25%, 20%);
-    border-radius: 1px;
-    border: 1px solid hsl(23, 6%, 39%);
-    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%);
-    color: hsl(36, 13%, 59%);
-    margin: 2px 0px;
-    padding: 1px 4px;
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
 }
 
 #tribes .top-colors {

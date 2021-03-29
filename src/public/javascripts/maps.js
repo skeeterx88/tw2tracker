@@ -756,17 +756,17 @@ require([
                 }
 
                 $button.classList.add('market');
-                $button.classList.add('text-container');
+                $button.classList.add('flat-button');
                 $flag.innerText = market;
                 $flag.classList.add(`flag-${market}`);
 
                 $button.appendChild($flag);
 
                 $button.addEventListener('mouseenter', function () {
-                    const $selectedmarket = $worldList.querySelector('.market.selected');
+                    const $selectedMarket = $worldList.querySelector('.market.selected');
 
-                    if ($selectedmarket) {
-                        $selectedmarket.classList.remove('selected');
+                    if ($selectedMarket) {
+                        $selectedMarket.classList.remove('selected');
                     }
 
                     this.classList.add('selected');
@@ -794,12 +794,13 @@ require([
                 $archor.href = location.origin + `/maps/${market}/${num}/`;
 
                 $button.classList.add('world');
+                $button.classList.add('relax-button');
 
                 if (worldNumber === num && marketId === market) {
                     $button.classList.add('selected');
                 }
 
-                $button.innerText = `${market}${num} ${name}`;
+                $button.innerText = `${num} ${name}`;
 
                 $archor.appendChild($button);
                 $world.appendChild($archor);

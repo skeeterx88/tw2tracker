@@ -59,16 +59,16 @@
             </div>
             <div class="map full">
                 <div class="map-info">
-                    <div>
+                    <div class="flat-button">
                         <span class="position-x">500</span>|<span class="position-y">500</span>
                     </div>
 
-                    <div class="last-sync hidden">
+                    <div class="flat-button last-sync hidden">
                         <span><%= i18n('last_update', 'maps', lang) %></span>
                         <span class="date"></span>
                     </div>
 
-                    <div class="share-date hidden">
+                    <div class="flat-button share-date hidden">
                         <span><%= i18n('share_date', 'maps', lang) %></span>
                         <span class="date"></span>
                     </div>
@@ -95,8 +95,10 @@
         <div class="map-world-list floating-modal invisible">
             <h2><%= i18n('open_worlds', 'maps', lang) %></h2>
             <div class="loading"><div class="b1"></div><div class="b2"></div><div></div></div>
-            <ul class="map-market-list"></ul>
-            <ul class="map-market-worlds"></ul>
+            <div class="wrapper">
+                <ul class="map-market-list"></ul>
+                <ul class="map-market-worlds"></ul>
+            </div>
         </div>
 
         <div class="map-settings floating-modal invisible">
