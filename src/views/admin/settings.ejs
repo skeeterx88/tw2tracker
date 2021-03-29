@@ -14,17 +14,17 @@
                                     <label for="<%= category + '_' + configId %>"><%= i18n('label_' + category + '_' + configId, 'admin_settings', lang) %></label>
 
                                     <% if (configData.type === 'string') { -%>
-                                        <input class="relax-input" type="text" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config[category][configId] %>"/>
+                                        <input class="relax-input" type="text" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config(category, configId) %>"/>
                                     <% } else if (configData.type === 'number') { -%>
-                                        <input class="relax-input" type="number" min="<%= configData.min %>" max="<%= configData.max %>" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config[category][configId] %>"/>
+                                        <input class="relax-input" type="number" min="<%= configData.min %>" max="<%= configData.max %>" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config(category, configId) %>"/>
                                     <% } else if (configData.type === 'time') { -%>
-                                        <input class="relax-input" type="text" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config[category][configId] %>"/>
+                                        <input class="relax-input" type="text" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config(category, configId) %>"/>
                                     <% } else if (configData.type === 'password') { -%>
-                                        <input class="relax-input" type="password" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config[category][configId] %>"/>
+                                        <input class="relax-input" type="password" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config(category, configId) %>"/>
                                     <% } else if (configData.type === 'language') { -%>
                                         <select class="relax-input" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>">
                                             <% for (const langId of availableLanguages) { %>
-                                                <option value="<%= langId %>"<% __append(config[category][configId] === langId ? ' selected' : '') %>><%= i18n('language', 'meta', langId) %></option>
+                                                <option value="<%= langId %>"<% __append(config(category, configId) === langId ? ' selected' : '') %>><%= i18n('language', 'meta', langId) %></option>
                                             <% } %>
                                         </select>
                                     <% } -%>
