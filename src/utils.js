@@ -202,7 +202,7 @@ const formatSince = function (date, lang) {
             if (dayHours <= 2) {
                 format = i18n('days', 'time', lang, [1]);
             } else {
-                format = i18n('days', 'time', lang, [1]) + ' ' + i18n('and', 'general', lang) + ' ' + i18n('hours', 'time', lang, [Math.round(hours)]);
+                format = i18n('days', 'time', lang, [1]) + ' ' + i18n('and', 'general', lang) + ' ' + i18n('hours', 'time', lang, [Math.round(dayHours)]);
             }
         }
     }
