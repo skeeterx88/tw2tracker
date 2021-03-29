@@ -30,6 +30,7 @@ const villageRouter = asyncRouter(async function (req, res, next) {
         village
     } = await paramVillageParse(req, worldId);
 
+    const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
     const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
@@ -45,6 +46,7 @@ const villageRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/village',
         title: i18n('stats_village', 'page_titles', res.locals.lang, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
