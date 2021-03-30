@@ -33,7 +33,6 @@
         "world_type_victory_points": "Siegpunkte",
         "world_type_domination": "Vorherrschaft",
         "setting_troop_relocation": "Umsiedeln:",
-        
         "setting_enabled": "Aktiviert",
         "setting_disabled": "Deaktiviert",
         "open_date": "Weltenstart:",
@@ -161,7 +160,14 @@
         "achievement_date_time": "Datum/Stunde",
         "view_tribe_achievements": "Stammeserfolge anzeigen",
         "no_recent_achievements": "Gesamte Weltkarte anzeigen.",
-        "abandoned_village": "Verlassen"
+        "abandoned_village": "Verlassen",
+        "header_last_conquests": "Kürzliche Stammeseroberungen",
+        "view_tribe_conquests": "Stammeseroberungen anzeigen",
+        "column_village": "Dorf",
+        "column_points": "Punkte",
+        "column_date_hour": "Datum/Stunde",
+        "no_conquests": "Noch keine Eroberungen.",
+        "view_tribe_history": "Stammesverlauf anzeigen"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Dörfer des Stammes",
@@ -238,7 +244,14 @@
         "achievement_date_time": "Datum/Stunde",
         "view_player_achievements": "Spieler Erfolge anzeigen",
         "no_tribe": "Kein Stamm",
-        "no_recent_achievements": "Keine kürzlichen Erfolge."
+        "no_recent_achievements": "Keine kürzlichen Erfolge.",
+        "header_last_conquests": "Kürzliche Spieler Eroberungen",
+        "view_player_conquests": "Spieler Eroberungen anzeigen",
+        "column_village": "Dorf",
+        "column_points": "Punkte",
+        "column_date_hour": "Darum/Stunde",
+        "no_conquests": "Noch keine Eroberungen.",
+        "view_player_history": "Spielerverlauf anzeigen"
     },
     "player_profile_villages": {
         "header": "Dörfer des Spielers",
@@ -654,7 +667,8 @@
         "member_changes": "Mitgliederaktivität",
         "achievements": "Erfolge",
         "ranking": "Rangliste / %{category}",
-        "search": "Suche \"%{query}\""
+        "search": "Suche \"%{query}\"",
+        "history": "Verlauf"
     },
     "page_titles": {
         "admin_panel": "Admin Schaltfläche - %{site_name}",
@@ -683,12 +697,55 @@
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
-        "languages": "Sprachen - %{site_name}"
+        "languages": "Sprachen - %{site_name}",
+        "stats_tribe_history": "Stammes %{tribe_tag} - Verlauf - %{market_id}/%{world_name} - %{site_name}",
+        "stats_player_history": "Spieler %{player_name} - Verlauf - %{market_id}/%{world_name} - %{site_name}"
     },
     "time": {
-        "days": ["%{x} Tag", "%{x} Tage"],
-        "hours": ["%{x} Stunde", "%{x} STunden"],
-        "minutes": ["%{x} Minute", "%{x} Minuten"],
-        "seconds": ["%{x} Sekunde", "%{x} Sekunden"]
+        "days": [
+            "%{x} Tag",
+            "%{x} Tage"
+        ],
+        "hours": [
+            "%{x} Stunde",
+            "%{x} STunden"
+        ],
+        "minutes": [
+            "%{x} Minute",
+            "%{x} Minuten"
+        ],
+        "seconds": [
+            "%{x} Sekunde",
+            "%{x} Sekunden"
+        ],
+        "now": "gerade eben",
+        "ago": "vor"
+    },
+    "General": {
+        "and": "und"
+    },
+    "tribe_profile_history": {
+        "header_tribe_history": "Stammesverlauf",
+        "column_date": "Datum",
+        "column_rank": "Rang",
+        "column_members": "Mitglieder",
+        "column_points": "Punkte",
+        "column_villages": "Dörfer",
+        "column_victory_points": "Siegpunkte",
+        "column_bash_points_offense": "Off Kampfpunkte",
+        "column_bash_points_defense": "Deff Kampfpunkte",
+        "column_bash_points_total": "Kampfpunkte insgesamt"
+    },
+    "player_profile_history": {
+        "header_player_history": "Spielerverlauf",
+        "column_date": "Datum",
+        "column_tribe": "Stamm",
+        "column_rank": "Rang",
+        "column_points": "Punkte",
+        "column_villages": "Dörfer",
+        "column_victory_points": "Siegpunkte",
+        "column_bash_points_offense": "Off Kampfpunkte",
+        "column_bash_points_defense": "Deff Kampfpunkte",
+        "column_bash_points_total": "Kampfpunkte insgesamt"
     }
 }

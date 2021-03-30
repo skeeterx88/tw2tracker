@@ -162,7 +162,14 @@
         "achievement_date_time": "Date/Heure",
         "view_tribe_achievements": "Voir les succès de la tribu",
         "no_recent_achievements": "Pas de succès récent.",
-        "abandoned_village": "Abandonné"
+        "abandoned_village": "Abandonné",
+        "header_last_conquests": "Dernières conquêtes de la tribu",
+        "view_tribe_conquests": "Voir les conquêtes de la tribu",
+        "column_village": "Village",
+        "column_points": "Points",
+        "column_date_hour": "Date/Heure",
+        "no_conquests": "Pas de conquêtes pour l'instant.",
+        "view_tribe_history": "Voir l'historique de la tribu"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Villages de la Tribu",
@@ -239,7 +246,14 @@
         "achievement_date_time": "Date/Heure",
         "view_player_achievements": "Voir les succès du joueur",
         "no_tribe": "Pas de tribu",
-        "no_recent_achievements": "Pas de succès récent."
+        "no_recent_achievements": "Pas de succès récent.",
+        "header_last_conquests": "Dernières conquêtes du joueur",
+        "view_player_conquests": "Voir les conquêtes de la tribu",
+        "column_village": "Village",
+        "column_points": "Points",
+        "column_date_hour": "Date/Heure",
+        "no_conquests": "Pas de conquêtes pour l'instant.",
+        "view_player_history": "Voir l'historique de la tribu"
     },
     "player_profile_villages": {
         "header": "Villages du Joueur",
@@ -655,7 +669,8 @@
         "member_changes": "Changements de membre",
         "achievements": "Succès",
         "ranking": "Rang / %{category}",
-        "search": "Recherche \"%{query}\""
+        "search": "Recherche \"%{query}\"",
+        "history": "Historique"
     },
     "page_titles": {
         "admin_panel": "Panneau admin - %{site_name}",
@@ -684,12 +699,55 @@
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
-        "languages": "Langues - %{site_name}"
+        "languages": "Langues - %{site_name}",
+        "stats_tribe_history": "Tribu %{tribe_tag} - Historique - %{market_id}/%{world_name} - %{site_name}",
+        "stats_player_history": "Joueur %{player_name} - Historique - %{market_id}/%{world_name} - %{site_name}"
     },
     "time": {
-        "days": ["%{x} jour", "%{x} jours"],
-        "hours": ["%{x} heure", "%{x} heures"],
-        "minutes": ["%{x} minute", "%{x} minutes"],
-        "seconds": ["%{x} seconde", "%{x} secondes"]
+        "days": [
+            "%{x} jour",
+            "%{x} jours"
+        ],
+        "hours": [
+            "%{x} heure",
+            "%{x} heures"
+        ],
+        "minutes": [
+            "%{x} minute",
+            "%{x} minutes"
+        ],
+        "seconds": [
+            "%{x} seconde",
+            "%{x} secondes"
+        ],
+        "now": "juste maintenant",
+        "ago": "avant"
+    },
+    "general": {
+        "and": "et"
+    },
+    "tribe_profile_history": {
+        "header_tribe_history": "Historique tribu",
+        "column_date": "Date",
+        "column_rank": "Rang",
+        "column_members": "Membres",
+        "column_points": "Points",
+        "column_villages": "Villages",
+        "column_victory_points": "Points de Victoire",
+        "column_bash_points_offense": "Bash Off",
+        "column_bash_points_defense": "Bash Def",
+        "column_bash_points_total": "Bash Total"
+    },
+    "player_profile_history": {
+        "header_player_history": "Historique joueur",
+        "column_date": "Date",
+        "column_tribe": "Tribu",
+        "column_rank": "Rang",
+        "column_points": "Points",
+        "column_villages": "Villages",
+        "column_victory_points": "Points de Victoire",
+        "column_bash_points_offense": "Bash Off",
+        "column_bash_points_defense": "Bash Def",
+        "column_bash_points_total": "Bash Total"
     }
 }
