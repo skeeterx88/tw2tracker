@@ -169,7 +169,8 @@
         "column_village": "Village",
         "column_points": "Points",
         "column_date_hour": "Date/Hour",
-        "no_conquests": "No conquests yet."
+        "no_conquests": "No conquests yet.",
+        "view_tribe_history": "View tribe's history"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Tribe Villages",
@@ -264,7 +265,8 @@
         "column_village": "Village",
         "column_points": "Points",
         "column_date_hour": "Date/Hour",
-        "no_conquests": "No conquests yet."
+        "no_conquests": "No conquests yet.",
+        "view_player_history": "View players's history"
     },
     "player_profile_villages": {
         "header": "Player Villages",
