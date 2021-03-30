@@ -42,6 +42,18 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
+    const conquests = await db.map(sql.getTribeConquests, {worldId, tribeId, offset: 0, limit: 5}, function (conquest) {
+        if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
+            conquest.type = conquestTypes.SELF;
+        } else if (conquest.new_owner_tribe_id === tribeId) {
+            conquest.type = conquestTypes.GAIN;
+        } else if (conquest.old_owner_tribe_id === tribeId) {
+            conquest.type = conquestTypes.LOSS;
+        }
+
+        return conquest;
+    });
+
     const conquestCount = (await db.one(sql.getTribeConquestsCount, {worldId, tribeId})).count;
     const conquestGainCount = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count;
     const conquestLossCount = (await db.one(sql.getTribeConquestsLossCount, {worldId, tribeId})).count;
@@ -69,6 +81,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         worldNumber,
         world,
         tribe,
+        conquests,
         conquestCount,
         conquestGainCount,
         conquestLossCount,

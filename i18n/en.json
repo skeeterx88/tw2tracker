@@ -141,6 +141,7 @@
     "tribe_profile": {
         "header_tribe_profile": "Tribe Profile",
         "header_last_achievements": "Tribe's Latest Achievement",
+        "header_last_conquests": "Tribe's Latest Conquests",
         "tribe_rank": "Rank:",
         "tribe_name": "Name:",
         "tribe_tag": "Tag:",
@@ -162,8 +163,13 @@
         "achievement_name": "Name",
         "achievement_date_time": "Date/Hour",
         "view_tribe_achievements": "View tribe's achievements",
+        "view_tribe_conquests": "View tribe's conquests",
         "no_recent_achievements": "No recent achievements.",
-        "abandoned_village": "Abandoned"
+        "abandoned_village": "Abandoned",
+        "column_village": "Village",
+        "column_points": "Points",
+        "column_date_hour": "Date/Hour",
+        "no_conquests": "No conquests yet."
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Tribe Villages",
