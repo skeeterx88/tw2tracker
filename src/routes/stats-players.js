@@ -463,6 +463,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
     res.render('stats', {
         page: 'stats/player-achievements',
         title: i18n('stats_player_achievements', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        market,
         marketId,
         worldNumber,
         world,
