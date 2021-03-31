@@ -8,7 +8,7 @@ const config = require('../config.js');
 const i18n = require('../i18n.js');
 const conquestTypes = require('../conquest-types.json');
 const memberChangeTypes = require('../member-change-types.json');
-
+const historyOrderTypes = require('../history-order-types.json');
 
 const {
     paramWorld,
@@ -459,7 +459,7 @@ const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
         currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
-        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem);
+        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
         currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
         currentItem.bash_points_off_change = getHistoryChangeType('bash_points_off', currentItem, lastItem);
         currentItem.bash_points_def_change = getHistoryChangeType('bash_points_def', currentItem, lastItem);

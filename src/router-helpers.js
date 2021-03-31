@@ -7,6 +7,7 @@ const i18n = require('./i18n.js');
 const rankingSortTypes = require('./ranking-sort-types.json');
 const rankingSortTypesValues = Object.values(rankingSortTypes);
 const historyChangeTypes = require('./history-change-types.json');
+const historyOrderTypes = require('./history-order-types.json');
 
 async function getPlayer (worldId, playerId) {
     const player = await db.any(sql.getPlayer, {worldId, playerId});
@@ -199,11 +200,13 @@ function parseRankingSort (req, victoryPointSystem) {
     };
 }
 
-function getHistoryChangeType (type, currentItem, lastItem) {
+function getHistoryChangeType (type, currentItem, lastItem, order = historyOrderTypes.ASC) {
     if (!lastItem || currentItem[type] === lastItem[type]) {
         return historyChangeTypes.EQUAL;
-    } else {
+    } else if (order === historyOrderTypes.ASC) {
         return currentItem[type] > lastItem[type] ? historyChangeTypes.INCREASE : historyChangeTypes.DECREASE;
+    } else if (order === historyOrderTypes.DESC) {
+        return currentItem[type] < lastItem[type] ? historyChangeTypes.INCREASE : historyChangeTypes.DECREASE;
     }
 }
 

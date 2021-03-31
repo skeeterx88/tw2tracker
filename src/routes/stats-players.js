@@ -7,6 +7,8 @@ const utils = require('../utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
 const conquestTypes = require('../conquest-types.json');
+const conquestCategories = ['gain', 'loss', 'all', 'self'];
+const historyOrderTypes = require('../history-order-types.json');
 
 const {
     paramWorld,
@@ -20,8 +22,6 @@ const {
     asyncRouter,
     getHistoryChangeType
 } = require('../router-helpers.js');
-
-const conquestCategories = ['gain', 'loss', 'all', 'self'];
 
 const playerProfileRouter = asyncRouter(async function (req, res, next) {
     if (!paramWorld(req)) {
@@ -516,7 +516,7 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
     const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId}, function (currentItem) {
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
-        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem);
+        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
         currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
         currentItem.bash_points_off_change = getHistoryChangeType('bash_points_off', currentItem, lastItem);
         currentItem.bash_points_def_change = getHistoryChangeType('bash_points_def', currentItem, lastItem);
