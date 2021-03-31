@@ -534,7 +534,7 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
 
     res.render('stats', {
         page: 'stats/player-history',
-        title: i18n('stats_tribe_history', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_player_history', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
