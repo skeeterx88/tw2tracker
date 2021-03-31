@@ -116,11 +116,11 @@ Sync.init = async function () {
 
     if (process.env.NODE_ENV !== 'development') {
         tasks.initChecker();
+        await initHistoryProcessing();
     }
 
     await Sync.initQueue('data');
     await Sync.initQueue('achievements');
-    await initHistoryProcessing();
 
     // await Sync.all('data');
     // await Sync.all('achievements');
