@@ -349,6 +349,10 @@ div.world-title {
     margin-left: 10px;
 }
 
+.content > .increase-20 {
+    flex-basis: 20%;
+}
+
 .section-actions {
     margin: 8px 0px;
 }
