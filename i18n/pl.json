@@ -162,7 +162,14 @@
         "achievement_date_time": "Data/Godzina",
         "view_tribe_achievements": "Widok osiągnięć Plemienia",
         "no_recent_achievements": "Brak niedawnych osiagnięć.",
-        "abandoned_village": "Opuszczone"
+        "abandoned_village": "Opuszczone",
+        "header_last_conquests": "Ostatnie podboje Plemienia",
+        "view_tribe_conquests": "Pokaż podboje Plemienia",
+        "column_village": "Wioska",
+        "column_points": "Punkty",
+        "column_date_hour": "Data/Godzina",
+        "no_conquests": "Brak podbojów.",
+        "view_tribe_history": "Pokaż historię Plemienia"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Wioski plemienne",
@@ -239,7 +246,14 @@
         "achievement_date_time": "Data/Godzina",
         "view_player_achievements": "Podgląd Osiągnięć Gracza",
         "no_tribe": "Brak Plemienia",
-        "no_recent_achievements": "Brak najnowszych osiągnięc."
+        "no_recent_achievements": "Brak najnowszych osiągnięc.",
+        "header_last_conquests": "Ostatnie podboje Gracza",
+        "view_player_conquests": "Pokaż podboje Gracza",
+        "column_village": "Wioska",
+        "column_points": "Punkty",
+        "column_date_hour": "Data/Godzina",
+        "no_conquests": "Brak podbojów.",
+        "view_player_history": "Pokaż historię Gracza"
     },
     "player_profile_villages": {
         "header": "Wioski Gracza",
@@ -655,7 +669,8 @@
         "member_changes": "Zmiany Członków",
         "achievements": "Osiagnięcia",
         "ranking": "Ranking / %{category}",
-        "search": "Szukaj \"%{query}\""
+        "search": "Szukaj \"%{query}\"",
+        "history": "Historia"
     },
     "page_titles": {
         "admin_panel": "Panel Administratora - %{site_name}",
@@ -684,12 +699,55 @@
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
-        "languages": "Języki - %{site_name}"
+        "languages": "Języki - %{site_name}",
+        "stats_tribe_history": "Plemię %{tribe_tag} - Historia - %{market_id}/%{world_name} - %{site_name}",
+        "stats_player_history": "Gracz %{player_name} - Historia - %{market_id}/%{world_name} - %{site_name}"
     },
     "time": {
-        "days": ["%{x} dzień", "%{x} dni", "%{x} dni"],
-        "hours": ["%{x} godzina", "%{x} godziny"],
-        "minutes": ["%{x} minuta", "%{x} minuty"],
-        "seconds": ["%{x} sekunda", "%{x} sekundy"]
+        "days": [
+            "%{x} dzień",
+            "%{x} dni",
+            "%{x} dni"
+        ],
+        "hours": [
+            "%{x} godzina",
+            "%{x} godziny"
+        ],
+        "minutes": [
+            "%{x} minuta",
+            "%{x} minuty"
+        ],
+        "seconds": [
+            "%{x} sekunda",
+            "%{x} sekundy"
+        ],
+        "now": "temu"
+    },
+    "general": {
+        "and": "oraz"
+    },
+    "tribe_profile_history": {
+        "header_tribe_history": "Historia Plemienia",
+        "column_date": "Data",
+        "column_rank": "Ranga",
+        "column_members": "Członkowie",
+        "column_points": "Punkty",
+        "column_villages": "Wioski",
+        "column_victory_points": "Punkty Zwycięstwa",
+        "column_bash_points_offense": "Punkty Off",
+        "column_bash_points_defense": "Punkty Def",
+        "column_bash_points_total": "Pkt Bojowe ogólnie"
+    },
+    "player_profile_history": {
+        "header_player_history": "Historia Gracza",
+        "column_date": "Data",
+        "column_tribe": "Plemię",
+        "column_rank": "Ranga",
+        "column_points": "Punkty",
+        "column_villages": "Wioski",
+        "column_victory_points": "Punkty Zwycięstwa",
+        "column_bash_points_offense": "Punkty Off",
+        "column_bash_points_defense": "Punkty Def",
+        "column_bash_points_total": "Pkt Bojowe Ogólne"
     }
 }

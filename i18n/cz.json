@@ -85,7 +85,13 @@
         "accessibility_search_label": "pole vyhledávání",
         "column_victory_points_full": "Vítězné body",
         "column_domination": "%",
-        "column_domination_full": "Světová dominance v procentech"
+        "column_domination_full": "Světová dominance v procentech",
+        "column_tribe_tag": "Tag",
+        "column_bash_points": "Úderné body",
+        "column_bash_points_offense": "Off body",
+        "column_bash_points_defense": "Deff body",
+        "column_bash_points_total": "All body",
+        "column_actions": "Akce"
     },
     "world_ranking": {
         "header_players": "Hráčký žebříček",
@@ -154,7 +160,14 @@
         "achievement_date_time": "Datum/hodina",
         "view_tribe_achievements": "Zobrazit kmenové úspěchy",
         "no_recent_achievements": "Žádné kmenové úspěchy.",
-        "abandoned_village": "Vesnice Barbarů"
+        "abandoned_village": "Vesnice Barbarů",
+        "header_last_conquests": "Kmenové poslední zábory",
+        "view_tribe_conquests": "Zobrazit poslední kmenové zábory",
+        "column_village": "Vesnice",
+        "column_points": "Body",
+        "column_date_hour": "Čas/hodina",
+        "no_conquests": "zatím žádné zábory.",
+        "view_tribe_history": "Zobrazit kmenovou historii"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Kmenové vesnice",
@@ -231,7 +244,14 @@
         "achievement_date_time": "Čas",
         "view_player_achievements": "Zobrazit ocenění hráče",
         "no_tribe": "Žádný kmen",
-        "no_recent_achievements": "Žádná poslední ocenění."
+        "no_recent_achievements": "Žádná poslední ocenění.",
+        "header_last_conquests": "Hráčské poslední zábory",
+        "view_player_conquests": "Zobrazit poslední dobytí hráče",
+        "column_village": "Vesnice",
+        "column_points": "Body",
+        "column_date_hour": "Datum/čas",
+        "no_conquests": "zatím žádné zábory.",
+        "view_player_history": "Zobrazit historii hráče"
     },
     "player_profile_villages": {
         "header": "Vensnice hráče",
@@ -374,7 +394,9 @@
         "last_time": "Poslední čas:",
         "last_status": "Poslední status:",
         "closed": "Uzavřen",
-        "never": "nikdy"
+        "never": "nikdy",
+        "sync_data_queue": "Data byly přidány do fronty synchronizace:",
+        "sync_achievements_queue": "Úspěchy byly přidány do fronty synchronizace:"
     },
     "admin_sync_status": {
         "success": "Úspěch",
@@ -437,7 +459,11 @@
         "error_world_not_found": "Svět neexistuje",
         "error_invalid_highlights": "Neplatná data zvíraznění",
         "error_no_highlights_input": "Zvíraznění nespocifikována",
-        "error_map_share_no_highlights": "Žádné zvíraznění ke sdílení mapy"
+        "error_map_share_no_highlights": "Žádné zvíraznění ke sdílení mapy",
+        "button_open_stats": "Statistiky",
+        "ranking_menu_players": "Hráči",
+        "ranking_menu_tribes": "Kmeny",
+        "button_ranking": "Žebříčky"
     },
     "maps_tooltip": {
         "village": "Vesnice",
@@ -573,7 +599,9 @@
         "map_share_not_found": "Sdílená data nenalezena",
         "router_missing_sub_page": "Požadovaná podstránka neexistuje",
         "router_missing_category": "Požadovaná kategorie neexistuje",
-        "router_missing_sub_category": "Požadovaná podkategorie neexistuje"
+        "router_missing_sub_category": "Požadovaná podkategorie neexistuje",
+        "contact_us": "Pokud si myslíš, že tuto stránku nemáš vidět, pošli nám zprávu.",
+        "header_error": "Chyba %{error}"
     },
     "navigation": {
         "maps": "Mapy",
@@ -593,7 +621,8 @@
         "member_changes": "Změny členů",
         "achievements": "Ocenění",
         "ranking": "Žebříček / %{category}",
-        "search": "Hledat \"%{query}\""
+        "search": "Hledat \"%{query}\"",
+        "history": "Historie"
     },
     "page_titles": {
         "admin_panel": "Admin Panel - %{site_name}",
@@ -622,12 +651,101 @@
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
-        "languages": "Jazyky - %{site_name}"
+        "languages": "Jazyky - %{site_name}",
+        "stats_tribe_history": "Kmen %{tribe_tag} - Historie - %{market_id}/%{world_name} - %{site_name}",
+        "stats_player_history": "Hráč %{player_name} - History - %{market_id}/%{world_name} - %{site_name}"
     },
     "time": {
-        "days": ["%{x} den", "%{x} dny"],
-        "hours": ["%{x} hodina", "%{x} hodiny"],
-        "minutes": ["%{x} minuta", "%{x} minuty"],
-        "seconds": ["%{x} sekunda", "%{x} sekundy"]
+        "days": [
+            "%{x} den",
+            "%{x} dny"
+        ],
+        "hours": [
+            "%{x} hodina",
+            "%{x} hodiny"
+        ],
+        "minutes": [
+            "%{x} minuta",
+            "%{x} minuty"
+        ],
+        "seconds": [
+            "%{x} sekunda",
+            "%{x} sekundy"
+        ],
+        "now": "nyní",
+        "ago": "v minulosti"
+    },
+    "general": {
+        "and": "a"
+    },
+    "tribe_profile_history": {
+        "header_tribe_history": "Kmenová historie",
+        "column_date": "Datum",
+        "column_rank": "Rank",
+        "column_members": "4lenové",
+        "column_points": "Body",
+        "column_villages": "Vesnice",
+        "column_victory_points": "VP",
+        "column_bash_points_offense": "Off body",
+        "column_bash_points_defense": "Deff body",
+        "column_bash_points_total": "All body"
+    },
+    "player_profile_history": {
+        "header_player_history": "Historie hráče",
+        "column_date": "Datum",
+        "column_tribe": "kmen",
+        "column_rank": "Rank",
+        "column_points": "Body",
+        "column_villages": "Vesnice",
+        "column_victory_points": "VP",
+        "column_bash_points_offense": "Off body",
+        "column_bash_points_defense": "Deff body",
+        "column_bash_points_total": "All body"
+    },
+    "admin_settings": {
+        "header_settings": "Nastavení",
+        "category_general": "Obecné nastavení",
+        "category_ui": "Nastavení rozhraní",
+        "category_search": "Nastavení vyhledávání",
+        "category_sync": "Nastavení synchronizace",
+        "category_sync_timeouts": "Nastavení synchronizace - timeout",
+        "category_sync_intervals": "Nastavení synchronizačních intervalů",
+        "category_emails": "Nastavení emailu",
+        "label_general_site_name": "Jméno stránky:",
+        "label_general_lang": "Přednastavený jazyk:",
+        "label_ui_ranking_page_items_per_page": "Žebříčky hráčů/kmenů - počet na stránku:",
+        "label_ui_world_page_maximum_ranking_items": "Zobrazit počet hráčů / kmenů na domovské stránce světa:",
+        "label_ui_world_page_maximum_last_conquests": "Zobrazit počet posledních dobytí na domovské stránce světa:",
+        "label_ui_navigation_separator": "Oddělovač navigace:",
+        "label_search_min_search_characters": "Minimální počet znaků pro vyhledávání:",
+        "label_search_max_search_characters": "Maximální počet znaků pro vyhledávání:",
+        "label_sync_static_share_expire_time": "Čas expirace statické mapy:",
+        "label_sync_parallel_achievements_sync": "Maximální počet paralerních synchronizací úspěchů:",
+        "label_sync_parallel_data_sync": "Maximální počet paralerních synchronizací dat:",
+        "label_sync_task_check_interval": "Interval mezi kontrolami úkolů:",
+        "label_sync_max_sync_attempts": "Limit opakovaných pokusů o synchronizaci:",
+        "label_sync_max_login_attempts": "Limit opakovaných pokusů o přihlášení:",
+        "label_sync_min_time_between_data_syncs": "Minimální čas mezi synchronizacemi dat:",
+        "label_sync_min_time_between_achievement_syncs": "Minimální čas mezi synchronizacemi úspěchů:",
+        "label_sync_max_sync_data_running_time": "Časový limit pro jednu synchronizaci dat:",
+        "label_sync_max_sync_achievements_running_time": "Časový limit pro synchronizaci jednotlivých úspěchů:",
+        "label_sync_timeouts_ready_state": "Časový limit získání statusu připraveno:",
+        "label_sync_timeouts_load_continent_section": "Časový limit pro načtení částí kontinentu:",
+        "label_sync_timeouts_load_continent": "Časový limit pro načtení kontinentu:",
+        "label_sync_timeouts_auth_socket_emit": "Časový limit pro ověření účtu:",
+        "label_sync_intervals_data_all": "Přidet do fronty synchronizace dat všechny světy:",
+        "label_sync_intervals_achievements_all": "Přidet do fronty synchronizace úspěchů všechny světy:",
+        "label_sync_intervals_worlds": "Synchronizovat přehled světů každých:",
+        "label_sync_intervals_clean_shares": "Kontrola expirace statických map každých:",
+        "label_emails_issues": "Problémy související s e-mailem:",
+        "label_emails_contact": "Kontaktní email:",
+        "label_emails_warn_sync_mods_on_fails": "Upozornit moderátory, pokud synchtonizace selže:",
+        "label_emails_user": "Notifikační email - jméno:",
+        "label_emails_pass": "Notifikační e-mail - heslo:",
+        "save_settings": "Uložit nastavení",
+        "error_invalid_number_range": "Nastavení %{setting} musí být od %{min} do %{max}.",
+        "error_invalid_time_format": "Nastavení %{setting} má neplatný časový formát.",
+        "error_invalid_not_a_number": "Nastavení %{setting} musí být číslo.",
+        "message_settings_changed": "Nastavení změněno."
     }
 }
