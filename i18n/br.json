@@ -163,7 +163,14 @@
         "achievement_date_time": "Data/Hora",
         "view_tribe_achievements": "Ver conquistas da tribo",
         "no_recent_achievements": "Sem conquistas recentes.",
-        "abandoned_village": "Abandonada"
+        "abandoned_village": "Abandonada",
+        "header_last_conquests": "Últimas Noblagens da Tribo",
+        "view_tribe_conquests": "Ver noblagens da tribeo",
+        "column_village": "Aldeia",
+        "column_points": "Pontos",
+        "column_date_hour": "Data/Hora",
+        "no_conquests": "Sem noblagens ainda.",
+        "view_tribe_history": "Ver histórico da tribo"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Aldeias da Tribo",
@@ -240,7 +247,14 @@
         "achievement_date_time": "Data/Hora",
         "view_player_achievements": "Ver conquistas do jogador",
         "no_tribe": "Sem tribo",
-        "no_recent_achievements": "Sem conquistas recentes."
+        "no_recent_achievements": "Sem conquistas recentes.",
+        "header_last_conquests": "Últimas Noblages do Jogador",
+        "view_player_conquests": "Ver noblagens do jogador",
+        "column_village": "Aldeia",
+        "column_points": "Pontos",
+        "column_date_hour": "Data/Hora",
+        "no_conquests": "Sem noblagens ainda.",
+        "view_player_history": "Ver histórico do jogador"
     },
     "player_profile_villages": {
         "header": "Aldeias do Jogador",
@@ -610,7 +624,8 @@
         "member_changes": "Mudanças de Membros",
         "achievements": "Conquistas",
         "ranking": "Classificação / %{category}",
-        "search": "Pesquisa \"%{query}\""
+        "search": "Pesquisa \"%{query}\"",
+        "history": "Histórico"
     },
     "page_titles": {
         "admin_panel": "Panel de Administração - %{site_name}",
@@ -639,14 +654,98 @@
         "stats_servers": "%{site_name}",
         "stats_worlds": "%{market_id} - %{site_name}",
         "stats_world": "%{market_id}/%{world_name} - %{site_name}",
-        "languages": "Linguagem - %{site_name}"
+        "languages": "Linguagem - %{site_name}",
+        "stats_tribe_history": "Tribo %{tribe_tag} - Histórico - %{market_id}/%{world_name} - %{site_name}",
+        "stats_player_history": "Jogador %{player_name} - Histórico - %{market_id}/%{world_name} - %{site_name}"
     },
     "time": {
-        "days": ["%{x} dia", "%{x} dias"],
-        "hours": ["%{x} hora", "%{x} horas"],
-        "minutes": ["%{x} minuto", "%{x} minutos"],
-        "seconds": ["%{x} segundo", "%{x} segundos"],
+        "days": [
+            "%{x} dia",
+            "%{x} dias"
+        ],
+        "hours": [
+            "%{x} hora",
+            "%{x} horas"
+        ],
+        "minutes": [
+            "%{x} minuto",
+            "%{x} minutos"
+        ],
+        "seconds": [
+            "%{x} segundo",
+            "%{x} segundos"
+        ],
         "now": "agora",
         "ago": "atrás"
+    },
+    "tribe_profile_history": {
+        "header_tribe_history": "Histórico da Tribo",
+        "column_date": "Data",
+        "column_rank": "Posição",
+        "column_members": "Membros",
+        "column_points": "Pontos",
+        "column_villages": "Aldeias",
+        "column_victory_points": "Pontos de Vitória",
+        "column_bash_points_offense": "Impacto Att",
+        "column_bash_points_defense": "Impacto Def",
+        "column_bash_points_total": "Impacto Total"
+    },
+    "player_profile_history": {
+        "header_player_history": "Histórico do Jogador",
+        "column_date": "Data",
+        "column_tribe": "Tribo",
+        "column_rank": "Posição",
+        "column_points": "Pontos",
+        "column_villages": "Aldeias",
+        "column_victory_points": "Pontos de Vitória",
+        "column_bash_points_offense": "Impacto Att",
+        "column_bash_points_defense": "Impacto Def",
+        "column_bash_points_total": "Impacto Total"
+    },
+    "admin_settings": {
+        "header_settings": "Configurações",
+        "category_general": "Configurações Gerais",
+        "category_ui": "Configurações de Interface",
+        "category_search": "Configurações de Pesquisa",
+        "category_sync": "Configurações de Sincronização",
+        "category_sync_timeouts": "Configurações de Expiração de Sincronização",
+        "category_sync_intervals": "Configurações de Intervalo de Sincronização",
+        "category_emails": "Configurações de E-mail",
+        "label_general_site_name": "Nome do site:",
+        "label_general_lang": "Língua padrão do site:",
+        "label_ui_ranking_page_items_per_page": "Jogadores/tribos na classificação por página:",
+        "label_ui_world_page_maximum_ranking_items": "Mostrar quantos jogadores/tribos na classificação da página inicial do mundo:",
+        "label_ui_world_page_maximum_last_conquests": "Mostrar quantas noblagens página inicial do mundo:",
+        "label_ui_navigation_separator": "Separador de navegação:",
+        "label_search_min_search_characters": "Mínimo de caractéres em pequisas:",
+        "label_search_max_search_characters": "Máximo de caractéres em pequisas:",
+        "label_sync_static_share_expire_time": "Expiração de mapas estáticos:",
+        "label_sync_parallel_achievements_sync": "Limite de sincronização de conquistas em paralelo:",
+        "label_sync_parallel_data_sync": "Limite de sincronização de dados em paralelo:",
+        "label_sync_task_check_interval": "Intervalo entro checagens de tarefas:",
+        "label_sync_max_sync_attempts": "Limite de tentativas de login de sincronização:",
+        "label_sync_max_login_attempts": "Limite de tentativas de login de moreradores:",
+        "label_sync_min_time_between_data_syncs": "Tempo mínimo entre sincronizações de dados:",
+        "label_sync_min_time_between_achievement_syncs": "Tempo mínimo entre sincronizações de conquistas:",
+        "label_sync_max_sync_data_running_time": "Tempo limite de sincronização de dados:",
+        "label_sync_max_sync_achievements_running_time": "Tempo limite de sincronizações de conquistas:",
+        "label_sync_timeouts_ready_state": "Esperar \"estado pronto\" de sincronização por quanto tempo:",
+        "label_sync_timeouts_load_continent_section": "Tempo limite para carregamento de sessões de continentes:",
+        "label_sync_timeouts_load_continent": "Tempo limite para carregamento continentes:",
+        "label_sync_timeouts_auth_socket_emit": "Tempo limite para autenticação de contas de sincronização:",
+        "label_sync_intervals_data_all": "Adicionar todos os mundos a lista de espera de dados toda:",
+        "label_sync_intervals_achievements_all": "Adicionar todos os mundos a lista de espera de conquistas toda:",
+        "label_sync_intervals_worlds": "Sincronizar lista de mundos toda:",
+        "label_sync_intervals_clean_shares": "Checar mapas estáticos compatilhados toda:",
+        "label_emails_issues": "E-mail relacionado à problemas:",
+        "label_emails_contact": "E-mail de contato:",
+        "label_emails_warn_sync_mods_on_fails": "Notificar moderadores caso sincronização falhe quantas vezes:",
+        "label_emails_user": "E-mail de notificação usuário:",
+        "label_emails_pass": "E-mail de notificação senha:",
+        "save_settings": "Salvas Configurações",
+        "error_invalid_number_range": "A configuração %{setting} varia de %{min} à %{max}.",
+        "error_invalid_time_format": "A configuração %{setting} tem a data inválida.",
+        "error_invalid_not_a_number": "A configuração %{setting} deve ser um número.",
+        "message_settings_changed": "Configurações alteradas."
     }
 }
