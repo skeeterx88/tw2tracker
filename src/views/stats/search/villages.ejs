@@ -10,17 +10,17 @@
     <tbody>
         <% for (let village of results) { %>
             <tr>
-                <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>/"><%= village.village_name %> (<%= village.village_x %>|<%= village.village_y %>)</a></td>
+                <td><a class="village-link" href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>/"><%= village.village_name %> (<%= village.village_x %>|<%= village.village_y %>)</a></td>
                 <td><%= formatNumbers(village.village_points) %></td>
 
                 <% if (village.player_id) { %>
-                    <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
+                    <td><a class="player-link" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
                 <% } else { %>
                     <td><%= i18n('abandoned_village', 'world_search', lang) %></td>
                 <% } %>
 
                 <% if (village.tribe_id) { %>
-                    <td><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= village.tribe_id %>/"><%= village.tribe_tag %></a></td>
+                    <td><a class="tribe-link" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= village.tribe_id %>/"><%= village.tribe_tag %></a></td>
                 <% } else { %>
                     <td>-</td>
                 <% } %>

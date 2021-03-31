@@ -1346,6 +1346,34 @@ div.world-title {
     padding-left: 20px;
 }
 
+a.village-link,
+a.tribe-link,
+a.player-link {
+    padding-left: 20px;
+}
+
+a.village-link::before,
+a.tribe-link::before,
+a.player-link::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    margin-left: -20px;
+}
+
+a.village-link::before {
+    background: url(/images/village-icon.png) no-repeat;
+}
+
+a.player-link::before {
+    background: url(/images/player.png) no-repeat;
+}
+
+a.tribe-link::before {
+    background: url(/images/tribe.png) no-repeat;
+}
+
 .color-picker {
     background: hsl(31deg 44% 34%);
     left: 0px;

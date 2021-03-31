@@ -12,7 +12,7 @@
             <tbody>
                 <% for (let village of villages) { %>
                     <tr class="quick-highlight" data-id="<%= village.id %>" data-type="villages">
-                        <td><a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
+                        <td><a class="village-link" href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= village.id %>"><%= village.name %></a></td>
                         <td><%= village.x + '|' + village.y %></td>
                         <td><%= formatNumbers(village.points) %></td>
                     </tr>

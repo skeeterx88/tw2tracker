@@ -119,7 +119,7 @@
                                 <tr class="quick-highlight" data-id="<%= conquest.village_id %>" data-old-owner="<%= conquest.old_owner %>" data-new-owner="<%= conquest.new_owner %>" data-type="conquest">
                                     <td><span class="conquest-<%= conquest.type %>"></span></td>
                                     <td>
-                                        <a href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
+                                        <a class="village-link" href="/stats/<%= marketId %>/<%= world.num %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
                                     </td>
                                     <td><%= formatNumbers(conquest.village_points_then) %></td>
                                     <td title="<%= formatDate(conquest.date, market.time_offset, 'hours-only') %>"><%= formatSince(conquest.date, lang) %></td>
