@@ -15,10 +15,10 @@
         <% for (let player of ranking) { %>
             <tr class="quick-highlight" data-id="<%= player.id %>" data-type="players">
                 <td><%= player.rank %></td>
-                <td><a href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
+                <td><a class="player-link" href="/stats/<%= marketId %>/<%= world.num %>/players/<%= player.id %>"><%= player.name %></a></td>
                 
                 <% if (player.tribe_id) { -%>
-                    <td><a href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
+                    <td><a class="tribe-link" href="/stats/<%= marketId %>/<%= world.num %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
                 <% } else { -%>
                     <td>-</td>
                 <% } -%>
