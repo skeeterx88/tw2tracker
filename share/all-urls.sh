@@ -30,3 +30,5 @@ chromium http://localhost:3000/stats/en/62/players/112091/achievements/repeatabl
 chromium http://localhost:3000/stats/en/62/players/112091/achievements/repeatable/detailed
 chromium http://localhost:3000/stats/en/62/players/112091/history
 chromium http://localhost:3000/stats/en/62/villages/618
+chromium http://localhost:3000/stats/en/56/ranking/players
+chromium http://localhost:3000/stats/en/56/ranking/tribes
