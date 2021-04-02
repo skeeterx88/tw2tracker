@@ -43,7 +43,8 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
-    const conquests = await db.map(sql.getPlayerConquests, {worldId, playerId, offset: 0, limit: 5}, function (conquest) {
+    const conquestLimit = config('ui', 'profile_last_conquest_count');
+    const conquests = await db.map(sql.getPlayerConquests, {worldId, playerId, offset: 0, limit: conquestLimit}, function (conquest) {
         if (conquest.new_owner === conquest.old_owner) {
             conquest.type = conquestTypes.SELF;
         } else if (conquest.new_owner === playerId) {
@@ -77,7 +78,8 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     }, 0);
 
     let lastItem;
-    const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId, limit: 5}, function (currentItem) {
+    const historyLimit = config('ui', 'profile_last_history_count');
+    const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId, limit: historyLimit}, function (currentItem) {
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
         currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);

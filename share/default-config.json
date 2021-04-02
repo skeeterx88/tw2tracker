@@ -8,7 +8,9 @@
         "ranking_page_items_per_page": 20,
         "world_page_maximum_ranking_items": 10,
         "world_page_maximum_last_conquests": 10,
-        "navigation_separator": " / "
+        "navigation_separator": " / ",
+        "profile_last_history_count": 5,
+        "profile_last_conquest_count": 5
     },
     "search": {
         "min_search_characters": 3,

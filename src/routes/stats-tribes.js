@@ -42,7 +42,8 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
-    const conquests = await db.map(sql.getTribeConquests, {worldId, tribeId, offset: 0, limit: 5}, function (conquest) {
+    const conquestLimit = config('ui', 'profile_last_conquest_count');
+    const conquests = await db.map(sql.getTribeConquests, {worldId, tribeId, offset: 0, limit: conquestLimit}, function (conquest) {
         if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
             conquest.type = conquestTypes.SELF;
         } else if (conquest.new_owner_tribe_id === tribeId) {
@@ -64,7 +65,8 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const achievementsRepeatableCount = achievements.reduce((sum, {period}) => period ? sum + 1 : sum, 0);
 
     let lastItem;
-    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId, limit: 5}, function (currentItem) {
+    const historyLimit = config('ui', 'profile_last_history_count');
+    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId, limit: historyLimit}, function (currentItem) {
         currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);

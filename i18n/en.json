@@ -493,6 +493,8 @@
         "label_ui_world_page_maximum_ranking_items": "Display how many ranking players/tribes on world's homepage:",
         "label_ui_world_page_maximum_last_conquests": "Display how many last conquests on world's homepage:",
         "label_ui_navigation_separator": "Navigation separator:",
+        "label_ui_profile_last_history_count": "Display how many last historic changes on player/tribe profile:",
+        "label_ui_profile_last_conquest_count": "Display how many last conquests on player/tribe profile:",
         "label_search_min_search_characters": "Search's minimum characters:",
         "label_search_max_search_characters": "Search's maximum characters:",
         "label_sync_static_share_expire_time": "Map static share expiration time:",
