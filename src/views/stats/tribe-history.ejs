@@ -24,7 +24,7 @@
                         <% if (history.length) { -%>
                             <% for (let item of history) { %>
                                 <tr>
-                                    <td><%= formatDate(item.date, market.time_offset, 'hours-only') %></td>
+                                    <td><%= formatDate(item.date, market.time_offset, 'day-only') %></td>
                                     <td><span class="history-change-type <%= item.rank_change %>"></span><%= formatNumbers(item.rank) %></td>
                                     <td><span class="history-change-type <%= item.members_change %>"></span><a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= item.tribe_id %>/member-changes"><%= formatNumbers(item.members) %></a></td>
                                     <td><span class="history-change-type <%= item.points_change %>"></span><%= formatNumbers(item.points) %></td>
