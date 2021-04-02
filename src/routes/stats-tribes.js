@@ -63,6 +63,18 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const achievementsLatest = achievements.slice(0, 5);
     const achievementsRepeatableCount = achievements.reduce((sum, {period}) => period ? sum + 1 : sum, 0);
 
+    let lastItem;
+    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId, limit: 5}, function (currentItem) {
+        currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
+        currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
+        currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
+        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
+        currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
+        lastItem = currentItem;
+        return currentItem;
+    });
+    const history = reversedHistory.reverse();
+
     const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count;
 
     mergeBackendLocals(res, {
@@ -89,6 +101,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         conquestTypes,
         achievementsRepeatableCount,
         achievementsLatest,
+        history,
         memberChangesCount,
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
@@ -450,12 +463,12 @@ const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    let lastItem;
-
     const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
-    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId}, function (currentItem) {
+    let lastItem;
+    const historyLimit = config('sync', 'maximum_history_days');
+    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId, limit: historyLimit}, function (currentItem) {
         currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
@@ -467,7 +480,6 @@ const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
         lastItem = currentItem;
         return currentItem;
     });
-
     const history = reversedHistory.reverse();
 
     mergeBackendLocals(res, {

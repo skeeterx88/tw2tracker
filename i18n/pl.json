@@ -169,7 +169,12 @@
         "column_points": "Punkty",
         "column_date_hour": "Data/Godzina",
         "no_conquests": "Brak podbojów.",
-        "view_tribe_history": "Pokaż historię Plemienia"
+        "view_tribe_history": "Pokaż historię Plemienia",
+        "column_date": "Data",
+        "column_rank": "Ranga",
+        "column_members": "Członkowie",
+        "column_villages": "Wioski",
+        "column_victory_points": "Punkty Zwycięstwa"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Wioski plemienne",
@@ -253,7 +258,13 @@
         "column_points": "Punkty",
         "column_date_hour": "Data/Godzina",
         "no_conquests": "Brak podbojów.",
-        "view_player_history": "Pokaż historię Gracza"
+        "view_player_history": "Pokaż historię Gracza",
+        "header_player_history": "Historia Gracza",
+        "column_date": "Data",
+        "column_tribe": "Plemię",
+        "column_rank": "Ranga",
+        "column_villages": "Wioski",
+        "column_victory_points": "Punkty Zwycięstwa"
     },
     "player_profile_villages": {
         "header": "Wioski Gracza",

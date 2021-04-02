@@ -169,7 +169,12 @@
         "column_points": "Points",
         "column_date_hour": "Date/Heure",
         "no_conquests": "Pas de conquêtes pour l'instant.",
-        "view_tribe_history": "Voir l'historique de la tribu"
+        "view_tribe_history": "Voir l'historique de la tribu",
+        "column_date": "Date",
+        "column_rank": "Rang",
+        "column_members": "Membres",
+        "column_villages": "Villages",
+        "column_victory_points": "Points de Victoire"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Villages de la Tribu",
@@ -253,7 +258,13 @@
         "column_points": "Points",
         "column_date_hour": "Date/Heure",
         "no_conquests": "Pas de conquêtes pour l'instant.",
-        "view_player_history": "Voir l'historique de la tribu"
+        "view_player_history": "Voir l'historique de la tribu",
+        "header_player_history": "Historique joueur",
+        "column_date": "Date",
+        "column_tribe": "Tribu",
+        "column_rank": "Rang",
+        "column_villages": "Villages",
+        "column_victory_points": "Points de Victoire"
     },
     "player_profile_villages": {
         "header": "Villages du Joueur",

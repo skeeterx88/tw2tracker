@@ -80,10 +80,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <div class="section-actions">
-                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/history"><%= i18n('view_player_history', 'player_profile', lang) %></a>
-            </div>
         </section>
 
         <section id="player-latest-conquests">
@@ -118,6 +114,49 @@
 
             <div class="section-actions">
                 <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/conquests"><%= i18n('view_player_conquests', 'player_profile', lang) %></a>
+            </div>
+        </section>
+
+        <section id="player-latest-history">
+            <h2><%= i18n('header_last_history', 'player_profile', lang) %></h2>
+
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><%= i18n('column_date', 'player_profile', lang) %></th>
+                            <th><%= i18n('column_tribe', 'player_profile', lang) %></th>
+                            <th><%= i18n('column_rank', 'player_profile', lang) %></th>
+                            <th><%= i18n('column_points', 'player_profile', lang) %></th>
+                            <th><%= i18n('column_villages', 'player_profile', lang) %></th>
+                            <% if (world.config.victory_points) { -%>
+                                <th><%= i18n('column_victory_points', 'player_profile', lang) %></th>
+                            <% } -%>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (history.length) { -%>
+                            <% for (let item of history) { %>
+                                <tr>
+                                    <td><%= formatDate(item.date, market.time_offset, 'day-only') %></td>
+                                    <td><% __append(item.tribe_id ? `<a href="/stats/${marketId}/${worldNumber}/tribes/${item.tribe_id}">${item.tribe_tag}</a>` : '-') %></td>
+                                    <td><span class="history-change-type <%= item.rank_change %>"></span><%= formatNumbers(item.rank) %></td>
+                                    <td><span class="history-change-type <%= item.points_change %>"></span><%= formatNumbers(item.points) %></td>
+                                    <td><span class="history-change-type <%= item.villages_change %>"></span><%= formatNumbers(item.villages) %></td>
+                                    <% if (world.config.victory_points) { -%>
+                                        <td><span class="history-change-type <%= item.victory_points_change %>"></span><%= formatNumbers(item.victory_points) %></td>
+                                    <% } -%>
+                                </tr>
+                            <% } %>
+                        <% } else { -%>
+                            <tr><td><%= i18n('no_history', 'player_profile', lang) %></td></tr>
+                        <% } -%>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-actions">
+                <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/history"><%= i18n('view_player_history', 'player_profile', lang) %></a>
             </div>
         </section>
 

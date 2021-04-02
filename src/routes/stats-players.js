@@ -76,6 +76,17 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
             : sum + points.slice(0, level).reduce((sum, next) => sum + next, 0);
     }, 0);
 
+    let lastItem;
+    const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId, limit: 5}, function (currentItem) {
+        currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
+        currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
+        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
+        currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
+        lastItem = currentItem;
+        return currentItem;
+    });
+    const history = reversedHistory.reverse();
+
     const tribeChangesCount = (await db.one(sql.getPlayerTribeChangesCount, {worldId, id: playerId})).count;
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
 
@@ -105,6 +116,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         achievementPoints,
         achievementsLatest,
         achievementTypes,
+        history,
         tribeChangesCount,
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
@@ -508,12 +520,12 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    let lastItem;
-
     const market = await db.one(sql.getMarket, {marketId});
     const world = await db.one(sql.getWorld, {worldId});
 
-    const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId}, function (currentItem) {
+    let lastItem;
+    const historyLimit = config('sync', 'maximum_history_days');
+    const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId, limit: historyLimit}, function (currentItem) {
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
         currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);

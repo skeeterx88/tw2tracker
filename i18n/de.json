@@ -167,7 +167,12 @@
         "column_points": "Punkte",
         "column_date_hour": "Datum/Stunde",
         "no_conquests": "Noch keine Eroberungen.",
-        "view_tribe_history": "Stammesverlauf anzeigen"
+        "view_tribe_history": "Stammesverlauf anzeigen",
+        "column_date": "Datum",
+        "column_rank": "Rang",
+        "column_members": "Mitglieder",
+        "column_villages": "Dörfer",
+        "column_victory_points": "Siegpunkte"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Dörfer des Stammes",
@@ -251,7 +256,13 @@
         "column_points": "Punkte",
         "column_date_hour": "Darum/Stunde",
         "no_conquests": "Noch keine Eroberungen.",
-        "view_player_history": "Spielerverlauf anzeigen"
+        "view_player_history": "Spielerverlauf anzeigen",
+        "header_player_history": "Spielerverlauf",
+        "column_date": "Datum",
+        "column_tribe": "Stamm",
+        "column_rank": "Rang",
+        "column_villages": "Dörfer",
+        "column_victory_points": "Siegpunkte"
     },
     "player_profile_villages": {
         "header": "Dörfer des Spielers",

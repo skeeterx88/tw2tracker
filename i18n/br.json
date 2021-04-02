@@ -170,7 +170,12 @@
         "column_points": "Pontos",
         "column_date_hour": "Data/Hora",
         "no_conquests": "Sem noblagens ainda.",
-        "view_tribe_history": "Ver histórico da tribo"
+        "view_tribe_history": "Ver histórico da tribo",
+        "column_date": "Data",
+        "column_rank": "Posição",
+        "column_members": "Membros",
+        "column_villages": "Aldeias",
+        "column_victory_points": "Pontos de Vitória"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Aldeias da Tribo",
@@ -254,7 +259,13 @@
         "column_points": "Pontos",
         "column_date_hour": "Data/Hora",
         "no_conquests": "Sem noblagens ainda.",
-        "view_player_history": "Ver histórico do jogador"
+        "view_player_history": "Ver histórico do jogador",
+        "header_player_history": "Histórico do Jogador",
+        "column_date": "Data",
+        "column_tribe": "Tribo",
+        "column_rank": "Posição",
+        "column_villages": "Aldeias",
+        "column_victory_points": "Pontos de Vitória"
     },
     "player_profile_villages": {
         "header": "Aldeias do Jogador",

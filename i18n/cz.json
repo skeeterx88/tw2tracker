@@ -167,7 +167,12 @@
         "column_points": "Body",
         "column_date_hour": "Čas/hodina",
         "no_conquests": "zatím žádné zábory.",
-        "view_tribe_history": "Zobrazit kmenovou historii"
+        "view_tribe_history": "Zobrazit kmenovou historii",
+        "column_date": "Datum",
+        "column_rank": "Rank",
+        "column_members": "4lenové",
+        "column_villages": "Vesnice",
+        "column_victory_points": "VP"
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Kmenové vesnice",
@@ -251,7 +256,13 @@
         "column_points": "Body",
         "column_date_hour": "Datum/čas",
         "no_conquests": "zatím žádné zábory.",
-        "view_player_history": "Zobrazit historii hráče"
+        "view_player_history": "Zobrazit historii hráče",
+        "header_player_history": "Historie hráče",
+        "column_date": "Datum",
+        "column_tribe": "kmen",
+        "column_rank": "Rank",
+        "column_villages": "Vesnice",
+        "column_victory_points": "VP"
     },
     "player_profile_villages": {
         "header": "Vensnice hráče",
