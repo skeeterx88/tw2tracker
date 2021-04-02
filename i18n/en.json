@@ -177,7 +177,7 @@
         "column_members": "Members",
         "column_villages": "Villages",
         "column_victory_points": "Victory Points",
-        "no_history": "No history yet."
+        "no_history": "No historic changes yet."
     },
     "tribe_profile_villages": {
         "header_tribe_villages": "Tribe Villages",
@@ -244,7 +244,7 @@
         "column_bash_points_offense": "Bash Off",
         "column_bash_points_defense": "Bash Def",
         "column_bash_points_total": "Bash Total",
-        "no_history": "No history yet."
+        "no_history": "No historic changes yet."
     },
     "player_profile": {
         "header_player_profile": "Player Profile",
@@ -282,7 +282,7 @@
         "column_rank": "Rank",
         "column_villages": "Villages",
         "column_victory_points": "Victory Points",
-        "no_history": "No history yet."
+        "no_history": "No historic changes yet."
     },
     "player_profile_villages": {
         "header": "Player Villages",
@@ -343,7 +343,7 @@
         "column_bash_points_offense": "Bash Off",
         "column_bash_points_defense": "Bash Def",
         "column_bash_points_total": "Bash Total",
-        "no_history": "No history yet."
+        "no_history": "No historic changes yet."
     },
     "village_profile": {
         "header_village_profile": "Village Profile",
