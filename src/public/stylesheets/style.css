@@ -84,7 +84,7 @@ tbody td, thead th, table.vertical th {
     padding: 2px;
     text-align: center;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 
 .map-page td {
