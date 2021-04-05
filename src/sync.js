@@ -1495,26 +1495,29 @@ async function fetchMarketTimeOffset (page, marketId) {
     }
 }
 
-async function initHistoryProcessing (marketId) {
-    const markets = marketId
-        ? await db.any(sql.getMarket, {marketId})
-        : await db.any(sql.getMarkets);
+async function setupHistoryProcessing (marketId) {
+    const market = await db.any(sql.getMarket, {marketId});
+    const untilMidnight = getTimeUntilMidnight(market.time_offset);
+    const inMinutes = untilMidnight / 1000 / 60;
 
-    for (const market of markets) {
-        const untilMidnight = getTimeUntilMidnight(market.time_offset);
+    debug.history('market:%s history process starts in %i minutes', market.id, inMinutes);
 
-        debug.history('market:%s history process starts in %i minutes', market.id, untilMidnight / 1000 / 60);
+    setTimeout(function () {
+        historyQueue.add(async function () {
+            const marketWorlds = await db.any(sql.getMarketWorlds, {marketId: market.id});
+            const openWorlds = marketWorlds.filter(world => world.open);
 
-        setTimeout(function () {
-            historyQueue.add(async function () {
-                const marketWorlds = await db.any(sql.getMarketWorlds, {marketId: market.id});
-                const openWorlds = marketWorlds.filter(world => world.open);
+            for (const world of openWorlds) {
+                await processWorldHistory(world.world_id);
+                await setupHistoryProcessing(world.world_id);
+            }
+        });
+    }, untilMidnight);
+}
 
-                for (const world of openWorlds) {
-                    await processWorldHistory(world.world_id);
-                }
-            });
-        }, untilMidnight);
+async function initHistoryProcessing () {
+    for (const market of await db.any(sql.getMarkets)) {
+        setupHistoryProcessing(market.id);
     }
 }
 
