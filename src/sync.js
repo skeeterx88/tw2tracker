@@ -99,15 +99,6 @@ Sync.init = async function () {
 
     await Sync.initQueue('data');
     await Sync.initQueue('achievements');
-
-    // await Sync.all('data');
-    // await Sync.all('achievements');
-
-    // const worldId = 'br55';
-    // const data = JSON.parse(fs.readFileSync(path.join('.', 'data', 'raw', `${worldId}.json`), 'utf8'));
-    // await commitRawDataFilesystem(data, worldId);
-    // await commitDataDatabase(data, worldId);
-    // await commitDataFilesystem(worldId);
 };
 
 Sync.initQueue = async function (type) {
