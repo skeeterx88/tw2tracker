@@ -86,37 +86,15 @@ Sync.init = async function () {
         db.none(sql.updateAchievementsSync, {status, worldId});
     });
 
-    const tasks = await Sync.tasks();
+    if (process.env.NODE_ENV === 'development') {
+        const tasks = await Sync.tasks();
+        tasks.add('data_all', syncAllData);
+        tasks.add('achievements_all', syncAllAchievements);
+        tasks.add('worlds', syncMarketsAndWorlds);
+        tasks.add('clean_shares', cleanStaticMapShares);
+        tasks.watch();
 
-    tasks.add('data_all', function () {
-        Sync.all('data');
-    });
-
-    tasks.add('achievements_all', function () {
-        Sync.all('achievements');
-    });
-
-    tasks.add('worlds', async function () {
-        await Sync.markets();
-        await Sync.worlds();
-    });
-
-    tasks.add('clean_shares', async function () {
-        const now = Date.now();
-        const shares = await db.any(sql.maps.getShareLastAccess);
-        const expireTime = humanInterval(config('sync', 'static_share_expire_time'));
-
-        for (const {share_id, last_access} of shares) {
-            if (now - last_access.getTime() < expireTime) {
-                await db.query(sql.maps.deleteStaticShare, [share_id]);
-                // TODO: delete data as well
-            }
-        }
-    });
-
-    if (process.env.NODE_ENV !== 'development') {
-        tasks.initChecker();
-        await initHistoryProcessing();
+        initHistoryProcessing();
     }
 
     await Sync.initQueue('data');
@@ -725,7 +703,7 @@ Sync.tasks = async function () {
         add: function (id, handler) {
             taskHandlers.set(id, handler);
         },
-        initChecker: function () {
+        watch: function () {
             debug.tasks('start task checker (interval: %s)', config('sync', 'task_check_interval'));
 
             const intervalEntries = Object.entries(config('sync_intervals'));
@@ -1637,6 +1615,32 @@ function GenericSyncQueue () {
             onStart = handler;
         }
     };
+}
+
+function syncAllData () {
+    Sync.all('data');
+}
+
+function syncAllAchievements () {
+    Sync.all('achievements');
+}
+
+async function syncMarketsAndWorlds () {
+    await Sync.markets();
+    await Sync.worlds();
+}
+
+async function cleanStaticMapShares () {
+    const now = Date.now();
+    const shares = await db.any(sql.maps.getShareLastAccess);
+    const expireTime = humanInterval(config('sync', 'static_share_expire_time'));
+
+    for (const {share_id, last_access} of shares) {
+        if (now - last_access.getTime() < expireTime) {
+            await db.query(sql.maps.deleteStaticShare, [share_id]);
+            // TODO: delete data as well
+        }
+    }
 }
 
 module.exports = Sync;
