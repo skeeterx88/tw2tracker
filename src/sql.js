@@ -1,26 +1,22 @@
-const QueryFile = require('pg-promise').QueryFile;
 const path = require('path');
-const fs = require('fs');
-const rcamelcase = /-([a-z])/g;
+const QueryFile = require('pg-promise').QueryFile;
+const cache = new Map();
+const base = path.join(__dirname, 'sql');
 
-const getSqlTree = function (from, sub, tree = {}) {
-    sub = sub || from;
-
-    const items = fs.readdirSync(path.join(__dirname, from));
-
-    for (const item of items) {
-        const itemStat = fs.lstatSync(path.join(__dirname, from, item));
-
-        if (itemStat.isFile()) {
-            const fileName = path.parse(item).name;
-            const camelCaseName = fileName.replace(rcamelcase, (file) => file[1].toUpperCase());
-            tree[camelCaseName] = new QueryFile(path.join(sub, item));
-        } else if (itemStat.isDirectory()) {
-            tree[item] = getSqlTree(path.join(from, item), path.join(sub, item));
-        }
+module.exports = function (id) {
+    if (cache.has(id)) {
+        return cache.get(id);
     }
 
-    return tree;
-};
+    const parts = id.split('/');
+    const name = parts.pop() + '.sql';
+    const query = new QueryFile(path.join(base, ...parts, name));
 
-module.exports = getSqlTree('sql');
+    if (query.error) {
+        throw query.error;
+    }
+
+    cache.set(id, query);
+
+    return query;
+};

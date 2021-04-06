@@ -30,10 +30,10 @@ const villageRouter = asyncRouter(async function (req, res, next) {
         village
     } = await paramVillageParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
-    const conquests = await db.any(sql.getVillageConquests, {worldId, villageId});
+    const conquests = await db.any(sql('get-village-conquests'), {worldId, villageId});
 
     mergeBackendLocals(res, {
         marketId,

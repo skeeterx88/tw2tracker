@@ -7,13 +7,13 @@ const i18n = require('./i18n.js');
 
 const noop = function () {};
 
-const schemaExists = async function (schemaName) {
-    const schema = await db.one(sql.helpers.schemaExists, {schema: schemaName});
-    return schema.exists;
+const schemaExists = async function (schema) {
+    const result = await db.one(sql('helpers/schema-exists'), {schema});
+    return result.exists;
 };
 
 const worldEntryExists = async function (worldId) {
-    const worldEntry = await db.one(sql.worldExists, {worldId});
+    const worldEntry = await db.one(sql('world-exists'), {worldId});
     return worldEntry.exists;
 };
 

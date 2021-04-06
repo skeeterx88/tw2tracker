@@ -40,11 +40,11 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     } = await paramPlayerParse(req, worldId);
 
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const conquestLimit = config('ui', 'profile_last_conquest_count');
-    const conquests = await db.map(sql.getPlayerConquests, {worldId, playerId, offset: 0, limit: conquestLimit}, function (conquest) {
+    const conquests = await db.map(sql('get-player-conquests'), {worldId, playerId, offset: 0, limit: conquestLimit}, function (conquest) {
         if (conquest.new_owner === conquest.old_owner) {
             conquest.type = conquestTypes.SELF;
         } else if (conquest.new_owner === playerId) {
@@ -56,13 +56,13 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         return conquest;
     });
 
-    const conquestCount = (await db.one(sql.getPlayerConquestsCount, {worldId, playerId})).count;
-    const conquestGainCount = (await db.one(sql.getPlayerConquestsGainCount, {worldId, playerId})).count;
-    const conquestLossCount = (await db.one(sql.getPlayerConquestsLossCount, {worldId, playerId})).count;
-    const conquestSelfCount = (await db.one(sql.getPlayerConquestsSelfCount, {worldId, playerId})).count;
+    const conquestCount = (await db.one(sql('get-player-conquests-count'), {worldId, playerId})).count;
+    const conquestGainCount = (await db.one(sql('get-player-conquests-gain-count'), {worldId, playerId})).count;
+    const conquestLossCount = (await db.one(sql('get-player-conquests-loss-count'), {worldId, playerId})).count;
+    const conquestSelfCount = (await db.one(sql('get-player-conquests-self-count'), {worldId, playerId})).count;
 
-    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]));
-    const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId});
+    const achievementTypes = Object.fromEntries(await db.map(sql('achievement-types'), {}, (achievement) => [achievement.name, achievement]));
+    const achievements = await db.any(sql('get-player-achievements'), {worldId, id: playerId});
     const achievementsLatest = achievements.slice(0, 5);
 
     const achievementPoints = achievements.reduce(function (sum, {type, level}) {
@@ -79,7 +79,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
 
     let lastItem;
     const historyLimit = config('ui', 'profile_last_history_count');
-    const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId, limit: historyLimit}, function (currentItem) {
+    const reversedHistory = await db.map(sql('get-player-history'), {worldId, playerId, limit: historyLimit}, function (currentItem) {
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
         currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
@@ -89,7 +89,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     });
     const history = reversedHistory.reverse();
 
-    const tribeChangesCount = (await db.one(sql.getPlayerTribeChangesCount, {worldId, id: playerId})).count;
+    const tribeChangesCount = (await db.one(sql('get-player-tribe-changes-count'), {worldId, id: playerId})).count;
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
 
     mergeBackendLocals(res, {
@@ -145,7 +145,7 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, {worldId});
+    const world = await db.one(sql('get-world'), {worldId});
     const villages = await getPlayerVillages(worldId, playerId);
 
     mergeBackendLocals(res, {
@@ -190,8 +190,8 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
@@ -199,23 +199,23 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
 
     const conquestsTypeMap = {
         all: {
-            sqlConquests: sql.getPlayerConquests,
-            sqlCount: sql.getPlayerConquestsCount,
+            sqlConquests: sql('get-player-conquests'),
+            sqlCount: sql('get-player-conquests-count'),
             navigationTitle: i18n('sub_title_all', 'player_profile_conquests', res.locals.lang)
         },
         gain: {
-            sqlConquests: sql.getPlayerConquestsGain,
-            sqlCount: sql.getPlayerConquestsGainCount,
+            sqlConquests: sql('get-player-conquests-gain'),
+            sqlCount: sql('get-player-conquests-gain-count'),
             navigationTitle: i18n('sub_title_gain', 'player_profile_conquests', res.locals.lang)
         },
         loss: {
-            sqlConquests: sql.getPlayerConquestsLoss,
-            sqlCount: sql.getPlayerConquestsLossCount,
+            sqlConquests: sql('get-player-conquests-loss'),
+            sqlCount: sql('get-player-conquests-loss-count'),
             navigationTitle: i18n('sub_title_loss', 'player_profile_conquests', res.locals.lang)
         },
         self: {
-            sqlConquests: sql.getPlayerConquestsSelf,
-            sqlCount: sql.getPlayerConquestsSelfCount,
+            sqlConquests: sql('get-player-conquests-self'),
+            sqlCount: sql('get-player-conquests-self-count'),
             navigationTitle: i18n('sub_title_self', 'player_profile_conquests', res.locals.lang)
         }
     };
@@ -287,19 +287,19 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
-    const tribeChanges = await db.any(sql.getPlayerTribeChanges, {worldId, id: playerId});
+    const tribeChanges = await db.any(sql('get-player-tribe-changes'), {worldId, id: playerId});
     const tribeTags = {};
 
     for (const change of tribeChanges) {
         if (change.old_tribe && !utils.hasOwn(tribeTags, change.old_tribe)) {
-            tribeTags[change.old_tribe] = (await db.one(sql.getTribe, {worldId, tribeId: change.old_tribe})).tag;
+            tribeTags[change.old_tribe] = (await db.one(sql('get-tribe'), {worldId, tribeId: change.old_tribe})).tag;
         }
 
         if (change.new_tribe && !utils.hasOwn(tribeTags, change.new_tribe)) {
-            tribeTags[change.new_tribe] = (await db.one(sql.getTribe, {worldId, tribeId: change.new_tribe})).tag;
+            tribeTags[change.new_tribe] = (await db.one(sql('get-tribe'), {worldId, tribeId: change.new_tribe})).tag;
         }
     }
 
@@ -347,8 +347,8 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const selectedCategory = req.params.category;
     const subCategory = req.params.subCategory;
@@ -368,8 +368,8 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
     }
 
-    const achievementTypes = Object.fromEntries(await db.map(sql.achievementTypes, {}, (achievement) => [achievement.name, achievement]));
-    const achievements = await db.any(sql.getPlayerAchievements, {worldId, id: playerId});
+    const achievementTypes = Object.fromEntries(await db.map(sql('achievement-types'), {}, (achievement) => [achievement.name, achievement]));
+    const achievements = await db.any(sql('get-player-achievements'), {worldId, id: playerId});
     const achievementByCategory = {};
     const achievementsWithPoints = [];
 
@@ -522,12 +522,12 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     let lastItem;
     const historyLimit = config('sync', 'maximum_history_days');
-    const reversedHistory = await db.map(sql.getPlayerHistory, {worldId, playerId, limit: historyLimit}, function (currentItem) {
+    const reversedHistory = await db.map(sql('get-player-history'), {worldId, playerId, limit: historyLimit}, function (currentItem) {
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
         currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);

@@ -10,7 +10,7 @@ const historyChangeTypes = require('./history-change-types.json');
 const historyOrderTypes = require('./history-order-types.json');
 
 async function getPlayer (worldId, playerId) {
-    const player = await db.any(sql.getPlayer, {worldId, playerId});
+    const player = await db.any(sql('get-player'), {worldId, playerId});
 
     if (!player.length) {
         throw createError(404, 'This tribe does not exist');
@@ -20,7 +20,7 @@ async function getPlayer (worldId, playerId) {
 }
 
 async function getTribe (worldId, tribeId) {
-    const tribe = await db.any(sql.getTribe, {worldId, tribeId});
+    const tribe = await db.any(sql('get-tribe'), {worldId, tribeId});
 
 
     if (!tribe.length) {
@@ -31,7 +31,7 @@ async function getTribe (worldId, tribeId) {
 }
 
 async function getVillage (worldId, villageId) {
-    const village = await db.any(sql.getVillage, {worldId, villageId});
+    const village = await db.any(sql('get-village'), {worldId, villageId});
 
     if (!village.length) {
         throw createError(404, 'This village does not exist');
@@ -41,7 +41,7 @@ async function getVillage (worldId, villageId) {
 }
 
 async function getPlayerVillages (worldId, playerId) {
-    return await db.any(sql.getPlayerVillages, {worldId, playerId});
+    return await db.any(sql('get-player-villages'), {worldId, playerId});
 }
 
 function paramMarket (req) {

@@ -15,10 +15,10 @@
     }
 
     const sql = require('./sql.js');
-    const schemaInitialized = (await db.one(sql.helpers.schemaInitialized)).exists;
+    const schemaInitialized = (await db.one(sql('helpers/schema-initialized'))).exists;
 
     if (!schemaInitialized) {
-        await db.query(sql.createSchema);
+        await db.query(sql('create-schema'));
     }
 
     const Sync = require('./sync.js');

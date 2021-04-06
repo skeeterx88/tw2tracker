@@ -1,2 +1,0 @@
-INSERT INTO public.tasks (id) VALUES (${id})
-ON CONFLICT DO NOTHING;

@@ -72,7 +72,7 @@ module.exports = function () {
     passport.use(new passportLocal.Strategy({
         passReqToCallback: true
     }, async function (req, name, pass, done) {
-        const [account] = await db.any(sql.getModAccountByName, {name});
+        const [account] = await db.any(sql('get-mod-account-by-name'), {name});
 
         if (!account) {
             return done(null, false, {
@@ -99,7 +99,7 @@ module.exports = function () {
 
     passport.serializeUser(async function (account, callback) {
         const parsedPrivileges = typeof account.privileges === 'string' ? pgArray.create(account.privileges, String).parse() : account.privileges;
-        const privilegeEntries = await db.map(sql.getModPrivilegeTypes, [], ({type}) => [type, parsedPrivileges.includes(type)]);
+        const privilegeEntries = await db.map(sql('get-mod-privilege-types'), [], ({type}) => [type, parsedPrivileges.includes(type)]);
         const privilegeObject = Object.fromEntries(privilegeEntries);
 
         callback(null, {

@@ -25,7 +25,7 @@ const tribesRouter = require('./stats-tribes.js');
 const conquestsRouter = require('./stats-conquests.js');
 
 const marketsRouter = asyncRouter(async function (req, res, next) {
-    const worlds = await db.any(sql.getWorlds);
+    const worlds = await db.any(sql('get-worlds'));
     const openWorlds = worlds.filter(world => world.open);
     const marketsIds = Array.from(new Set(worlds.map(world => world.market)));
     const worldsByMarket = {};
@@ -75,7 +75,7 @@ const worldsRouter = asyncRouter(async function (req, res, next) {
     }
 
     const marketId = req.params.marketId;
-    const syncedWorlds = await db.any(sql.getSyncedWorlds);
+    const syncedWorlds = await db.any(sql('get-synced-worlds'));
     const marketWorlds = syncedWorlds.filter((world) => world.market === marketId);
 
     if (!marketWorlds.length) {
@@ -133,7 +133,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const world = await db.one(sql.getWorld, {worldId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const {
         playerRankingSortField,
@@ -151,13 +151,13 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         lastDailyTribeAchievements,
         lastWeeklyTribeAchievements
     ] = await Promise.all([
-        db.any(sql.getWorldTopPlayers, {worldId, limit: config('ui', 'world_page_maximum_ranking_items'), playerRankingSortField, playerRankingSortOrder}),
-        db.any(sql.getWorldTopTribes, {worldId, limit: config('ui', 'world_page_maximum_ranking_items'), tribeRankingSortField, tribeRankingSortOrder}),
-        db.any(sql.getWorldLastConquests, {worldId, limit: config('ui', 'world_page_maximum_last_conquests')}),
-        db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-%-%'}),
-        db.any(sql.getWorldLastPlayerRepeatableAchievements, {worldId, period: '%-W%'}),
-        db.any(sql.getWorldLastTribeRepeatableAchievements, {worldId, period: '%-%-%'}),
-        db.any(sql.getWorldLastTribeRepeatableAchievements, {worldId, period: '%-W%'})
+        db.any(sql('get-world-top-players'), {worldId, limit: config('ui', 'world_page_maximum_ranking_items'), playerRankingSortField, playerRankingSortOrder}),
+        db.any(sql('get-world-top-tribes'), {worldId, limit: config('ui', 'world_page_maximum_ranking_items'), tribeRankingSortField, tribeRankingSortOrder}),
+        db.any(sql('get-world-last-conquests'), {worldId, limit: config('ui', 'world_page_maximum_last_conquests')}),
+        db.any(sql('get-world-last-player-repeatable-achievements'), {worldId, period: '%-%-%'}),
+        db.any(sql('get-world-last-player-repeatable-achievements'), {worldId, period: '%-W%'}),
+        db.any(sql('get-world-last-tribe-repeatable-achievements'), {worldId, period: '%-%-%'}),
+        db.any(sql('get-world-last-tribe-repeatable-achievements'), {worldId, period: '%-W%'})
     ]);
 
     if (!world.config.victory_points) {

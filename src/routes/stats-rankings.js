@@ -21,12 +21,12 @@ const rankingCategories = ['players', 'tribes'];
 
 const rankingRouterSqlMap = {
     players: {
-        ranking: sql.getWorldRankingPlayers,
-        count: sql.getWorldPlayerCount
+        ranking: sql('get-world-ranking-players'),
+        count: sql('get-world-player-count')
     },
     tribes: {
-        ranking: sql.getWorldRankingTribes,
-        count: sql.getWorldTribeCount
+        ranking: sql('get-world-ranking-tribes'),
+        count: sql('get-world-tribe-count')
     }
 };
 
@@ -53,7 +53,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
     const limit = parseInt(config('ui', 'ranking_page_items_per_page'), 10);
     const offset = limit * (page - 1);
 
-    const world = await db.one(sql.getWorld, {worldId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const {
         playerRankingSortField,

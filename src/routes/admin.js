@@ -117,10 +117,10 @@ const syncRouter = asyncRouter(async function (req, res) {
         markets,
         syncQueue
     ] = await Promise.all([
-        db.any(sql.getOpenWorlds),
-        db.any(sql.getClosedWorlds),
-        db.any(sql.getMarkets),
-        db.any(sql.getSyncQueue)
+        db.any(sql('get-open-worlds')),
+        db.any(sql('get-closed-worlds')),
+        db.any(sql('get-markets')),
+        db.any(sql('get-sync-queue'))
     ]);
 
     const syncQueueTyped = {
@@ -178,7 +178,7 @@ const syncDataRouter = asyncRouter(async function (req, res) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
+    const marketsWithAccounts = await db.map(sql('get-markets-with-accounts'), [], market => market.id);
 
     if (!marketsWithAccounts.includes(marketId)) {
         req.flash('error', i18n('error_market_has_no_sync_accounts', 'admin', res.locals.lang, [worldId]));
@@ -213,7 +213,7 @@ const syncAchievementsRouter = asyncRouter(async function (req, res) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
+    const marketsWithAccounts = await db.map(sql('get-markets-with-accounts'), [], market => market.id);
 
     if (!marketsWithAccounts.includes(marketId)) {
         req.flash('error', i18n('error_market_has_no_sync_accounts', 'admin', res.locals.lang, [worldId]));
@@ -272,8 +272,8 @@ const toggleSyncRouter = asyncRouter(async function (req, res) {
 });
 
 const accountsRouter = asyncRouter(async function (req, res) {
-    const markets = await db.map(sql.getMarkets, [], market => market.id);
-    const accounts = await db.map(sql.getAccounts, [], function (account) {
+    const markets = await db.map(sql('get-markets'), [], market => market.id);
+    const accounts = await db.map(sql('get-accounts'), [], function (account) {
         account.missingMarkets = getMissingMarkets(account.markets || [], markets);
         return account;
     });
@@ -305,8 +305,8 @@ const accountsRouter = asyncRouter(async function (req, res) {
 const accountsAddMarketRouter = asyncRouter(async function (req, res) {
     const accountId = req.params.accountId;
     const marketId = req.params.marketId;
-    const account = await db.any(sql.getAccount, {accountId});
-    const market = await db.any(sql.getMarket, {marketId});
+    const account = await db.any(sql('get-account'), {accountId});
+    const market = await db.any(sql('get-market'), {marketId});
 
     if (!account.length) {
         req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang));
@@ -316,7 +316,7 @@ const accountsAddMarketRouter = asyncRouter(async function (req, res) {
         req.flash('error', i18n('error_sync_account_market_included', 'admin', res.locals.lang, [marketId.toUpperCase()]));
     } else {
         req.flash('messages', i18n('message_sync_account_market_added', 'admin', res.locals.lang, [marketId.toUpperCase()]));
-        await db.query(sql.addAccountMarket, {accountId, marketId});
+        await db.query(sql('add-account-market'), {accountId, marketId});
     }
 
     res.redirect(`/admin/accounts#account-${accountId}`);
@@ -325,8 +325,8 @@ const accountsAddMarketRouter = asyncRouter(async function (req, res) {
 const accountsRemoveMarketRouter = asyncRouter(async function (req, res) {
     const accountId = req.params.accountId;
     const marketId = req.params.marketId;
-    const account = await db.any(sql.getAccount, {accountId});
-    const market = await db.any(sql.getMarket, {marketId});
+    const account = await db.any(sql('get-account'), {accountId});
+    const market = await db.any(sql('get-market'), {marketId});
 
     if (!account.length) {
         req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang, [accountId]));
@@ -336,7 +336,7 @@ const accountsRemoveMarketRouter = asyncRouter(async function (req, res) {
         req.flash('error', i18n('error_sync_account_market_included', 'admin', res.locals.lang));
     } else {
         req.flash('messages', i18n('message_sync_account_market_removed', 'admin', res.locals.lang));
-        await db.query(sql.removeAccountMarket, {accountId, marketId});
+        await db.query(sql('remove-account-market'), {accountId, marketId});
     }
 
     res.redirect(`/admin/accounts#account-${accountId}`);
@@ -344,7 +344,7 @@ const accountsRemoveMarketRouter = asyncRouter(async function (req, res) {
 
 const accountsDeleteRouter = asyncRouter(async function (req, res) {
     const accountId = req.params.accountId;
-    const account = await db.any(sql.getAccount, {accountId});
+    const account = await db.any(sql('get-account'), {accountId});
 
     if (!account.length) {
         req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang, [accountId]));
@@ -352,7 +352,7 @@ const accountsDeleteRouter = asyncRouter(async function (req, res) {
         req.flash('error', i18n('error_sync_account_delete_own', 'admin', res.locals.lang));
     } else {
         req.flash('messages', i18n('message_sync_account_deleted', 'admin', res.locals.lang));
-        await db.query(sql.deleteAccount, {accountId});
+        await db.query(sql('delete-account'), {accountId});
     }
 
     res.redirect('/admin/accounts');
@@ -360,7 +360,7 @@ const accountsDeleteRouter = asyncRouter(async function (req, res) {
 
 const accountsEditRouter = asyncRouter(async function (req, res) {
     const {name, pass, id: accountId} = req.body;
-    const account = await db.any(sql.getAccount, {accountId});
+    const account = await db.any(sql('get-account'), {accountId});
 
     // TODO: add values to config.json
     if (!account.length) {
@@ -371,7 +371,7 @@ const accountsEditRouter = asyncRouter(async function (req, res) {
         req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [4]));
     } else {
         req.flash('messages', i18n('message_sync_account_altered', 'admin', res.locals.lang));
-        await db.query(sql.editAccount, {accountId, name, pass});
+        await db.query(sql('edit-account'), {accountId, name, pass});
     }
 
     res.redirect(`/admin/accounts#account-${accountId}`);
@@ -386,13 +386,13 @@ const accountsCreateRouter = asyncRouter(async function (req, res) {
     } else if (name.length < 4) {
         req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [4]));
     } else {
-        const accountExists = await db.any(sql.getAccountByName, {name});
+        const accountExists = await db.any(sql('get-account-by-name'), {name});
 
         if (accountExists.length) {
             req.flash('error', i18n('error_sync_username_already_exists', 'admin', res.locals.lang, [name]));
         } else {
             req.flash('messages', i18n('message_sync_account_added', 'admin', res.locals.lang));
-            await db.query(sql.addAccount, {name, pass});
+            await db.query(sql('add-account'), {name, pass});
         }
     }
 
@@ -400,7 +400,7 @@ const accountsCreateRouter = asyncRouter(async function (req, res) {
 });
 
 const modsRouter = asyncRouter(async function (req, res) {
-    const mods = await db.map(sql.getMods, [], function (mod) {
+    const mods = await db.map(sql('get-mods'), [], function (mod) {
         mod.privileges = pgArray.create(mod.privileges, String).parse();
         return mod;
     });
@@ -436,9 +436,9 @@ const modsEditRouter = asyncRouter(async function (req, res) {
     }
 
     const me = req.session.passport.user;
-    const [mod] = await db.any(sql.getMod, {id});
-    const [accountName] = await db.any(sql.getModAccountByName, {name});
-    const [accountEmail] = await db.any(sql.getModAccountByEmail, {email});
+    const [mod] = await db.any(sql('get-mod'), {id});
+    const [accountName] = await db.any(sql('get-mod-account-by-name'), {name});
+    const [accountEmail] = await db.any(sql('get-mod-account-by-email'), {email});
 
     // TODO: add values to config.json
     if (!mod) {
@@ -465,9 +465,9 @@ const modsEditRouter = asyncRouter(async function (req, res) {
     } else {
         if (pass) {
             const hash = await bcrypt.hash(pass, saltRounds);
-            await db.query(sql.updateModAccount, {id, name, pass: hash, privileges, email});
+            await db.query(sql('update-mod-account'), {id, name, pass: hash, privileges, email});
         } else {
-            await db.query(sql.updateModAccountKeepPass, {id, name, privileges, email});
+            await db.query(sql('update-mod-account-keep-pass'), {id, name, privileges, email});
         }
 
         if (id === req.user.id) {
@@ -500,8 +500,8 @@ const modsCreateRouter = asyncRouter(async function (req, res) {
         privileges = [privileges];
     }
 
-    const [accountName] = await db.any(sql.getModAccountByName, {name});
-    const [accountEmail] = await db.any(sql.getModAccountByEmail, {email});
+    const [accountName] = await db.any(sql('get-mod-account-by-name'), {name});
+    const [accountEmail] = await db.any(sql('get-mod-account-by-email'), {email});
 
     // TODO: add values to config.json
     if (name.length < 3) {
@@ -516,7 +516,7 @@ const modsCreateRouter = asyncRouter(async function (req, res) {
         req.flash('error', i18n('error_invalid_privilege', 'admin', res.locals.lang));
     } else {
         const hash = await bcrypt.hash(pass, saltRounds);
-        const {id} = await db.one(sql.createModAccount, {name, pass: hash, privileges, email});
+        const {id} = await db.one(sql('create-mod-account'), {name, pass: hash, privileges, email});
         req.flash('messages', i18n('message_mod_account_created', 'admin', res.locals.lang));
         return res.redirect(`/admin/mods#mod-${id}`);
     }
@@ -527,7 +527,7 @@ const modsCreateRouter = asyncRouter(async function (req, res) {
 const modsDeleteRouter = asyncRouter(async function (req, res) {
     const {id} = req.params;
 
-    const [mod] = await db.any(sql.getMod, {id});
+    const [mod] = await db.any(sql('get-mod'), {id});
 
     if (!mod) {
         req.flash('error', i18n('error_mod_account_not_exists', 'admin', res.locals.lang));
@@ -535,7 +535,7 @@ const modsDeleteRouter = asyncRouter(async function (req, res) {
         req.flash('error', i18n('error_can_not_delete_yourself', 'admin', res.locals.lang));
     } else {
         req.flash('messages', i18n('message_mod_account_deleted', 'admin', res.locals.lang));
-        await db.query(sql.deleteModAccount, {id});
+        await db.query(sql('delete-mod-account'), {id});
     }
 
     res.redirect('/admin/mods');

@@ -39,11 +39,11 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const conquestLimit = config('ui', 'profile_last_conquest_count');
-    const conquests = await db.map(sql.getTribeConquests, {worldId, tribeId, offset: 0, limit: conquestLimit}, function (conquest) {
+    const conquests = await db.map(sql('get-tribe-conquests'), {worldId, tribeId, offset: 0, limit: conquestLimit}, function (conquest) {
         if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
             conquest.type = conquestTypes.SELF;
         } else if (conquest.new_owner_tribe_id === tribeId) {
@@ -55,18 +55,18 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
         return conquest;
     });
 
-    const conquestCount = (await db.one(sql.getTribeConquestsCount, {worldId, tribeId})).count;
-    const conquestGainCount = (await db.one(sql.getTribeConquestsGainCount, {worldId, tribeId})).count;
-    const conquestLossCount = (await db.one(sql.getTribeConquestsLossCount, {worldId, tribeId})).count;
-    const conquestSelfCount = (await db.one(sql.getTribeConquestsSelfCount, {worldId, tribeId})).count;
+    const conquestCount = (await db.one(sql('get-tribe-conquests-count'), {worldId, tribeId})).count;
+    const conquestGainCount = (await db.one(sql('get-tribe-conquests-gain-count'), {worldId, tribeId})).count;
+    const conquestLossCount = (await db.one(sql('get-tribe-conquests-loss-count'), {worldId, tribeId})).count;
+    const conquestSelfCount = (await db.one(sql('get-tribe-conquests-self-count'), {worldId, tribeId})).count;
 
-    const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId});
+    const achievements = await db.any(sql('get-tribe-achievements'), {worldId, id: tribeId});
     const achievementsLatest = achievements.slice(0, 5);
     const achievementsRepeatableCount = achievements.reduce((sum, {period}) => period ? sum + 1 : sum, 0);
 
     let lastItem;
     const historyLimit = config('ui', 'profile_last_history_count');
-    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId, limit: historyLimit}, function (currentItem) {
+    const reversedHistory = await db.map(sql('get-tribe-history'), {worldId, tribeId, limit: historyLimit}, function (currentItem) {
         currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
@@ -77,7 +77,7 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     });
     const history = reversedHistory.reverse();
 
-    const memberChangesCount = (await db.one(sql.getTribeMemberChangesCount, {worldId, id: tribeId})).count;
+    const memberChangesCount = (await db.one(sql('get-tribe-member-changes-count'), {worldId, id: tribeId})).count;
 
     mergeBackendLocals(res, {
         marketId,
@@ -130,8 +130,8 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
@@ -139,23 +139,23 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
 
     const conquestsTypeMap = {
         all: {
-            sqlConquests: sql.getTribeConquests,
-            sqlCount: sql.getTribeConquestsCount,
+            sqlConquests: sql('get-tribe-conquests'),
+            sqlCount: sql('get-tribe-conquests-count'),
             navigationTitle: i18n('sub_title_all', 'tribe_profile_achievements', res.locals.lang)
         },
         gain: {
-            sqlConquests: sql.getTribeConquestsGain,
-            sqlCount: sql.getTribeConquestsGainCount,
+            sqlConquests: sql('get-tribe-conquests-gain'),
+            sqlCount: sql('get-tribe-conquests-gain-count'),
             navigationTitle: i18n('sub_title_gain', 'tribe_profile_achievements', res.locals.lang)
         },
         loss: {
-            sqlConquests: sql.getTribeConquestsLoss,
-            sqlCount: sql.getTribeConquestsLossCount,
+            sqlConquests: sql('get-tribe-conquests-loss'),
+            sqlCount: sql('get-tribe-conquests-loss-count'),
             navigationTitle: i18n('sub_title_loss', 'tribe_profile_achievements', res.locals.lang)
         },
         self: {
-            sqlConquests: sql.getTribeConquestsSelf,
-            sqlCount: sql.getTribeConquestsSelfCount,
+            sqlConquests: sql('get-tribe-conquests-self'),
+            sqlCount: sql('get-tribe-conquests-self-count'),
             navigationTitle: i18n('sub_title_self', 'tribe_profile_achievements', res.locals.lang)
         }
     };
@@ -228,8 +228,8 @@ const tribeMembersRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, {worldId});
-    const members = await db.any(sql.getTribeMembers, {worldId, tribeId});
+    const world = await db.one(sql('get-world'), {worldId});
+    const members = await db.any(sql('get-tribe-members'), {worldId, tribeId});
 
     mergeBackendLocals(res, {
         marketId,
@@ -272,12 +272,12 @@ const tribeVillagesRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const world = await db.one(sql.getWorld, {worldId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
-    const allVillages = await db.any(sql.getTribeVillages, {worldId, tribeId});
+    const allVillages = await db.any(sql('get-tribe-villages'), {worldId, tribeId});
     const villages = allVillages.slice(offset, offset + limit);
     const total = allVillages.length;
 
@@ -323,16 +323,16 @@ const tribeMembersChangeRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const playersName = {};
-    const memberChangesRaw = await db.any(sql.getTribeMemberChanges, {worldId, id: tribeId});
+    const memberChangesRaw = await db.any(sql('get-tribe-member-changes'), {worldId, id: tribeId});
     const memberChanges = [];
 
     for (const change of memberChangesRaw) {
         if (!utils.hasOwn(playersName, change.character_id)) {
-            playersName[change.character_id] = (await db.one(sql.getPlayer, {worldId, playerId: change.character_id})).name;
+            playersName[change.character_id] = (await db.one(sql('get-player'), {worldId, playerId: change.character_id})).name;
         }
 
         memberChanges.push({
@@ -386,8 +386,8 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const subCategory = req.params.subCategory;
 
@@ -395,7 +395,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
         throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
     }
 
-    const achievements = await db.any(sql.getTribeAchievements, {worldId, id: tribeId});
+    const achievements = await db.any(sql('get-tribe-achievements'), {worldId, id: tribeId});
     const achievementsRepeatable = {};
     const achievementsRepeatableCategoryCount = {};
     let achievementsRepeatableGeralCount = 0;
@@ -465,12 +465,12 @@ const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
         tribe
     } = await paramTribeParse(req, worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     let lastItem;
     const historyLimit = config('sync', 'maximum_history_days');
-    const reversedHistory = await db.map(sql.getTribeHistory, {worldId, tribeId, limit: historyLimit}, function (currentItem) {
+    const reversedHistory = await db.map(sql('get-tribe-history'), {worldId, tribeId, limit: historyLimit}, function (currentItem) {
         currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
         currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
         currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);

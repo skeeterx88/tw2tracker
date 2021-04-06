@@ -27,7 +27,7 @@ const getWorldInfoRouter = asyncRouter(async function (req, res) {
     let dataPath;
 
     if (req.params.mapShareId) {
-        const mapShare = await db.one(sql.maps.getShareInfo, [req.params.mapShareId, marketId, worldNumber]);
+        const mapShare = await db.one(sql('maps/get-share-info'), [req.params.mapShareId, marketId, worldNumber]);
         const dateId = utils.getHourlyDir(mapShare.creation_date);
         dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, 'info');
     } else {
@@ -59,13 +59,13 @@ const getWorldInfoRouter = asyncRouter(async function (req, res) {
 });
 
 const getOpenWorldsRouter = asyncRouter(async function (req, res) {
-    const allWorlds = await db.any(sql.getOpenWorlds);
+    const allWorlds = await db.any(sql('get-open-worlds'));
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(allWorlds));
 });
 
 const getMarketsRouters = asyncRouter(async function (req, res) {
-    const marketsWithAccounts = await db.map(sql.getMarketsWithAccounts, [], market => market.id);
+    const marketsWithAccounts = await db.map(sql('get-markets-with-accounts'), [], market => market.id);
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(marketsWithAccounts));
 });
@@ -86,7 +86,7 @@ const getContinentRouter = asyncRouter(async function (req, res) {
     let dataPath;
 
     if (req.params.mapShareId) {
-        const mapShare = await db.one(sql.maps.getShareInfo, [req.params.mapShareId, marketId, worldNumber]);
+        const mapShare = await db.one(sql('maps/get-share-info'), [req.params.mapShareId, marketId, worldNumber]);
         const dateId = utils.getHourlyDir(mapShare.creation_date);
         dataPath = path.join('.', 'data', 'static-maps', worldId, dateId, continentId);
     } else {
@@ -193,7 +193,7 @@ const crateShareRouter = asyncRouter(async function (req, res) {
     const shareId = utils.makeid(20);
 
     const settingsString = JSON.stringify(settings);
-    const {creation_date} = await db.one(sql.maps.createShare, [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y]);
+    const {creation_date} = await db.one(sql('maps/create-share'), [shareId, marketId, worldNumber, shareType, highlightsString, settingsString, center.x, center.y]);
 
     if (shareType === mapShareTypes.STATIC) {
         const dateId = utils.getHourlyDir(creation_date);
@@ -238,7 +238,7 @@ const getShareRouter = asyncRouter(async function (req, res) {
     }
 
     try {
-        const shareSql = highlightsOnly ? sql.maps.getShareHighlights : sql.maps.getShareInfo;
+        const shareSql = highlightsOnly ? sql('maps/get-share-highlights') : sql('maps/get-share-info');
         const mapShare = await db.one(shareSql, [mapShareId, marketId, worldNumber]);
 
         res.setHeader('Content-Type', 'application/json');

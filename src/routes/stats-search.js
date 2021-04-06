@@ -63,7 +63,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const world = await db.one(sql.getWorld, {worldId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
@@ -84,7 +84,7 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
     }
 
     const query = '%' + rawQuery + '%';
-    const allResults = await db.any(sql.search[category], {worldId, query});
+    const allResults = await db.any(sql('search/' + category), {worldId, query});
     const results = allResults.slice(offset, offset + limit);
     const total = allResults.length;
 

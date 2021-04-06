@@ -62,7 +62,7 @@ Sync.init = async function () {
         process.exit(0);
     });
 
-    const appState = await db.one(sql.getProgramState);
+    const appState = await db.one(sql('get-program-state'));
 
     if (appState.first_run) {
         debug.sync('first run detected');
@@ -70,7 +70,7 @@ Sync.init = async function () {
         await Sync.markets();
         await Sync.worlds();
 
-        await db.query(sql.updateProgramState, {
+        await db.query(sql('update-program-state'), {
             column: 'first_run',
             value: false
         });
@@ -79,11 +79,11 @@ Sync.init = async function () {
     }
 
     Events.on(syncEvents.DATA_FINISH, function (worldId, status) {
-        db.none(sql.updateDataSync, {status, worldId});
+        db.none(sql('update-data-sync'), {status, worldId});
     });
 
     Events.on(syncEvents.ACHIEVEMENTS_FINISH, function (worldId, status) {
-        db.none(sql.updateAchievementsSync, {status, worldId});
+        db.none(sql('update-achievements-sync'), {status, worldId});
     });
 
     if (process.env.NODE_ENV === 'development') {
@@ -117,12 +117,12 @@ Sync.initQueue = async function (type) {
                 const data = queue[type].shift();
 
                 Sync[type](data.market_id, data.world_number, null, function () {
-                    db.none(sql.removeSyncQueue, {
+                    db.none(sql('remove-sync-queue'), {
                         id: data.id
                     });
                 });
 
-                await db.none(sql.setQueueItemActive, {
+                await db.none(sql('set-queue-item-active'), {
                     id: data.id,
                     active: true
                 });
@@ -137,8 +137,8 @@ Sync.initQueue = async function (type) {
 
     Events.on(queueEvents[type].START_QUEUE, processQueue);
 
-    await db.none(sql.resetQueueItems);
-    queue[type].push(...await db.any(sql.getSyncQueueType, {type}));
+    await db.none(sql('reset-queue-items'));
+    queue[type].push(...await db.any(sql('get-sync-queue-type'), {type}));
 
     if (queue[type].length) {
         processQueue();
@@ -154,7 +154,7 @@ Sync.addQueue = async function (type, worlds) {
 
     await db.tx(async function () {
         for (const {market_id, world_number} of worlds) {
-            const data = await this.one(sql.addSyncQueue, {type, market_id, world_number});
+            const data = await this.one(sql('add-sync-queue'), {type, market_id, world_number});
             queue[type].push(data);
         }
     });
@@ -213,9 +213,9 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
 
     running.data.add(worldId);
 
-    const market = await db.one(sql.getMarket, {marketId});
+    const market = await db.one(sql('get-market'), {marketId});
     const world = await getWorld(worldId);
-    const marketAccounts = await db.any(sql.getMarketAccounts, {marketId});
+    const marketAccounts = await db.any(sql('get-market-accounts'), {marketId});
 
     if (!marketAccounts.length) {
         debug.sync('market:%s does not have any sync accounts', marketId);
@@ -264,7 +264,7 @@ Sync.data = async function (marketId, worldNumber, flag, callback, attempt = 1) 
             if (!worldCharacter) {
                 await Sync.character(marketId, worldNumber);
             } else if (!worldCharacter.allow_login) {
-                await db.query(sql.closeWorld, [marketId, worldNumber]);
+                await db.query(sql('close-world'), [marketId, worldNumber]);
                 debug.sync('world:%s closing', worldId);
                 Events.trigger(syncEvents.DATA_FINISH, [worldId, syncStatus.WORLD_CLOSED]);
                 running.data.delete(worldId);
@@ -346,7 +346,7 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
     running.achievements.add(worldId);
 
     const world = await getWorld(worldId);
-    const marketAccounts = await db.any(sql.getMarketAccounts, {marketId});
+    const marketAccounts = await db.any(sql('get-market-accounts'), {marketId});
 
     if (!marketAccounts.length) {
         debug.sync('market:%s does not have any sync accounts', marketId);
@@ -434,8 +434,8 @@ Sync.achievements = async function (marketId, worldNumber, flag, callback, attem
 };
 
 Sync.all = async function (type, flag) {
-    const syncQueue = await db.map(sql.getSyncQueueNonActive, [], ({market_id, world_number}) => market_id + world_number);
-    const worlds = await db.map(sql.getSyncEnabledWorlds, [], function (world) {
+    const syncQueue = await db.map(sql('get-sync-queue-non-active'), [], ({market_id, world_number}) => market_id + world_number);
+    const worlds = await db.map(sql('get-sync-enabled-worlds'), [], function (world) {
         return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
     });
     const uniqueWorlds = worlds.filter(world => world !== false);
@@ -446,7 +446,7 @@ Sync.all = async function (type, flag) {
 Sync.worlds = async function () {
     debug.worlds('start world list sync');
 
-    const markets = await db.any(sql.getMarkets);
+    const markets = await db.any(sql('get-markets'));
 
     for (const market of markets) {
         const marketId = market.id;
@@ -489,7 +489,7 @@ Sync.worlds = async function () {
                 if (!await utils.worldEntryExists(worldId)) {
                     debug.worlds('world:%s creating world db entry', worldId);
 
-                    await db.query(sql.createWorldSchema, {
+                    await db.query(sql('create-world-schema'), {
                         worldId,
                         marketId,
                         worldNumber,
@@ -507,7 +507,7 @@ Sync.worlds = async function () {
 Sync.markets = async function () {
     debug.sync('start market list sync');
 
-    const storedMarkets = await db.map(sql.getMarkets, [], market => market.id);
+    const storedMarkets = await db.map(sql('get-markets'), [], market => market.id);
     const $portalBar = await utils.getHTML('https://tribalwars2.com/portal-bar/https/portal-bar.html');
     const $markets = $portalBar.querySelectorAll('.pb-lang-sec-options a');
 
@@ -519,7 +519,7 @@ Sync.markets = async function () {
     const missingMarkets = marketList.filter(marketId => !storedMarkets.includes(marketId));
 
     for (const marketId of missingMarkets) {
-        await db.query(sql.addMarket, {marketId});
+        await db.query(sql('add-market'), {marketId});
     }
 
     return missingMarkets;
@@ -566,7 +566,7 @@ Sync.auth = async function (marketId, attempt = 1) {
 
     try {
         auths[marketId] = utils.timeout(async function () {
-            const accounts = await db.any(sql.getMarketAccounts, {marketId});
+            const accounts = await db.any(sql('get-market-accounts'), {marketId});
 
             if (!accounts.length) {
                 debug.auth('market:%s do not have any accounts', marketId, attempt);
@@ -680,13 +680,13 @@ Sync.tasks = async function () {
 
     const taskHandlers = new Map();
     const intervalKeys = Object.keys(config('sync_intervals'));
-    const presentTasks = await db.any(sql.getTasks);
+    const presentTasks = await db.any(sql('get-tasks'));
     const interval = humanInterval(config('sync', 'task_check_interval'));
 
     for (const {id} of presentTasks) {
         if (!intervalKeys.includes(id)) {
             debug.tasks('task:%s add missing db entry', id);
-            db.query(sql.addTaskIfMissing, {id});
+            db.query(sql('add-task-if-missing'), {id});
         }
     }
 
@@ -704,7 +704,7 @@ Sync.tasks = async function () {
             setInterval(async function () {
                 debug.tasks('checking tasks...');
 
-                const lastRunEntries = await db.map(sql.getTasks, [], ({id, last_run}) => [id, last_run]);
+                const lastRunEntries = await db.map(sql('get-tasks'), [], ({id, last_run}) => [id, last_run]);
                 const mappedLastRuns = new Map(lastRunEntries);
 
                 for (const [id, handler] of taskHandlers.entries()) {
@@ -721,7 +721,7 @@ Sync.tasks = async function () {
 
                     debug.tasks('task:%s running', id);
                     handler();
-                    db.query(sql.updateTaskLastRun, {id});
+                    db.query(sql('update-task-last-run'), {id});
                 }
             }, interval);
         }
@@ -733,7 +733,7 @@ Sync.toggle = async function (marketId, worldNumber) {
     const world = await getWorld(worldId);
     const enabled = !world.sync_enabled;
 
-    await db.query(sql.syncToggleWorld, {
+    await db.query(sql('sync-toggle-world'), {
         marketId,
         worldNumber,
         enabled
@@ -745,7 +745,7 @@ Sync.toggle = async function (marketId, worldNumber) {
 };
 
 Sync.createAccounts = async function (name, pass, mail) {
-    const markets = await db.any(sql.getMarkets);
+    const markets = await db.any(sql('get-markets'));
 
     for (const market of markets) {
         const urlId = market.id === 'zz' ? 'beta' : market.id;
@@ -790,9 +790,9 @@ Sync.createAccounts = async function (name, pass, mail) {
         if (created) {
             debug.sync('market:%s account "%s" created', market.id, name);
 
-            const [exists] = await db.any(sql.getAccountByName, {name});
-            const {id} = exists ? exists : await db.one(sql.addAccount, {name, pass});
-            await db.query(sql.addAccountMarket, {accountId: id, marketId: market.id});
+            const [exists] = await db.any(sql('get-account-by-name'), {name});
+            const {id} = exists ? exists : await db.one(sql('add-account'), {name, pass});
+            await db.query(sql('add-account-market'), {accountId: id, marketId: market.id});
         } else {
             debug.sync('market:%s fail creating account "%s"', market.id, name);
         }
@@ -809,11 +809,11 @@ async function commitDataDatabase (data, worldId) {
         entriesPlayerRecordsOld, 
         entriesTribeRecordsOld
     ] = await db.task(async db => [
-        await db.map(sql.getActiveSubjects, {worldId, type: 'players'}, subject => [subject.id, subject]),
-        await db.map(sql.getActiveSubjects, {worldId, type: 'tribes'}, subject => [subject.id, subject]),
-        await db.map(sql.getWorldVillages, {worldId}, subject => [subject.id, subject]),
-        await db.map(sql.getSubjectRecords, {worldId, type: 'players'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]),
-        await db.map(sql.getSubjectRecords, {worldId, type: 'tribes'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]])
+        await db.map(sql('get-active-subjects'), {worldId, type: 'players'}, subject => [subject.id, subject]),
+        await db.map(sql('get-active-subjects'), {worldId, type: 'tribes'}, subject => [subject.id, subject]),
+        await db.map(sql('get-world-villages'), {worldId}, subject => [subject.id, subject]),
+        await db.map(sql('get-subject-records'), {worldId, type: 'players'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]),
+        await db.map(sql('get-subject-records'), {worldId, type: 'tribes'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]])
     ]);
 
     const playersOld = new Map(entriesPlayersOld);
@@ -847,17 +847,17 @@ async function commitDataDatabase (data, worldId) {
         async function updateSubjectsData () {
             for (const [id, subject] of data.tribes) {
                 if (tribesOld.has(id)) {
-                    await db.query(sql.updateTribe, {worldId, id, ...subject});
+                    await db.query(sql('update-tribe'), {worldId, id, ...subject});
                 } else {
-                    await db.query(sql.addTribe, {worldId, id, ...subject});
+                    await db.query(sql('add-tribe'), {worldId, id, ...subject});
                 }
             }
 
             for (const [id, subject] of data.players) {
                 if (playersOld.has(id)) {
-                    await db.query(sql.updatePlayer, {worldId, id, ...subject});
+                    await db.query(sql('update-player'), {worldId, id, ...subject});
                 } else {
-                    await db.query(sql.addPlayer, {worldId, id, ...subject});
+                    await db.query(sql('add-player'), {worldId, id, ...subject});
                 }
             }
         }
@@ -891,7 +891,7 @@ async function commitDataDatabase (data, worldId) {
                         tribeData.old_owner_tribe_tag_then = tribesNew.get(oldOwner.tribe_id).tag;
                     }
 
-                    await db.query(sql.addConquest, {
+                    await db.query(sql('add-conquest'), {
                         worldId,
                         village_id,
                         newOwner: newOwnerId,
@@ -907,11 +907,11 @@ async function commitDataDatabase (data, worldId) {
 
         async function updateMissingSubjects () {
             for (const id of missingPlayersIds) {
-                await db.query(sql.archivePlayer, {worldId, id});
+                await db.query(sql('archive-player'), {worldId, id});
             }
 
             for (const id of missingTribesIds) {
-                await db.query(sql.archiveTribe, {worldId, id});
+                await db.query(sql('archive-tribe'), {worldId, id});
             }
         }
 
@@ -926,15 +926,15 @@ async function commitDataDatabase (data, worldId) {
                     const [bestRank, bestPoints, bestVillages] = oldRecords[type].get(id) || [];
 
                     if (!bestRank || subject.rank <= bestRank) {
-                        await db.query(sql.updateSubjectRecord, {worldId, type, recordType: 'rank', id, value: subject.rank});
+                        await db.query(sql('update-subject-record'), {worldId, type, recordType: 'rank', id, value: subject.rank});
                     }
 
                     if (!bestPoints || subject.points >= bestPoints) {
-                        await db.query(sql.updateSubjectRecord, {worldId, type, recordType: 'points', id, value: subject.points});
+                        await db.query(sql('update-subject-record'), {worldId, type, recordType: 'points', id, value: subject.points});
                     }
 
                     if (!bestVillages || subject.villages >= bestVillages) {
-                        await db.query(sql.updateSubjectRecord, {worldId, type, recordType: 'villages', id, value: subject.villages});
+                        await db.query(sql('update-subject-record'), {worldId, type, recordType: 'villages', id, value: subject.villages});
                     }
                 }
             }
@@ -942,13 +942,13 @@ async function commitDataDatabase (data, worldId) {
 
         async function updateProvinces () {
             for (const [province_name, province_id] of data.provinces) {
-                await db.query(sql.addProvince, {worldId, province_id, province_name});
+                await db.query(sql('add-province'), {worldId, province_id, province_name});
             }
         }
 
         async function updateVillages () {
             for (const [village_id, village] of data.villages) {
-                await db.query(sql.addVillage, {worldId, village_id, ...village});
+                await db.query(sql('add-village'), {worldId, village_id, ...village});
             }
         }
 
@@ -963,7 +963,7 @@ async function commitDataDatabase (data, worldId) {
                     const oldTribe = tribesOld.get(oldTribeId);
                     const newTribe = tribesOld.get(newTribeId);
 
-                    await db.query(sql.addTribeMemberChange, {
+                    await db.query(sql('add-tribe-member-change'), {
                         worldId,
                         character_id,
                         old_tribe: oldTribeId,
@@ -979,7 +979,7 @@ async function commitDataDatabase (data, worldId) {
 
         async function updatePlayerVillages () {
             for (const [character_id, villages_id] of data.villagesByPlayer) {
-                await db.query(sql.updatePlayerVillages, {worldId, character_id, villages_id});
+                await db.query(sql('update-player-villages'), {worldId, character_id, villages_id});
             }
         }
 
@@ -1038,16 +1038,16 @@ async function commitDataDatabase (data, worldId) {
             }
 
             for (const [id, avg] of Object.entries(players)) {
-                await db.query(sql.updateSubjectAvgCoords, {worldId, type: 'players', id, avg});
+                await db.query(sql('update-subject-avg-coords'), {worldId, type: 'players', id, avg});
             }
 
             for (const [id, avg] of Object.entries(tribes)) {
-                await db.query(sql.updateSubjectAvgCoords, {worldId, type: 'tribes', id, avg});
+                await db.query(sql('update-subject-avg-coords'), {worldId, type: 'tribes', id, avg});
             }
         }
 
         async function updateWorldStats () {
-            await db.query(sql.updateWorldStats, {
+            await db.query(sql('update-world-stats'), {
                 worldId,
                 villages: data.villages.length,
                 players: data.players.length,
@@ -1083,12 +1083,12 @@ async function commitAchievementsDatabase (data, worldId) {
 
     const sqlSubjectMap = {
         players: {
-            [ACHIEVEMENT_COMMIT_ADD]: sql.addPlayerAchievement,
-            [ACHIEVEMENT_COMMIT_UPDATE]: sql.updatePlayerAchievement
+            [ACHIEVEMENT_COMMIT_ADD]: sql('add-player-achievement'),
+            [ACHIEVEMENT_COMMIT_UPDATE]: sql('update-player-achievement')
         },
         tribes: {
-            [ACHIEVEMENT_COMMIT_ADD]: sql.addTribeAchievement,
-            [ACHIEVEMENT_COMMIT_UPDATE]: sql.updateTribeAchievement
+            [ACHIEVEMENT_COMMIT_ADD]: sql('add-tribe-achievement'),
+            [ACHIEVEMENT_COMMIT_UPDATE]: sql('update-tribe-achievement')
         }
     };
 
@@ -1131,11 +1131,11 @@ async function commitDataFilesystem (worldId) {
             tribes,
             provinces
         ] = await db.task(async (db) => [
-            await db.one(sql.getWorld, {worldId}),
-            await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'rank'}),
-            await db.any(sql.getWorldData, {worldId, table: 'villages', sort: 'points'}),
-            await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'rank'}),
-            await db.any(sql.getWorldData, {worldId, table: 'provinces', sort: 'id'})
+            await db.one(sql('get-world'), {worldId}),
+            await db.any(sql('get-world-data'), {worldId, table: 'players', sort: 'rank'}),
+            await db.any(sql('get-world-data'), {worldId, table: 'villages', sort: 'points'}),
+            await db.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'rank'}),
+            await db.any(sql('get-world-data'), {worldId, table: 'provinces', sort: 'id'})
         ]);
 
         const parsedPlayers = [];
@@ -1271,7 +1271,7 @@ async function getWorld (worldId) {
     let world;
 
     try {
-        world = await db.one(sql.getWorld, {worldId});
+        world = await db.one(sql('get-world'), {worldId});
     } catch (e) {
         throw new Error(`World ${worldId} not found.`);
     }
@@ -1287,8 +1287,8 @@ async function getModifiedAchievements (tx, subjectType, achievements, worldId) 
     const achievementsToCommit = [];
 
     const sqlAchievementsMap = {
-        players: sql.getPlayerAchievements,
-        tribes: sql.getTribeAchievements
+        players: sql('get-player-achievements'),
+        tribes: sql('get-tribe-achievements')
     };
 
     for (const [subjectId, newAchievementsRaw] of achievements) {
@@ -1438,7 +1438,7 @@ async function fetchWorldConfig (page, worldId) {
             return filteredConfig;
         });
 
-        await db.none(sql.updateWorldConfig, {
+        await db.none(sql('update-world-config'), {
             worldId,
             worldConfig
         });
@@ -1455,7 +1455,7 @@ async function fetchMarketTimeOffset (page, marketId) {
             return require('helper/time').getGameTimeOffset();
         });
 
-        await db.none(sql.updateMarketTimeOffset, {
+        await db.none(sql('update-market-time-offset'), {
             marketId,
             timeOffset
         });
@@ -1465,7 +1465,7 @@ async function fetchMarketTimeOffset (page, marketId) {
 }
 
 async function setupHistoryProcessing (marketId) {
-    const market = await db.any(sql.getMarket, {marketId});
+    const market = await db.any(sql('get-market'), {marketId});
     const untilMidnight = getTimeUntilMidnight(market.time_offset);
     const inMinutes = untilMidnight / 1000 / 60;
 
@@ -1473,7 +1473,7 @@ async function setupHistoryProcessing (marketId) {
 
     setTimeout(function () {
         historyQueue.add(async function () {
-            const marketWorlds = await db.any(sql.getMarketWorlds, {marketId: market.id});
+            const marketWorlds = await db.any(sql('get-market-worlds'), {marketId: market.id});
             const openWorlds = marketWorlds.filter(world => world.open);
 
             for (const world of openWorlds) {
@@ -1485,7 +1485,7 @@ async function setupHistoryProcessing (marketId) {
 }
 
 async function initHistoryProcessing () {
-    for (const market of await db.any(sql.getMarkets)) {
+    for (const market of await db.any(sql('get-markets'))) {
         setupHistoryProcessing(market.id);
     }
 }
@@ -1503,26 +1503,26 @@ async function processWorldHistory (worldId) {
     await db.task(async function (db) {
         debug.history('world:%s processing history', worldId);
 
-        const players = await db.any(sql.getWorldData, {worldId, table: 'players', sort: 'id'});
-        const tribes = await db.any(sql.getWorldData, {worldId, table: 'tribes', sort: 'id'});
+        const players = await db.any(sql('get-world-data'), {worldId, table: 'players', sort: 'id'});
+        const tribes = await db.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'id'});
 
         for (const player of players) {
             if (player.archived) {
                 continue;
             }
 
-            const history = await db.any(sql.getPlayerHistory, {worldId, playerId: player.id});
+            const history = await db.any(sql('get-player-history'), {worldId, playerId: player.id});
 
             if (history.length >= historyLimit) {
                 let exceeding = history.length - historyLimit + 1;
 
                 while (exceeding--) {
                     const {id} = history.pop();
-                    await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'players', id});
+                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'players', id});
                 }
             }
 
-            await db.query(sql.addPlayerHistoryItem, {
+            await db.query(sql('add-player-history-item'), {
                 worldId,
                 id: player.id,
                 tribe_id: player.tribe_id,
@@ -1541,18 +1541,18 @@ async function processWorldHistory (worldId) {
                 continue;
             }
 
-            const history = await db.any(sql.getTribeHistory, {worldId, tribeId: tribe.id});
+            const history = await db.any(sql('get-tribe-history'), {worldId, tribeId: tribe.id});
 
             if (history.length >= historyLimit) {
                 let exceeding = history.length - historyLimit + 1;
 
                 while (exceeding--) {
                     const {id} = history.pop();
-                    await db.query(sql.deleteSubjectHistoryItem, {worldId, type: 'tribes', id});
+                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'tribes', id});
                 }
             }
 
-            await db.query(sql.addTribeHistoryItem, {
+            await db.query(sql('add-tribe-history-item'), {
                 worldId,
                 id: tribe.id,
                 members: tribe.members,
@@ -1623,12 +1623,12 @@ async function syncMarketsAndWorlds () {
 
 async function cleanStaticMapShares () {
     const now = Date.now();
-    const shares = await db.any(sql.maps.getShareLastAccess);
+    const shares = await db.any(sql('maps/get-share-last-access'));
     const expireTime = humanInterval(config('sync', 'static_share_expire_time'));
 
     for (const {share_id, last_access} of shares) {
         if (now - last_access.getTime() < expireTime) {
-            await db.query(sql.maps.deleteStaticShare, [share_id]);
+            await db.query(sql('maps/delete-static-share'), [share_id]);
             // TODO: delete data as well
         }
     }

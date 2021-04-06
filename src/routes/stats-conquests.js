@@ -25,8 +25,8 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
         worldNumber
     } = await paramWorldParse(req);
 
-    const market = await db.one(sql.getMarket, {marketId});
-    const world = await db.one(sql.getWorld, {worldId});
+    const market = await db.one(sql('get-market'), {marketId});
+    const world = await db.one(sql('get-world'), {worldId});
 
     const page = req.params.page && !isNaN(req.params.page)
         ? Math.max(1, parseInt(req.params.page, 10))
@@ -34,8 +34,8 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
     const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
-    const conquests = await db.any(sql.getWorldConquests, {worldId, offset, limit});
-    const total = parseInt((await db.one(sql.getWorldConquestsCount, {worldId})).count, 10);
+    const conquests = await db.any(sql('get-world-conquests'), {worldId, offset, limit});
+    const total = parseInt((await db.one(sql('get-world-conquests-count'), {worldId})).count, 10);
 
     mergeBackendLocals(res, {
         marketId,

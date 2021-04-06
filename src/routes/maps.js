@@ -34,7 +34,7 @@ const worldRouter = asyncRouter(async function (req, res, next) {
         throw createError(404, i18n('missing_world', 'errors', res.locals.lang));
     }
 
-    const world = await db.one(sql.getWorld, {worldId});
+    const world = await db.one(sql('get-world'), {worldId});
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
 
     mergeBackendLocals(res, {
@@ -65,9 +65,9 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
     } = await paramWorldParse(req);
 
     const mapShareId = req.params.mapShareId;
-    const world = await db.one(sql.getWorld, {worldId});
+    const world = await db.one(sql('get-world'), {worldId});
     const lastDataSyncDate = world.last_data_sync_date ? new Date(world.last_data_sync_date).getTime() : false;
-    const [mapShare] = await db.any(sql.maps.getShareInfo, [mapShareId, marketId, worldNumber]);
+    const [mapShare] = await db.any(sql('maps/get-share-info'), [mapShareId, marketId, worldNumber]);
 
     if (!mapShare) {
         throw createError(404, i18n('missing_map_share', 'errors', res.locals.lang));
@@ -76,7 +76,7 @@ const mapShareRouter = asyncRouter(async function (req, res, next) {
     mapShare.creation_date = new Date(mapShare.creation_date).getTime();
     mapShare.settings = JSON.parse(mapShare.settings);
 
-    db.query(sql.maps.updateShareAccess, [mapShareId]);
+    db.query(sql('maps/update-share-access'), [mapShareId]);
 
     mergeBackendLocals(res, {
         marketId,
