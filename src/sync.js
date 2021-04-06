@@ -86,7 +86,7 @@ Sync.init = async function () {
         db.none(sql('update-achievements-sync'), {status, worldId});
     });
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV !== 'development') {
         const tasks = await Sync.tasks();
         tasks.add('data_all', syncAllData);
         tasks.add('achievements_all', syncAllAchievements);
