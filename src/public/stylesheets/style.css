@@ -1691,13 +1691,12 @@ span[class^="flag-"] {
     top: 0px;
     transition: all 0.2s;
     visibility: hidden;
-    width: 360px;
+    width: 370px;
     z-index: 5;
 }
 
 #map-tooltip table {
     background: var(--noise) hsl(31, 45%, 67%);
-    border-collapse: separate;
     border-spacing: 1px;
     box-shadow: 0 0 0 2px hsla(26, 100%, 24%, 66%);
     width: 100%;
