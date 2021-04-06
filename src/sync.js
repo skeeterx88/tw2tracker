@@ -1465,7 +1465,7 @@ async function fetchMarketTimeOffset (page, marketId) {
 }
 
 async function setupHistoryProcessing (marketId) {
-    const market = await db.any(sql('get-market'), {marketId});
+    const market = await db.one(sql('get-market'), {marketId});
     const untilMidnight = getTimeUntilMidnight(market.time_offset);
     const inMinutes = untilMidnight / 1000 / 60;
 
