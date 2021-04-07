@@ -1467,25 +1467,27 @@ async function fetchMarketTimeOffset (page, marketId) {
 async function setupHistoryProcessing (marketId) {
     const market = await db.one(sql('get-market'), {marketId});
     const untilMidnight = getTimeUntilMidnight(market.time_offset);
-    const inMinutes = untilMidnight / 1000 / 60;
 
-    debug.history('market:%s history process starts in %i minutes', market.id, inMinutes);
+    debug.history('market:%s history process starts in %i minutes', marketId, untilMidnight / 1000 / 60);
 
     setTimeout(function () {
         historyQueue.add(async function () {
-            const marketWorlds = await db.any(sql('get-market-worlds'), {marketId: market.id});
+            const marketWorlds = await db.any(sql('get-market-worlds'), {marketId});
             const openWorlds = marketWorlds.filter(world => world.open);
 
             for (const world of openWorlds) {
                 await processWorldHistory(world.world_id);
-                await setupHistoryProcessing(world.world_id);
             }
+
+            await setupHistoryProcessing(marketId);
         });
     }, untilMidnight);
 }
 
 async function initHistoryProcessing () {
-    for (const market of await db.any(sql('get-markets'))) {
+    const markets = await db.any(sql('get-markets'));
+
+    for (const market of markets) {
         setupHistoryProcessing(market.id);
     }
 }
@@ -1511,7 +1513,7 @@ async function processWorldHistory (worldId) {
                 continue;
             }
 
-            const history = await db.any(sql('get-player-history'), {worldId, playerId: player.id});
+            const history = await db.any(sql('get-player-history'), {worldId, playerId: player.id, limit: historyLimit + 100});
 
             if (history.length >= historyLimit) {
                 let exceeding = history.length - historyLimit + 1;
@@ -1541,7 +1543,7 @@ async function processWorldHistory (worldId) {
                 continue;
             }
 
-            const history = await db.any(sql('get-tribe-history'), {worldId, tribeId: tribe.id});
+            const history = await db.any(sql('get-tribe-history'), {worldId, tribeId: tribe.id, limit: historyLimit + 100});
 
             if (history.length >= historyLimit) {
                 let exceeding = history.length - historyLimit + 1;
