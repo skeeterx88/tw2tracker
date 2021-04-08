@@ -172,7 +172,7 @@ async function syncWorld (type, marketId, worldNumber) {
         syncTypeMapping[type].activeWorlds.add(worldId);
 
         const market = await db.one(sql('get-market'), {marketId});
-        const world = await getWorld(worldId);
+        const world = await getOpenWorld(worldId);
         const marketAccounts = await db.any(sql('get-market-accounts'), {marketId});
 
         if (!world.sync_enabled) {
@@ -599,7 +599,7 @@ async function initTasks () {
 
 async function toggleWorld (marketId, worldNumber) {
     const worldId = marketId + worldNumber;
-    const world = await getWorld(worldId);
+    const world = await getOpenWorld(worldId);
     const enabled = !world.sync_enabled;
 
     await db.query(sql('sync-toggle-world'), {
@@ -1136,12 +1136,10 @@ async function createPuppeteerPage () {
     return page;
 }
 
-async function getWorld (worldId) {
-    let world;
+async function getOpenWorld (worldId) {
+    const [world] = await db.any(sql('get-world'), {worldId});
 
-    try {
-        world = await db.one(sql('get-world'), {worldId});
-    } catch (e) {
+    if (!world) {
         throw new Error(`World ${worldId} not found.`);
     }
 
