@@ -912,9 +912,9 @@ async function commitAchievementsDatabase (data, worldId) {
         const log = {};
 
         for (const subjectType of ['players', 'tribes']) {
-            const modifiedAchievements = await getModifiedAchievements(tx, subjectType, data[subjectType], worldId);
+            const commits = await generateAchievementCommits(tx, subjectType, data[subjectType], worldId);
 
-            for (const {commitType, achievement} of modifiedAchievements) {
+            for (const {commitType, achievement} of commits) {
                 tx.none(sqlSubjectMap[subjectType][commitType], {
                     worldId,
                     id: achievement.id,
@@ -927,8 +927,8 @@ async function commitAchievementsDatabase (data, worldId) {
             }
 
             log[subjectType] = {
-                added: modifiedAchievements.filter(({commitType}) => commitType === ACHIEVEMENT_COMMIT_ADD).length,
-                updated: modifiedAchievements.filter(({commitType}) => commitType === ACHIEVEMENT_COMMIT_UPDATE).length
+                added: commits.filter(({commitType}) => commitType === ACHIEVEMENT_COMMIT_ADD).length,
+                updated: commits.filter(({commitType}) => commitType === ACHIEVEMENT_COMMIT_UPDATE).length
             };
         }
 
@@ -1357,7 +1357,7 @@ async function getOpenWorld (worldId) {
     return world;
 }
 
-async function getModifiedAchievements (tx, subjectType, achievements, worldId) {
+async function generateAchievementCommits (tx, subjectType, achievements, worldId) {
     const achievementsToCommit = [];
 
     const sqlAchievementsMap = {
@@ -1374,83 +1374,75 @@ async function getModifiedAchievements (tx, subjectType, achievements, worldId) 
             const oldAchievements = mapAchievements(oldAchievementsRaw);
             const newAchievements = mapAchievements(newAchievementsRaw);
 
-            const oldUniqueTypes = Object.keys(oldAchievements.unique);
-            const newUniqueTypes = Object.keys(newAchievements.unique);
-
             if (newAchievementsRaw.length > oldAchievementsRaw.length) {
-                const missingTypes = newUniqueTypes.filter(type => !oldUniqueTypes.includes(type));
-
-                for (const type of missingTypes) {
-                    achievementsToMerge.push({
-                        commitType: ACHIEVEMENT_COMMIT_ADD,
-                        achievement: newAchievements.unique[type]
-                    });
+                for (const type of newAchievements.unique.keys()) {
+                    if (!oldAchievements.unique.has(type)) {
+                        achievementsToMerge.push({
+                            commitType: ACHIEVEMENT_COMMIT_ADD,
+                            achievement: newAchievements.unique.get(type)
+                        });
+                    }
                 }
             }
 
-            for (const type of oldUniqueTypes) {
-                if (!newAchievements.unique[type]) {
-                    debug.sync('*New* achievement do not have *old* achievement: %s', type);
-                    continue;
-                }
-
-                if (newAchievements.unique[type].level > oldAchievements.unique[type].level) {
+            for (const type of oldAchievements.unique.keys()) {
+                if (newAchievements.unique.has(type) && newAchievements.unique.get(type).level > oldAchievements.unique.get(type).level) {
                     achievementsToMerge.push({
                         commitType: ACHIEVEMENT_COMMIT_UPDATE,
-                        achievement: newAchievements.unique[type]
+                        achievement: newAchievements.unique.get(type)
                     });
                 }
             }
 
-            for (const type of Object.keys(newAchievements.repeatable)) {
-                const newRepeatable = newAchievements.repeatable[type];
-                const oldRepeatable = oldAchievements.repeatable[type];
-
-                const merge = [];
+            for (const type of newAchievements.repeatable.keys()) {
+                const newRepeatable = newAchievements.repeatable.get(type);
+                const oldRepeatable = oldAchievements.repeatable.get(type);
+                const missing = [];
 
                 if (!oldRepeatable) {
-                    merge.push(...newRepeatable);
+                    missing.concat(newRepeatable);
                 } else if (oldRepeatable.length !== newRepeatable.length) {
-                    merge.push(...newRepeatable.slice(oldRepeatable.length, newRepeatable.length));
+                    missing.concat(newRepeatable.slice(oldRepeatable.length, newRepeatable.length));
                 }
 
-                achievementsToMerge.push(...merge.map(achievement => {
-                    return {
+                for (const achievement of missing) {
+                    achievementsToMerge.push({
                         commitType: ACHIEVEMENT_COMMIT_ADD,
                         achievement
-                    };
-                }));
+                    });
+                }
             }
         } else {
-            achievementsToMerge.push(...newAchievementsRaw.map(achievement => {
-                return {
+            for (const achievement of newAchievementsRaw) {
+                achievementsToMerge.push({
                     commitType: ACHIEVEMENT_COMMIT_ADD,
                     achievement
-                };
-            }));
+                });
+            }
         }
 
-        const achievementsToMergeMap = achievementsToMerge.map(function (commit) {
+        for (const commit of achievementsToMerge) {
             commit.achievement.id = subjectId;
-            return commit;
-        });
-
-        achievementsToCommit.push(...achievementsToMergeMap);
+            achievementsToCommit.push(commit);
+        }
     }
 
     return achievementsToCommit;
 }
 
 function mapAchievements (achievements) {
-    const unique = {};
-    const repeatable = {};
+    const unique = new Map;
+    const repeatable = new Map();
 
     for (const achievement of achievements) {
         if (achievement.period) {
-            repeatable[achievement.type] = repeatable[achievement.type] || [];
-            repeatable[achievement.type].push(achievement);
+            if (!repeatable.has(achievement.type)) {
+                repeatable.set(achievement.type, []);
+            }
+
+            repeatable.get(achievement.type).push(achievement);
         } else {
-            unique[achievement.type] = achievement;
+            unique.set(achievement.type, achievement);
         }
     }
 
