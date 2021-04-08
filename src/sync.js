@@ -75,7 +75,7 @@ async function init () {
 
     if (!worlds.length) {
         await syncWorldList();
-        syncAll(syncTypes.DATA);
+        syncAllWorlds(syncTypes.DATA);
     }
 
     if (process.env.NODE_ENV !== 'development') {
@@ -87,7 +87,7 @@ async function init () {
 async function trigger (msg) {
     switch (msg.command) {
         case syncCommands.DATA_ALL: {
-            syncAll(syncTypes.DATA);
+            syncAllWorlds(syncTypes.DATA);
             break;
         }
         case syncCommands.DATA: {
@@ -98,7 +98,7 @@ async function trigger (msg) {
             break;
         }
         case syncCommands.ACHIEVEMENTS_ALL: {
-            syncAll(syncTypes.ACHIEVEMENTS);
+            syncAllWorlds(syncTypes.ACHIEVEMENTS);
             break;
         }
         case syncCommands.ACHIEVEMENTS: {
@@ -302,7 +302,7 @@ async function syncWorld (type, marketId, worldNumber) {
         .catch(finish);
 }
 
-async function syncAll (type, flag) {
+async function syncAllWorlds (type, flag) {
     const syncQueue = await db.map(sql('get-sync-queue-non-active'), [], ({market_id, world_number}) => market_id + world_number);
     const worlds = await db.map(sql('get-sync-enabled-worlds'), [], function (world) {
         return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
@@ -542,59 +542,6 @@ async function authMarketAccount (marketId, attempt = 1) {
             throw new Error(error.message);
         }
     }
-}
-
-async function initTasks () {
-    debug.tasks('initializing task system');
-
-    const taskHandlers = new Map();
-    const intervalKeys = Object.keys(config('sync_intervals'));
-    const presentTasks = await db.any(sql('get-tasks'));
-    const interval = humanInterval(config('sync', 'task_check_interval'));
-
-    for (const {id} of presentTasks) {
-        if (!intervalKeys.includes(id)) {
-            debug.tasks('task:%s add missing db entry', id);
-            db.query(sql('add-task-if-missing'), {id});
-        }
-    }
-
-    taskHandlers.set('data_all', syncAllData);
-    taskHandlers.set('achievements_all', syncAllAchievements);
-    taskHandlers.set('worlds', syncMarketsAndWorlds);
-    taskHandlers.set('clean_shares', cleanStaticMapShares);
-
-    debug.tasks('start task checker (interval: %s)', config('sync', 'task_check_interval'));
-
-    const intervalEntries = Object.entries(config('sync_intervals'));
-    const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
-    const mappedIntervals = new Map(parsedIntervals);
-
-    async function checkTasks () {
-        debug.tasks('checking tasks...');
-
-        const lastRunEntries = await db.map(sql('get-tasks'), [], ({id, last_run}) => [id, last_run]);
-        const mappedLastRuns = new Map(lastRunEntries);
-
-        for (const [id, handler] of taskHandlers.entries()) {
-            const interval = mappedIntervals.get(id);
-            const lastRun = mappedLastRuns.get(id);
-
-            if (lastRun) {
-                const elapsedTime = (Date.now() + (lastRun.getTimezoneOffset() * 1000 * 60)) - lastRun.getTime();
-
-                if (elapsedTime < interval) {
-                    continue;
-                }
-            }
-
-            debug.tasks('task:%s running', id);
-            handler();
-            db.query(sql('update-task-last-run'), {id});
-        }
-    }
-
-    setInterval(checkTasks, interval);
 }
 
 async function toggleWorld (marketId, worldNumber) {
@@ -1119,6 +1066,266 @@ async function commitRawAchievementsFilesystem (achievements, worldId) {
     await fs.promises.writeFile(path.join(location, `${worldId}-achievements.json`), JSON.stringify(achievements));
 }
 
+async function fetchWorldMapStructure (page, worldId, urlId) {
+    debug.sync('world:%s fetch map structure', worldId);
+
+    const structPath = await page.evaluate(function () {
+        const cdn = require('cdn');
+        const conf = require('conf/conf');
+        return cdn.getPath(conf.getMapPath());
+    });
+
+    const buffer = await utils.getBuffer(`https://${urlId}.tribalwars2.com/${structPath}`);
+    const gzipped = zlib.gzipSync(buffer);
+
+    await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true});
+    await fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped);
+}
+
+async function fetchWorldConfig (page, worldId) {
+    try {
+        debug.sync('world:%s fetch config', worldId);
+
+        const worldConfig = await page.evaluate(function () {
+            const modelDataService = injector.get('modelDataService');
+            const worldConfig = modelDataService.getWorldConfig().data;
+            const filteredConfig = {};
+
+            const selecteConfig = [
+                'speed',
+                'victory_points',
+                'barbarian_point_limit',
+                'barbarian_spawn_rate',
+                'barbarize_inactive_percent',
+                'bathhouse',
+                'chapel_bonus',
+                'church',
+                'farm_rule',
+                'instant_recruit',
+                'language_selection',
+                'loyalty_after_conquer',
+                'mass_buildings',
+                'mass_recruiting',
+                'noob_protection_days',
+                'relocate_units',
+                'resource_deposits',
+                'second_village',
+                'tribe_member_limit',
+                'tribe_skills'
+            ];
+
+            for (const key of selecteConfig) {
+                filteredConfig[key] = worldConfig[key];
+            }
+
+            return filteredConfig;
+        });
+
+        await db.none(sql('update-world-config'), {
+            worldId,
+            worldConfig
+        });
+    } catch (error) {
+        debug.sync('world:%s error fetching config (%s)', worldId, error.message);
+    }
+}
+
+async function fetchMarketTimeOffset (page, marketId) {
+    try {
+        debug.sync('world:%s fetch timezone', marketId);
+
+        const timeOffset = await page.evaluate(function () {
+            return require('helper/time').getGameTimeOffset();
+        });
+
+        await db.none(sql('update-market-time-offset'), {
+            marketId,
+            timeOffset
+        });
+    } catch (error) {
+        debug.sync('market:%s error fetching timezone (%s)', marketId, error.message);
+    }
+}
+
+// history
+
+async function initHistoryQueue () {
+    const markets = await db.any(sql('get-markets'));
+
+    for (const market of markets) {
+        queueMarketHistory(market.id);
+    }
+}
+
+async function queueMarketHistory (marketId) {
+    const market = await db.one(sql('get-market'), {marketId});
+    const untilMidnight = getTimeUntilMidnight(market.time_offset);
+
+    debug.history('market:%s history process starts in %i minutes', marketId, untilMidnight / 1000 / 60);
+
+    setTimeout(function () {
+        historyQueue.add(async function () {
+            const marketWorlds = await db.any(sql('get-market-worlds'), {marketId});
+            const openWorlds = marketWorlds.filter(world => world.open);
+
+            for (const world of openWorlds) {
+                await processWorldHistory(world.world_id);
+            }
+
+            await queueMarketHistory(marketId);
+        });
+    }, untilMidnight);
+}
+
+async function processWorldHistory (worldId) {
+    const historyLimit = config('sync', 'maximum_history_days');
+
+    await db.task(async function (db) {
+        debug.history('world:%s processing history', worldId);
+
+        const players = await db.any(sql('get-world-data'), {worldId, table: 'players', sort: 'id'});
+        const tribes = await db.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'id'});
+
+        for (const player of players) {
+            if (player.archived) {
+                continue;
+            }
+
+            const history = await db.any(sql('get-player-history'), {worldId, playerId: player.id, limit: historyLimit + 100});
+
+            if (history.length >= historyLimit) {
+                let exceeding = history.length - historyLimit + 1;
+
+                while (exceeding--) {
+                    const {id} = history.pop();
+                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'players', id});
+                }
+            }
+
+            await db.query(sql('add-player-history-item'), {
+                worldId,
+                id: player.id,
+                tribe_id: player.tribe_id,
+                points: player.points,
+                villages: player.villages,
+                rank: player.rank,
+                victory_points: player.victory_points || null,
+                bash_points_off: player.bash_points_off,
+                bash_points_def: player.bash_points_def,
+                bash_points_total: player.bash_points_total
+            });
+        }
+
+        for (const tribe of tribes) {
+            if (tribe.archived) {
+                continue;
+            }
+
+            const history = await db.any(sql('get-tribe-history'), {worldId, tribeId: tribe.id, limit: historyLimit + 100});
+
+            if (history.length >= historyLimit) {
+                let exceeding = history.length - historyLimit + 1;
+
+                while (exceeding--) {
+                    const {id} = history.pop();
+                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'tribes', id});
+                }
+            }
+
+            await db.query(sql('add-tribe-history-item'), {
+                worldId,
+                id: tribe.id,
+                members: tribe.members,
+                points: tribe.points,
+                villages: tribe.villages,
+                rank: tribe.rank,
+                victory_points: tribe.victory_points || null,
+                bash_points_off: tribe.bash_points_off,
+                bash_points_def: tribe.bash_points_def,
+                bash_points_total: tribe.bash_points_total
+            });
+        }
+    });
+}
+
+// tasks
+
+async function initTasks () {
+    debug.tasks('initializing task system');
+
+    const taskHandlers = new Map();
+    const intervalKeys = Object.keys(config('sync_intervals'));
+    const presentTasks = await db.any(sql('get-tasks'));
+    const interval = humanInterval(config('sync', 'task_check_interval'));
+
+    for (const {id} of presentTasks) {
+        if (!intervalKeys.includes(id)) {
+            debug.tasks('task:%s add missing db entry', id);
+            db.query(sql('add-task-if-missing'), {id});
+        }
+    }
+
+    taskHandlers.set('data_all', function () {
+        syncAllWorlds(syncTypes.DATA);
+    });
+
+    taskHandlers.set('achievements_all', function () {
+        syncAllWorlds(syncTypes.ACHIEVEMENTS);
+    });
+
+    taskHandlers.set('worlds', async function () {
+        await syncMarketList();
+        await syncWorldList();
+    });
+
+    taskHandlers.set('clean_shares', async function () {
+        const now = Date.now();
+        const shares = await db.any(sql('maps/get-share-last-access'));
+        const expireTime = humanInterval(config('sync', 'static_share_expire_time'));
+
+        for (const {share_id, last_access} of shares) {
+            if (now - last_access.getTime() < expireTime) {
+                await db.query(sql('maps/delete-static-share'), [share_id]);
+                // TODO: delete data as well
+            }
+        }
+    });
+
+    debug.tasks('start task checker (interval: %s)', config('sync', 'task_check_interval'));
+
+    const intervalEntries = Object.entries(config('sync_intervals'));
+    const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
+    const mappedIntervals = new Map(parsedIntervals);
+
+    async function checkTasks () {
+        debug.tasks('checking tasks...');
+
+        const lastRunEntries = await db.map(sql('get-tasks'), [], ({id, last_run}) => [id, last_run]);
+        const mappedLastRuns = new Map(lastRunEntries);
+
+        for (const [id, handler] of taskHandlers.entries()) {
+            const interval = mappedIntervals.get(id);
+            const lastRun = mappedLastRuns.get(id);
+
+            if (lastRun) {
+                const elapsedTime = (Date.now() + (lastRun.getTimezoneOffset() * 1000 * 60)) - lastRun.getTime();
+
+                if (elapsedTime < interval) {
+                    continue;
+                }
+            }
+
+            debug.tasks('task:%s running', id);
+            handler();
+            db.query(sql('update-task-last-run'), {id});
+        }
+    }
+
+    setInterval(checkTasks, interval);
+}
+
+// helpers
+
 async function createPuppeteerPage () {
     if (!browser) {
         browser = new Promise(function (resolve) {
@@ -1250,191 +1457,11 @@ function mapAchievements (achievements) {
     return {unique, repeatable};
 }
 
-async function fetchWorldMapStructure (page, worldId, urlId) {
-    debug.sync('world:%s fetch map structure', worldId);
-
-    const structPath = await page.evaluate(function () {
-        const cdn = require('cdn');
-        const conf = require('conf/conf');
-        return cdn.getPath(conf.getMapPath());
-    });
-
-    const buffer = await utils.getBuffer(`https://${urlId}.tribalwars2.com/${structPath}`);
-    const gzipped = zlib.gzipSync(buffer);
-
-    await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true});
-    await fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped);
-}
-
-async function fetchWorldConfig (page, worldId) {
-    try {
-        debug.sync('world:%s fetch config', worldId);
-
-        const worldConfig = await page.evaluate(function () {
-            const modelDataService = injector.get('modelDataService');
-            const worldConfig = modelDataService.getWorldConfig().data;
-            const filteredConfig = {};
-
-            const selecteConfig = [
-                'speed',
-                'victory_points',
-                'barbarian_point_limit',
-                'barbarian_spawn_rate',
-                'barbarize_inactive_percent',
-                'bathhouse',
-                'chapel_bonus',
-                'church',
-                'farm_rule',
-                'instant_recruit',
-                'language_selection',
-                'loyalty_after_conquer',
-                'mass_buildings',
-                'mass_recruiting',
-                'noob_protection_days',
-                'relocate_units',
-                'resource_deposits',
-                'second_village',
-                'tribe_member_limit',
-                'tribe_skills'
-            ];
-
-            for (const key of selecteConfig) {
-                filteredConfig[key] = worldConfig[key];
-            }
-
-            return filteredConfig;
-        });
-
-        await db.none(sql('update-world-config'), {
-            worldId,
-            worldConfig
-        });
-    } catch (error) {
-        debug.sync('world:%s error fetching config (%s)', worldId, error.message);
-    }
-}
-
-async function fetchMarketTimeOffset (page, marketId) {
-    try {
-        debug.sync('world:%s fetch timezone', marketId);
-
-        const timeOffset = await page.evaluate(function () {
-            return require('helper/time').getGameTimeOffset();
-        });
-
-        await db.none(sql('update-market-time-offset'), {
-            marketId,
-            timeOffset
-        });
-    } catch (error) {
-        debug.sync('market:%s error fetching timezone (%s)', marketId, error.message);
-    }
-}
-
-async function initHistoryQueue () {
-    const markets = await db.any(sql('get-markets'));
-
-    for (const market of markets) {
-        queueMarketHistory(market.id);
-    }
-}
-
-async function queueMarketHistory (marketId) {
-    const market = await db.one(sql('get-market'), {marketId});
-    const untilMidnight = getTimeUntilMidnight(market.time_offset);
-
-    debug.history('market:%s history process starts in %i minutes', marketId, untilMidnight / 1000 / 60);
-
-    setTimeout(function () {
-        historyQueue.add(async function () {
-            const marketWorlds = await db.any(sql('get-market-worlds'), {marketId});
-            const openWorlds = marketWorlds.filter(world => world.open);
-
-            for (const world of openWorlds) {
-                await processWorldHistory(world.world_id);
-            }
-
-            await queueMarketHistory(marketId);
-        });
-    }, untilMidnight);
-}
-
 function getTimeUntilMidnight (timeOffset) {
     const now = utils.UTC() + timeOffset;
     const then = new Date(now);
     then.setHours(24, 0, 0, 0);
     return then - now;
-}
-
-async function processWorldHistory (worldId) {
-    const historyLimit = config('sync', 'maximum_history_days');
-
-    await db.task(async function (db) {
-        debug.history('world:%s processing history', worldId);
-
-        const players = await db.any(sql('get-world-data'), {worldId, table: 'players', sort: 'id'});
-        const tribes = await db.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'id'});
-
-        for (const player of players) {
-            if (player.archived) {
-                continue;
-            }
-
-            const history = await db.any(sql('get-player-history'), {worldId, playerId: player.id, limit: historyLimit + 100});
-
-            if (history.length >= historyLimit) {
-                let exceeding = history.length - historyLimit + 1;
-
-                while (exceeding--) {
-                    const {id} = history.pop();
-                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'players', id});
-                }
-            }
-
-            await db.query(sql('add-player-history-item'), {
-                worldId,
-                id: player.id,
-                tribe_id: player.tribe_id,
-                points: player.points,
-                villages: player.villages,
-                rank: player.rank,
-                victory_points: player.victory_points || null,
-                bash_points_off: player.bash_points_off,
-                bash_points_def: player.bash_points_def,
-                bash_points_total: player.bash_points_total
-            });
-        }
-
-        for (const tribe of tribes) {
-            if (tribe.archived) {
-                continue;
-            }
-
-            const history = await db.any(sql('get-tribe-history'), {worldId, tribeId: tribe.id, limit: historyLimit + 100});
-
-            if (history.length >= historyLimit) {
-                let exceeding = history.length - historyLimit + 1;
-
-                while (exceeding--) {
-                    const {id} = history.pop();
-                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'tribes', id});
-                }
-            }
-
-            await db.query(sql('add-tribe-history-item'), {
-                worldId,
-                id: tribe.id,
-                members: tribe.members,
-                points: tribe.points,
-                villages: tribe.villages,
-                rank: tribe.rank,
-                victory_points: tribe.victory_points || null,
-                bash_points_off: tribe.bash_points_off,
-                bash_points_def: tribe.bash_points_def,
-                bash_points_total: tribe.bash_points_total
-            });
-        }
-    });
 }
 
 function GenericQueue (parallel = 1) {
@@ -1472,32 +1499,6 @@ function GenericQueue (parallel = 1) {
             process();
         }
     };
-}
-
-function syncAllData () {
-    syncAll(syncTypes.DATA);
-}
-
-function syncAllAchievements () {
-    syncAll(syncTypes.ACHIEVEMENTS);
-}
-
-async function syncMarketsAndWorlds () {
-    await syncMarketList();
-    await syncWorldList();
-}
-
-async function cleanStaticMapShares () {
-    const now = Date.now();
-    const shares = await db.any(sql('maps/get-share-last-access'));
-    const expireTime = humanInterval(config('sync', 'static_share_expire_time'));
-
-    for (const {share_id, last_access} of shares) {
-        if (now - last_access.getTime() < expireTime) {
-            await db.query(sql('maps/delete-static-share'), [share_id]);
-            // TODO: delete data as well
-        }
-    }
 }
 
 module.exports = {
