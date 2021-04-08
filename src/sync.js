@@ -23,53 +23,39 @@ const ACHIEVEMENT_COMMIT_ADD = 'achievement_commit_add';
 const ACHIEVEMENT_COMMIT_UPDATE = 'achievement_commit_update';
 
 const auths = {};
-const Sync = {};
 
-const historyQueue = new GenericSyncQueue();
+const parallelData = config('sync', 'parallel_data_sync');
+const parallelAchievements = config('sync', 'parallel_achievements_sync');
+
+const historyQueue = new GenericQueue();
+const dataQueue = new GenericQueue(parallelData);
+const achievementsQueue = new GenericQueue(parallelAchievements);
 
 let browser = null;
 
-const running = {
-    data: new Set(),
-    achievements: new Set()
-};
-
-const queue = {
-    data: [],
-    achievements: []
-};
-const processingQueue = {
-    data: false,
-    achievements: false
-};
 const syncTypes = {
     DATA: 'data',
     ACHIEVEMENTS: 'achievements'
 };
-const queueEvents = {
-    [syncTypes.DATA]: {
-        START_QUEUE: 'sync_queue_data_start',
-        ITEM_FINISH: syncEvents.DATA_FINISH
-    },
-    [syncTypes.ACHIEVEMENTS]: {
-        START_QUEUE: 'sync_queue_achievements_start',
-        ITEM_FINISH: syncEvents.ACHIEVEMENTS_FINISH
-    }
-};
+
 const syncTypeMapping = {
     [syncTypes.DATA]: {
+        queue: dataQueue,
+        activeWorlds: new Set(),
         MAX_RUNNING_TIME_CONFIG: 'max_sync_data_running_time',
         FINISH_EVENT: syncEvents.DATA_FINISH,
         UPDATE_LAST_SYNC_QUERY: sql('update-data-sync')
     },
     [syncTypes.ACHIEVEMENTS]: {
+        queue: achievementsQueue,
+        activeWorlds: new Set(),
         MAX_RUNNING_TIME_CONFIG: 'max_sync_achievements_running_time',
         FINISH_EVENT: syncEvents.ACHIEVEMENTS_FINISH,
         UPDATE_LAST_SYNC_QUERY: sql('update-achievements-sync')
     }
 };
 
-Sync.init = async function () {
+async function init () {
     debug.sync('initializing sync system');
 
     process.on('SIGTERM', async function () {
@@ -82,133 +68,99 @@ Sync.init = async function () {
     if (appState.first_run) {
         debug.sync('first run detected');
 
-        await Sync.markets();
-        await Sync.worlds();
+        await syncMarketList();
+        await syncWorldList();
 
         await db.query(sql('update-program-state'), {
             column: 'first_run',
             value: false
         });
 
-        Sync.all(syncTypes.DATA);
+        syncAll(syncTypes.DATA);
     }
 
     if (process.env.NODE_ENV !== 'development') {
-        const tasks = await Sync.tasks();
-        tasks.add('data_all', syncAllData);
-        tasks.add('achievements_all', syncAllAchievements);
-        tasks.add('worlds', syncMarketsAndWorlds);
-        tasks.add('clean_shares', cleanStaticMapShares);
-        tasks.watch();
-
-        initHistoryProcessing();
+        await initTasks();
+        await initHistoryQueue();
     }
 
-    await Sync.initQueue(syncTypes.DATA);
-    await Sync.initQueue(syncTypes.ACHIEVEMENTS);
-};
+    await initSyncQueue(syncTypes.DATA);
+    await initSyncQueue(syncTypes.ACHIEVEMENTS);
+}
 
-Sync.initQueue = async function (type) {
-    debug.queue('initializing sync queue:%s', type);
-
-    async function processQueue () {
-        if (processingQueue[type]) {
-            return false;
-        }
-
-        debug.queue('queue:%s starting', type);
-        processingQueue[type] = true;
-
-        while (queue[type].length) {
-            if (running[type].size < config('sync', 'parallel_data_sync')) {
-                const data = queue[type].shift();
-
-                Sync.sync(type, data.market_id, data.world_number).then(function () {
-                    db.none(sql('remove-sync-queue'), {id: data.id});
-                });
-
-                await db.none(sql('set-queue-item-active'), {
-                    id: data.id,
-                    active: true
-                });
-            } else {
-                await Events.on(queueEvents[type].ITEM_FINISH);
-            }
-        }
-
-        debug.queue('queue:%s finished', type);
-        processingQueue[type] = false;
-    }
-
-    Events.on(queueEvents[type].START_QUEUE, processQueue);
-
-    await db.none(sql('reset-queue-items'));
-    queue[type].push(...await db.any(sql('get-sync-queue-type'), {type}));
-
-    if (queue[type].length) {
-        processQueue();
-    }
-};
-
-Sync.addQueue = async function (type, worlds) {
-    debug.queue('add queue of type %s, worlds %s', type, worlds.map(({market_id, world_number}) => market_id + world_number).join(','));
-
-    if (!Array.isArray(worlds)) {
-        throw new Error('Sync addQueue: argument "worlds" is not of type "array"');
-    }
-
-    await db.tx(async function () {
-        for (const {market_id, world_number} of worlds) {
-            const data = await this.one(sql('add-sync-queue'), {type, market_id, world_number});
-            queue[type].push(data);
-        }
-    });
-
-    if (!processingQueue[type]) {
-        Events.trigger(queueEvents[type].START_QUEUE);
-    }
-};
-
-Sync.trigger = function (msg) {
+async function trigger (msg) {
     switch (msg.command) {
         case syncCommands.DATA_ALL: {
-            Sync.all(syncTypes.DATA);
+            syncAll(syncTypes.DATA);
             break;
         }
         case syncCommands.DATA: {
-            Sync.addQueue(syncTypes.DATA, [{
+            addSyncQueue(syncTypes.DATA, [{
                 market_id: msg.marketId,
                 world_number: msg.worldNumber
             }]);
             break;
         }
         case syncCommands.ACHIEVEMENTS_ALL: {
-            Sync.all(syncTypes.ACHIEVEMENTS);
+            syncAll(syncTypes.ACHIEVEMENTS);
             break;
         }
         case syncCommands.ACHIEVEMENTS: {
-            Sync.addQueue(syncTypes.ACHIEVEMENTS, [{
+            addSyncQueue(syncTypes.ACHIEVEMENTS, [{
                 market_id: msg.marketId,
                 world_number: msg.worldNumber
             }]);
             break;
         }
         case syncCommands.MARKETS: {
-            Sync.markets();
+            syncMarketList();
             break;
         }
         case syncCommands.WORLDS: {
-            Sync.worlds();
+            syncWorldList();
             break;
         }
         case syncCommands.TOGGLE: {
-            Sync.toggle(msg.marketId, msg.worldNumber);
+            toggleWorld(msg.marketId, msg.worldNumber);
             break;
         }
     }
-};
+}
 
-Sync.sync = function (type, marketId, worldNumber) {
+async function initSyncQueue (type) {
+    debug.queue('initializing sync queue:%s', type);
+
+    await db.none(sql('reset-queue-items'));
+    const queue = await db.any(sql('get-sync-queue-type'), {type});
+    addSyncQueue(type, queue, true);
+}
+
+async function addSyncQueue (type, queue, restore = false) {
+    if (!Array.isArray(queue)) {
+        throw new Error('addSyncQueue: argument "queue" is not of type "array"');
+    }
+
+    for (const item of queue) {
+        const market_id = item.market_id;
+        const world_number = item.world_number;
+        let id = item.id;
+
+        debug.queue('add world:%s%s type:%s', market_id, world_number, type);
+
+        if (!restore) {
+            const stored = await db.one(sql('add-sync-queue'), {type, market_id, world_number});
+            id = stored.id;
+        }
+
+        syncTypeMapping[type].queue.add(async function () {
+            await db.none(sql('set-queue-item-active'), {id, active: true});
+            await syncWorld(type, market_id, world_number);
+            await db.none(sql('remove-sync-queue'), {id});
+        });
+    }
+}
+
+async function syncWorld (type, marketId, worldNumber) {
     const mapping = syncTypeMapping[type];
     const worldId = marketId + worldNumber;
     const urlId = marketId === 'zz' ? 'beta' : marketId;
@@ -217,11 +169,11 @@ Sync.sync = function (type, marketId, worldNumber) {
     let page = false;
 
     const promise = new Promise(async function (resolve, reject) {
-        if (running[type].has(worldId)) {
+        if (syncTypeMapping[type].activeWorlds.has(worldId)) {
             return reject(syncStatus.IN_PROGRESS);
         }
 
-        running[type].add(worldId);
+        syncTypeMapping[type].activeWorlds.add(worldId);
 
         const market = await db.one(sql('get-market'), {marketId});
         const world = await getWorld(worldId);
@@ -238,7 +190,7 @@ Sync.sync = function (type, marketId, worldNumber) {
         debug.sync('world:%s start %s sync', worldId, type);
 
         await utils.timeout(async function () {
-            const account = await Sync.auth(marketId);
+            const account = await authMarketAccount(marketId);
 
             if (!account) {
                 return reject(syncStatus.ALL_ACCOUNTS_FAILED);
@@ -247,7 +199,7 @@ Sync.sync = function (type, marketId, worldNumber) {
             const character = account.characters.find(({world_id}) => world_id === worldId);
 
             if (!character) {
-                await Sync.character(marketId, worldNumber);
+                await createCharacter(marketId, worldNumber);
             } else if (!character.allow_login) {
                 return reject(syncStatus.WORLD_CLOSED);
             }
@@ -309,7 +261,7 @@ Sync.sync = function (type, marketId, worldNumber) {
 
     const finish = async function (status) {
         Events.trigger(mapping.FINISH_EVENT, [worldId, status]);
-        running[type].delete(worldId);
+        syncTypeMapping[type].activeWorlds.delete(worldId);
         db.none(mapping.UPDATE_LAST_SYNC_QUERY, {status, worldId});
 
         switch (status) {
@@ -352,19 +304,19 @@ Sync.sync = function (type, marketId, worldNumber) {
     return promise
         .then(finish)
         .catch(finish);
-};
+}
 
-Sync.all = async function (type, flag) {
+async function syncAll (type, flag) {
     const syncQueue = await db.map(sql('get-sync-queue-non-active'), [], ({market_id, world_number}) => market_id + world_number);
     const worlds = await db.map(sql('get-sync-enabled-worlds'), [], function (world) {
         return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
     });
     const uniqueWorlds = worlds.filter(world => world !== false);
 
-    Sync.addQueue(type, uniqueWorlds);
-};
+    addSyncQueue(type, uniqueWorlds);
+}
 
-Sync.worlds = async function () {
+async function syncWorldList () {
     debug.worlds('start world list sync');
 
     const markets = await db.any(sql('get-markets'));
@@ -375,7 +327,7 @@ Sync.worlds = async function () {
         debug.worlds('market:%s check missing worlds', marketId);
 
         try {
-            const account = await Sync.auth(marketId);
+            const account = await authMarketAccount(marketId);
 
             if (!account) {
                 continue;
@@ -404,7 +356,7 @@ Sync.worlds = async function () {
                 const worldId = marketId + worldNumber;
 
                 if (!registered) {
-                    await Sync.character(marketId, worldNumber);
+                    await createCharacter(marketId, worldNumber);
                 }
 
                 if (!await utils.worldEntryExists(worldId)) {
@@ -423,9 +375,9 @@ Sync.worlds = async function () {
             debug.worlds('market:%s failed to sync worlds (%s)', marketId, error.message);
         }
     }
-};
+}
 
-Sync.markets = async function () {
+async function syncMarketList () {
     debug.sync('start market list sync');
 
     const storedMarkets = await db.map(sql('get-markets'), [], market => market.id);
@@ -444,9 +396,9 @@ Sync.markets = async function () {
     }
 
     return missingMarkets;
-};
+}
 
-Sync.character = async function (marketId, worldNumber) {
+async function createCharacter (marketId, worldNumber) {
     const worldId = marketId + worldNumber;
 
     debug.sync('world:%s create character', worldId);
@@ -476,9 +428,9 @@ Sync.character = async function (marketId, worldNumber) {
     } else {
         debug.sync('world:%s failed to create character %o', worldId, response);
     }
-};
+}
 
-Sync.auth = async function (marketId, attempt = 1) {
+async function authMarketAccount (marketId, attempt = 1) {
     if (auths[marketId]) {
         return await auths[marketId];
     }
@@ -588,15 +540,15 @@ Sync.auth = async function (marketId, attempt = 1) {
 
         if (attempt < config('sync', 'max_login_attempts')) {
             debug.auth('market:%s authentication failed (%s)', marketId, error.message);
-            return await Sync.auth(marketId, attempt + 1);
+            return await authMarketAccount(marketId, attempt + 1);
         } else {
             debug.auth('market:%s authentication failed (maximum attempts reached)');
             throw new Error(error.message);
         }
     }
-};
+}
 
-Sync.tasks = async function () {
+async function initTasks () {
     debug.tasks('initializing task system');
 
     const taskHandlers = new Map();
@@ -611,45 +563,45 @@ Sync.tasks = async function () {
         }
     }
 
-    return {
-        add: function (id, handler) {
-            taskHandlers.set(id, handler);
-        },
-        watch: function () {
-            debug.tasks('start task checker (interval: %s)', config('sync', 'task_check_interval'));
+    taskHandlers.set('data_all', syncAllData);
+    taskHandlers.set('achievements_all', syncAllAchievements);
+    taskHandlers.set('worlds', syncMarketsAndWorlds);
+    taskHandlers.set('clean_shares', cleanStaticMapShares);
 
-            const intervalEntries = Object.entries(config('sync_intervals'));
-            const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
-            const mappedIntervals = new Map(parsedIntervals);
+    debug.tasks('start task checker (interval: %s)', config('sync', 'task_check_interval'));
 
-            setInterval(async function () {
-                debug.tasks('checking tasks...');
+    const intervalEntries = Object.entries(config('sync_intervals'));
+    const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
+    const mappedIntervals = new Map(parsedIntervals);
 
-                const lastRunEntries = await db.map(sql('get-tasks'), [], ({id, last_run}) => [id, last_run]);
-                const mappedLastRuns = new Map(lastRunEntries);
+    async function checkTasks () {
+        debug.tasks('checking tasks...');
 
-                for (const [id, handler] of taskHandlers.entries()) {
-                    const interval = mappedIntervals.get(id);
-                    const lastRun = mappedLastRuns.get(id);
+        const lastRunEntries = await db.map(sql('get-tasks'), [], ({id, last_run}) => [id, last_run]);
+        const mappedLastRuns = new Map(lastRunEntries);
 
-                    if (lastRun) {
-                        const elapsedTime = (Date.now() + (lastRun.getTimezoneOffset() * 1000 * 60)) - lastRun.getTime();
+        for (const [id, handler] of taskHandlers.entries()) {
+            const interval = mappedIntervals.get(id);
+            const lastRun = mappedLastRuns.get(id);
 
-                        if (elapsedTime < interval) {
-                            continue;
-                        }
-                    }
+            if (lastRun) {
+                const elapsedTime = (Date.now() + (lastRun.getTimezoneOffset() * 1000 * 60)) - lastRun.getTime();
 
-                    debug.tasks('task:%s running', id);
-                    handler();
-                    db.query(sql('update-task-last-run'), {id});
+                if (elapsedTime < interval) {
+                    continue;
                 }
-            }, interval);
-        }
-    };
-};
+            }
 
-Sync.toggle = async function (marketId, worldNumber) {
+            debug.tasks('task:%s running', id);
+            handler();
+            db.query(sql('update-task-last-run'), {id});
+        }
+    }
+
+    setInterval(checkTasks, interval);
+}
+
+async function toggleWorld (marketId, worldNumber) {
     const worldId = marketId + worldNumber;
     const world = await getWorld(worldId);
     const enabled = !world.sync_enabled;
@@ -663,9 +615,9 @@ Sync.toggle = async function (marketId, worldNumber) {
     Events.trigger(syncEvents.TOGGLE_WORLD, [marketId, worldNumber, enabled]);
 
     return true;
-};
+}
 
-Sync.createAccounts = async function (name, pass, mail) {
+async function createAccounts (name, pass, mail) {
     const markets = await db.any(sql('get-markets'));
 
     for (const market of markets) {
@@ -718,7 +670,7 @@ Sync.createAccounts = async function (name, pass, mail) {
             debug.sync('market:%s fail creating account "%s"', market.id, name);
         }
     }
-};
+}
 
 async function commitDataDatabase (data, worldId) {
     debug.db('world:%s commit db data', worldId);
@@ -1385,7 +1337,15 @@ async function fetchMarketTimeOffset (page, marketId) {
     }
 }
 
-async function setupHistoryProcessing (marketId) {
+async function initHistoryQueue () {
+    const markets = await db.any(sql('get-markets'));
+
+    for (const market of markets) {
+        queueMarketHistory(market.id);
+    }
+}
+
+async function queueMarketHistory (marketId) {
     const market = await db.one(sql('get-market'), {marketId});
     const untilMidnight = getTimeUntilMidnight(market.time_offset);
 
@@ -1400,17 +1360,9 @@ async function setupHistoryProcessing (marketId) {
                 await processWorldHistory(world.world_id);
             }
 
-            await setupHistoryProcessing(marketId);
+            await queueMarketHistory(marketId);
         });
     }, untilMidnight);
-}
-
-async function initHistoryProcessing () {
-    const markets = await db.any(sql('get-markets'));
-
-    for (const market of markets) {
-        setupHistoryProcessing(market.id);
-    }
 }
 
 function getTimeUntilMidnight (timeOffset) {
@@ -1491,21 +1443,30 @@ async function processWorldHistory (worldId) {
     });
 }
 
-function GenericSyncQueue () {
+function GenericQueue (parallel = 1) {
     const queue = [];
     let processing = false;
-    let onFinish = async function () {};
-    let onStart = async function () {};
+    let running = 0;
 
     async function process () {
         processing = true;
-        await onStart();
-        while (queue.length) {
-            const handler = queue.shift();
-            await handler();
+
+        const handler = queue.shift();
+        if (handler) {
+            if (++running >= parallel) {
+                await handler();
+                running--;
+                process();
+            } else {
+                handler().then(function () {
+                    running--;
+                    process();
+                });
+                process();
+            }
+        } else {
+            processing = false;
         }
-        processing = false;
-        await onFinish();
     }
 
     this.add = function (handler) {
@@ -1517,31 +1478,19 @@ function GenericSyncQueue () {
             process();
         }
     };
-
-    this.onFinish = function (handler) {
-        if (typeof handler === 'function') {
-            onFinish = handler;
-        }
-    };
-
-    this.onStart = function (handler) {
-        if (typeof handler === 'function') {
-            onStart = handler;
-        }
-    };
 }
 
 function syncAllData () {
-    Sync.all(syncTypes.DATA);
+    syncAll(syncTypes.DATA);
 }
 
 function syncAllAchievements () {
-    Sync.all(syncTypes.ACHIEVEMENTS);
+    syncAll(syncTypes.ACHIEVEMENTS);
 }
 
 async function syncMarketsAndWorlds () {
-    await Sync.markets();
-    await Sync.worlds();
+    await syncMarketList();
+    await syncWorldList();
 }
 
 async function cleanStaticMapShares () {
@@ -1557,4 +1506,7 @@ async function cleanStaticMapShares () {
     }
 }
 
-module.exports = Sync;
+module.exports = {
+    init,
+    trigger
+};
