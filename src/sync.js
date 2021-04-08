@@ -618,62 +618,54 @@ async function createAccounts (name, pass, mail) {
 async function commitDataDatabase (data, worldId) {
     debug.db('world:%s commit db data', worldId);
 
-    const [
-        entriesPlayersOld,
-        entriesTribesOld,
-        entriesVillagesOld,
-        entriesPlayerRecordsOld, 
-        entriesTribeRecordsOld
-    ] = await db.task(async db => [
-        await db.map(sql('get-active-subjects'), {worldId, type: 'players'}, subject => [subject.id, subject]),
-        await db.map(sql('get-active-subjects'), {worldId, type: 'tribes'}, subject => [subject.id, subject]),
-        await db.map(sql('get-world-villages'), {worldId}, subject => [subject.id, subject]),
-        await db.map(sql('get-subject-records'), {worldId, type: 'players'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]),
-        await db.map(sql('get-subject-records'), {worldId, type: 'tribes'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]])
-    ]);
+    db.tx(async function (tx) {
+        const entriesPlayersOld = await tx.map(sql('get-active-subjects'), {worldId, type: 'players'}, subject => [subject.id, subject]);
+        const entriesTribesOld = await tx.map(sql('get-active-subjects'), {worldId, type: 'tribes'}, subject => [subject.id, subject]);
+        const entriesVillagesOld = await tx.map(sql('get-world-villages'), {worldId}, subject => [subject.id, subject]);
+        const entriesPlayerRecordsOld = await tx.map(sql('get-subject-records'), {worldId, type: 'players'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]);
+        const entriesTribeRecordsOld = await tx.map(sql('get-subject-records'), {worldId, type: 'tribes'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]);
 
-    const playersOld = new Map(entriesPlayersOld);
-    const playersNew = new Map(data.players);
-    const tribesOld = new Map(entriesTribesOld);
-    const tribesNew = new Map(data.tribes);
-    const villagesOld = new Map(entriesVillagesOld);
-    const villagesNew = new Map(data.villages);
-    const playerRecordsOld = new Map(entriesPlayerRecordsOld);
-    const tribeRecordsOld = new Map(entriesTribeRecordsOld);
+        const playersOld = new Map(entriesPlayersOld);
+        const playersNew = new Map(data.players);
+        const tribesOld = new Map(entriesTribesOld);
+        const tribesNew = new Map(data.tribes);
+        const villagesOld = new Map(entriesVillagesOld);
+        const villagesNew = new Map(data.villages);
+        const playerRecordsOld = new Map(entriesPlayerRecordsOld);
+        const tribeRecordsOld = new Map(entriesTribeRecordsOld);
 
-    const playersOldIds = Array.from(playersOld.keys());
-    const playersNewIds = Array.from(playersNew.keys());
-    const tribesOldIds = Array.from(tribesOld.keys());
-    const tribesNewIds = Array.from(tribesNew.keys());
-    const villagesNewIds = Array.from(villagesNew.keys());
-    const villagesOldIds = Array.from(villagesOld.keys());
+        const playersOldIds = Array.from(playersOld.keys());
+        const playersNewIds = Array.from(playersNew.keys());
+        const tribesOldIds = Array.from(tribesOld.keys());
+        const tribesNewIds = Array.from(tribesNew.keys());
+        const villagesNewIds = Array.from(villagesNew.keys());
+        const villagesOldIds = Array.from(villagesOld.keys());
 
-    const missingPlayersIds = playersOldIds.filter(tribeId => !playersNewIds.includes(tribeId));
-    const missingTribesIds = tribesOldIds.filter(tribeId => !tribesNewIds.includes(tribeId));
-    const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId));
+        const missingPlayersIds = playersOldIds.filter(tribeId => !playersNewIds.includes(tribeId));
+        const missingTribesIds = tribesOldIds.filter(tribeId => !tribesNewIds.includes(tribeId));
+        const missingVillagesIds = villagesNewIds.filter(villageId => !villagesOldIds.includes(villageId));
 
-    const newPlayersIds = playersNewIds.filter(tribeId => !playersOldIds.includes(tribeId));
-    const newTribesIds = tribesNewIds.filter(tribeId => !tribesOldIds.includes(tribeId));
-    const newVillagesIds = villagesOldIds.filter(villageId => !villagesNewIds.includes(villageId));
+        const newPlayersIds = playersNewIds.filter(tribeId => !playersOldIds.includes(tribeId));
+        const newTribesIds = tribesNewIds.filter(tribeId => !tribesOldIds.includes(tribeId));
+        const newVillagesIds = villagesOldIds.filter(villageId => !villagesNewIds.includes(villageId));
 
-    await db.tx(async function (db) {
         let conquestsCount = 0;
         let tribeChangesCount = 0;
 
         async function updateSubjectsData () {
             for (const [id, subject] of data.tribes) {
                 if (tribesOld.has(id)) {
-                    await db.query(sql('update-tribe'), {worldId, id, ...subject});
+                    await tx.query(sql('update-tribe'), {worldId, id, ...subject});
                 } else {
-                    await db.query(sql('add-tribe'), {worldId, id, ...subject});
+                    await tx.query(sql('add-tribe'), {worldId, id, ...subject});
                 }
             }
 
             for (const [id, subject] of data.players) {
                 if (playersOld.has(id)) {
-                    await db.query(sql('update-player'), {worldId, id, ...subject});
+                    await tx.query(sql('update-player'), {worldId, id, ...subject});
                 } else {
-                    await db.query(sql('add-player'), {worldId, id, ...subject});
+                    await tx.query(sql('add-player'), {worldId, id, ...subject});
                 }
             }
         }
@@ -707,7 +699,7 @@ async function commitDataDatabase (data, worldId) {
                         tribeData.old_owner_tribe_tag_then = tribesNew.get(oldOwner.tribe_id).tag;
                     }
 
-                    await db.query(sql('add-conquest'), {
+                    await tx.query(sql('add-conquest'), {
                         worldId,
                         village_id,
                         newOwner: newOwnerId,
@@ -723,11 +715,11 @@ async function commitDataDatabase (data, worldId) {
 
         async function updateMissingSubjects () {
             for (const id of missingPlayersIds) {
-                await db.query(sql('archive-player'), {worldId, id});
+                await tx.query(sql('archive-player'), {worldId, id});
             }
 
             for (const id of missingTribesIds) {
-                await db.query(sql('archive-tribe'), {worldId, id});
+                await tx.query(sql('archive-tribe'), {worldId, id});
             }
         }
 
@@ -742,15 +734,15 @@ async function commitDataDatabase (data, worldId) {
                     const [bestRank, bestPoints, bestVillages] = oldRecords[type].get(id) || [];
 
                     if (!bestRank || subject.rank <= bestRank) {
-                        await db.query(sql('update-subject-record'), {worldId, type, recordType: 'rank', id, value: subject.rank});
+                        await tx.query(sql('update-subject-record'), {worldId, type, recordType: 'rank', id, value: subject.rank});
                     }
 
                     if (!bestPoints || subject.points >= bestPoints) {
-                        await db.query(sql('update-subject-record'), {worldId, type, recordType: 'points', id, value: subject.points});
+                        await tx.query(sql('update-subject-record'), {worldId, type, recordType: 'points', id, value: subject.points});
                     }
 
                     if (!bestVillages || subject.villages >= bestVillages) {
-                        await db.query(sql('update-subject-record'), {worldId, type, recordType: 'villages', id, value: subject.villages});
+                        await tx.query(sql('update-subject-record'), {worldId, type, recordType: 'villages', id, value: subject.villages});
                     }
                 }
             }
@@ -758,13 +750,13 @@ async function commitDataDatabase (data, worldId) {
 
         async function updateProvinces () {
             for (const [province_name, province_id] of data.provinces) {
-                await db.query(sql('add-province'), {worldId, province_id, province_name});
+                await tx.query(sql('add-province'), {worldId, province_id, province_name});
             }
         }
 
         async function updateVillages () {
             for (const [village_id, village] of data.villages) {
-                await db.query(sql('add-village'), {worldId, village_id, ...village});
+                await tx.query(sql('add-village'), {worldId, village_id, ...village});
             }
         }
 
@@ -779,7 +771,7 @@ async function commitDataDatabase (data, worldId) {
                     const oldTribe = tribesOld.get(oldTribeId);
                     const newTribe = tribesOld.get(newTribeId);
 
-                    await db.query(sql('add-tribe-member-change'), {
+                    await tx.query(sql('add-tribe-member-change'), {
                         worldId,
                         character_id,
                         old_tribe: oldTribeId,
@@ -795,7 +787,7 @@ async function commitDataDatabase (data, worldId) {
 
         async function updatePlayerVillages () {
             for (const [character_id, villages_id] of data.villagesByPlayer) {
-                await db.query(sql('update-player-villages'), {worldId, character_id, villages_id});
+                await tx.query(sql('update-player-villages'), {worldId, character_id, villages_id});
             }
         }
 
@@ -854,16 +846,16 @@ async function commitDataDatabase (data, worldId) {
             }
 
             for (const [id, avg] of Object.entries(players)) {
-                await db.query(sql('update-subject-avg-coords'), {worldId, type: 'players', id, avg});
+                await tx.query(sql('update-subject-avg-coords'), {worldId, type: 'players', id, avg});
             }
 
             for (const [id, avg] of Object.entries(tribes)) {
-                await db.query(sql('update-subject-avg-coords'), {worldId, type: 'tribes', id, avg});
+                await tx.query(sql('update-subject-avg-coords'), {worldId, type: 'tribes', id, avg});
             }
         }
 
         async function updateWorldStats () {
-            await db.query(sql('update-world-stats'), {
+            await tx.query(sql('update-world-stats'), {
                 worldId,
                 villages: data.villages.length,
                 players: data.players.length,
@@ -908,7 +900,7 @@ async function commitAchievementsDatabase (data, worldId) {
         }
     };
 
-    await db.tx(async function (tx) {
+    db.tx(async function (tx) {
         const log = {};
 
         for (const subjectType of ['players', 'tribes']) {
@@ -946,12 +938,12 @@ async function commitDataFilesystem (worldId) {
             villages,
             tribes,
             provinces
-        ] = await db.task(async (db) => [
-            await db.one(sql('get-world'), {worldId}),
-            await db.any(sql('get-world-data'), {worldId, table: 'players', sort: 'rank'}),
-            await db.any(sql('get-world-data'), {worldId, table: 'villages', sort: 'points'}),
-            await db.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'rank'}),
-            await db.any(sql('get-world-data'), {worldId, table: 'provinces', sort: 'id'})
+        ] = await db.task(async tx => [
+            await tx.one(sql('get-world'), {worldId}),
+            await tx.any(sql('get-world-data'), {worldId, table: 'players', sort: 'rank'}),
+            await tx.any(sql('get-world-data'), {worldId, table: 'villages', sort: 'points'}),
+            await tx.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'rank'}),
+            await tx.any(sql('get-world-data'), {worldId, table: 'provinces', sort: 'id'})
         ]);
 
         const parsedPlayers = [];
@@ -1180,29 +1172,29 @@ async function queueMarketHistory (marketId) {
 async function processWorldHistory (worldId) {
     const historyLimit = config('sync', 'maximum_history_days');
 
-    await db.task(async function (db) {
+    await db.task(async function (tx) {
         debug.history('world:%s processing history', worldId);
 
-        const players = await db.any(sql('get-world-data'), {worldId, table: 'players', sort: 'id'});
-        const tribes = await db.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'id'});
+        const players = await tx.any(sql('get-world-data'), {worldId, table: 'players', sort: 'id'});
+        const tribes = await tx.any(sql('get-world-data'), {worldId, table: 'tribes', sort: 'id'});
 
         for (const player of players) {
             if (player.archived) {
                 continue;
             }
 
-            const history = await db.any(sql('get-player-history'), {worldId, playerId: player.id, limit: historyLimit + 100});
+            const history = await tx.any(sql('get-player-history'), {worldId, playerId: player.id, limit: historyLimit + 100});
 
             if (history.length >= historyLimit) {
                 let exceeding = history.length - historyLimit + 1;
 
                 while (exceeding--) {
                     const {id} = history.pop();
-                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'players', id});
+                    await tx.query(sql('delete-subject-history-item'), {worldId, type: 'players', id});
                 }
             }
 
-            await db.query(sql('add-player-history-item'), {
+            await tx.query(sql('add-player-history-item'), {
                 worldId,
                 id: player.id,
                 tribe_id: player.tribe_id,
@@ -1221,18 +1213,18 @@ async function processWorldHistory (worldId) {
                 continue;
             }
 
-            const history = await db.any(sql('get-tribe-history'), {worldId, tribeId: tribe.id, limit: historyLimit + 100});
+            const history = await tx.any(sql('get-tribe-history'), {worldId, tribeId: tribe.id, limit: historyLimit + 100});
 
             if (history.length >= historyLimit) {
                 let exceeding = history.length - historyLimit + 1;
 
                 while (exceeding--) {
                     const {id} = history.pop();
-                    await db.query(sql('delete-subject-history-item'), {worldId, type: 'tribes', id});
+                    await tx.query(sql('delete-subject-history-item'), {worldId, type: 'tribes', id});
                 }
             }
 
-            await db.query(sql('add-tribe-history-item'), {
+            await tx.query(sql('add-tribe-history-item'), {
                 worldId,
                 id: tribe.id,
                 members: tribe.members,
