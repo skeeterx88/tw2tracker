@@ -4,5 +4,9 @@
     "ALREADY_SYNCED": "already_synced",
     "NO_ACCOUNTS": "no_accounts",
     "AUTH_FAILED": "auth_failed",
-    "WORLD_CLOSED": "world_closed"
+    "WORLD_CLOSED": "world_closed",
+    "NOT_ENABLED": "not_enabled",
+    "ALL_ACCOUNTS_FAILED": "all_accounts_failed",
+    "TIMEOUT": "timeout",
+    "IN_PROGRESS": "in_progress"
 }

@@ -447,7 +447,11 @@
         "fail": "Fail",
         "already_synced": "Already Synced",
         "world_closed": "World Closed",
-        "no_accounts": "No Sync Accounts"
+        "no_accounts": "No Sync Accounts",
+        "not_enabled": "Not Enabled",
+        "all_accounts_failed": "All Accounts Failed",
+        "timeout": "Timed out",
+        "in_progress": "In Progress"
     },
     "admin_sync_accounts": {
         "header_accounts": "Sync Accounts",
