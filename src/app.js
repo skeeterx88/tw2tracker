@@ -15,9 +15,9 @@
     }
 
     const sql = require('./sql.js');
-    const schemaInitialized = (await db.one(sql('helpers/schema-initialized'))).exists;
+    const table = await db.one(sql('helpers/table-exists'), 'markets');
 
-    if (!schemaInitialized) {
+    if (!table.exists) {
         await db.query(sql('create-schema'));
     }
 

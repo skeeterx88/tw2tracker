@@ -1,11 +1,5 @@
 SET TIMEZONE='UTC';
 
-CREATE TABLE public.state (
-    first_run BOOLEAN DEFAULT TRUE
-);
-
-INSERT INTO public.state (first_run) VALUES (TRUE);
-
 CREATE TABLE public.tasks (
     id VARCHAR (100) PRIMARY KEY,
     last_run TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())

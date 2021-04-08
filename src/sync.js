@@ -63,19 +63,18 @@ async function init () {
         process.exit(0);
     });
 
-    const appState = await db.one(sql('get-program-state'));
+    await initSyncQueue(syncTypes.DATA);
+    await initSyncQueue(syncTypes.ACHIEVEMENTS);
 
-    if (appState.first_run) {
-        debug.sync('first run detected');
+    const markets = await db.any(sql('get-markets'));
+    const worlds = await db.any(sql('get-worlds'));
 
+    if (!markets.length) {
         await syncMarketList();
+    }
+
+    if (!worlds.length) {
         await syncWorldList();
-
-        await db.query(sql('update-program-state'), {
-            column: 'first_run',
-            value: false
-        });
-
         syncAll(syncTypes.DATA);
     }
 
@@ -83,9 +82,6 @@ async function init () {
         await initTasks();
         await initHistoryQueue();
     }
-
-    await initSyncQueue(syncTypes.DATA);
-    await initSyncQueue(syncTypes.ACHIEVEMENTS);
 }
 
 async function trigger (msg) {
