@@ -1423,37 +1423,26 @@ function getTimeUntilMidnight (timeOffset) {
 
 function GenericQueue (parallel = 1) {
     const queue = [];
-    let processing = false;
     let running = 0;
 
-    async function process () {
-        processing = true;
+    async function loop () {
+        if (running < parallel) {
+            running++;
 
-        const handler = queue.shift();
-        if (handler) {
-            if (++running >= parallel) {
+            const handler = queue.shift();
+
+            if (handler) {
                 await handler();
                 running--;
-                process();
-            } else {
-                handler().then(function () {
-                    running--;
-                    process();
-                });
-                process();
+                loop();
             }
-        } else {
-            processing = false;
         }
     }
 
     this.add = function (handler) {
         if (typeof handler === 'function') {
             queue.push(handler);
-        }
-
-        if (!processing) {
-            process();
+            loop();
         }
     };
 }
