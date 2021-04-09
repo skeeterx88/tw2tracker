@@ -29,16 +29,6 @@ module.exports = function () {
     const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT;
     const app = express();
 
-    if (!development && config('general', 'force_https')) {
-        app.use(function (req, res, next) {
-            if (req.headers['x-forwarded-proto'] === 'https') {
-                next();
-            } else {
-                res.redirect('https://' + req.hostname + req.url);
-            }
-        });
-    }
-
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
 
@@ -172,6 +162,8 @@ module.exports = function () {
     });
 
     app.set('port', port);
+    app.set('trust proxy', true);
+    app.set('trust proxy', 'loopback');
 
     httpServer.on('request', app);
     httpServer.on('error', function (error) {
