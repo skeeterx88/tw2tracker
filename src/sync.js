@@ -250,8 +250,12 @@ async function syncWorld (type, marketId, worldNumber) {
             }
 
             resolve(syncStatus.SUCCESS);
-        }, maxRunningTime).catch(function () {
-            reject(syncStatus.TIMEOUT);
+        }, maxRunningTime).catch(function (error) {
+            if (error.timeout) {
+                reject(syncStatus.TIMEOUT);
+            } else {
+                throw error;
+            }
         });
     });
 

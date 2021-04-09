@@ -109,7 +109,9 @@ const timeout = function (handler, time, errorMessage) {
     return new Promise(async function (resolve, reject) {
         const id = setTimeout(function () {
             const timeoutMessage = typeof time === 'string' ? `${time} timeout` : `${time}ms timeout`;
-            reject(new Error(errorMessage ? errorMessage : timeoutMessage));
+            const error = new Error(errorMessage ? errorMessage : timeoutMessage);
+            error.timeout = true;
+            reject(error);
         }, typeof time === 'string' ? humanInterval(time) : time);
 
         handler().then(function (result) {
