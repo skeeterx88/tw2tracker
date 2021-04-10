@@ -63,8 +63,7 @@ async function init () {
         process.exit(0);
     });
 
-    await initSyncQueue(syncTypes.DATA);
-    await initSyncQueue(syncTypes.ACHIEVEMENTS);
+    await initSyncQueue();
 
     const markets = await db.any(sql('get-markets'));
     const worlds = await db.any(sql('get-worlds'));
@@ -123,35 +122,40 @@ async function trigger (msg) {
     }
 }
 
-async function initSyncQueue (type) {
-    debug.queue('initializing sync queue:%s', type);
+async function initSyncQueue () {
+    debug.queue('initializing sync queue');
 
     await db.none(sql('reset-queue-items'));
-    const queue = await db.any(sql('get-sync-queue-type'), {type});
-    addSyncQueue(type, queue, true);
+
+    const dataQueue = await db.any(sql('get-sync-queue-type'), {type: syncTypes.DATA});
+    const achievementsQueue = await db.any(sql('get-sync-queue-type'), {type: syncTypes.ACHIEVEMENTS});
+
+    await addSyncQueue(syncTypes.DATA, dataQueue, true);
+    await addSyncQueue(syncTypes.ACHIEVEMENTS, achievementsQueue, true);
 }
 
-async function addSyncQueue (type, queue, restore = false) {
-    if (!Array.isArray(queue)) {
-        throw new Error('addSyncQueue: argument "queue" is not of type "array"');
+async function addSyncQueue (type, newItems, restore = false) {
+    if (!Array.isArray(newItems)) {
+        throw new TypeError('Argument newItems must be an Array');
     }
 
-    for (const item of queue) {
-        const market_id = item.market_id;
-        const world_number = item.world_number;
-        let id = item.id;
+    const {queue} = syncTypeMapping[type];
 
-        debug.queue('add world:%s%s type:%s', market_id, world_number, type);
+    for (let item of newItems) {
+        debug.queue('add world:%s%s type:%s', item.market_id, item.world_number, type);
 
         if (!restore) {
-            const stored = await db.one(sql('add-sync-queue'), {type, market_id, world_number});
-            id = stored.id;
+            item = await db.one(sql('add-sync-queue'), {
+                type,
+                market_id: item.market_id,
+                world_number: item.world_number
+            });
         }
 
-        syncTypeMapping[type].queue.add(async function () {
-            await db.none(sql('set-queue-item-active'), {id, active: true});
-            await syncWorld(type, market_id, world_number);
-            await db.none(sql('remove-sync-queue'), {id});
+        queue.add(async function () {
+            await db.none(sql('set-queue-item-active'), {id: item.id, active: true});
+            await syncWorld(type, item.market_id, item.world_number);
+            await db.none(sql('remove-sync-queue'), {id: item.id});
         });
     }
 }
