@@ -1429,16 +1429,17 @@ function GenericQueue (parallel = 1) {
     const queue = [];
     let running = 0;
 
-    async function loop () {
+    function loop () {
         if (running < parallel) {
-            running++;
-
             const handler = queue.shift();
 
             if (handler) {
-                await handler();
-                running--;
-                loop();
+                running++;
+
+                handler().finally(function () {
+                    running--;
+                    loop();
+                });
             }
         }
     }
