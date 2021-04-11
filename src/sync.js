@@ -1369,9 +1369,9 @@ async function generateAchievementCommits (tx, subjectType, achievements, worldI
                 const missing = [];
 
                 if (!oldRepeatable) {
-                    missing.concat(newRepeatable);
+                    missing.push(...newRepeatable);
                 } else if (oldRepeatable.length !== newRepeatable.length) {
-                    missing.concat(newRepeatable.slice(oldRepeatable.length, newRepeatable.length));
+                    missing.push(...newRepeatable.slice(oldRepeatable.length, newRepeatable.length));
                 }
 
                 for (const achievement of missing) {
