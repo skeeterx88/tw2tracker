@@ -1427,27 +1427,37 @@ function getTimeUntilMidnight (timeOffset) {
 
 function GenericQueue (parallel = 1) {
     const queue = [];
+    let active = false;
     let running = 0;
 
-    function loop () {
-        if (running < parallel) {
-            const handler = queue.shift();
+    function process () {
+        active = true;
 
-            if (handler) {
-                running++;
+        const handler = queue.shift();
 
-                handler().finally(function () {
-                    running--;
-                    loop();
-                });
+        if (handler) {
+            running++;
+
+            handler().finally(function () {
+                running--;
+                process();
+            });
+
+            if (running < parallel) {
+                process();
             }
+        } else {
+            active = false;
         }
     }
 
     this.add = function (handler) {
         if (typeof handler === 'function') {
             queue.push(handler);
-            loop();
+
+            if (!active) {
+                process();
+            }
         }
     };
 }
