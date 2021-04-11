@@ -796,9 +796,8 @@ async function commitDataDatabase (data, worldId) {
 
                 const avgX = Math.floor(sumX / villageIds.length);
                 const avgY = Math.floor(sumY / villageIds.length);
-                const avg = [avgX, avgY];
 
-                players[playerId] = avg;
+                players[playerId] = [avgX, avgY];
             }
 
             for (const [tribeId, tribeMembers] of data.playersByTribe) {
@@ -825,9 +824,7 @@ async function commitDataDatabase (data, worldId) {
 
                 const avgX = Math.floor(sumX / count);
                 const avgY = Math.floor(sumY / count);
-                const avg = [avgX, avgY];
-
-                tribes[tribeId] = avg;
+                tribes[tribeId] = [avgX, avgY];
             }
 
             for (const [id, avg] of Object.entries(players)) {
