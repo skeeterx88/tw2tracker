@@ -161,19 +161,19 @@ async function addSyncQueue (type, newItems, restore = false) {
 }
 
 async function syncWorld (type, marketId, worldNumber) {
-    const mapping = syncTypeMapping[type];
+    const syncTypeValues = syncTypeMapping[type];
     const worldId = marketId + worldNumber;
     const urlId = marketId === 'zz' ? 'beta' : marketId;
-    const maxRunningTime = config('sync', mapping.MAX_RUNNING_TIME_CONFIG);
+    const maxRunningTime = config('sync', syncTypeValues.MAX_RUNNING_TIME_CONFIG);
 
     let page = false;
 
     const promise = new Promise(async function (resolve, reject) {
-        if (syncTypeMapping[type].activeWorlds.has(worldId)) {
+        if (syncTypeValues.activeWorlds.has(worldId)) {
             return reject(syncStatus.IN_PROGRESS);
         }
 
-        syncTypeMapping[type].activeWorlds.add(worldId);
+        syncTypeValues.activeWorlds.add(worldId);
 
         const market = await db.one(sql('get-market'), {marketId});
         const world = await getOpenWorld(worldId);
@@ -264,9 +264,9 @@ async function syncWorld (type, marketId, worldNumber) {
     });
 
     const finish = async function (status) {
-        Events.trigger(mapping.FINISH_EVENT, [worldId, status]);
-        syncTypeMapping[type].activeWorlds.delete(worldId);
-        await db.none(mapping.UPDATE_LAST_SYNC_QUERY, {status, worldId});
+        Events.trigger(syncTypeValues.FINISH_EVENT, [worldId, status]);
+        syncTypeValues.activeWorlds.delete(worldId);
+        await db.none(syncTypeValues.UPDATE_LAST_SYNC_QUERY, {status, worldId});
 
         switch (status) {
             case syncStatus.IN_PROGRESS: {
