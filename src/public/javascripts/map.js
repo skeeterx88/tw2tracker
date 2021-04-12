@@ -531,11 +531,9 @@ define('TW2Map', [
                 }
             }
 
-            const sorted = visibleContinents.sort(function (a, b) {
+            return visibleContinents.sort(function (a, b) {
                 return Math.abs(55 - a) - Math.abs(55 - b);
             });
-
-            return sorted;
         };
 
         const renderVisibleContinents = () => {
@@ -1290,7 +1288,7 @@ define('TW2DataLoader', [
         mapShareTypes
     }
 ) {
-    const TW2DataLoader = function (marketId, worldNumber) {
+    return function (marketId, worldNumber) {
         const continentPromises = {};
 
         this.players = false;
@@ -1409,12 +1407,10 @@ define('TW2DataLoader', [
             resolve();
         });
     };
-
-    return TW2DataLoader;
 });
 
 define('TW2Tooltip', [], function () {
-    const TW2Tooltip = function (selector) {
+    return function (selector) {
         const $tooltip = document.querySelector(selector);
 
         if (!$tooltip || !$tooltip.nodeName || $tooltip.nodeName !== 'DIV') {
@@ -1510,6 +1506,4 @@ define('TW2Tooltip', [], function () {
             $tooltip.style.opacity = 0;
         };
     };
-
-    return TW2Tooltip;
 });
