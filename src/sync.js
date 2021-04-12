@@ -19,6 +19,7 @@ const syncCommands = require('./sync-commands.json');
 const syncStatus = require('./sync-status.json');
 const syncEvents = require('./sync-events.json');
 const syncTypes = require('./sync-types.json');
+const syncAuthEvents = require('./sync-auth-events.json');
 
 const ACHIEVEMENT_COMMIT_ADD = 'achievement_commit_add';
 const ACHIEVEMENT_COMMIT_UPDATE = 'achievement_commit_update';
@@ -471,29 +472,57 @@ async function authMarketAccount (marketId, attempt = 1) {
                 waitUntil: ['domcontentloaded', 'networkidle0']
             });
 
-            const account = await page.evaluate(function (marketId, credentials, config) {
-                return new Promise(function (resolve, reject) {
+            const account = await page.evaluate(function (marketId, credentials, syncAuthEvents, config) {
+                return new Promise(function (resolve) {
                     const socketService = injector.get('socketService');
                     const routeProvider = injector.get('routeProvider');
+                    const eventTypeProvider = injector.get('eventTypeProvider');
+                    const errorTypeProvider = injector.get('errorTypeProvider');
+                    const $rootScope = injector.get('$rootScope');
 
-                    const loginTimeout = setTimeout(function () {
-                        reject('emit credentials timeout');
-                    }, config.authSocketEmitTimeout);
+                    function invalidUsername () {
+                        resolve({
+                            error: true,
+                            type: syncAuthEvents.INVALID_USERNAME
+                        });
+                    }
+
+                    function invalidPassword () {
+                        resolve({
+                            error: true,
+                            type: syncAuthEvents.INVALID_PASSWORD
+                        });
+                    }
+
+                    function banned () {
+                        resolve({
+                            error: true,
+                            type: syncAuthEvents.BANNED
+                        });
+                    }
+
+                    $rootScope.$on(eventTypeProvider.LOGIN_SUCCESS, function (event, data) {
+                        resolve(data);
+                    });
+
+                    $rootScope.$on(errorTypeProvider.AUTH_INVALID_PASSWORD, invalidPassword);
+                    $rootScope.$on(errorTypeProvider.AUTH_INCORRECT_PASSWORD, invalidPassword);
+                    $rootScope.$on(errorTypeProvider.AUTH_GLOBAL_BAN, banned);
+                    $rootScope.$on(errorTypeProvider.AUTH_WORLD_BAN, banned);
+                    $rootScope.$on(errorTypeProvider.AUTH_UNKNOWN_PLAYER, invalidUsername);
+                    $rootScope.$on(errorTypeProvider.AUTH_INVALID_CREDENTIALS, invalidUsername);
+                    $rootScope.$on(errorTypeProvider.AUTH_PLAYER_DELETED, invalidUsername);
 
                     debug('market:%s emit login command', marketId);
 
-                    socketService.emit(routeProvider.LOGIN, {...credentials, ref_param: ''}, function (data) {
-                        clearTimeout(loginTimeout);
-                        resolve(data);
-                    });
+                    socketService.emit(routeProvider.LOGIN, {...credentials, ref_param: ''}, resolve);
                 });
-            }, marketId, credentials, {
+            }, marketId, credentials, syncAuthEvents, {
                 authSocketEmitTimeout: humanInterval(config('sync_timeouts', 'auth_socket_emit'))
             });
 
-            if (!account) {
-                const error = await page.$eval('.login-error .error-message', $elem => $elem.textContent);
-                throw new Error(error);
+            if (account.error) {
+                throw new Error(account.type);
             }
 
             debug.auth('market:%s setup cookie', marketId);
