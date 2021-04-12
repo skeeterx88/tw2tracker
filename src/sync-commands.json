@@ -5,5 +5,7 @@
     "ACHIEVEMENTS": "sync_command_achievements",
     "MARKETS": "sync_command_markets",
     "WORLDS": "sync_command_worlds",
-    "TOGGLE": "sync_command_toggle"
+    "TOGGLE": "sync_command_toggle",
+    "DATA_RESET_QUEUE": "data_reset_queue",
+    "ACHIEVEMENTS_RESET_QUEUE": "achievements_reset_queue"
 }

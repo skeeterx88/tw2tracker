@@ -17,6 +17,8 @@ const passport = require('passport');
 const humanInterval = require('human-interval');
 const fs = require('fs');
 
+const syncTypes = require('../sync-types.json');
+
 const {
     mergeBackendLocals,
     asyncRouter,
@@ -269,6 +271,19 @@ const toggleSyncRouter = asyncRouter(async function (req, res) {
 
     req.flash('messages', i18n('message_world_toggled', 'admin', res.locals.lang, [worldId]));
     res.redirect(`/admin/sync#world-${worldId}`);
+});
+
+const resetQueueRouter = asyncRouter(async function (req, res) {
+    const type = req.params.type;
+
+    if (!Object.values(syncTypes).includes(type)) {
+        req.flash('error', i18n('error_invalid_sync_type', 'admin', res.locals.lang, [type]));
+        return res.redirect('/admin/sync');
+    }
+
+    await db.none(sql('reset-sync-queue'), {type});
+    req.flash('messages', i18n('message_sync_queue_reseted', 'admin', res.locals.lang, [type]));
+    res.redirect('/admin/sync');
 });
 
 const accountsRouter = asyncRouter(async function (req, res) {
@@ -651,6 +666,8 @@ router.get('/sync/achievements/:marketId/:worldNumber', authStartSyncAction, syn
 router.get('/sync/markets', authStartSyncAction, scrapeMarketsRouter);
 router.get('/sync/worlds', authStartSyncAction, scrapeWorldsRouter);
 router.get('/sync/toggle/:marketId/:worldNumber?', authControlSyncAction, toggleSyncRouter);
+
+router.get('/sync/queue/:type/reset', authStartSyncAction, resetQueueRouter);
 
 router.get('/accounts', authModifyAccountsAccess, accountsRouter);
 router.get('/accounts/markets/add/:accountId/:marketId', authModifyAccountsAction, accountsAddMarketRouter);

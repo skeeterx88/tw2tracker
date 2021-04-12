@@ -391,6 +391,7 @@
         "error_mod_account_not_exists": "This mod account does not exist",
         "error_market_has_no_sync_accounts": "This market does not have any sync accounts.",
         "error_world_not_found": "World does not exist",
+        "error_invalid_sync_type": "Sync queue types ${type} does not exist",
         "message_world_toggled": "World %{world_id} toggled.",
         "message_scrape_worlds_started": "Sync world list started.",
         "message_scrape_markets_started": "Sync market list started.",
@@ -406,7 +407,8 @@
         "message_sync_account_added": "Sync account added.",
         "message_mod_account_altered": "Mod account altered",
         "message_mod_account_created": "Mod account created",
-        "message_mod_account_deleted": "Mod account deleted"
+        "message_mod_account_deleted": "Mod account deleted",
+        "message_sync_queue_reseted": "Sync queue of type %{type} reseted"
     },
     "admin_menu": {
         "sync": "Sync",
@@ -435,6 +437,8 @@
         "button_sync_world_achievements_active": "Sync achievements in progress...",
         "button_disable_sync": "Disable sync",
         "button_enable_sync": "Enable sync",
+        "button_reset_data_queue": "Reset data queue",
+        "button_reset_achievements_queue": "Reset achievements queue",
         "data_info": "Data:",
         "achievements_info": "Achievements:",
         "last_time": "Last time:",

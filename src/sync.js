@@ -18,6 +18,7 @@ const scraperReadyState = require('./scraper-ready-state.js');
 const syncCommands = require('./sync-commands.json');
 const syncStatus = require('./sync-status.json');
 const syncEvents = require('./sync-events.json');
+const syncTypes = require('./sync-types.json');
 
 const ACHIEVEMENT_COMMIT_ADD = 'achievement_commit_add';
 const ACHIEVEMENT_COMMIT_UPDATE = 'achievement_commit_update';
@@ -32,11 +33,6 @@ const dataQueue = new GenericQueue(parallelData);
 const achievementsQueue = new GenericQueue(parallelAchievements);
 
 let browser = null;
-
-const syncTypes = {
-    DATA: 'data',
-    ACHIEVEMENTS: 'achievements'
-};
 
 const syncTypeMapping = {
     [syncTypes.DATA]: {
@@ -117,6 +113,14 @@ async function trigger (msg) {
         }
         case syncCommands.TOGGLE: {
             await toggleWorld(msg.marketId, msg.worldNumber);
+            break;
+        }
+        case syncCommands.DATA_RESET_QUEUE: {
+            dataQueue.clear();
+            break;
+        }
+        case syncCommands.ACHIEVEMENTS_RESET_QUEUE: {
+            achievementsQueue.clear();
             break;
         }
     }
@@ -1454,6 +1458,12 @@ function GenericQueue (parallel = 1) {
             if (!active) {
                 process();
             }
+        }
+    };
+
+    this.clear = function () {
+        while (queue.length) {
+            queue.pop();
         }
     };
 }

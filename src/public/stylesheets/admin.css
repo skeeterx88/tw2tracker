@@ -114,6 +114,7 @@
 
 #admin .actions {
     display: flex;
+    flex-wrap: wrap;
 }
 
 #admin .actions .relax-button.right {
