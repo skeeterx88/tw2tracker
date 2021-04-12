@@ -4,6 +4,9 @@ const cache = new Map();
 const base = path.join(__dirname, 'sql');
 
 module.exports = function (id) {
+    if (typeof id !== 'string') {
+        throw TypeError('SQL: Argument "id" is not a String');
+    }
     if (cache.has(id)) {
         return cache.get(id);
     }
