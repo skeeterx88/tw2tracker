@@ -159,8 +159,9 @@ async function addSyncQueue (type, newItems, restore = false) {
 
         queue.add(async function () {
             await db.none(sql('set-queue-item-active'), {id: item.id, active: true});
-            await syncWorld(type, item.market_id, item.world_number);
-            await db.none(sql('remove-sync-queue'), {id: item.id});
+            await syncWorld(type, item.market_id, item.world_number).finally(async function () {
+                await db.none(sql('remove-sync-queue'), {id: item.id});
+            });
         });
     }
 }
@@ -197,7 +198,7 @@ async function syncWorld (type, marketId, worldNumber) {
         await utils.timeout(async function () {
             const account = await authMarketAccount(marketId);
 
-            if (!account) {
+            if (account.error) {
                 return reject(syncStatus.ALL_ACCOUNTS_FAILED);
             }
 
@@ -439,10 +440,6 @@ async function createCharacter (marketId, worldNumber) {
 }
 
 async function authMarketAccount (marketId, attempt = 1) {
-    if (auths[marketId]) {
-        return await auths[marketId];
-    }
-
     let page;
 
     try {
@@ -455,14 +452,14 @@ async function authMarketAccount (marketId, attempt = 1) {
 
             if (!accounts.length) {
                 debug.auth('market:%s do not have any accounts', marketId, attempt);
-                return false;
+                return {error: syncAuthEvents.NO_ACCOUNTS};
             }
 
             const credentials = accounts[attempt - 1];
 
             if (!credentials) {
                 debug.auth('market:%s all accounts failed to authenticate', marketId, attempt);
-                return false;
+                return {error: syncAuthEvents.ALL_ACCOUNTS_FAILED};
             }
 
             debug.auth('market:%s authenticating (attempt %d)', marketId, attempt);
@@ -476,7 +473,7 @@ async function authMarketAccount (marketId, attempt = 1) {
                 waitUntil: ['domcontentloaded', 'networkidle0']
             });
 
-            const account = await page.evaluate(function (marketId, credentials, syncAuthEvents, config) {
+            const account = await page.evaluate(function (marketId, credentials, syncAuthEvents) {
                 return new Promise(function (resolve) {
                     const socketService = injector.get('socketService');
                     const routeProvider = injector.get('routeProvider');
@@ -485,24 +482,15 @@ async function authMarketAccount (marketId, attempt = 1) {
                     const $rootScope = injector.get('$rootScope');
 
                     function invalidUsername () {
-                        resolve({
-                            error: true,
-                            type: syncAuthEvents.INVALID_USERNAME
-                        });
+                        resolve({error: syncAuthEvents.INVALID_USERNAME});
                     }
 
                     function invalidPassword () {
-                        resolve({
-                            error: true,
-                            type: syncAuthEvents.INVALID_PASSWORD
-                        });
+                        resolve({error: syncAuthEvents.INVALID_PASSWORD});
                     }
 
                     function banned () {
-                        resolve({
-                            error: true,
-                            type: syncAuthEvents.BANNED
-                        });
+                        resolve({error: syncAuthEvents.BANNED});
                     }
 
                     $rootScope.$on(eventTypeProvider.LOGIN_SUCCESS, function (event, data) {
@@ -521,12 +509,10 @@ async function authMarketAccount (marketId, attempt = 1) {
 
                     socketService.emit(routeProvider.LOGIN, {...credentials, ref_param: ''}, resolve);
                 });
-            }, marketId, credentials, syncAuthEvents, {
-                authSocketEmitTimeout: humanInterval(config('sync_timeouts', 'auth_socket_emit'))
-            });
+            }, marketId, credentials, syncAuthEvents);
 
             if (account.error) {
-                throw new Error(account.type);
+                return account;
             }
 
             debug.auth('market:%s setup cookie', marketId);
@@ -556,7 +542,7 @@ async function authMarketAccount (marketId, attempt = 1) {
             try {
                 await page.waitForSelector('.player-worlds', {timeout: 3000});
             } catch (error) {
-                throw new Error('Unknown reason');
+                return {error: syncAuthEvents.UNKNOWN};
             }
 
             await page.close();
@@ -565,9 +551,8 @@ async function authMarketAccount (marketId, attempt = 1) {
             return account;
         }, '1 minute');
 
-        if (auths[marketId] === false) {
-            delete auths[marketId];
-            return false;
+        if (auths[marketId].error) {
+            throw new Error(auths[marketId].error);
         }
 
         return await auths[marketId];
@@ -583,7 +568,7 @@ async function authMarketAccount (marketId, attempt = 1) {
             return await authMarketAccount(marketId, attempt + 1);
         } else {
             debug.auth('market:%s authentication failed (maximum attempts reached)');
-            throw new Error(error.message);
+            return {error: syncAuthEvents.ALL_ACCOUNTS_FAILED};
         }
     }
 }

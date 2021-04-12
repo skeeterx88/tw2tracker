@@ -1,5 +1,8 @@
 {
     "INVALID_USERNAME": "invalid_username",
     "INVALID_PASSWORD": "invalid_password",
-    "BANNED": "banned"
+    "BANNED": "banned",
+    "UNKNOWN": "unknown",
+    "ALL_ACCOUNTS_FAILED": "all_accounts_failed",
+    "NO_ACCOUNTS": "no_accounts"
 }
