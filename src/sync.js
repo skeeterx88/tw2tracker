@@ -74,7 +74,7 @@ async function init () {
 
     if (!worlds.length) {
         await syncWorldList();
-        syncAllWorlds(syncTypes.DATA);
+        await syncAllWorlds(syncTypes.DATA);
     }
 
     if (process.env.NODE_ENV !== 'development') {
@@ -86,37 +86,37 @@ async function init () {
 async function trigger (msg) {
     switch (msg.command) {
         case syncCommands.DATA_ALL: {
-            syncAllWorlds(syncTypes.DATA);
+            await syncAllWorlds(syncTypes.DATA);
             break;
         }
         case syncCommands.DATA: {
-            addSyncQueue(syncTypes.DATA, [{
+            await addSyncQueue(syncTypes.DATA, [{
                 market_id: msg.marketId,
                 world_number: msg.worldNumber
             }]);
             break;
         }
         case syncCommands.ACHIEVEMENTS_ALL: {
-            syncAllWorlds(syncTypes.ACHIEVEMENTS);
+            await syncAllWorlds(syncTypes.ACHIEVEMENTS);
             break;
         }
         case syncCommands.ACHIEVEMENTS: {
-            addSyncQueue(syncTypes.ACHIEVEMENTS, [{
+            await addSyncQueue(syncTypes.ACHIEVEMENTS, [{
                 market_id: msg.marketId,
                 world_number: msg.worldNumber
             }]);
             break;
         }
         case syncCommands.MARKETS: {
-            syncMarketList();
+            await syncMarketList();
             break;
         }
         case syncCommands.WORLDS: {
-            syncWorldList();
+            await syncWorldList();
             break;
         }
         case syncCommands.TOGGLE: {
-            toggleWorld(msg.marketId, msg.worldNumber);
+            await toggleWorld(msg.marketId, msg.worldNumber);
             break;
         }
     }
@@ -266,7 +266,7 @@ async function syncWorld (type, marketId, worldNumber) {
     const finish = async function (status) {
         Events.trigger(mapping.FINISH_EVENT, [worldId, status]);
         syncTypeMapping[type].activeWorlds.delete(worldId);
-        db.none(mapping.UPDATE_LAST_SYNC_QUERY, {status, worldId});
+        await db.none(mapping.UPDATE_LAST_SYNC_QUERY, {status, worldId});
 
         switch (status) {
             case syncStatus.IN_PROGRESS: {
@@ -316,8 +316,7 @@ async function syncAllWorlds (type) {
         return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
     });
     const uniqueWorlds = worlds.filter(world => world !== false);
-
-    addSyncQueue(type, uniqueWorlds);
+    await addSyncQueue(type, uniqueWorlds);
 }
 
 async function syncWorldList () {
