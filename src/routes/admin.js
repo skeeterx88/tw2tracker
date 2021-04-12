@@ -34,7 +34,7 @@ function emitSync (command, data, callback) {
 }
 
 const authRouter = asyncRouter(async function (req, res, next) {
-    passport.authenticate('local', function (error, user, info) {
+    passport.authenticate('local', {}, function (error, user, info) {
         if (error) {
             return next(error);
         }
@@ -593,7 +593,7 @@ const settingsEditRouter = asyncRouter(async function (req, res) {
             case 'number': {
                 const parsed = parseInt(value, 10);
 
-                if (isNaN(value)) {
+                if (isNaN(parsed)) {
                     req.flash('error', i18n('error_invalid_not_a_number', 'admin_settings', res.locals.lang, [category + ':' + configId]));
                     newConfig[category][configId] = config[category][configId];
                 } else if (parsed < map.min || parsed > map.max) {

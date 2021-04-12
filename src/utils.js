@@ -57,6 +57,10 @@ const getHTML = function (url) {
     });
 };
 
+/**
+ * @param url {String}
+ * @returns {Promise<Buffer>}
+ */
 const getBuffer = function (url) {
     return new Promise(function (resolve) {
         https.get(url, function (res) {

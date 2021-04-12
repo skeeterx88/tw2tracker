@@ -10,6 +10,12 @@ define('i18n', [
         return string.replace(/%{[^}]*}/g, () => tokens[i++]);
     }
 
+    /**
+     * @param key {String}
+     * @param namespace {String}
+     * @param [tokens] {Array<String>}
+     * @return {String}
+     */
     return function (key, namespace, tokens) {
         try {
             if (!language[namespace][key]) {
