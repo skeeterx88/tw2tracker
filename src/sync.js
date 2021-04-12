@@ -446,6 +446,10 @@ async function authMarketAccount (marketId, attempt = 1) {
     let page;
 
     try {
+        if (auths[marketId]) {
+            return await auths[marketId];
+        }
+
         auths[marketId] = utils.timeout(async function () {
             const accounts = await db.any(sql('get-market-accounts'), {marketId});
 
