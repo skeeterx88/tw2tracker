@@ -19,9 +19,11 @@ define('easingEffects', [], function () {
 
 define('TW2Map', [
     'easingEffects',
+    'i18n',
     'backendValues'
 ], function (
     easingEffects,
+    i18n,
     {
         marketId,
         worldNumber,
@@ -1153,7 +1155,6 @@ define('TW2Map', [
         };
 
         this.shareMap = async (shareType) => {
-            const i18n = require('i18n');
             const highlightsExport = [];
 
             for (const [id, data] of Object.entries(highlights.players)) {
