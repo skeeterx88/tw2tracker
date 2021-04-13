@@ -118,11 +118,11 @@ const syncRouter = asyncRouter(async function (req, res) {
         closedWorlds,
         markets,
         syncQueue
-    ] = await Promise.all([
-        db.any(sql('get-open-worlds')),
-        db.any(sql('get-closed-worlds')),
-        db.any(sql('get-markets')),
-        db.any(sql('get-sync-queue'))
+    ] = await db.task(async tx => [
+        await tx.any(sql('get-open-worlds')),
+        await tx.any(sql('get-closed-worlds')),
+        await tx.any(sql('get-markets')),
+        await tx.any(sql('get-sync-queue'))
     ]);
 
     const syncQueueTyped = {
