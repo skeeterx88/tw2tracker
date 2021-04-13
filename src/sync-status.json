@@ -8,5 +8,6 @@
     "NOT_ENABLED": "not_enabled",
     "ALL_ACCOUNTS_FAILED": "all_accounts_failed",
     "TIMEOUT": "timeout",
-    "IN_PROGRESS": "in_progress"
+    "IN_PROGRESS": "in_progress",
+    "FAILED_TO_SELECT_CHARACTER":  "failed_to_select_character"
 }
