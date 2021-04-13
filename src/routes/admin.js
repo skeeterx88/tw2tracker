@@ -26,7 +26,7 @@ const {
     paramWorld
 } = require('../router-helpers.js');
 
-function emitSync (command, data, callback) {
+function emitSync (command, data) {
     return new Promise(function (resolve) {
         process.send({command, ...data});
         setTimeout(resolve, 100);
@@ -74,7 +74,7 @@ function createAdminMenu (user, selected) {
         }]
     ];
 
-    return adminMenu.filter(function ([id, data]) {
+    return adminMenu.filter(function ([, data]) {
         return data.enabled;
     });
 }
