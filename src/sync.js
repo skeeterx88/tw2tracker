@@ -56,9 +56,12 @@ const syncTypeMapping = {
 };
 
 /**
+ * @class CreateScraper
  * @param marketId {String}
  * @param worldNumber {Number}
- * @class CreateScraper
+ *
+ * @typedef {Object} MarketAccount Logged-in account object.
+ * @typedef {Object} AccountCharacter Account's character object.
  */
 function CreateScraper (marketId, worldNumber) {
     const worldId = marketId + worldNumber;
@@ -132,36 +135,32 @@ function CreateScraper (marketId, worldNumber) {
     };
 
     /**
-     * Logged-in account object.
-     * @typedef {Object} SyncAccount
-     */
-
-    /**
      * Authenticate using one of the available sync accounts.
-     * @return {Promise<SyncAccount|boolean>} The authenticated account or false.
+     * @return {Promise<MarketAccount|boolean>} The authenticated account or false.
      */
     this.auth = async function () {
         if (authenticated) {
             return authenticated;
         }
 
-        const accounts = await db.any(sql('get-market-accounts'), {marketId});
+        const marketAccounts = await db.any(sql('get-market-accounts'), {marketId});
 
-        if (!accounts.length) {
+        if (!marketAccounts.length) {
             debug.auth('market:%s do not have any accounts', marketId);
             return false;
         }
 
-        while (accounts.length) {
-            const account = accounts.shift();
-            const result = await this.emit('Authentication/login', account);
+        while (marketAccounts.length) {
+            const credentials = marketAccounts.shift();
+            /** @type MarketAccount */
+            const account = await this.emit('Authentication/login', credentials);
 
-            if (result.token) {
-                debug.auth('market:%s account %s successed', marketId, account.name);
-                authenticated = result;
-                return result;
-            } else if (result.code) {
-                debug.auth('market:%s account %s failed: %s', marketId, account.name, result.code);
+            if (account.token) {
+                debug.auth('market:%s account %s successed', marketId, credentials.name);
+                authenticated = account;
+                return account;
+            } else if (account.code) {
+                debug.auth('market:%s account %s failed: %s', marketId, credentials.name, account.code);
             }
         }
 
@@ -169,22 +168,18 @@ function CreateScraper (marketId, worldNumber) {
     };
 
     /**
-     * Account's character object.
-     * @typedef {Object} SyncAccountCharacter
-     */
-
-    /**
      * Select an account's character (world). Simulates the emits
      * like it's a user logging in from the browser.
      *
-     * @param characterId
-     * @return {Promise<SyncAccountCharacter|boolean>}
+     * @param {number} characterId
+     * @return {Promise<AccountCharacter|boolean>}
      */
     this.selectCharacter = async (characterId) => {
         if (characterSelected) {
             return characterSelected;
         }
 
+        /** @type {AccountCharacter} */
         const character = await this.emit('Authentication/selectCharacter', {
             world_id: worldId,
             id: characterId
@@ -196,9 +191,6 @@ function CreateScraper (marketId, worldNumber) {
 
         const gameData = await this.emit('GameDataBatch/getGameData');
         const characterInfo = await this.emit('Character/getInfo', {});
-
-        worldsGameData.set(worldId, gameData);
-        commitWorldConfig(gameData['WorldConfig/config'], worldId);
 
         let createVillageId;
 
@@ -273,7 +265,7 @@ function CreateScraper (marketId, worldNumber) {
     /**
      * Create a character on a specific world.
      * @param worldNumber
-     * @return {Promise<SyncAccountCharacter>}
+     * @return {Promise<AccountCharacter>}
      */
     this.createCharacter = async function (worldNumber) {
         debug.sync('world:%s create character', worldId);
