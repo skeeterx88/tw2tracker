@@ -516,7 +516,7 @@ async function socketScrapeData (socket, worldId) {
         for (const [id, village] of villages.entries()) {
             const {character_id} = village;
 
-            if (character_id) {
+            if (villagesByPlayer.has(character_id)) {
                 villagesByPlayer.get(character_id).push(id);
             }
         }
