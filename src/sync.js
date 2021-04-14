@@ -39,16 +39,12 @@ const worldScrapers = new Map();
 const syncTypeMapping = {
     [syncTypes.DATA]: {
         queue: dataQueue,
-        activeWorlds: new Set(),
-        MAX_RUNNING_TIME_CONFIG: 'max_sync_data_running_time',
-        FINISH_EVENT: syncEvents.DATA_FINISH,
+        MAX_RUNNING_TIME: humanInterval(config('sync', 'max_sync_data_running_time')),
         UPDATE_LAST_SYNC_QUERY: sql('update-data-sync')
     },
     [syncTypes.ACHIEVEMENTS]: {
         queue: achievementsQueue,
-        activeWorlds: new Set(),
-        MAX_RUNNING_TIME_CONFIG: 'max_sync_achievements_running_time',
-        FINISH_EVENT: syncEvents.ACHIEVEMENTS_FINISH,
+        MAX_RUNNING_TIME: humanInterval(config('sync', 'max_sync_achievements_running_time')),
         UPDATE_LAST_SYNC_QUERY: sql('update-achievements-sync')
     }
 };
@@ -830,16 +826,20 @@ async function addSyncQueue (type, newItems) {
     const {queue} = syncTypeMapping[type];
 
     for (const item of newItems) {
-        const {id} = await db.one(sql('add-sync-queue'), {
-            type,
-            market_id: item.market_id,
-            world_number: item.world_number
-        });
+        const worldId = item.market_id + item.world_number;
+        const active = queue.workersList().some(worker => worker.data.worldId === worldId);
+
+        if (active) {
+            continue;
+        }
+
+        const {id} = await db.one(sql('add-sync-queue'), {type, ...item});
 
         queue.push({
             id,
-            handler: async function () {
-                await syncWorld(type, item.market_id, item.world_number);
+            worldId,
+            handler: function () {
+                return syncWorld(type, item.market_id, item.world_number);
             }
         });
     }
@@ -849,13 +849,13 @@ async function syncWorld (type, marketId, worldNumber) {
     const syncTypeValues = syncTypeMapping[type];
     const worldId = marketId + worldNumber;
     let scraper;
+    let finished = false;
+    let timeoutId;
 
     const promise = new Promise(async function (resolve, reject) {
-        if (syncTypeValues.activeWorlds.has(worldId)) {
-            return reject(syncStatus.IN_PROGRESS);
-        }
-
-        syncTypeValues.activeWorlds.add(worldId);
+        timeoutId = setTimeout(function () {
+            reject(syncStatus.TIMEOUT);
+        }, syncTypeValues.MAX_RUNNING_TIME);
 
         const world = await getOpenWorld(worldId);
         const marketAccounts = await db.any(sql('get-market-accounts'), {marketId});
@@ -897,6 +897,10 @@ async function syncWorld (type, marketId, worldNumber) {
             return reject(syncStatus.FAILED_TO_SELECT_CHARACTER);
         }
 
+        if (finished) {
+            return;
+        }
+
         switch (type) {
             case syncTypes.DATA: {
                 debug.sync('world:%s fetching data', worldId);
@@ -913,11 +917,11 @@ async function syncWorld (type, marketId, worldNumber) {
             case syncTypes.ACHIEVEMENTS: {
                 debug.sync('world:%s fetching achievements', worldId);
 
-                const achievements = await socketScrapeAchivements(scraper);
-                await commitAchievementsDatabase(achievements, worldId);
+                const data = await socketScrapeAchivements(scraper);
+                await commitAchievementsDatabase(data, worldId);
 
                 if (config('sync', 'store_raw_data')) {
-                    await commitRawAchievementsFilesystem(achievements, worldId);
+                    await commitRawAchievementsFilesystem(data, worldId);
                 }
                 break;
             }
@@ -926,10 +930,13 @@ async function syncWorld (type, marketId, worldNumber) {
         resolve(syncStatus.SUCCESS);
     });
 
-    const finish = async function (status) {
-        Events.trigger(syncTypeValues.FINISH_EVENT, [worldId, status]);
-        syncTypeValues.activeWorlds.delete(worldId);
-        await db.none(syncTypeValues.UPDATE_LAST_SYNC_QUERY, {status, worldId});
+    let status;
+
+    promise.then(function (_status) {
+        status = _status;
+        debug.sync('world:%s data %s finished', worldId, type);
+    }).catch(function (_status) {
+        status = _status;
 
         switch (status) {
             case syncStatus.IN_PROGRESS: {
@@ -954,23 +961,24 @@ async function syncWorld (type, marketId, worldNumber) {
             }
             case syncStatus.WORLD_CLOSED: {
                 debug.sync('world:%s closing', worldId);
-                await db.query(sql('close-world'), [marketId, worldNumber]);
+                db.query(sql('close-world'), [marketId, worldNumber]);
                 break;
             }
             case syncStatus.FAILED_TO_SELECT_CHARACTER: {
                 debug.sync('world:%s failed to select character', worldId);
                 break;
             }
-            case syncStatus.SUCCESS: {
-                debug.sync('world:%s data %s finished', worldId, type);
-                break;
+            default: {
+                throw _status;
             }
         }
-    };
+    }).finally(function () {
+        clearTimeout(timeoutId);
+        finished = true;
+        db.none(syncTypeValues.UPDATE_LAST_SYNC_QUERY, {status, worldId});
+    });
 
-    return promise
-        .then(finish)
-        .catch(finish);
+    return promise;
 }
 
 async function syncAllWorlds (type) {
@@ -1913,23 +1921,13 @@ function getTimeUntilMidnight (timeOffset) {
 }
 
 function createSyncQueue (concurrent) {
-    const queue = async.queue(async function (task) {
-        debug.queue('task %s start', task.id);
-
+    return async.queue(async function (task) {
+        debug.queue('world:%s start (queue id %d)', task.worldId, task.id);
         await db.none(sql('set-queue-item-active'), {id: task.id, active: true});
         await task.handler();
         await db.none(sql('remove-sync-queue'), {id: task.id});
-
-        debug.queue('task %s finish', task.id);
+        debug.queue('world:%s finish (queue id %d)', task.worldId, task.id);
     }, concurrent);
-
-    queue.error(async function (err, task) {
-        await db.none(sql('remove-sync-queue'), {id: task.id});
-        debug.queue('task %s error: %s', task.id, err.message);
-        queue.push(task);
-    });
-
-    return queue;
 }
 
 function randomInteger (min, max) {
