@@ -10,4 +10,4 @@ FROM ${worldId:name}.players
 LEFT OUTER JOIN ${worldId:name}.tribes
 ON (${worldId:name}.players.tribe_id = tribes.id)
 WHERE players.name ILIKE ${query}
-ORDER BY players.rank ASC
+ORDER BY players.rank

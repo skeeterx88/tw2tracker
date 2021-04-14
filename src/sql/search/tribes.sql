@@ -9,4 +9,4 @@ SELECT
 FROM ${worldId:name}.tribes
 WHERE name ILIKE ${query}
 OR tag ILIKE ${query}
-ORDER BY rank ASC
+ORDER BY rank
