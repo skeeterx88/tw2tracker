@@ -1,2 +1,1 @@
-UPDATE public.sync_queue
-SET active = FALSE;
+DELETE FROM public.sync_queue

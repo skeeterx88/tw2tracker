@@ -3,6 +3,7 @@ const zlib = require('zlib');
 const path = require('path');
 const humanInterval = require('human-interval');
 const WebSocket = require('ws');
+const async = require('async');
 
 const debug = require('./debug.js');
 const {db} = require('./db.js');
@@ -27,9 +28,12 @@ const ACHIEVEMENT_COMMIT_UPDATE = 'achievement_commit_update';
 const parallelData = config('sync', 'parallel_data_sync');
 const parallelAchievements = config('sync', 'parallel_achievements_sync');
 
-const historyQueue = new GenericQueue();
-const dataQueue = new GenericQueue(parallelData);
-const achievementsQueue = new GenericQueue(parallelAchievements);
+const historyQueue = async.queue(async function (handler) {
+    await handler();
+}, 1);
+
+const dataQueue = createSyncQueue(parallelData);
+const achievementsQueue = createSyncQueue(parallelAchievements);
 
 const worldScrapers = new Map();
 
@@ -87,7 +91,7 @@ function CreateScraper (marketId, worldNumber) {
 
             const id = emitId++;
 
-            debug.socket('world:%s emit #%i %s %o', worldId, id, type, data);
+            // debug.socket('world:%s emit #%i %s %o', worldId, id, type, data);
 
             socket.send('42' + JSON.stringify(['msg', {
                 type,
@@ -779,39 +783,34 @@ async function trigger (msg) {
 async function initSyncQueue () {
     debug.queue('initializing sync queue');
 
-    await db.none(sql('reset-queue-items'));
-
     const dataQueue = await db.any(sql('get-sync-queue-type'), {type: syncTypes.DATA});
     const achievementsQueue = await db.any(sql('get-sync-queue-type'), {type: syncTypes.ACHIEVEMENTS});
 
-    await addSyncQueue(syncTypes.DATA, dataQueue, true);
-    await addSyncQueue(syncTypes.ACHIEVEMENTS, achievementsQueue, true);
+    await db.none(sql('reset-queue-items'));
+
+    await addSyncQueue(syncTypes.DATA, dataQueue);
+    await addSyncQueue(syncTypes.ACHIEVEMENTS, achievementsQueue);
 }
 
-async function addSyncQueue (type, newItems, restore = false) {
+async function addSyncQueue (type, newItems) {
     if (!Array.isArray(newItems)) {
         throw new TypeError('Argument newItems must be an Array');
     }
 
     const {queue} = syncTypeMapping[type];
 
-    for (let item of newItems) {
-        debug.queue('add world:%s%s type:%s', item.market_id, item.world_number, type);
+    for (const item of newItems) {
+        const {id} = await db.one(sql('add-sync-queue'), {
+            type,
+            market_id: item.market_id,
+            world_number: item.world_number
+        });
 
-        if (!restore) {
-            item = await db.one(sql('add-sync-queue'), {
-                type,
-                market_id: item.market_id,
-                world_number: item.world_number
-            });
-        }
-
-        queue.add(async function () {
-            await db.none(sql('set-queue-item-active'), {id: item.id, active: true});
-
-            syncWorld(type, item.market_id, item.world_number).finally(function () {
-                db.none(sql('remove-sync-queue'), {id: item.id});
-            });
+        queue.push({
+            id,
+            handler: async function () {
+                await syncWorld(type, item.market_id, item.world_number);
+            }
         });
     }
 }
@@ -1636,7 +1635,7 @@ async function queueMarketHistory (marketId) {
     debug.history('market:%s history process starts in %i minutes', marketId, untilMidnight / 1000 / 60);
 
     setTimeout(function () {
-        historyQueue.add(async function () {
+        historyQueue.push(async function () {
             const marketWorlds = await db.any(sql('get-market-worlds'), {marketId});
             const openWorlds = marketWorlds.filter(world => world.open);
 
@@ -1928,47 +1927,24 @@ function getTimeUntilMidnight (timeOffset) {
     return then - now;
 }
 
-function GenericQueue (parallel = 1) {
-    const queue = [];
-    let active = false;
-    let running = 0;
+function createSyncQueue (concurrent) {
+    const queue = async.queue(async function (task) {
+        debug.queue('task %s start', task.id);
 
-    function process () {
-        active = true;
+        await db.none(sql('set-queue-item-active'), {id: task.id, active: true});
+        await task.handler();
+        await db.none(sql('remove-sync-queue'), {id: task.id});
 
-        const handler = queue.shift();
+        debug.queue('task %s finish', task.id);
+    }, concurrent);
 
-        if (handler) {
-            running++;
+    queue.error(async function (err, task) {
+        await db.none(sql('remove-sync-queue'), {id: task.id});
+        debug.queue('task %s error: %s', task.id, err.message);
+        queue.push(task);
+    });
 
-            handler().finally(function () {
-                running--;
-                process();
-            });
-
-            if (running < parallel) {
-                process();
-            }
-        } else {
-            active = false;
-        }
-    }
-
-    this.add = function (handler) {
-        if (typeof handler === 'function') {
-            queue.push(handler);
-
-            if (!active) {
-                process();
-            }
-        }
-    };
-
-    this.clear = function () {
-        while (queue.length) {
-            queue.pop();
-        }
-    };
+    return queue;
 }
 
 function randomInteger (min, max) {
