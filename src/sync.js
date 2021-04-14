@@ -17,6 +17,8 @@ const MAP_CHUNK_SIZE = 25;
 const RANKING_QUERY_COUNT = 25;
 const worldsGameData = new Map();
 
+const saveRawData = false;
+
 const syncCommands = require('./sync-commands.json');
 const syncStatus = require('./sync-status.json');
 const syncEvents = require('./sync-events.json');
@@ -869,17 +871,23 @@ async function syncWorld (type, marketId, worldNumber) {
                 debug.sync('world:%s fetching data', worldId);
 
                 const data = await socketScrapeData(scraper, worldId);
-                // await commitRawDataFilesystem(data, worldId);
                 await commitDataDatabase(data, worldId);
                 await commitDataFilesystem(worldId);
+
+                if (saveRawData) {
+                    await commitRawDataFilesystem(data, worldId);
+                }
                 break;
             }
             case syncTypes.ACHIEVEMENTS: {
                 debug.sync('world:%s fetching achievements', worldId);
 
                 const achievements = await socketScrapeAchivements(scraper);
-                // await commitRawAchievementsFilesystem(achievements, worldId);
                 await commitAchievementsDatabase(achievements, worldId);
+
+                if (saveRawData) {
+                    await commitRawAchievementsFilesystem(achievements, worldId);
+                }
                 break;
             }
         }
