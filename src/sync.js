@@ -222,8 +222,14 @@ function CreateScraper (marketId, worldNumber) {
             this.emit('ResourceDeposit/getInfo');
         }
 
-        this.emit('System/getTime', {}).then(function (data) {
-            commitMarketTimeOffset(data.offset, marketId);
+        this.emit('System/getTime', {}).then(function (gameTime) {
+            commitMarketTimeOffset(gameTime.offset, marketId);
+            commitWorldConfig(gameData['WorldConfig/config'], worldId);
+            fetchWorldMapStructure(character.map_name, marketId, worldNumber);
+
+            if (!worldsGameData.has(worldId)) {
+                worldsGameData.set(worldId, gameData);
+            }
         });
 
         this.emit('DailyLoginBonus/getInfo', null);
@@ -895,8 +901,6 @@ async function syncWorld (type, marketId, worldNumber) {
 
         switch (type) {
             case syncTypes.DATA: {
-                await fetchWorldMapStructure(scraper, marketId, worldNumber);
-
                 debug.sync('world:%s fetching data', worldId);
 
                 const data = await socketScrapeData(scraper, worldId);
@@ -1543,29 +1547,21 @@ async function commitRawAchievementsFilesystem (achievements, worldId) {
     await fs.promises.writeFile(path.join(location, `${worldId}-achievements.json`), JSON.stringify(achievements));
 }
 
-async function fetchWorldMapStructure (page, marketId, worldNumber) {
+async function fetchWorldMapStructure (fileName, marketId, worldNumber) {
     const worldId = marketId + worldNumber;
 
     if (fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
         return;
     }
 
-    ///bin/mapv2-rc1_934bc4ad3c.bin
-
     debug.sync('world:%s fetch map structure', worldId);
 
-    const structPath = await page.evaluate(function () {
-        const cdn = require('cdn');
-        const conf = require('conf/conf');
-        return cdn.getPath(conf.getMapPath());
-    });
-
-    const url = marketDomain(marketId, `https://%market.tribalwars2.com/${structPath}`);
+    const url = marketDomain(marketId, `https://%market.tribalwars2.com/bin/${fileName}.bin`);
     const buffer = await utils.getBuffer(url);
     const gzipped = zlib.gzipSync(buffer);
 
-    await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true});
-    await fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped);
+    fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true});
+    fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped);
 }
 
 async function commitWorldConfig (worldConfig, worldId) {
