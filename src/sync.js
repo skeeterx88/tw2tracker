@@ -248,6 +248,11 @@ function CreateScraper (marketId, worldNumber) {
         return true;
     };
 
+    this.createCharacter = async function (worldNumber) {
+        debug.sync('world:%s create character', worldId);
+        return await this.emit('Authentication/createCharacter', {world: marketId + worldNumber});
+    };
+
     function onMessage () {
         socket.on('message', function (raw) {
             const [,, json] = raw.match(/^(\d+)(.*)/);
@@ -851,17 +856,23 @@ async function syncWorld (type, marketId, worldNumber) {
         }
 
         const character = account.characters.find(({world_id}) => world_id === worldId);
+        let characterId;
 
-        if (!character) {
-            // await createCharacter(marketId, worldNumber);
+        if (character) {
+            characterId = character.character_id;
+        } else if (!character) {
+            const created = await scraper.createCharacter(worldNumber);
+            if (created.id) {
+                characterId = created.id;
+            }
         } else if (!character.allow_login) {
             return reject(syncStatus.WORLD_CLOSED);
-        } else {
-            const success = await scraper.selectCharacter(character.character_id);
+        }
 
-            if (!success) {
-                return reject(syncStatus.FAILED_TO_SELECT_CHARACTER);
-            }
+        const selected = await scraper.selectCharacter(characterId);
+
+        if (!selected) {
+            return reject(syncStatus.FAILED_TO_SELECT_CHARACTER);
         }
 
         switch (type) {
@@ -993,7 +1004,7 @@ async function syncWorldList () {
             const worldId = marketId + worldNumber;
 
             if (!registered) {
-                await createCharacter(marketId, worldNumber);
+                await scraper.createCharacter(marketId, worldNumber);
             }
 
             if (!await utils.worldEntryExists(worldId)) {
@@ -1032,38 +1043,6 @@ async function syncMarketList () {
     }
 
     return missingMarkets;
-}
-
-async function createCharacter (marketId, worldNumber) {
-    const worldId = marketId + worldNumber;
-
-    debug.sync('world:%s create character', worldId);
-
-    const page = await createPuppeteerPage();
-    await page.goto(`https://${marketId}.tribalwars2.com/page`, {
-        waitUntil: ['domcontentloaded', 'networkidle0']
-    });
-
-    const response = await page.evaluate(function (worldId) {
-        return new Promise(function (resolve) {
-            const socketService = injector.get('socketService');
-            const routeProvider = injector.get('routeProvider');
-
-            debug('world:%s emit create character command', worldId);
-
-            socketService.emit(routeProvider.CREATE_CHARACTER, {
-                world: worldId
-            }, resolve);
-        });
-    }, worldId);
-
-    page.close();
-
-    if (response.id && response.world_id) {
-        debug.sync('world:%s character created %o', worldId. response);
-    } else {
-        debug.sync('world:%s failed to create character %o', worldId, response);
-    }
 }
 
 async function toggleWorld (marketId, worldNumber) {
