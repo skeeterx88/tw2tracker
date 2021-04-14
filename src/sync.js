@@ -58,6 +58,7 @@ const syncTypeMapping = {
 /**
  * @param marketId {String}
  * @param worldNumber {Number}
+ * @class CreateScraper
  */
 function CreateScraper (marketId, worldNumber) {
     const worldId = marketId + worldNumber;
@@ -121,12 +122,24 @@ function CreateScraper (marketId, worldNumber) {
         });
     };
 
+    /**
+     * Completely defuses the scraper.
+     */
     this.kill = function () {
         clearTimeout(pingIntervalId);
         socket.close();
         worldScrapers.delete(worldId);
     };
 
+    /**
+     * Logged-in account object.
+     * @typedef {Object} SyncAccount
+     */
+
+    /**
+     * Authenticate using one of the available sync accounts.
+     * @return {Promise<SyncAccount|boolean>} The authenticated account or false.
+     */
     this.auth = async function () {
         if (authenticated) {
             return authenticated;
@@ -155,6 +168,18 @@ function CreateScraper (marketId, worldNumber) {
         return false;
     };
 
+    /**
+     * Account's character object.
+     * @typedef {Object} SyncAccountCharacter
+     */
+
+    /**
+     * Select an account's character (world). Simulates the emits
+     * like it's a user logging in from the browser.
+     *
+     * @param characterId
+     * @return {Promise<SyncAccountCharacter|boolean>}
+     */
     this.selectCharacter = async (characterId) => {
         if (characterSelected) {
             return characterSelected;
@@ -242,9 +267,14 @@ function CreateScraper (marketId, worldNumber) {
 
         characterSelected = character;
 
-        return true;
+        return characterSelected;
     };
 
+    /**
+     * Create a character on a specific world.
+     * @param worldNumber
+     * @return {Promise<SyncAccountCharacter>}
+     */
     this.createCharacter = async function (worldNumber) {
         debug.sync('world:%s create character', worldId);
         return await this.emit('Authentication/createCharacter', {world: marketId + worldNumber});
