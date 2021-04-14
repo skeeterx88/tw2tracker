@@ -66,8 +66,8 @@ function CreateScraper (marketId, worldNumber) {
     const callbacks = new Map();
     const timeouts = new Map();
 
-    const urlId = marketId === 'zz' ? 'beta' : marketId;
-    const socket = new WebSocket(`wss://${urlId}.tribalwars2.com/socket.io/?platform=desktop&EIO=3&transport=websocket`);
+    const url = marketDomain(marketId, 'wss://%market.tribalwars2.com/socket.io/?platform=desktop&EIO=3&transport=websocket');
+    const socket = new WebSocket(url);
     const LOADING_TIMEOUT = 10000;
 
     let authenticated = false;
@@ -852,7 +852,6 @@ async function addSyncQueue (type, newItems) {
 async function syncWorld (type, marketId, worldNumber) {
     const syncTypeValues = syncTypeMapping[type];
     const worldId = marketId + worldNumber;
-    const urlId = marketId === 'zz' ? 'beta' : marketId;
     let scraper;
 
     const promise = new Promise(async function (resolve, reject) {
@@ -904,7 +903,7 @@ async function syncWorld (type, marketId, worldNumber) {
 
         switch (type) {
             case syncTypes.DATA: {
-                await fetchWorldMapStructure(scraper, worldId, urlId);
+                await fetchWorldMapStructure(scraper, marketId, worldNumber);
 
                 debug.sync('world:%s fetching data', worldId);
 
@@ -1552,7 +1551,9 @@ async function commitRawAchievementsFilesystem (achievements, worldId) {
     await fs.promises.writeFile(path.join(location, `${worldId}-achievements.json`), JSON.stringify(achievements));
 }
 
-async function fetchWorldMapStructure (page, worldId, urlId) {
+async function fetchWorldMapStructure (page, marketId, worldNumber) {
+    const worldId = marketId + worldNumber;
+
     if (fs.existsSync(path.join('.', 'data', worldId, 'struct'))) {
         return;
     }
@@ -1567,7 +1568,8 @@ async function fetchWorldMapStructure (page, worldId, urlId) {
         return cdn.getPath(conf.getMapPath());
     });
 
-    const buffer = await utils.getBuffer(`https://${urlId}.tribalwars2.com/${structPath}`);
+    const url = marketDomain(marketId, `https://%market.tribalwars2.com/${structPath}`);
+    const buffer = await utils.getBuffer(url);
     const gzipped = zlib.gzipSync(buffer);
 
     await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true});
@@ -2002,6 +2004,17 @@ function tribePowerToLevel (worldId, power) {
     }
 
     return level;
+}
+
+/**
+ * Get the correct URL to the specified market.
+ * @param marketId {string}
+ * @param url {string}
+ * @return {string}
+ */
+function marketDomain (marketId, url) {
+    const market = marketId === 'zz' ? 'beta' : marketId;
+    return url.replace('%market', market);
 }
 
 module.exports = {
