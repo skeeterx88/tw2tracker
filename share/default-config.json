@@ -27,7 +27,8 @@
         "min_time_between_achievement_syncs": "5 minutes",
         "max_sync_data_running_time": "5 minutes",
         "max_sync_achievements_running_time": "30 minutes",
-        "maximum_history_days": 30
+        "maximum_history_days": 30,
+        "store_raw_data": false
     },
     "sync_timeouts": {
         "ready_state": "20 seconds",
