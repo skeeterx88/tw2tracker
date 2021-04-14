@@ -4,19 +4,19 @@
     --bg-button-red: linear-gradient(hsl(0, 47%, 51%), hsl(0, 70%, 29%));
     --bg-button: linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
     --color-content-layer-2: var(--noise) hsl(43, 52%, 75%);
-    --color-content: var(--noise) hsl(40deg 53% 66%);
-    --color-highlight: hsl(39deg 35% 53%);
-    --color-table-header: var(--noise) hsl(40deg 53% 60%);
-    --color-table-row-even: var(--noise) hsl(40deg 53% 64%);
-    --color-table-row-hover: var(--noise) hsl(40deg 53% 69%);
-    --content-inner-shadow: inset -2px -2px 3px hsl(0, 0%, 0%, 30%);
-    --content-menu-shadow: 2px 2px 3px hsl(0, 0%, 0%, 35%);
-    --main-background: hsl(43deg 59% 78%);
+    --color-content: var(--noise) hsl(40, 53%, 66%);
+    --color-highlight: hsl(39, 35%, 53%);
+    --color-table-header: var(--noise) hsl(40, 53%, 60%);
+    --color-table-row-even: var(--noise) hsl(40, 53%, 64%);
+    --color-table-row-hover: var(--noise) hsl(40, 53%, 69%);
+    --content-inner-shadow: inset -2px -2px 3px hsla(0, 0%, 0%, .03);
+    --content-menu-shadow: 2px 2px 3px hsla(0, 0%, 0%, 0.35);
+    --main-background: hsl(43, 59%, 78%);
     --noise: url(/images/noise.webp);
-    --shadow-border-1: 0px 0px 0px 1px hsl(23, 55%, 24%), 0px 0px 0px 2px hsl(23, 47%, 36%), 2px 2px 4px hsla(0, 0%, 0%, 50%);
-    --shadow-border-2: 0px 0px 0px 1px hsl(23deg 67% 17%), inset 0px 0px 0px 1px hsl(23deg 67% 17%), 2px 2px 2px hsl(0deg 0% 0%), inset -1px -1px 2px hsl(0, 0%, 0%);
-    --shadow-border-input: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset 1px 1px 3px hsla(0, 0%, 0%, 95%);
-    --shadow-button-1: 0px 0px 0px 1px hsl(23deg 67% 17%), inset 0px 0px 0px 1px hsl(23deg 67% 17%), 2px 2px 2px hsl(0deg 0% 0% / 50%), inset -1px -1px 2px hsl(0deg 0% 0%);
+    --shadow-border-1: 0px 0px 0px 1px hsl(23, 55%, 24%), 0px 0px 0px 2px hsl(23, 47%, 36%), 2px 2px 4px hsla(0, 0%, 0%, 0.50);
+    --shadow-border-2: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset -1px -1px 2px hsl(0, 0%, 0%);
+    --shadow-border-input: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset 1px 1px 3px hsla(0, 0%, 0%, 0.95);
+    --shadow-button-1: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsla(0, 0%, 0%, 0.50), inset -1px -1px 2px hsl(0, 0%, 0%);
 }
 
 *, *:before, *:after {
@@ -52,7 +52,7 @@ body {
     max-width: initial;
     width: 100%;
     height: 100%;
-    padding: 0px;
+    padding: 0;
 }
 
 ::placeholder {
@@ -62,7 +62,7 @@ body {
 }
 
 table {
-    border-spacing: 0px;
+    border-spacing: 0;
     width: 100%;
 }
 
@@ -71,20 +71,19 @@ th {
 }
 
 .map-page th {
-    background: hsl(0 0% 0% / 20%);
-    padding: 5px 0px;
+    background: hsla(0, 0%, 0%, 0.20);
+    padding: 5px 0;
 }
 
 tbody td, thead th, table.vertical th {
-    border-bottom: 1px solid hsl(40deg 44% 58%);
-    border-top: 1px solid hsl(40deg 44% 65%);
+    border-bottom: 1px solid hsl(40, 44%, 58%);
+    border-top: 1px solid hsl(40, 44%, 65%);
     height: 20px;
-    margin: 0px;
+    margin: 0;
     overflow: hidden;
     padding: 2px;
     text-align: center;
     text-overflow: ellipsis;
-    /* white-space: nowrap; */
 }
 
 .map-page td {
@@ -105,19 +104,19 @@ tbody tr:last-child td {
 }
 
 tbody tr:nth-child(even) {
-    background: hsl(40deg 84% 33% / 5%);
+    background: hsla(40, 84%, 33%, 0.05);
 }
 
 tbody tr:hover td {
-    background: hsl(0 100% 100% / 10%);
+    background: hsla(0, 100%, 100%, 0.10);
 }
 
 table.vertical tr:hover th {
-    background: hsl(0 100% 100% / 5%);
+    background: hsla(0, 100%, 100%, 0.05);
 }
 
 .map-page tbody tr:hover td {
-    background: hsl(0 100% 100% / 05%);
+    background: hsla(0, 100%, 100%, 0.05);
 }
 
 table.vertical th,
@@ -131,7 +130,7 @@ table.vertical .right {
 }
 
 code {
-    background: hsla(19, 58%, 41%, 38%);
+    background: hsla(19, 58%, 41%, 0.38);
     border-radius: 3px;
     padding: 3px;
 }
@@ -169,7 +168,7 @@ ul {
 
 h1 {
     font-size: 1.5rem;
-    margin: 5px 0px;
+    margin: 5px 0;
 }
 
 h2 {
@@ -197,7 +196,7 @@ main, footer {
     border-radius: 2px;
     border: 1px solid hsl(174, 16%, 26%);
     box-shadow: var(--shadow-border-1);
-    margin: 0px auto;
+    margin: 0 auto;
     padding: 10px;
     position: relative;
 }
@@ -213,7 +212,7 @@ footer {
 
 small {
     font-size: 0.8rem;
-    padding: 2px 0px;
+    padding: 2px 0;
 }
 
 fieldset {
@@ -235,7 +234,7 @@ div.modal {
     color: hsl(0, 35%, 81%);
     margin: 0 auto;
     padding: 3px;
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    text-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.90);
     transition: visibility 0.02s linear, opacity 0.02s linear;
     width: 630px;
     z-index: 7;
@@ -248,7 +247,7 @@ div.world-title {
 
 #main-header {
     background: url(/images/banner.svg) no-repeat center / 33em;
-    filter: drop-shadow(10px 10px 12px hsla(0, 0%, 0%, 50%));
+    filter: drop-shadow(10px 10px 12px hsla(0, 0%, 0%, 0.50));
     height: 10em;
     margin-bottom: 10px;
     width: 100%;
@@ -257,22 +256,22 @@ div.world-title {
 #main-menu {
     display: flex;
     font-size: 1rem;
-    padding: 0px 10px;
+    padding: 0 10px;
     position: relative;
 }
 
 #main-menu a {
     background: var(--noise), radial-gradient(ellipse farthest-corner at 0 140%, hsl(204, 47%, 65%) 0%, hsl(205, 21%, 31%) 70%, hsl(204, 20%, 37%) 70%);
-    border-radius: 1px 1px 0px 0px;
-    box-shadow: 0px 0px 0px 1px hsl(28, 62%, 16%), 0px 0px 0px 2px hsl(24, 49%, 52%), 0px 0px 0px 3px hsl(23, 48%, 38%), 0px 0px 0px 4px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 40%), inset -1px -1px 1px hsla(0, 0%, 0%, 40%);
+    border-radius: 1px 1px 0 0;
+    box-shadow: 0 0 0 1px hsl(28, 62%, 16%), 0 0 0 2px hsl(24, 49%, 52%), 0 0 0 3px hsl(23, 48%, 38%), 0 0 0 4px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 0.40), inset -1px -1px 1px hsla(0, 0%, 0%, 0.40);
     color: white;
     display: inline-block;
     font-weight: bold;
-    margin: 0px 4px 0px 4px;
+    margin: 0 4px 0 4px;
     padding: 6px 20px;
     text-align: center;
     text-decoration: none;
-    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
+    text-shadow: 1px 1px 0 hsl(0, 0%, 0%);
     text-transform: uppercase;
 }
 
@@ -328,7 +327,7 @@ div.world-title {
 
 #search .relax-button {
     height: 25px;
-    margin: 0px;
+    margin: 0;
     vertical-align: top;
 }
 
@@ -354,15 +353,15 @@ div.world-title {
 }
 
 .section-actions {
-    margin: 8px 0px;
+    margin: 8px 0;
 }
 
 .content-menu {
     border-bottom: 2px solid hsl(23, 55%, 24%);
     border-radius: 3px;
     box-shadow: var(--content-menu-shadow);
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
     text-align: center;
 }
 
@@ -380,7 +379,7 @@ div.world-title {
     outline: none;
     padding: 2px 10px;
     text-align: center;
-    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
+    text-shadow: 1px 1px 0 hsl(0, 0%, 0%);
 }
 
 .content-menu li:hover {
@@ -402,7 +401,7 @@ div.world-title {
     border: 1px solid hsl(24, 42%, 39%);
     box-shadow: var(--shadow-border-input);
     height: 25px;
-    padding: 0px 5px;
+    padding: 0 5px;
 }
 
 .relax-input:focus {
@@ -437,10 +436,10 @@ div.world-title {
     line-height: 23px;
     margin: 5px 5px;
     outline: none;
-    padding: 0px 5px;
+    padding: 0 5px;
     text-align: center;
     text-decoration: none;
-    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
+    text-shadow: 1px 1px 0 hsl(0, 0%, 0%);
     vertical-align: middle;
     white-space: nowrap;
 }
@@ -454,13 +453,13 @@ div.world-title {
 .map-page .relax-button {
     height: 22px;
     line-height: 21px;
-    padding: 0px 3px;
+    padding: 0 3px;
 }
 
 .map-page .relax-input {
     height: 22px;
     line-height: 21px;
-    padding: 0px 3px;
+    padding: 0 3px;
 }
 
 .relax-button.disabled {
@@ -492,11 +491,11 @@ div.world-title {
     background: var(--noise) hsl(23, 25%, 20%);
     border-radius: 1px;
     border: 1px solid hsl(23, 6%, 39%);
-    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%);
     color: hsl(36, 13%, 59%);
-    margin: 2px 0px;
+    margin: 2px 0;
     padding: 1px 4px;
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    text-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.90);
 }
 
 .flat-button.selected {
@@ -522,12 +521,12 @@ div.world-title {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    margin: 10px 0px;
+    margin: 10px 0;
     padding: 5px;
 }
 
 .relax-container > * {
-    margin: 0px 5px;
+    margin: 0 5px;
 }
 
 .market-list .title,
@@ -545,7 +544,7 @@ div.world-title {
 
 .market-list p,
 .world-list p {
-    margin: 0px;
+    margin: 0;
 }
 
 .world-list {
@@ -573,7 +572,7 @@ div.world-title {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin: 5px 0px;
+    margin: 5px 0;
     padding: 2px 8px;
 }
 
@@ -588,20 +587,20 @@ div.world-title {
     border-style: solid;
     border-width: 1px;
     box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%);
-    margin: 5px 0px;
-    padding: 0px 8px;
+    margin: 5px 0;
+    padding: 0 8px;
 }
 
 .modal-container {
     background: var(--noise) hsl(23, 48%, 29%);
     border-radius: 1px;
     border: 1px solid hsl(23, 55%, 24%);
-    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
+    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 0.95);
     color: hsl(0, 35%, 81%);
     left: 50%;
     padding: 3px;
     position: fixed;
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    text-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.90);
     top: 50%;
     transform: translate(-50%, -50%);
     transition: visibility 0.02s linear, opacity 0.02s linear;
@@ -619,8 +618,8 @@ div.world-title {
     cursor: pointer;
     height: 26px;
     position: absolute;
-    right: 0px;
-    top: 0px;
+    right: 0;
+    top: 0;
     user-select: none;
     width: 26px;
 }
@@ -637,10 +636,10 @@ div.world-title {
     background: var(--noise) hsl(23, 48%, 29%);
     border-radius: 1px;
     border: 1px solid hsl(23, 55%, 24%);
-    box-shadow: 0px 0px 0px 1px hsl(0, 0%, 0%), 0px 0px 0px 2px hsl(23, 55%, 24%), 0px 0px 0px 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 95%);
+    box-shadow: 0 0 0 1px hsl(0, 0%, 0%), 0 0 0 2px hsl(23, 55%, 24%), 0 0 0 4px hsl(0, 0%, 0%), 2px 2px 5px 5px hsla(0, 0%, 0%, 0.95);
     color: hsl(0, 35%, 81%);
     position: fixed;
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    text-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.90);
     transition: opacity 0.1s;
     z-index: 15;
 }
@@ -665,11 +664,11 @@ div.world-title {
 }
 
 .floating-modal .floating-modal-drag {
-    background-image: linear-gradient(130deg, hsl(0deg 0% 0% / 15%) 16.67%, hsl(0deg 0% 0% / 0%) 16.67%, hsl(0deg 0% 0% / 0%) 50%, hsl(0deg 0% 0% / 15%) 50%, hsl(0deg 0% 0% / 15%) 66.67%, hsl(0deg 0% 0% / 0%) 66.67%, hsl(0deg 0% 0% / 0%) 100%);
-    background-size: 7.83px 9.33px;
+    background-image: linear-gradient(130deg, hsla(0, 0%, 0%, 0.15) 16.67%, hsla(0, 0%, 0%, 0) 16.67%, hsla(0, 0%, 0%, 0) 50%, hsla(0, 0%, 0%, 0.15) 50%, hsla(0, 0%, 0%, 0.15) 66.67%, hsla(0, 0%, 0%, 0) 66.67%, hsla(0, 0%, 0%, 0) 100%);
+    background-size: 8px 9px;
     cursor: move;
     flex: 1;
-    margin: 0px 5px;
+    margin: 0 5px;
     user-select: none;
 }
 
@@ -690,8 +689,8 @@ div.world-title {
 }
 
 .pagination {
-    border-top: 1px solid hsl(40deg 44% 55%);
-    padding: 3px 0px;
+    border-top: 1px solid hsl(40, 44%, 55%);
+    padding: 3px 0;
     text-align: center;
     user-select: none;
 }
@@ -706,17 +705,17 @@ div.world-title {
 
 .pagination .page {
     cursor: pointer;
-    padding: 0px 7px;
+    padding: 0 7px;
 }
 
 .pagination .current {
     font-weight: bold;
-     border: 1px solid hsl(40deg 44% 44%); 
+     border: 1px solid hsl(40, 44%, 44%);
     border-radius: 2px;
 }
 
 .map-page .pagination .current {
-    border: 1px solid hsl(23deg 43% 40%);
+    border: 1px solid hsl(23, 43%, 40%);
 }
 
 .pagination .next,
@@ -742,7 +741,7 @@ div.world-title {
 .conquest-loss,
 .conquest-self {
     border-radius: 7px;
-    box-shadow: 1px 1px 0px hsla(0, 0%, 0%, 50%);
+    box-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.50);
     display: inline-block;
     height: 10px;
     width: 10px;
@@ -768,7 +767,7 @@ div.world-title {
 
 .sub-menu .item {
     background: var(--noise), linear-gradient(hsl(34, 73%, 31%), hsl(36, 48%, 65%));
-    box-shadow: 0px 0px 0px 1px hsl(28deg 62% 16%), 0px 0px 0px 2px hsl(24deg 49% 52%), 0px 0px 0px 3px hsl(17deg 28% 10%), inset 1px 1px 3px hsl(0deg 0% 100% / 40%), inset -1px -1px 1px hsl(0deg 0% 0% / 40%), 1px 1px 2px 3px hsl(0deg 0% 0% / 20%);
+    box-shadow: 0 0 0 1px hsl(28, 62%, 16%), 0 0 0 2px hsl(24, 49%, 52%), 0 0 0 3px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 0.40), inset -1px -1px 1px hsla(0, 0%, 0%, 0.40), 1px 1px 2px 3px hsla(0, 0%, 0%, 0.20);
     color: hsl(27, 22%, 8%);
     display: inline-block;
     font-weight: bold;
@@ -782,13 +781,13 @@ div.world-title {
 
 .sub-menu .item.selected {
     background: var(--noise), linear-gradient(hsl(34, 73%, 31%), hsl(36, 55%, 55%));
-    box-shadow: 0px 0px 0px 1px hsl(28, 62%, 16%), 0px 0px 0px 2px hsl(24, 79%, 64%), 0px 0px 0px 3px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 40%), inset -1px -1px 1px hsla(0, 0%, 0%, 40%), 1px 1px 2px 3px hsla(0, 0%, 0%, 70%);
+    box-shadow: 0 0 0 1px hsl(28, 62%, 16%), 0 0 0 2px hsl(24, 79%, 64%), 0 0 0 3px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 0.40), inset -1px -1px 1px hsla(0, 0%, 0%, 0.40), 1px 1px 2px 3px hsla(0, 0%, 0%, 0.70);
     color: hsl(25, 26%, 9%);
-    text-shadow: 1px 1px 1px hsla(0, 0%, 0%, 20%);
+    text-shadow: 1px 1px 1px hsla(0, 0%, 0%, 0.20);
 }
 
 .sub-menu .item:hover {
-    box-shadow: 0px 0px 0px 1px hsl(28, 62%, 16%), 0px 0px 0px 2px hsl(24, 79%, 64%), 0px 0px 0px 3px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 40%), inset -1px -1px 1px hsla(0, 0%, 0%, 40%), 1px 1px 2px 3px hsla(0, 0%, 0%, 70%);
+    box-shadow: 0 0 0 1px hsl(28, 62%, 16%), 0 0 0 2px hsl(24, 79%, 64%), 0 0 0 3px hsl(17, 28%, 10%), inset 1px 1px 3px hsla(0, 0%, 100%, 0.40), inset -1px -1px 1px hsla(0, 0%, 0%, 0.40), 1px 1px 2px 3px hsla(0, 0%, 0%, 0.70);
 }
 
 .sub-menu .item.right {
@@ -810,7 +809,7 @@ div.world-title {
     border: 1px solid hsl(0, 0%, 4%);
     display: inline-block;
     height: 25px;
-    margin: 2px 0px;
+    margin: 2px 0;
     position: relative;
     vertical-align: middle;
     width: 100%;
@@ -830,12 +829,12 @@ div.world-title {
     height: 100%;
     line-height: 25px;
     position: absolute;
-    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
+    text-shadow: 1px 1px 0 hsl(0, 0%, 0%);
     width: 100%;
 }
 
 .error {
-    background-color: hsl(0deg, 78%, 63%, 35%);
+    background-color: hsla(0, 78%, 63%, 0.35);
     border-radius: 3px;
     border: 2px solid hsl(0, 79%, 55%);
     padding: 10px;
@@ -843,9 +842,9 @@ div.world-title {
 }
 
 .message {
-    background: var(--noise) hsl(96deg 53% 77%);
+    background: var(--noise) hsl(96, 53%, 77%);
     border-radius: 3px;
-    border: 2px solid hsl(107deg 28% 49%);
+    border: 2px solid hsl(107, 28%, 49%);
     padding: 10px;
     width: 100%;
 }
@@ -890,16 +889,15 @@ div.world-title {
     border-radius: 1px;
     border: 1px solid hsl(23, 6%, 39%);
     bottom: 40px;
-    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 5px hsl(0, 0%, 0%), inset 3px 3px 2px hsla(0, 0%, 100%, 10%), inset -3px -3px 2px hsla(0, 0%, 0%, 10%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 2px 2px 5px hsl(0, 0%, 0%), inset 3px 3px 2px hsla(0, 0%, 100%, 0.10), inset -3px -3px 2px hsla(0, 0%, 0%, 0.10);
     color: hsl(38, 100%, 90%);
     max-height: 200px;
     max-width: 400px;
     min-width: 300px;
-    padding-bottom: 10px;
     padding: 2px 6px;
     position: absolute;
     right: 40px;
-    text-shadow: 1px 1px 0px hsla(0, 0%, 0%, 90%);
+    text-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.90);
     transition: visibility 0.1s linear, opacity 0.1s linear, right 0.15s ease-out;
     z-index: 15;
 }
@@ -913,14 +911,13 @@ div.world-title {
 }
 
 .notif .content {
-    margin: 0px;
+    margin: 0;
     text-align: center;
     word-break: break-word;
 }
 
 .notif .title {
-    border-bottom: 1px solid hsla(38, 100%, 90%, 50%);
-    margin-bottom: 0px;
+    border-bottom: 1px solid hsla(38, 100%, 90%, 0.50);
     margin: 3px;
     padding-bottom: 5px;
     text-align: center;
@@ -948,7 +945,7 @@ div.world-title {
 
 .map-panel {
     background: url(/images/side-bar-left.jpg) left repeat-y, url(/images/side-bar-right.jpg) right repeat-y, url(/images/side-bar-middle.jpg), hsl(23, 25%, 20%);
-    box-shadow: 5px 0px 6px hsla(0, 0%, 0%, 80%);
+    box-shadow: 5px 0 6px hsla(0, 0%, 0%, 0.80);
     color: hsl(38, 100%, 90%);
     display: flex;
     flex-direction: column;
@@ -978,7 +975,7 @@ div.world-title {
 }
 
 .map-panel .relax-button {
-    margin: 0px;
+    margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -990,10 +987,10 @@ div.world-title {
 
 .map-panel .toggle {
     background: var(--noise) hsl(23, 25%, 20%);
-    border-radius: 0px 5px 5px 0px;
+    border-radius: 0 5px 5px 0;
     border: 1px solid hsl(23, 6%, 39%);
     bottom: 0;
-    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 5px 0px 6px hsla(0, 0%, 0%, 80%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 5px 0 6px hsla(0, 0%, 0%, 0.80);
     height: 50px;
     margin: auto;
     position: absolute;
@@ -1067,7 +1064,7 @@ div.world-title {
     overflow-y: auto;
     scrollbar-color: hsl(27, 21%, 41%) transparent;
     scrollbar-width: thin;
-    text-shadow: 1px 1px 0px hsl(0deg 0% 0%);
+    text-shadow: 1px 1px 0 hsl(0, 0%, 0%);
 }
 
 .map-panel .highlights-items .item {
@@ -1114,7 +1111,7 @@ div.world-title {
 .map-panel .highlights-items .item .villages {
     color: hsl(38, 28%, 64%);
     font-size: 0.9rem;
-    line-height: 0px;
+    line-height: 0;
     padding-left: 19px;
     width: 100%;
 }
@@ -1132,12 +1129,12 @@ div.world-title {
 }
 
 .map-panel .search input {
-    padding: 0px 8px;
+    padding: 0 8px;
 }
 
 .map-panel .search .results {
     background: url(/images/noise-3.png) top left hsl(32, 43%, 66%);
-    box-shadow: inset 0 0 0 1px hsl(31, 46%, 22%), inset 0 0 0 2px hsl(32, 51%, 72%), 5px 5px 5px hsla(0, 0%, 0%, 80%);
+    box-shadow: inset 0 0 0 1px hsl(31, 46%, 22%), inset 0 0 0 2px hsl(32, 51%, 72%), 5px 5px 5px hsla(0, 0%, 0%, 0.80);
     color: hsl(0, 0%, 0%);
     left: 2px;
     line-height: 15px;
@@ -1156,9 +1153,9 @@ div.world-title {
 
 .map-panel .search .result {
     cursor: pointer;
-    margin: 0px;
+    margin: 0;
     overflow: hidden;
-    padding: 2px 0px;
+    padding: 2px 0;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -1171,12 +1168,12 @@ div.world-title {
 
 .map-panel .search .result:hover,
 .map-panel .search .result.selected:hover {
-    background-color: hsla(31, 68%, 87%, 66%);
+    background-color: hsla(31, 68%, 87%, 0.66);
     color: hsl(31, 100%, 25%);
 }
 
 .map-panel .search .result.selected {
-    background-color: hsla(31, 68%, 87%, 36%);
+    background-color: hsla(31, 68%, 87%, 0.36);
     color: hsl(31, 100%, 25%);
 }
 
@@ -1189,7 +1186,7 @@ div.world-title {
 
 .map-settings .color-option {
     display: block;
-    padding: 2px 0px;
+    padding: 2px 0;
 }
 
 .map-panel .info {
@@ -1199,7 +1196,7 @@ div.world-title {
 }
 
 .map-panel .info p {
-    margin: 2px 0px;
+    margin: 2px 0;
 }
 
 .map-panel .info a {
@@ -1375,15 +1372,15 @@ a.tribe-link::before {
 }
 
 .color-picker {
-    background: hsl(31deg 44% 34%);
-    left: 0px;
+    background: hsl(31, 44%, 34%);
+    left: 0;
     position: absolute;
-    top: 0px;
+    top: 0;
     z-index: 10;
 }
 
 .color-picker td {
-    padding: 0px;
+    padding: 0;
     border: none;
 }
 
@@ -1398,7 +1395,7 @@ a.tribe-link::before {
 }
 
 .color-picker .active {
-    box-shadow: inset 0px 0px 0px 1px hsla(120, 100%, 50%, 80%), inset 0px 0px 0px 2px hsla(0, 0%, 0%, 80%), inset 0px 0px 0px 3px hsla(120, 100%, 50%, 80%), inset 0px 0px 0px 4px hsla(0, 0%, 0%, 80%);
+    box-shadow: inset 0 0 0 1px hsla(120, 100%, 50%, 0.80), inset 0 0 0 2px hsla(0, 0%, 0%, 0.80), inset 0 0 0 3px hsla(120, 100%, 50%, 0.80), inset 0 0 0 4px hsla(0, 0%, 0%, 0.80);
 }
 
 .floating-ranking {
@@ -1408,8 +1405,7 @@ a.tribe-link::before {
 .floating-ranking tbody a {
     background: url(/images/external-link.png) 97% center no-repeat, var(--noise), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
     border-radius: 3px;
-    border: 1px solid hsl(28deg 62% 16%);
-    box-shadow: 1px 1px 1px hsl(0deg 0% 0% / 10%);
+    border: 1px solid hsl(28, 62%, 16%);
     box-shadow: none;
     display: inline-block;
     height: initial;
@@ -1417,7 +1413,7 @@ a.tribe-link::before {
 }
 
 .floating-ranking tbody a:hover {
-    border: 1px solid hsl(28deg 92% 10%);
+    border: 1px solid hsl(28, 92%, 10%);
     text-decoration: none;
 }
 
@@ -1438,20 +1434,20 @@ a.tribe-link::before {
 }
 
 .floating-ranking th {
-    color: hsl(22deg 38% 58%);
+    color: hsl(22, 38%, 58%);
     max-width: 80px;
     overflow: hidden;
-    padding: 5px 0px 5px 10px;
+    padding: 5px 0 5px 10px;
     text-overflow: ellipsis;
 }
 
 .floating-ranking .sort {
-    color: hsl(22deg 58% 58%);
+    color: hsl(22, 58%, 58%);
     cursor: pointer;
 }
 
 .floating-ranking .sort:hover {
-    color: hsl(22deg 80% 58%);
+    color: hsl(22, 80%, 58%);
 }
 
 .floating-ranking .sort.selected::before {
@@ -1653,7 +1649,7 @@ span[class^="flag-"] {
 
 .map {
     background: hsl(84, 68%, 23%);
-    box-shadow: 0px 0px 0px 1px hsl(23deg 55% 24%), 0px 0px 0px 2px hsl(23deg 47% 36%), 2px 2px 4px hsl(0deg 0% 0% / 50%);
+    box-shadow: 0 0 0 1px hsl(23, 55%, 24%), 0 0 0 2px hsl(23, 47%, 36%), 2px 2px 4px hsla(0, 0%, 0%, 0.50);
     touch-action: none;
     user-select: none;
 }
@@ -1672,7 +1668,7 @@ span[class^="flag-"] {
     background-image: var(--noise);
     border-radius: 1px;
     border: 1px solid hsl(24, 42%, 39%);
-    box-shadow: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
+    box-shadow: 0 0 0 1px hsl(23, 67%, 17%), inset 0 0 0 1px hsl(23, 67%, 17%), 1px 1px 2px hsl(0, 0%, 0%);
     display: inline-block;
     height: 8px;
     position: relative;
@@ -1682,13 +1678,13 @@ span[class^="flag-"] {
 #map-tooltip {
     background: var(--color-content);
     font-size: 12px;
-    left: 0px;
+    left: 0;
     margin-top: 3px;
     opacity: 0;
     padding: 3px;
     pointer-events: none;
     position: fixed;
-    top: 0px;
+    top: 0;
     transition: all 0.2s;
     visibility: hidden;
     width: 370px;
@@ -1698,13 +1694,13 @@ span[class^="flag-"] {
 #map-tooltip table {
     background: var(--noise) hsl(31, 45%, 67%);
     border-spacing: 1px;
-    box-shadow: 0 0 0 2px hsla(26, 100%, 24%, 66%);
+    box-shadow: 0 0 0 2px hsla(26, 100%, 24%, 0.66);
     width: 100%;
 }
 
 #map-tooltip td {
-    background: var(--noise) hsl(30deg 36% 60%);
-    border: 1px solid hsl(32deg 33% 48%);
+    background: var(--noise) hsl(30, 36%, 60%);
+    border: 1px solid hsl(32, 33%, 48%);
     box-shadow: none;
     padding: 1px;
     text-align: left;
@@ -1722,7 +1718,7 @@ span[class^="flag-"] {
 }
 
 #map-tooltip .title {
-    color: hsla(0, 0%, 0%, 95%);
+    color: hsla(0, 0%, 0%, 0.95);
     display: block;
 }
 
@@ -1756,7 +1752,7 @@ span[class^="flag-"] {
 }
 
 #map-tooltip .icon {
-    background: linear-gradient(hsla(180, 20%, 1%, 73%), hsla(180, 20%, 1%, 00%)), url(/images/background-icon-black.webp);
+    background: linear-gradient(hsla(180, 20%, 1%, 0.73), hsla(180, 20%, 1%, 0)), url(/images/background-icon-black.webp);
     border: 1px solid hsl(0, 13%, 15%);
     display: inline-block;
     height: 25px;
@@ -1821,7 +1817,7 @@ span[class^="flag-"] {
 }
 
 #language-list a {
-    border-bottom-color: hsla(0, 0%, 0%, 25%);
+    border-bottom-color: hsla(0, 0%, 0%, 0.25);
     border-bottom-style: dotted;
     border-bottom-width: 2px;
     color: hsl(18, 53%, 85%);
@@ -1830,7 +1826,7 @@ span[class^="flag-"] {
 }
 
 #language-list a:hover {
-    background: hsla(0, 0%, 100%, 08%);
+    background: hsla(0, 0%, 100%, 0.08);
     color: hsl(0, 0%, 100%);
 }
 
@@ -1843,7 +1839,7 @@ span[class^="flag-"] {
 }
 
 #language-list h2 {
-    margin: 0px;
+    margin: 0;
 }
 
 .history-change-type {
@@ -1853,17 +1849,17 @@ span[class^="flag-"] {
 
 .history-change-type.equal::after {
     content: '=';
-    color: hsl(39deg 25% 45%);
+    color: hsl(39, 25%, 45%);
 }
 
 .history-change-type.increase::after {
     content: '+';
-    color: hsl(120deg 63% 35%);
+    color: hsl(120, 63%, 35%);
 }
 
 .history-change-type.decrease::after {
     content: '−';
-    color: hsl(0deg 100% 50%);
+    color: hsl(0, 100%, 50%);
 }
 
 @keyframes sk-bouncedelay {
@@ -1876,12 +1872,12 @@ span[class^="flag-"] {
 
 @media (max-width: 800px) {
     body {
-        padding: 1px 0px;
+        padding: 1px 0;
     }
 
     .map-page body {
         width: 100%;
-        padding: 0px 0px;
+        padding: 0 0;
     }
 
     .map-panel .toggle {
@@ -1893,14 +1889,14 @@ span[class^="flag-"] {
     }
 
     .map.full {
-        margin-left: 0px;
+        margin-left: 0;
     }
 
     #main-header {
         height: 8rem;
         background-size: 25em;
         margin-bottom: 10px;
-        filter: drop-shadow(10px 10px 12px hsla(0, 0%, 0%, 90%));
+        filter: drop-shadow(10px 10px 12px hsla(0, 0%, 0%, 0.90));
     }
 
     .content {
@@ -1929,8 +1925,8 @@ span[class^="flag-"] {
 
     #main-menu {
         margin-bottom: 5px;
-        padding-left: 0px;
-        padding-right: 0px;
+        padding-left: 0;
+        padding-right: 0;
     }
 
     #main-menu a {
@@ -1956,7 +1952,7 @@ span[class^="flag-"] {
     .market-list .relax-button,
     .world-list .relax-button {
         display: block;
-        margin: 5px 0px;
+        margin: 5px 0;
     }
 
     .world-list .label,
@@ -1969,7 +1965,7 @@ span[class^="flag-"] {
     }
 
     .relax-container > * {
-        margin: 0px 1px;
+        margin: 0 1px;
     }
 
     .color-picker {

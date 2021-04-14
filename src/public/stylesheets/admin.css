@@ -7,8 +7,8 @@
     cursor: default;
     display: inline-block;
     margin: 1px 1px;
-    padding: 0px 3px;
-    text-shadow: 1px 1px 0px hsl(0, 0%, 0%);
+    padding: 0 3px;
+    text-shadow: 1px 1px 0 hsl(0, 0%, 0%);
 }
 
 .align-checkbox label {
@@ -28,7 +28,7 @@
 
 #sync-summary {
     position: sticky;
-    top: 0px;
+    top: 0;
 }
 
 #admin .section-content {
@@ -36,7 +36,7 @@
 }
 
 #sync-summary .summary-block {
-    margin: 10px 0px;
+    margin: 10px 0;
 }
 
 #sync-summary .summary-block label {
@@ -49,8 +49,8 @@
 }
 
 #sync-panel ul {
-    margin: 5px 0px;
-    padding: 0px;
+    margin: 5px 0;
+    padding: 0;
 }
 
 #sync-worlds .world-id {
@@ -64,12 +64,12 @@
 }
 
 #sync-worlds .world p {
-    margin: 0px;
+    margin: 0;
 }
 
 #sync-worlds .world ul {
-    margin: 5px 0px;
-    padding: 0px;
+    margin: 5px 0;
+    padding: 0;
 }
 
 #sync-worlds .world ul li {
@@ -139,7 +139,7 @@
 
 #admin form label.input {
     display: block;
-    margin: 5px 0px;
+    margin: 5px 0;
 }
 
 #admin form label.input span {
@@ -149,7 +149,7 @@
 }
 
 #settings fieldset {
-    margin: 5px 0px;
+    margin: 5px 0;
 }
 
 #settings fieldset legend {
@@ -158,7 +158,7 @@
 }
 
 #settings .setting {
-    margin: 5px 0px;
+    margin: 5px 0;
 }
 
 #settings label {
@@ -167,7 +167,7 @@
 
 #settings input,
 #settings select {
-    margin: 5px 0px;
+    margin: 5px 0;
     max-width: 50%;
     outline: none;
 }
