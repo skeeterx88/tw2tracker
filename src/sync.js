@@ -8,7 +8,6 @@ const async = require('async');
 const debug = require('./debug.js');
 const {db} = require('./db.js');
 const sql = require('./sql.js');
-const puppeteer = require('./puppeteer.js');
 const utils = require('./utils.js');
 const config = require('./config.js');
 const Events = require('./events.js');
@@ -38,8 +37,6 @@ const dataQueue = createSyncQueue(parallelData);
 const achievementsQueue = createSyncQueue(parallelAchievements);
 
 const worldScrapers = new Map();
-
-let browser = null;
 
 const syncTypeMapping = {
     [syncTypes.DATA]: {
@@ -1783,23 +1780,6 @@ async function initTasks () {
 }
 
 // helpers
-
-async function createPuppeteerPage () {
-    if (!browser) {
-        browser = new Promise(function (resolve) {
-            puppeteer().then(resolve);
-        });
-    }
-
-    if (browser instanceof Promise) {
-        browser = await browser;
-    }
-
-    const page = await browser.newPage();
-    await page.exposeFunction('debug', debug.puppeteer);
-    await page.exposeFunction('humanInterval', humanInterval);
-    return page;
-}
 
 async function getOpenWorld (worldId) {
     const [world] = await db.any(sql('get-world'), {worldId});
