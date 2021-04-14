@@ -839,8 +839,11 @@ async function addSyncQueue (type, newItems) {
             id,
             worldId,
             handler: function () {
+                db.none(sql('set-queue-item-active'), {id});
                 return syncWorld(type, item.market_id, item.world_number);
             }
+        }, function () {
+            db.none(sql('remove-sync-queue'), {id});
         });
     }
 }
@@ -1921,11 +1924,10 @@ function getTimeUntilMidnight (timeOffset) {
 }
 
 function createSyncQueue (concurrent) {
-    return async.queue(async function (task) {
+    return async.queue(async function (task, callback) {
         debug.queue('world:%s start (queue id %d)', task.worldId, task.id);
-        await db.none(sql('set-queue-item-active'), {id: task.id, active: true});
         await task.handler();
-        await db.none(sql('remove-sync-queue'), {id: task.id});
+        callback();
         debug.queue('world:%s finish (queue id %d)', task.worldId, task.id);
     }, concurrent);
 }

@@ -1,3 +1,3 @@
 UPDATE public.sync_queue
-SET active = ${active}
+SET active = TRUE
 WHERE id = ${id};
