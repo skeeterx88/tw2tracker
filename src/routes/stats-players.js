@@ -77,17 +77,19 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
             : sum + points.slice(0, level).reduce((sum, next) => sum + next, 0);
     }, 0);
 
-    let lastItem;
+    let last;
     const historyLimit = config('ui', 'profile_last_history_count');
-    const reversedHistory = await db.map(sql('get-player-history'), {worldId, playerId, limit: historyLimit}, function (currentItem) {
-        currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
-        currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
-        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
-        currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
-        lastItem = currentItem;
-        return currentItem;
-    });
-    const history = reversedHistory.reverse();
+    const history = (await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit}))
+        .reverse()
+        .map(function (current) {
+            current.points_change = getHistoryChangeType('points', current, last);
+            current.villages_change = getHistoryChangeType('villages', current, last);
+            current.rank_change = getHistoryChangeType('rank', current, last, historyOrderTypes.DESC);
+            current.victory_points_change = getHistoryChangeType('victory_points', current, last);
+            last = current;
+            return current;
+        })
+        .reverse();
 
     const tribeChangesCount = (await db.one(sql('get-player-tribe-changes-count'), {worldId, id: playerId})).count;
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
@@ -525,21 +527,22 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
-    let lastItem;
+    let last;
     const historyLimit = config('sync', 'maximum_history_days');
-    const reversedHistory = await db.map(sql('get-player-history'), {worldId, playerId, limit: historyLimit}, function (currentItem) {
-        currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
-        currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
-        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
-        currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
-        currentItem.bash_points_off_change = getHistoryChangeType('bash_points_off', currentItem, lastItem);
-        currentItem.bash_points_def_change = getHistoryChangeType('bash_points_def', currentItem, lastItem);
-        currentItem.bash_points_total_change = getHistoryChangeType('bash_points_total', currentItem, lastItem);
-        lastItem = currentItem;
-        return currentItem;
-    });
-
-    const history = reversedHistory.reverse();
+    const history = (await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit}))
+        .reverse()
+        .map(function (current) {
+            current.points_change = getHistoryChangeType('points', current, last);
+            current.villages_change = getHistoryChangeType('villages', current, last);
+            current.rank_change = getHistoryChangeType('rank', current, last, historyOrderTypes.DESC);
+            current.victory_points_change = getHistoryChangeType('victory_points', current, last);
+            current.bash_points_off_change = getHistoryChangeType('bash_points_off', current, last);
+            current.bash_points_def_change = getHistoryChangeType('bash_points_def', current, last);
+            current.bash_points_total_change = getHistoryChangeType('bash_points_total', current, last);
+            last = current;
+            return current;
+        })
+        .reverse();
 
     mergeBackendLocals(res, {
         marketId,

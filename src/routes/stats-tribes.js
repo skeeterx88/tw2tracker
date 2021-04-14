@@ -64,18 +64,20 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const achievementsLatest = achievements.slice(0, 5);
     const achievementsRepeatableCount = achievements.reduce((sum, {period}) => period ? sum + 1 : sum, 0);
 
-    let lastItem;
+    let last;
     const historyLimit = config('ui', 'profile_last_history_count');
-    const reversedHistory = await db.map(sql('get-tribe-history'), {worldId, tribeId, limit: historyLimit}, function (currentItem) {
-        currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
-        currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
-        currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
-        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
-        currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
-        lastItem = currentItem;
-        return currentItem;
-    });
-    const history = reversedHistory.reverse();
+    const history = (await db.any(sql('get-tribe-history'), {worldId, tribeId, limit: historyLimit}))
+        .reverse()
+        .map(function (current) {
+            current.members_change = getHistoryChangeType('members', current, last);
+            current.points_change = getHistoryChangeType('points', current, last);
+            current.villages_change = getHistoryChangeType('villages', current, last);
+            current.rank_change = getHistoryChangeType('rank', current, last, historyOrderTypes.DESC);
+            current.victory_points_change = getHistoryChangeType('victory_points', current, last);
+            last = current;
+            return current;
+        })
+        .reverse();
 
     const memberChangesCount = (await db.one(sql('get-tribe-member-changes-count'), {worldId, id: tribeId})).count;
 
@@ -468,21 +470,23 @@ const tribeHistoryRouter = asyncRouter(async function (req, res, next) {
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
-    let lastItem;
+    let last;
     const historyLimit = config('sync', 'maximum_history_days');
-    const reversedHistory = await db.map(sql('get-tribe-history'), {worldId, tribeId, limit: historyLimit}, function (currentItem) {
-        currentItem.members_change = getHistoryChangeType('members', currentItem, lastItem);
-        currentItem.points_change = getHistoryChangeType('points', currentItem, lastItem);
-        currentItem.villages_change = getHistoryChangeType('villages', currentItem, lastItem);
-        currentItem.rank_change = getHistoryChangeType('rank', currentItem, lastItem, historyOrderTypes.DESC);
-        currentItem.victory_points_change = getHistoryChangeType('victory_points', currentItem, lastItem);
-        currentItem.bash_points_off_change = getHistoryChangeType('bash_points_off', currentItem, lastItem);
-        currentItem.bash_points_def_change = getHistoryChangeType('bash_points_def', currentItem, lastItem);
-        currentItem.bash_points_total_change = getHistoryChangeType('bash_points_total', currentItem, lastItem);
-        lastItem = currentItem;
-        return currentItem;
-    });
-    const history = reversedHistory.reverse();
+    const history = (await db.any(sql('get-tribe-history'), {worldId, tribeId, limit: historyLimit}))
+        .reverse()
+        .map(function (current) {
+            current.members_change = getHistoryChangeType('members', current, last);
+            current.points_change = getHistoryChangeType('points', current, last);
+            current.villages_change = getHistoryChangeType('villages', current, last);
+            current.rank_change = getHistoryChangeType('rank', current, last, historyOrderTypes.DESC);
+            current.victory_points_change = getHistoryChangeType('victory_points', current, last);
+            current.bash_points_off_change = getHistoryChangeType('bash_points_off', current, last);
+            current.bash_points_def_change = getHistoryChangeType('bash_points_def', current, last);
+            current.bash_points_total_change = getHistoryChangeType('bash_points_total', current, last);
+            last = current;
+            return current;
+        })
+        .reverse();
 
     mergeBackendLocals(res, {
         marketId,
