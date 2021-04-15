@@ -50,9 +50,9 @@ const syncTypeMapping = {
 };
 
 /**
- * @class CreateScraper
- * @param marketId {String}
- * @param worldNumber {Number}
+ * @class
+ * @param {String} marketId
+ * @param {Number=} worldNumber
  *
  * @typedef {Object} MarketAccount Logged-in account object.
  * @typedef {Object} AccountCharacter Account's character object.
@@ -72,15 +72,57 @@ function CreateScraper (marketId, worldNumber) {
     let emitId = 1;
     let pingIntervalId;
 
+    const init = () => {
+        socket.on('message', function (raw) {
+            const [,, json] = raw.match(/^(\d+)(.*)/);
+
+            if (!json) {
+                return;
+            }
+
+            const parsed = JSON.parse(json);
+
+            if (parsed.sid) {
+                pingIntervalId = setInterval(function () {
+                    socket.send('2');
+                }, parsed.pingInterval);
+
+                return;
+            }
+
+            const msg = parsed[1];
+
+            if (!msg.type) {
+                return;
+            }
+
+            const id = parseInt(msg.id, 10);
+
+            if (callbacks.has(id)) {
+                const callback = callbacks.get(id);
+                callbacks.delete(id);
+                callback(msg.data, msg.type);
+            }
+        });
+
+        this.ready.then(() => {
+            this.emit('System/identify', {
+                device: userAgent,
+                api_version: '10.*.*',
+                platform: 'browser'
+            });
+        });
+    };
+
     this.ready = new Promise(function (resolve) {
         socket.on('open', resolve);
     });
 
     /**
      * @param {String} type
-     * @param {Object} [data]
-     * @param {Function} [callback]
-     * @return {Promise<Object>}
+     * @param {Object=} data
+     * @param {Function=} callback
+     * @return {Promise<object>}
      */
     this.emit = function (type, data, callback) {
         return new Promise(async (resolve, reject) => {
@@ -130,7 +172,7 @@ function CreateScraper (marketId, worldNumber) {
 
     /**
      * Authenticate using one of the available sync accounts.
-     * @return {Promise<MarketAccount|boolean>} The authenticated account or false.
+     * @return {Promise<MarketAccount|Boolean>} The authenticated account or false.
      */
     this.auth = async function () {
         if (authenticated) {
@@ -146,7 +188,6 @@ function CreateScraper (marketId, worldNumber) {
 
         while (marketAccounts.length) {
             const credentials = marketAccounts.shift();
-            /** @type MarketAccount */
             const account = await this.emit('Authentication/login', credentials);
 
             if (account.token) {
@@ -165,8 +206,8 @@ function CreateScraper (marketId, worldNumber) {
      * Select an account's character (world). Simulates the emits
      * like it's a user logging in from the browser.
      *
-     * @param {number} characterId
-     * @return {Promise<AccountCharacter|boolean>}
+     * @param {Number} characterId
+     * @return {Promise<AccountCharacter|Boolean>}
      */
     this.selectCharacter = async (characterId) => {
         if (characterSelected) {
@@ -272,463 +313,417 @@ function CreateScraper (marketId, worldNumber) {
         return await this.emit('Authentication/createCharacter', {world: marketId + worldNumber});
     };
 
-    function onMessage () {
-        socket.on('message', function (raw) {
-            const [,, json] = raw.match(/^(\d+)(.*)/);
-
-            if (!json) {
-                return;
-            }
-
-            const parsed = JSON.parse(json);
-
-            if (parsed.sid) {
-                pingIntervalId = setInterval(function () {
-                    socket.send('2');
-                }, parsed.pingInterval);
-
-                return;
-            }
-
-            const msg = parsed[1];
-
-            if (!msg.type) {
-                return;
-            }
-
-            const id = parseInt(msg.id, 10);
-
-            if (callbacks.has(id)) {
-                const callback = callbacks.get(id);
-                callbacks.delete(id);
-                callback(msg.data, msg.type);
-            }
-        });
-    }
-
-    onMessage();
-
-    this.ready.then(() => {
-        this.emit('System/identify', {
-            device: userAgent,
-            api_version: '10.*.*',
-            platform: 'browser'
-        });
-    });
-}
-
-async function createScraper (marketId, worldNumber) {
-    const worldId = marketId + worldNumber;
-
-    let scraper;
-
-    if (worldScrapers.has(worldId)) {
-        scraper = worldScrapers.get(worldId);
-    } else {
-        scraper = new CreateScraper(marketId, worldNumber);
-        worldScrapers.set(worldId, scraper);
-    }
-
-    await scraper.ready;
-    return scraper;
-}
-
-async function socketScrapeData (socket, worldId) {
-    const CHUNK_SIZE = 50;
-    const COORDS_REFERENCE = {
-        topLeft: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
-        topRight: [[600, 0], [700, 0], [800, 0], [900, 0], [600, 100], [700, 100], [800, 100], [900, 100], [600, 200], [700, 200], [800, 200], [900, 200], [600, 300], [700, 300], [800, 300], [900, 300]],
-        bottomLeft: [[0, 600], [100, 600], [200, 600], [300, 600], [0, 700], [100, 700], [200, 700], [300, 700], [0, 800], [100, 800], [200, 800], [300, 800], [0, 900], [100, 900], [200, 900], [300, 900]],
-        bottomRight: [[600, 600], [700, 600], [800, 600], [900, 600], [600, 700], [700, 700], [800, 700], [900, 700], [600, 800], [700, 800], [800, 800], [900, 800], [600, 900], [700, 900], [800, 900], [900, 900]]
-    };
-    const BOUNDARIE_REFERENCE_COORDS = {
-        left: [[400, 400], [400, 500], [300, 400], [300, 500], [200, 400], [200, 500], [100, 400], [100, 500], [0, 400], [0, 500]],
-        right: [[500, 400], [500, 500], [600, 400], [600, 500], [700, 400], [700, 500], [800, 400], [800, 500], [900, 400], [900, 500]],
-        top: [[400, 300], [500, 300], [400, 200], [500, 200], [400, 100], [500, 100], [400, 0], [500, 0]],
-        bottom: [[400, 600], [500, 600], [400, 700], [500, 700], [400, 800], [500, 800], [400, 900], [500, 900]]
-    };
-
-    const playersByTribe = new Map();
-    const villagesByPlayer = new Map();
-    const villages = new Map();
-    const tribes = new Map();
-    const players = new Map();
-    const provinces = new Map();
-    const playersAchievement = new Map();
-
-    const getBoundaries = async function () {
-        const boundaries = {
-            left: 500,
-            right: 500,
-            top: 500,
-            bottom: 500
+    /**
+     * @return {Promise<{
+     *     provinces: Map<String, Number>,
+     *     villages: Map<Number, Object>,
+     *     players: Map<Number, Object>,
+     *     playersByTribe: Map<Number, Number[]>,
+     *     tribes: Map<Number, Object>,
+     *     villagesByPlayer: Map<Number, Number[]>
+     * }>}
+     */
+    this.data = async function () {
+        const CHUNK_SIZE = 50;
+        const COORDS_REFERENCE = {
+            topLeft: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
+            topRight: [[600, 0], [700, 0], [800, 0], [900, 0], [600, 100], [700, 100], [800, 100], [900, 100], [600, 200], [700, 200], [800, 200], [900, 200], [600, 300], [700, 300], [800, 300], [900, 300]],
+            bottomLeft: [[0, 600], [100, 600], [200, 600], [300, 600], [0, 700], [100, 700], [200, 700], [300, 700], [0, 800], [100, 800], [200, 800], [300, 800], [0, 900], [100, 900], [200, 900], [300, 900]],
+            bottomRight: [[600, 600], [700, 600], [800, 600], [900, 600], [600, 700], [700, 700], [800, 700], [900, 700], [600, 800], [700, 800], [800, 800], [900, 800], [600, 900], [700, 900], [800, 900], [900, 900]]
+        };
+        const BOUNDARIE_REFERENCE_COORDS = {
+            left: [[400, 400], [400, 500], [300, 400], [300, 500], [200, 400], [200, 500], [100, 400], [100, 500], [0, 400], [0, 500]],
+            right: [[500, 400], [500, 500], [600, 400], [600, 500], [700, 400], [700, 500], [800, 400], [800, 500], [900, 400], [900, 500]],
+            top: [[400, 300], [500, 300], [400, 200], [500, 200], [400, 100], [500, 100], [400, 0], [500, 0]],
+            bottom: [[400, 600], [500, 600], [400, 700], [500, 700], [400, 800], [500, 800], [400, 900], [500, 900]]
         };
 
-        for (const side of ['left', 'right', 'top', 'bottom']) {
-            for (let i = 0; i < BOUNDARIE_REFERENCE_COORDS[side].length; i++) {
-                const [x, y] = BOUNDARIE_REFERENCE_COORDS[side][i];
+        const playersByTribe = new Map();
+        const villagesByPlayer = new Map();
+        const villages = new Map();
+        const tribes = new Map();
+        const players = new Map();
+        const provinces = new Map();
 
-                if (await loadContinent(x, y) === 0) {
-                    break;
+        const getBoundaries = async function () {
+            const boundaries = {
+                left: 500,
+                right: 500,
+                top: 500,
+                bottom: 500
+            };
+
+            for (const side of ['left', 'right', 'top', 'bottom']) {
+                for (let i = 0; i < BOUNDARIE_REFERENCE_COORDS[side].length; i++) {
+                    const [x, y] = BOUNDARIE_REFERENCE_COORDS[side][i];
+
+                    if (await loadContinent(x, y) === 0) {
+                        break;
+                    }
+
+                    boundaries[side] = (side === 'left' || side === 'right') ? x : y;
+                }
+            }
+
+            return boundaries;
+        };
+
+        const filterBlocks = function (boundaries) {
+            return [
+                ...COORDS_REFERENCE.topLeft.filter(([x, y]) => x >= boundaries.left && y >= boundaries.top),
+                ...COORDS_REFERENCE.topRight.filter(([x, y]) => x <= boundaries.right && y >= boundaries.top),
+                ...COORDS_REFERENCE.bottomLeft.filter(([x, y]) => x >= boundaries.left && y <= boundaries.bottom),
+                ...COORDS_REFERENCE.bottomRight.filter(([x, y]) => x <= boundaries.right && y <= boundaries.bottom)
+            ];
+        };
+
+        const loadVillageSection = async (x, y) => {
+            const section = await this.emit('Map/getVillagesByArea', {x, y, width: CHUNK_SIZE, height: CHUNK_SIZE});
+            processVillages(section.villages);
+            return section.villages.length;
+        };
+
+        const loadContinent = async function (x, y) {
+            const loadVillages = await Promise.all([
+                loadVillageSection(x, y),
+                loadVillageSection(x + CHUNK_SIZE, y),
+                loadVillageSection(x, y + CHUNK_SIZE),
+                loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
+            ]);
+
+            return loadVillages.reduce((sum, value) => sum + value);
+        };
+
+        const processVillages = function (rawVillages) {
+            if (!rawVillages.length) {
+                return;
+            }
+
+            for (const village of rawVillages) {
+                let province_id;
+
+                if (provinces.has(village.province_name)) {
+                    province_id = provinces.get(village.province_name);
+                } else {
+                    province_id = provinces.size;
+                    provinces.set(village.province_name, province_id);
                 }
 
-                boundaries[side] = (side === 'left' || side === 'right') ? x : y;
+                villages.set(village.id, {
+                    x: village.x,
+                    y: village.y,
+                    name: village.name,
+                    points: village.points,
+                    character_id: village.character_id || null,
+                    province_id
+                });
             }
-        }
+        };
 
-        return boundaries;
-    };
-
-    const filterBlocks = function (boundaries) {
-        return [
-            ...COORDS_REFERENCE.topLeft.filter(([x, y]) => x >= boundaries.left && y >= boundaries.top),
-            ...COORDS_REFERENCE.topRight.filter(([x, y]) => x <= boundaries.right && y >= boundaries.top),
-            ...COORDS_REFERENCE.bottomLeft.filter(([x, y]) => x >= boundaries.left && y <= boundaries.bottom),
-            ...COORDS_REFERENCE.bottomRight.filter(([x, y]) => x <= boundaries.right && y <= boundaries.bottom)
-        ];
-    };
-
-    const loadVillageSection = async function (x, y) {
-        const section = await socket.emit('Map/getVillagesByArea', {x, y, width: CHUNK_SIZE, height: CHUNK_SIZE});
-        processVillages(section.villages);
-        return section.villages.length;
-    };
-
-    const loadContinent = async function (x, y) {
-        const loadVillages = await Promise.all([
-            loadVillageSection(x, y),
-            loadVillageSection(x + CHUNK_SIZE, y),
-            loadVillageSection(x, y + CHUNK_SIZE),
-            loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
-        ]);
-
-        return loadVillages.reduce((sum, value) => sum + value);
-    };
-
-    const processVillages = function (rawVillages) {
-        if (!rawVillages.length) {
-            return;
-        }
-
-        for (const village of rawVillages) {
-            let province_id;
-
-            if (provinces.has(village.province_name)) {
-                province_id = provinces.get(village.province_name);
-            } else {
-                province_id = provinces.size;
-                provinces.set(village.province_name, province_id);
-            }
-
-            villages.set(village.id, {
-                x: village.x,
-                y: village.y,
-                name: village.name,
-                points: village.points,
-                character_id: village.character_id || null,
-                province_id
+        const loadTribes = async (offset) => {
+            const data = await this.emit('Ranking/getTribeRanking', {
+                area_type: 'world',
+                offset,
+                count: RANKING_QUERY_COUNT,
+                order_by: 'rank',
+                order_dir: 0,
+                query: ''
             });
-        }
-    };
 
-    const loadTribes = async function (offset) {
-        const data = await socket.emit('Ranking/getTribeRanking', {
-            area_type: 'world',
-            offset,
-            count: RANKING_QUERY_COUNT,
-            order_by: 'rank',
-            order_dir: 0,
-            query: ''
-        });
-
-        for (const tribe of data.ranking) {
-            tribes.set(tribe.tribe_id, {
-                bash_points_def: tribe.bash_points_def,
-                bash_points_off: tribe.bash_points_off,
-                bash_points_total: tribe.bash_points_total,
-                members: tribe.members,
-                name: tribe.name,
-                tag: tribe.tag,
-                points: tribe.points,
-                points_per_member: tribe.points_per_member,
-                points_per_villages: tribe.points_per_villages,
-                rank: tribe.rank,
-                victory_points: tribe.victory_points,
-                villages: tribe.villages,
-                level: tribePowerToLevel(worldId, tribe.power)
-            });
-        }
-
-        return data.total;
-    };
-
-    const processTribes = async function () {
-        let offset = 0;
-
-        const total = await loadTribes(offset);
-        offset += RANKING_QUERY_COUNT;
-
-        if (total <= RANKING_QUERY_COUNT) {
-            return;
-        }
-
-        for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-            await Promise.all([
-                loadTribes(offset),
-                loadTribes(offset + RANKING_QUERY_COUNT),
-                loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
-                loadTribes(offset + (RANKING_QUERY_COUNT * 3))
-            ]);
-        }
-    };
-
-    const loadPlayers = async function (offset) {
-        const data = await socket.emit('Ranking/getCharacterRanking', {
-            area_type: 'world',
-            offset: offset,
-            count: RANKING_QUERY_COUNT,
-            order_by: 'rank',
-            order_dir: 0,
-            query: ''
-        });
-
-        for (const player of data.ranking) {
-            players.set(player.character_id, {
-                bash_points_def: player.bash_points_def,
-                bash_points_off: player.bash_points_off,
-                bash_points_total: player.bash_points_total,
-                name: player.name,
-                points: player.points,
-                points_per_villages: player.points_per_villages,
-                rank: player.rank,
-                tribe_id: player.tribe_id,
-                victory_points: player.victory_points,
-                villages: player.villages
-            });
-        }
-
-        return data.total;
-    };
-
-    const processPlayers = async function () {
-        let offset = 0;
-
-        const total = await loadPlayers(offset);
-        offset += RANKING_QUERY_COUNT;
-
-        if (total <= RANKING_QUERY_COUNT) {
-            return;
-        }
-
-        for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-            await Promise.all([
-                loadPlayers(offset),
-                loadPlayers(offset + RANKING_QUERY_COUNT),
-                loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
-                loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
-            ]);
-        }
-    };
-
-    const processVillagesByPlayer = function () {
-        for (const character_id of players.keys()) {
-            villagesByPlayer.set(character_id, []);
-        }
-
-        for (const [id, village] of villages.entries()) {
-            const {character_id} = village;
-
-            if (villagesByPlayer.has(character_id)) {
-                villagesByPlayer.get(character_id).push(id);
+            for (const tribe of data.ranking) {
+                tribes.set(tribe.tribe_id, {
+                    bash_points_def: tribe.bash_points_def,
+                    bash_points_off: tribe.bash_points_off,
+                    bash_points_total: tribe.bash_points_total,
+                    members: tribe.members,
+                    name: tribe.name,
+                    tag: tribe.tag,
+                    points: tribe.points,
+                    points_per_member: tribe.points_per_member,
+                    points_per_villages: tribe.points_per_villages,
+                    rank: tribe.rank,
+                    victory_points: tribe.victory_points,
+                    villages: tribe.villages,
+                    level: tribePowerToLevel(worldId, tribe.power)
+                });
             }
-        }
-    };
 
-    const processPlayersByTribe = function () {
-        for (const tribe_id of tribes.keys()) {
-            playersByTribe.set(tribe_id, []);
-        }
+            return data.total;
+        };
 
-        for (const [character_id, player] of players.entries()) {
-            const {tribe_id} = player;
+        const processTribes = async function () {
+            let offset = 0;
 
-            if (tribe_id) {
-                playersByTribe.get(tribe_id).push(character_id);
+            const total = await loadTribes(offset);
+            offset += RANKING_QUERY_COUNT;
+
+            if (total <= RANKING_QUERY_COUNT) {
+                return;
             }
+
+            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
+                await Promise.all([
+                    loadTribes(offset),
+                    loadTribes(offset + RANKING_QUERY_COUNT),
+                    loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
+                    loadTribes(offset + (RANKING_QUERY_COUNT * 3))
+                ]);
+            }
+        };
+
+        const loadPlayers = async (offset) => {
+            const data = await this.emit('Ranking/getCharacterRanking', {
+                area_type: 'world',
+                offset: offset,
+                count: RANKING_QUERY_COUNT,
+                order_by: 'rank',
+                order_dir: 0,
+                query: ''
+            });
+
+            for (const player of data.ranking) {
+                players.set(player.character_id, {
+                    bash_points_def: player.bash_points_def,
+                    bash_points_off: player.bash_points_off,
+                    bash_points_total: player.bash_points_total,
+                    name: player.name,
+                    points: player.points,
+                    points_per_villages: player.points_per_villages,
+                    rank: player.rank,
+                    tribe_id: player.tribe_id,
+                    victory_points: player.victory_points,
+                    villages: player.villages
+                });
+            }
+
+            return data.total;
+        };
+
+        const processPlayers = async function () {
+            let offset = 0;
+
+            const total = await loadPlayers(offset);
+            offset += RANKING_QUERY_COUNT;
+
+            if (total <= RANKING_QUERY_COUNT) {
+                return;
+            }
+
+            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
+                await Promise.all([
+                    loadPlayers(offset),
+                    loadPlayers(offset + RANKING_QUERY_COUNT),
+                    loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
+                    loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
+                ]);
+            }
+        };
+
+        const processVillagesByPlayer = function () {
+            for (const character_id of players.keys()) {
+                villagesByPlayer.set(character_id, []);
+            }
+
+            for (const [id, village] of villages.entries()) {
+                const {character_id} = village;
+
+                if (villagesByPlayer.has(character_id)) {
+                    villagesByPlayer.get(character_id).push(id);
+                }
+            }
+        };
+
+        const processPlayersByTribe = function () {
+            for (const tribe_id of tribes.keys()) {
+                playersByTribe.set(tribe_id, []);
+            }
+
+            for (const [character_id, player] of players.entries()) {
+                const {tribe_id} = player;
+
+                if (tribe_id) {
+                    playersByTribe.get(tribe_id).push(character_id);
+                }
+            }
+        };
+
+        const boundaries = await getBoundaries();
+        const missingBlocks = filterBlocks(boundaries);
+
+        for (const [x, y] of missingBlocks) {
+            await loadContinent(x, y);
         }
+
+        await processTribes();
+        await processPlayers();
+
+        processVillagesByPlayer();
+        processPlayersByTribe();
+
+        return {
+            villages,
+            players,
+            tribes,
+            provinces,
+            villagesByPlayer,
+            playersByTribe
+        };
     };
 
-    const boundaries = await getBoundaries();
-    const missingBlocks = filterBlocks(boundaries);
+    /**
+     * @return {Promise<{players: Map<Number, Array>, tribes: Map<Number, Array>}>}
+     */
+    this.achivements = async function () {
+        const achievementsMap = {
+            players: {
+                router: 'Achievement/getCharacterAchievements',
+                key: 'character_id'
+            },
+            tribes: {
+                router: 'Achievement/getTribeAchievements',
+                key: 'tribe_id'
+            }
+        };
 
-    for (const [x, y] of missingBlocks) {
-        await loadContinent(x, y);
-    }
+        const playerIds = new Set();
+        const tribeIds = new Set();
+        const achievementsData = {
+            players: new Map(),
+            tribes: new Map()
+        };
 
-    await processTribes();
-    await processPlayers();
+        const loadTribes = async (offset) => {
+            const data = await this.emit('Ranking/getTribeRanking', {
+                area_type: 'world',
+                offset: offset,
+                count: RANKING_QUERY_COUNT,
+                order_by: 'rank',
+                order_dir: 0,
+                query: ''
+            });
 
-    processVillagesByPlayer();
-    processPlayersByTribe();
+            for (const tribe of data.ranking) {
+                tribeIds.add(tribe.tribe_id);
+            }
 
-    return {
-        villages: Array.from(villages),
-        players: Array.from(players),
-        tribes: Array.from(tribes),
-        provinces: Array.from(provinces),
-        villagesByPlayer: Array.from(villagesByPlayer),
-        playersByTribe: Array.from(playersByTribe),
-        playersAchievement: Array.from(playersAchievement)
+            return data.total;
+        };
+
+        const processTribes = async function () {
+            let offset = 0;
+
+            const total = await loadTribes(offset);
+            offset += RANKING_QUERY_COUNT;
+
+            if (total <= RANKING_QUERY_COUNT) {
+                return;
+            }
+
+            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
+                await Promise.all([
+                    loadTribes(offset),
+                    loadTribes(offset + RANKING_QUERY_COUNT),
+                    loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
+                    loadTribes(offset + (RANKING_QUERY_COUNT * 3))
+                ]);
+            }
+        };
+
+        const loadPlayers = async (offset) => {
+            const data = await this.emit('Ranking/getCharacterRanking', {
+                area_type: 'world',
+                offset: offset,
+                count: RANKING_QUERY_COUNT,
+                order_by: 'rank',
+                order_dir: 0,
+                query: ''
+            });
+
+            for (const player of data.ranking) {
+                playerIds.add(player.character_id);
+            }
+
+            return data.total;
+        };
+
+        const processPlayers = async function () {
+            let offset = 0;
+
+            const total = await loadPlayers(offset);
+            offset += RANKING_QUERY_COUNT;
+
+            if (total <= RANKING_QUERY_COUNT) {
+                return;
+            }
+
+            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
+                await Promise.all([
+                    loadPlayers(offset),
+                    loadPlayers(offset + RANKING_QUERY_COUNT),
+                    loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
+                    loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
+                ]);
+            }
+        };
+
+        const loadAchievements = async (type, id) => {
+            if (!id) {
+                return;
+            }
+
+            const {router, key} = achievementsMap[type];
+            const {achievements} = await this.emit(router, {[key]: id});
+
+            achievementsData[type].set(id, achievements.filter(achievement => achievement.level));
+        };
+
+        const loadTribesAchievements = async function () {
+            const tribeIdsArray = Array.from(tribeIds.values());
+
+            for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
+                await Promise.all([
+                    loadAchievements('tribes', tribeIdsArray[i]),
+                    loadAchievements('tribes', tribeIdsArray[i + 1]),
+                    loadAchievements('tribes', tribeIdsArray[i + 2]),
+                    loadAchievements('tribes', tribeIdsArray[i + 3])
+                ]);
+            }
+        };
+
+        const loadPlayersAchievements = async function () {
+            const playerIdsArray = Array.from(playerIds.values());
+
+            for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
+                await Promise.all([
+                    loadAchievements('players', playerIdsArray[i]),
+                    loadAchievements('players', playerIdsArray[i + 1]),
+                    loadAchievements('players', playerIdsArray[i + 2]),
+                    loadAchievements('players', playerIdsArray[i + 3])
+                ]);
+            }
+        };
+
+        await processTribes();
+        await processPlayers();
+        await loadTribesAchievements();
+        await loadPlayersAchievements();
+
+        return achievementsData;
     };
+
+    init();
 }
 
-async function socketScrapeAchivements (socket) {
-    const achievementsMap = {
-        players: {
-            router: 'Achievement/getCharacterAchievements',
-            key: 'character_id'
-        },
-        tribes: {
-            router: 'Achievement/getTribeAchievements',
-            key: 'tribe_id'
-        }
-    };
+async function getScraper (marketId, worldNumber) {
+    const worldId = marketId + worldNumber;
 
-    const playerIds = new Set();
-    const tribeIds = new Set();
-    const achievementsData = {
-        players: new Map(),
-        tribes: new Map()
-    };
+    if (worldScrapers.has(worldId)) {
+        return worldScrapers.get(worldId);
+    }
 
-    const loadTribes = async function (offset) {
-        // debug('world:%s load tribes ranking %i/?', worldId, offset);
-
-        const data = await socket.emit('Ranking/getTribeRanking', {
-            area_type: 'world',
-            offset: offset,
-            count: RANKING_QUERY_COUNT,
-            order_by: 'rank',
-            order_dir: 0,
-            query: ''
-        });
-
-        for (const tribe of data.ranking) {
-            tribeIds.add(tribe.tribe_id);
-        }
-
-        return data.total;
-    };
-
-    const processTribes = async function () {
-        let offset = 0;
-
-        const total = await loadTribes(offset);
-        offset += RANKING_QUERY_COUNT;
-
-        if (total <= RANKING_QUERY_COUNT) {
-            return;
-        }
-
-        for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-            await Promise.all([
-                loadTribes(offset),
-                loadTribes(offset + RANKING_QUERY_COUNT),
-                loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
-                loadTribes(offset + (RANKING_QUERY_COUNT * 3))
-            ]);
-        }
-    };
-
-    const loadPlayers = async function (offset) {
-        // debug('world:%s load players ranking %i/?', worldId, offset);
-
-        const data = await socket.emit('Ranking/getCharacterRanking', {
-            area_type: 'world',
-            offset: offset,
-            count: RANKING_QUERY_COUNT,
-            order_by: 'rank',
-            order_dir: 0,
-            query: ''
-        });
-
-        for (const player of data.ranking) {
-            playerIds.add(player.character_id);
-        }
-
-        return data.total;
-    };
-
-    const processPlayers = async function () {
-        let offset = 0;
-
-        const total = await loadPlayers(offset);
-        offset += RANKING_QUERY_COUNT;
-
-        if (total <= RANKING_QUERY_COUNT) {
-            return;
-        }
-
-        for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-            await Promise.all([
-                loadPlayers(offset),
-                loadPlayers(offset + RANKING_QUERY_COUNT),
-                loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
-                loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
-            ]);
-        }
-    };
-
-    const loadAchievements = async function (type, id) {
-        if (!id) {
-            return;
-        }
-
-        const {router, key} = achievementsMap[type];
-        const {achievements} = await socket.emit(router, {[key]: id});
-
-        achievementsData[type].set(id, achievements.filter(achievement => achievement.level));
-    };
-
-    const loadTribesAchievements = async function () {
-        const tribeIdsArray = Array.from(tribeIds.values());
-
-        for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
-            // debug('world:%s load tribe achievements %i/%i', worldId, i, l);
-
-            await Promise.all([
-                loadAchievements('tribes', tribeIdsArray[i]),
-                loadAchievements('tribes', tribeIdsArray[i + 1]),
-                loadAchievements('tribes', tribeIdsArray[i + 2]),
-                loadAchievements('tribes', tribeIdsArray[i + 3])
-            ]);
-        }
-    };
-
-    const loadPlayersAchievements = async function () {
-        const playerIdsArray = Array.from(playerIds.values());
-
-        for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
-            // debug('world:%s load player achievements %i/%i', worldId, i, l);
-
-            await Promise.all([
-                loadAchievements('players', playerIdsArray[i]),
-                loadAchievements('players', playerIdsArray[i + 1]),
-                loadAchievements('players', playerIdsArray[i + 2]),
-                loadAchievements('players', playerIdsArray[i + 3])
-            ]);
-        }
-    };
-
-    await processTribes();
-    await processPlayers();
-    await loadTribesAchievements();
-    await loadPlayersAchievements();
-
-    return {
-        players: Array.from(achievementsData.players),
-        tribes: Array.from(achievementsData.tribes)
-    };
+    const scraper = new CreateScraper(marketId, worldNumber);
+    worldScrapers.set(worldId, scraper);
+    return scraper;
 }
 
 async function init () {
@@ -873,7 +868,7 @@ async function syncWorld (type, marketId, worldNumber) {
 
         debug.sync('world:%s start %s sync', worldId, type);
 
-        scraper = await createScraper(marketId, worldNumber);
+        scraper = await getScraper(marketId, worldNumber);
         const account = await scraper.auth();
 
         if (!account) {
@@ -908,7 +903,7 @@ async function syncWorld (type, marketId, worldNumber) {
             case syncTypes.DATA: {
                 debug.sync('world:%s fetching data', worldId);
 
-                const data = await socketScrapeData(scraper, worldId);
+                const data = await scraper.data();
                 await commitDataDatabase(data, worldId);
                 await commitDataFilesystem(worldId);
 
@@ -920,7 +915,7 @@ async function syncWorld (type, marketId, worldNumber) {
             case syncTypes.ACHIEVEMENTS: {
                 debug.sync('world:%s fetching achievements', worldId);
 
-                const data = await socketScrapeAchivements(scraper);
+                const data = await scraper.achievements();
                 await commitAchievementsDatabase(data, worldId);
 
                 if (config('sync', 'store_raw_data')) {
@@ -1004,7 +999,7 @@ async function syncWorldList () {
         debug.worlds('market:%s check missing worlds', marketId);
 
         // TODO: allow to create scrapers with identifiers other than marketId + worldNumber.
-        const scraper = await createScraper(marketId, marketId);
+        const scraper = await getScraper(marketId, marketId);
         const account = await scraper.auth();
 
         if (!account) {
@@ -1035,7 +1030,7 @@ async function syncWorldList () {
             const worldId = marketId + worldNumber;
 
             if (!registered) {
-                await scraper.createCharacter(marketId, worldNumber);
+                await scraper.createCharacter(worldNumber);
             }
 
             if (!await utils.worldEntryExists(worldId)) {
@@ -1157,12 +1152,8 @@ async function commitDataDatabase (data, worldId) {
         const oldPlayerRecords = new Map(await tx.map(sql('get-subject-records'), {worldId, type: 'players'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]));
         const oldTribeRecords = new Map(await tx.map(sql('get-subject-records'), {worldId, type: 'tribes'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]));
 
-        const newPlayers = new Map(data.players);
-        const newTribes = new Map(data.tribes);
-        const newVillages = new Map(data.villages);
-
         async function updateSubjectsData () {
-            for (const [id, subject] of data.tribes) {
+            for (const [id, subject] of data.tribes.entries()) {
                 if (oldTribes.has(id)) {
                     await tx.none(sql('update-tribe'), {worldId, id, ...subject});
                 } else {
@@ -1170,7 +1161,7 @@ async function commitDataDatabase (data, worldId) {
                 }
             }
 
-            for (const [id, subject] of data.players) {
+            for (const [id, subject] of data.players.entries()) {
                 if (oldPlayers.has(id)) {
                     await tx.none(sql('update-player'), {worldId, id, ...subject});
                 } else {
@@ -1180,15 +1171,15 @@ async function commitDataDatabase (data, worldId) {
         }
 
         async function updateConquests () {
-            for (const [village_id, village] of newVillages.entries()) {
+            for (const [village_id, village] of data.villages.entries()) {
                 const oldVillage = oldVillages.has(village_id)
                     ? oldVillages.get(village_id)
                     : {village_id, ...village};
 
                 if (village.character_id !== oldVillage.character_id && village.character_id) {
                     const newOwnerId = village.character_id;
-                    const newOwner = newPlayers.get(newOwnerId);
-                    const oldOwner = newVillages.has(village_id) ? null : newPlayers.get(oldVillage.character_id);
+                    const newOwner = data.players.get(newOwnerId);
+                    const oldOwner = data.villages.has(village_id) ? null : data.players.get(oldVillage.character_id);
                     const oldOwnerId = oldOwner ? oldVillage.character_id : null;
 
                     const tribeData = {
@@ -1200,12 +1191,12 @@ async function commitDataDatabase (data, worldId) {
 
                     if (newOwner.tribe_id) {
                         tribeData.new_owner_tribe_id = newOwner.tribe_id;
-                        tribeData.new_owner_tribe_tag_then = newTribes.get(newOwner.tribe_id).tag;
+                        tribeData.new_owner_tribe_tag_then = data.tribes.get(newOwner.tribe_id).tag;
                     }
 
                     if (oldOwner && oldOwner.tribe_id) {
                         tribeData.old_owner_tribe_id = oldOwner.tribe_id;
-                        tribeData.old_owner_tribe_tag_then = newTribes.get(oldOwner.tribe_id).tag;
+                        tribeData.old_owner_tribe_tag_then = data.tribes.get(oldOwner.tribe_id).tag;
                     }
 
                     await tx.none(sql('add-conquest'), {
@@ -1222,13 +1213,13 @@ async function commitDataDatabase (data, worldId) {
 
         async function updateMissingSubjects () {
             for (const id of oldPlayers.keys()) {
-                if (!newPlayers.has(id)) {
+                if (!data.players.has(id)) {
                     await tx.none(sql('archive-player'), {worldId, id});
                 }
             }
 
             for (const id of oldTribes.keys()) {
-                if (!newTribes.has(id)) {
+                if (!data.tribes.has(id)) {
                     await tx.none(sql('archive-tribe'), {worldId, id});
                 }
             }
@@ -1241,7 +1232,7 @@ async function commitDataDatabase (data, worldId) {
             };
 
             for (const type of ['tribes', 'players']) {
-                for (const [id, subject] of data[type]) {
+                for (const [id, subject] of data[type].entries()) {
                     const [bestRank, bestPoints, bestVillages] = oldRecords[type].get(id) || [];
 
                     if (!bestRank || subject.rank <= bestRank) {
@@ -1260,19 +1251,19 @@ async function commitDataDatabase (data, worldId) {
         }
 
         async function updateProvinces () {
-            for (const [province_name, province_id] of data.provinces) {
+            for (const [province_name, province_id] of data.provinces.entries()) {
                 await tx.none(sql('add-province'), {worldId, province_id, province_name});
             }
         }
 
         async function updateVillages () {
-            for (const [village_id, village] of data.villages) {
+            for (const [village_id, village] of data.villages.entries()) {
                 await tx.none(sql('add-village'), {worldId, village_id, ...village});
             }
         }
 
         async function updateTribeMemberChanges () {
-            for (const [character_id, playerNewData] of newPlayers.entries()) {
+            for (const [character_id, playerNewData] of data.players.entries()) {
                 const playerOldData = oldPlayers.get(character_id);
 
                 const oldTribeId = playerOldData ? playerOldData.tribe_id : null;
@@ -1295,7 +1286,7 @@ async function commitDataDatabase (data, worldId) {
         }
 
         async function updatePlayerVillages () {
-            for (const [character_id, villages_id] of data.villagesByPlayer) {
+            for (const [character_id, villages_id] of data.villagesByPlayer.entries()) {
                 await tx.none(sql('update-player-villages'), {worldId, character_id, villages_id});
             }
         }
@@ -1304,7 +1295,7 @@ async function commitDataDatabase (data, worldId) {
             const players = {};
             const tribes = {};
 
-            for (const [playerId, villageIds] of data.villagesByPlayer) {
+            for (const [playerId, villageIds] of data.villagesByPlayer.entries()) {
                 if (!villageIds.length) {
                     continue;
                 }
@@ -1313,7 +1304,7 @@ async function commitDataDatabase (data, worldId) {
                 let sumY = 0;
 
                 for (const vid of villageIds) {
-                    const {x, y} = newVillages.get(vid);
+                    const {x, y} = data.villages.get(vid);
                     sumX += x;
                     sumY += y;
                 }
@@ -1324,7 +1315,7 @@ async function commitDataDatabase (data, worldId) {
                 players[playerId] = [avgX, avgY];
             }
 
-            for (const [tribeId, tribeMembers] of data.playersByTribe) {
+            for (const [tribeId, tribeMembers] of data.playersByTribe.entries()) {
                 if (!tribeMembers.length) {
                     continue;
                 }
@@ -1363,9 +1354,9 @@ async function commitDataDatabase (data, worldId) {
         async function updateWorldStats () {
             await tx.none(sql('update-world-stats'), {
                 worldId,
-                villages: data.villages.length,
-                players: data.players.length,
-                tribes: data.tribes.length
+                villages: data.villages.size,
+                players: data.players.size,
+                tribes: data.tribes.size
             });
         }
 
@@ -1543,9 +1534,15 @@ async function commitDataFilesystem (worldId) {
 async function commitRawDataFilesystem (data, worldId) {
     debug.sync('world:%s commit fs raw data', worldId);
 
+    const plainData = {};
+
+    for (const [type, value] of Object.entries(data)) {
+        plainData[type] = Array.from(value);
+    }
+
     const location = path.join('.', 'data', 'raw');
     await fs.promises.mkdir(location, {recursive: true});
-    await fs.promises.writeFile(path.join(location, `${worldId}.json`), JSON.stringify(data));
+    await fs.promises.writeFile(path.join(location, `${worldId}.json`), JSON.stringify(plainData));
 }
 
 async function commitRawAchievementsFilesystem (achievements, worldId) {
@@ -1832,7 +1829,7 @@ async function generateAchievementCommits (tx, subjectType, achievements, worldI
         tribes: sql('get-tribe-achievements')
     };
 
-    for (const [subjectId, newAchievementsRaw] of achievements) {
+    for (const [subjectId, newAchievementsRaw] of achievements.entries()) {
         const achievementsToMerge = [];
 
         const oldAchievementsRaw = await tx.any(sqlAchievementsMap[subjectType], {worldId, id: subjectId});
@@ -1939,11 +1936,11 @@ function randomInteger (min, max) {
 /**
  * Scales down the given rect into a grid and returns its coordinates.
  *
- * @param {number} x0
- * @param {number} y0
- * @param {number} w
- * @param {number} h
- * @param {number} gridSize
+ * @param {Number} x0
+ * @param {Number} y0
+ * @param {Number} w
+ * @param {Number} h
+ * @param {Number} gridSize
  */
 function scaledGridCoordinates (x0, y0, w, h, gridSize) {
     const minX = Math.floor(x0 / gridSize);
@@ -1994,9 +1991,9 @@ function tribePowerToLevel (worldId, power) {
 
 /**
  * Get the correct URL to the specified market.
- * @param marketId {string}
- * @param url {string}
- * @return {string}
+ * @param marketId {String}
+ * @param url {String}
+ * @return {String}
  */
 function marketDomain (marketId, url) {
     const market = marketId === 'zz' ? 'beta' : marketId;
