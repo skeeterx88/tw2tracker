@@ -22,7 +22,7 @@
                         <% for (let member of members) { %>
                             <tr class="quick-highlight" data-id="<%= member.id %>" data-type="players">
                                 <td><%= formatNumbers(member.rank) %></td>
-                                <td><a class="player-link" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
+                                <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= member.id %>"><%= member.name %></a></td>
                                 <td><%= formatNumbers(member.points) %></td>
                                 <td><%= formatNumbers(member.villages) %></td>
                             </tr>

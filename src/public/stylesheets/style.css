@@ -933,7 +933,7 @@ div.world-title {
 }
 
 .notif .close {
-    background: url(/images/close.png);
+    background: url(/images/icon-close.png);
     cursor: pointer;
     display: inline-block;
     height: 11px;
@@ -1333,6 +1333,20 @@ div.world-title {
     animation-delay: -0.1s;
 }
 
+.icon-border {
+    background: linear-gradient(hsl(150, 4%, 10%), hsl(130, 4%, 30%));
+    border: 1px solid hsl(0, 13%, 15%);
+    display: inline-flex;
+    height: 25px;
+    justify-content: center;
+    width: 26px;
+}
+
+.icon-villages {
+    background: url(/images/icon-village.png) left center no-repeat;
+    padding-left: 20px;
+}
+
 .icon-players {
     background: url(/images/icon-player.png) left center no-repeat;
     padding-left: 20px;
@@ -1343,32 +1357,19 @@ div.world-title {
     padding-left: 20px;
 }
 
-a.village-link,
-a.tribe-link,
-a.player-link {
+.icon-province {
+    background: url(/images/icon-province.png) left center no-repeat;
     padding-left: 20px;
 }
 
-a.village-link::before,
-a.tribe-link::before,
-a.player-link::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    margin-left: -20px;
+.icon-points {
+    background: url(/images/icon-points.png) left center no-repeat;
+    padding-left: 20px;
 }
 
-a.village-link::before {
-    background: url(/images/icon-village.png) no-repeat;
-}
-
-a.player-link::before {
-    background: url(/images/player.png) no-repeat;
-}
-
-a.tribe-link::before {
-    background: url(/images/icon-tribe.png) no-repeat;
+.icon-tribe-points {
+    background: url(/images/icon-tribe-points.png) left center no-repeat;
+    padding-left: 20px;
 }
 
 .color-picker {
@@ -1403,7 +1404,7 @@ a.tribe-link::before {
 }
 
 .floating-ranking tbody a {
-    background: url(/images/external-link.png) 97% center no-repeat, var(--noise), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
+    background: url(/images/icon-external-link.png) 97% center no-repeat, var(--noise), linear-gradient(hsl(24, 42%, 39%), hsl(25, 32%, 26%));
     border-radius: 3px;
     border: 1px solid hsl(28, 62%, 16%);
     box-shadow: none;
@@ -1680,13 +1681,13 @@ span[class^="flag-"] {
     font-size: 12px;
     left: 0;
     margin-top: 3px;
-    opacity: 0;
+     opacity: 0;
     padding: 3px;
     pointer-events: none;
     position: fixed;
     top: 0;
     transition: all 0.2s;
-    visibility: hidden;
+     visibility: hidden;
     width: 370px;
     z-index: 5;
 }
@@ -1710,7 +1711,7 @@ span[class^="flag-"] {
     height: 25px;
 }
 
-#map-tooltip td > div > div {
+#map-tooltip .values {
     display: inline-block;
     height: 24px;
     vertical-align: top;
@@ -1749,48 +1750,6 @@ span[class^="flag-"] {
 
 #map-tooltip .village-name {
     max-width: calc(100% - 50px);
-}
-
-#map-tooltip .icon {
-    background: linear-gradient(#191B1A, #4A504B);
-    border: 1px solid hsl(0, 13%, 15%);
-    display: inline-block;
-    height: 25px;
-    width: 26px;
-}
-
-#map-tooltip .icon:before {
-    background-position: center;
-    background-repeat: no-repeat;
-    content: ' ';
-    display: inline-block;
-    height: 23px;
-    width: 23px;
-    z-index: 1;
-}
-
-#map-tooltip .icon.village:before {
-    background-image: url(/images/icon-village.png);
-}
-
-#map-tooltip .icon.player:before {
-    background-image: url(/images/icon-player.png);
-}
-
-#map-tooltip .icon.tribe:before {
-    background-image: url(/images/icon-tribe.png);
-}
-
-#map-tooltip .icon.tribe-points-x:before {
-    background-image: url(/images/icon-tribe-points.png);
-}
-
-#map-tooltip .icon.points:before {
-    background-image: url(/images/icon-points.png);
-}
-
-#map-tooltip .icon.province:before {
-    background-image: url(/images/icon-province.png);
 }
 
 #languages-page a {

@@ -21,13 +21,13 @@
                             <td><%= formatDate(change.date, market.time_offset, 'hours-only') %></td>
 
                             <% if (change.old_tribe) { -%>
-                                <td><a class="tribe-link" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
+                                <td><a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
                             <% } else { -%>
                                 <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
                             <% } -%>
 
                             <% if (change.new_tribe) { -%>
-                                <td><a class="tribe-link" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
+                                <td><a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
                             <% } else { -%>
                                 <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
                             <% } -%>
