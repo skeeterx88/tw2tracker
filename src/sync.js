@@ -11,9 +11,9 @@ const utils = require('./utils.js');
 const config = require('./config.js');
 const Scraper = require('./scraper.js');
 
-const syncCommands = require('./sync-commands.json');
-const syncStatus = require('./sync-status.json');
-const syncTypes = require('./sync-types.json');
+const syncCommands = require('./types/sync-commands.json');
+const syncStatus = require('./types/sync-status.json');
+const syncTypes = require('./types/sync-types.json');
 
 const ACHIEVEMENT_COMMIT_ADD = 'achievement_commit_add';
 const ACHIEVEMENT_COMMIT_UPDATE = 'achievement_commit_update';

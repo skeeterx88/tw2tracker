@@ -6,9 +6,9 @@ const sql = require('../sql.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
-const conquestTypes = require('../conquest-types.json');
-const memberChangeTypes = require('../member-change-types.json');
-const historyOrderTypes = require('../history-order-types.json');
+const conquestTypes = require('../types/conquest-types.json');
+const memberChangeTypes = require('../types/member-change-types.json');
+const historyOrderTypes = require('../types/history-order-types.json');
 
 const {
     paramWorld,

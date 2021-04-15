@@ -5,9 +5,9 @@ const {db} = require('../db.js');
 const sql = require('../sql.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
-const syncCommands = require('../sync-commands.json');
-const privilegeTypes = require('../privileges.json');
-const configMap = require('../config-map.json');
+const syncCommands = require('../types/sync-commands.json');
+const privilegeTypes = require('../types/privileges.json');
+const configMap = require('../types/config-map.json');
 const privilegeTypesValue = Object.values(privilegeTypes);
 const pgArray = require('pg').types.arrayParser;
 const bcrypt = require('bcrypt');
@@ -17,7 +17,7 @@ const passport = require('passport');
 const humanInterval = require('human-interval');
 const fs = require('fs');
 
-const syncTypes = require('../sync-types.json');
+const syncTypes = require('../types/sync-types.json');
 
 const {
     mergeBackendLocals,

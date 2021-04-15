@@ -7,7 +7,7 @@ const config = require('../config.js');
 const {db} = require('../db.js');
 const sql = require('../sql.js');
 const i18n = require('../i18n.js');
-const mapShareTypes = require('../map-share-types.json');
+const mapShareTypes = require('../types/map-share-types.json');
 const mapsAPIRouter = require('./maps-api.js');
 
 const {

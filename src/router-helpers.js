@@ -4,10 +4,10 @@ const {db} = require('./db.js');
 const sql = require('./sql.js');
 const config = require('./config.js');
 const i18n = require('./i18n.js');
-const rankingSortTypes = require('./ranking-sort-types.json');
+const rankingSortTypes = require('./types/ranking-sort-types.json');
 const rankingSortTypesValues = Object.values(rankingSortTypes);
-const historyChangeTypes = require('./history-change-types.json');
-const historyOrderTypes = require('./history-order-types.json');
+const historyChangeTypes = require('./types/history-change-types.json');
+const historyOrderTypes = require('./types/history-order-types.json');
 
 async function getPlayer (worldId, playerId) {
     const player = await db.any(sql('get-player'), {worldId, playerId});
