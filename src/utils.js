@@ -218,6 +218,21 @@ const formatSince = function (date, lang) {
     return format;
 };
 
+/**
+ * Get the correct URL to the specified market.
+ * @param marketId {String}
+ * @param url {String}
+ * @return {String}
+ */
+function marketDomain (marketId, url) {
+    const market = marketId === 'zz' ? 'beta' : marketId;
+    return url.replace('%market', market);
+}
+
+function randomInteger (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 module.exports = {
     noop,
     schemaExists,
@@ -236,5 +251,7 @@ module.exports = {
     UTC,
     formatSince,
     formatNumbers,
-    formatDate
+    formatDate,
+    marketDomain,
+    randomInteger
 };
