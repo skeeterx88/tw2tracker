@@ -6,7 +6,7 @@
         return server();
     }
 
-    const {db} = require('./db.js');
+    const {db, sql} = require('./db.js');
 
     try {
         (await db.connect()).done();
@@ -14,7 +14,6 @@
         throw new Error(`Can't connect to PostgreSQL database: ${error.message}`);
     }
 
-    const sql = require('./sql.js');
     const table = await db.one(sql('helpers/table-exists'), 'markets');
 
     if (!table.exists) {

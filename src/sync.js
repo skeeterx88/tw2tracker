@@ -5,8 +5,7 @@ const humanInterval = require('human-interval');
 const async = require('async');
 
 const debug = require('./debug.js');
-const {db} = require('./db.js');
-const sql = require('./sql.js');
+const {db, sql} = require('./db.js');
 const utils = require('./utils.js');
 const config = require('./config.js');
 const Scraper = require('./scraper.js');

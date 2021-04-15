@@ -14,8 +14,7 @@ module.exports = function () {
     const pgArray = require('pg').types.arrayParser;
     const fs = require('fs');
 
-    const {db} = require('./db.js');
-    const sql = require('./sql.js');
+    const {db, sql} = require('./db.js');
     const config = require('./config.js');
     const authErrors = require('./types/auth-errors.json');
     const i18n = require('./i18n.js');

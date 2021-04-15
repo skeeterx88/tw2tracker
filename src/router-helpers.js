@@ -1,7 +1,6 @@
 const createError = require('http-errors');
 const utils = require('./utils.js');
-const {db} = require('./db.js');
-const sql = require('./sql.js');
+const {db, sql} = require('./db.js');
 const config = require('./config.js');
 const i18n = require('./i18n.js');
 const rankingSortTypes = require('./types/ranking-sort-types.json');

@@ -1,5 +1,4 @@
-const {db} = require('./db.js');
-const sql = require('./sql.js');
+const {db, sql} = require('./db.js');
 const https = require('https');
 const crypto = require('crypto');
 const humanInterval = require('human-interval');

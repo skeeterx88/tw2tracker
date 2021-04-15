@@ -4,8 +4,7 @@ const path = require('path');
 const zlib = require('zlib');
 const utils = require('./utils.js');
 const debug = require('./debug.js');
-const {db} = require('./db.js');
-const sql = require('./sql.js');
+const {db, sql} = require('./db.js');
 
 const userAgent = 'Mozilla/5.0%20(X11;%20Linux%20x86_64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/89.0.4389.114%20Safari/537.36';
 const MAP_CHUNK_SIZE = 25;
