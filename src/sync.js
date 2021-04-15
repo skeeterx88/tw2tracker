@@ -21,19 +21,17 @@ const parallelData = config('sync', 'parallel_data_sync');
 const parallelAchievements = config('sync', 'parallel_achievements_sync');
 
 const historyQueue = async.queue(async handler => await handler(), 1);
-const dataQueue = createSyncQueue(parallelData);
-const achievementsQueue = createSyncQueue(parallelAchievements);
+
+const syncQueue = {};
 
 const worldScrapers = new Map();
 
 const syncTypeMapping = {
     [syncTypes.DATA]: {
-        queue: dataQueue,
         MAX_RUNNING_TIME: humanInterval(config('sync', 'max_sync_data_running_time')),
         UPDATE_LAST_SYNC_QUERY: sql('update-data-sync')
     },
     [syncTypes.ACHIEVEMENTS]: {
-        queue: achievementsQueue,
         MAX_RUNNING_TIME: humanInterval(config('sync', 'max_sync_achievements_running_time')),
         UPDATE_LAST_SYNC_QUERY: sql('update-achievements-sync')
     }
@@ -122,11 +120,15 @@ async function trigger (msg) {
             break;
         }
         case syncCommands.DATA_RESET_QUEUE: {
-            dataQueue.clear();
+            await db.none(sql('reset-queue-items-type'), {type: syncTypes.DATA});
+            syncQueue[syncTypes.DATA].kill();
+            syncQueue[syncTypes.DATA] = createSyncQueue(parallelData);
             break;
         }
         case syncCommands.ACHIEVEMENTS_RESET_QUEUE: {
-            achievementsQueue.clear();
+            await db.none(sql('reset-queue-items-type'), {type: syncTypes.ACHIEVEMENTS});
+            syncQueue[syncTypes.ACHIEVEMENTS].kill();
+            syncQueue[syncTypes.ACHIEVEMENTS] = createSyncQueue(parallelAchievements);
             break;
         }
     }
@@ -135,13 +137,17 @@ async function trigger (msg) {
 async function initSyncQueue () {
     debug.queue('initializing sync queue');
 
-    const dataQueue = await db.any(sql('get-sync-queue-type'), {type: syncTypes.DATA});
-    const achievementsQueue = await db.any(sql('get-sync-queue-type'), {type: syncTypes.ACHIEVEMENTS});
+    syncQueue[syncTypes.DATA] = createSyncQueue(parallelData);
+    syncQueue[syncTypes.ACHIEVEMENTS] = createSyncQueue(parallelAchievements);
 
-    await db.none(sql('reset-queue-items'));
+    const queueData = await db.any(sql('get-sync-queue-type'), {type: syncTypes.DATA});
+    const queueAchievements = await db.any(sql('get-sync-queue-type'), {type: syncTypes.ACHIEVEMENTS});
 
-    await addSyncQueue(syncTypes.DATA, dataQueue);
-    await addSyncQueue(syncTypes.ACHIEVEMENTS, achievementsQueue);
+    await db.none(sql('reset-queue-items-type'), {type: syncTypes.DATA});
+    await db.none(sql('reset-queue-items-type'), {type: syncTypes.ACHIEVEMENTS});
+
+    await addSyncQueue(syncTypes.DATA, queueData);
+    await addSyncQueue(syncTypes.ACHIEVEMENTS, queueAchievements);
 }
 
 async function addSyncQueue (type, newItems) {
@@ -149,7 +155,7 @@ async function addSyncQueue (type, newItems) {
         throw new TypeError('Argument newItems must be an Array');
     }
 
-    const {queue} = syncTypeMapping[type];
+    const queue = syncQueue[type];
 
     for (const item of newItems) {
         const worldId = item.market_id + item.world_number;

@@ -280,7 +280,8 @@ const resetQueueRouter = asyncRouter(async function (req, res) {
         return res.redirect('/admin/sync');
     }
 
-    await db.none(sql('reset-sync-queue'), {type});
+    await emitSync(syncCommands.DATA_RESET_QUEUE);
+
     req.flash('messages', i18n('message_sync_queue_reseted', 'admin', res.locals.lang, [type]));
     res.redirect('/admin/sync');
 });
