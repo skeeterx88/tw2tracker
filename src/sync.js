@@ -371,7 +371,9 @@ async function syncWorldList () {
                 await scraper.createCharacter(worldNumber);
             }
 
-            if (!await utils.worldEntryExists(worldId)) {
+            const {exists: worldExists} = await db.one(sql('world-exists'), {worldId});
+
+            if (!worldExists) {
                 debug.worlds('world:%s creating world db entry', worldId);
 
                 await db.query(sql('create-world-schema'), {

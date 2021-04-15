@@ -1,20 +1,9 @@
-const {db, sql} = require('./db.js');
 const https = require('https');
 const crypto = require('crypto');
 const humanInterval = require('human-interval');
 const i18n = require('./i18n.js');
 
 const noop = function () {};
-
-const schemaExists = async function (schema) {
-    const result = await db.one(sql('helpers/schema-exists'), {schema});
-    return result.exists;
-};
-
-const worldEntryExists = async function (worldId) {
-    const worldEntry = await db.one(sql('world-exists'), {worldId});
-    return worldEntry.exists;
-};
 
 const extractNumbers = function (value) {
     const num = value.match(/\d+/);
@@ -232,10 +221,31 @@ function randomInteger (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function isObject (item) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
+function mergeDeep (target, changes) {
+    if (isObject(target) && isObject(changes)) {
+        for (const key in changes) {
+            if (isObject(changes[key])) {
+                if (!target[key]) Object.assign(target, {
+                    [key]: {}
+                });
+                mergeDeep(target[key], changes[key]);
+            } else {
+                Object.assign(target, {
+                    [key]: changes[key]
+                });
+            }
+        }
+    }
+
+    return target;
+}
+
 module.exports = {
     noop,
-    schemaExists,
-    worldEntryExists,
     extractNumbers,
     makeid,
     getHourlyDir,
@@ -252,5 +262,7 @@ module.exports = {
     formatNumbers,
     formatDate,
     marketDomain,
-    randomInteger
+    randomInteger,
+    isObject,
+    mergeDeep
 };
