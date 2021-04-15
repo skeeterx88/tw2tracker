@@ -71,8 +71,11 @@ function CreateScraper (marketId, worldNumber) {
     let characterSelected = false;
     let emitId = 1;
     let pingIntervalId;
+    let socketReady;
 
-    const init = () => {
+    function init () {
+        socketReady = new Promise(resolve => socket.on('open', resolve));
+
         socket.on('message', function (raw) {
             const [,, json] = raw.match(/^(\d+)(.*)/);
 
@@ -105,18 +108,14 @@ function CreateScraper (marketId, worldNumber) {
             }
         });
 
-        this.ready.then(() => {
-            this.emit('System/identify', {
+        socketReady.then(() => {
+            emit('System/identify', {
                 device: userAgent,
                 api_version: '10.*.*',
                 platform: 'browser'
             });
         });
-    };
-
-    this.ready = new Promise(function (resolve) {
-        socket.on('open', resolve);
-    });
+    }
 
     /**
      * @param {String} type
@@ -124,20 +123,16 @@ function CreateScraper (marketId, worldNumber) {
      * @param {Function=} callback
      * @return {Promise<object>}
      */
-    this.emit = function (type, data, callback) {
+    function emit (type, data, callback) {
         return new Promise(async (resolve, reject) => {
-            await this.ready;
-
+            await socketReady;
             const id = emitId++;
+            const headers = {traveltimes: [['browser_send', Date.now()]]};
+            const msg = {type, data, id, headers};
 
             // debug.socket('world:%s emit #%i %s %o', worldId, id, type, data);
 
-            socket.send('42' + JSON.stringify(['msg', {
-                type,
-                data,
-                id,
-                headers: {traveltimes: [['browser_send', Date.now()]]}
-            }]));
+            socket.send('42' + JSON.stringify(['msg', msg]));
 
             callbacks.set(id, function (data, eventId) {
                 if (typeof callback === 'function') {
@@ -159,22 +154,22 @@ function CreateScraper (marketId, worldNumber) {
                 timeouts.set(id, timeoutId);
             }
         });
-    };
+    }
 
     /**
      * Completely defuses the scraper.
      */
-    this.kill = function () {
+    function kill () {
         clearTimeout(pingIntervalId);
         socket.close();
         worldScrapers.delete(worldId);
-    };
+    }
 
     /**
      * Authenticate using one of the available sync accounts.
      * @return {Promise<MarketAccount|Boolean>} The authenticated account or false.
      */
-    this.auth = async function () {
+    async function auth () {
         if (authenticated) {
             return authenticated;
         }
@@ -188,7 +183,7 @@ function CreateScraper (marketId, worldNumber) {
 
         while (marketAccounts.length) {
             const credentials = marketAccounts.shift();
-            const account = await this.emit('Authentication/login', credentials);
+            const account = await emit('Authentication/login', credentials);
 
             if (account.token) {
                 debug.auth('market:%s account %s successed', marketId, credentials.name);
@@ -200,7 +195,7 @@ function CreateScraper (marketId, worldNumber) {
         }
 
         return false;
-    };
+    }
 
     /**
      * Select an account's character (world). Simulates the emits
@@ -209,13 +204,13 @@ function CreateScraper (marketId, worldNumber) {
      * @param {Number} characterId
      * @return {Promise<AccountCharacter|Boolean>}
      */
-    this.selectCharacter = async (characterId) => {
+    async function selectCharacter (characterId) {
         if (characterSelected) {
             return characterSelected;
         }
 
         /** @type {AccountCharacter} */
-        const character = await this.emit('Authentication/selectCharacter', {
+        const character = await emit('Authentication/selectCharacter', {
             world_id: worldId,
             id: characterId
         });
@@ -224,13 +219,13 @@ function CreateScraper (marketId, worldNumber) {
             return false;
         }
 
-        const gameData = await this.emit('GameDataBatch/getGameData');
-        const characterInfo = await this.emit('Character/getInfo', {});
+        const gameData = await emit('GameDataBatch/getGameData');
+        const characterInfo = await emit('Character/getInfo', {});
 
         let createVillageId;
 
         if (!characterInfo.villages.length) {
-            const createdVillage = await this.emit('Character/createVillage', {
+            const createdVillage = await emit('Character/createVillage', {
                 name: character.name,
                 direction: 'random'
             });
@@ -238,26 +233,26 @@ function CreateScraper (marketId, worldNumber) {
             createVillageId = createdVillage['village_id'];
         }
 
-        await this.emit('Premium/listItems');
-        await this.emit('GlobalInformation/getInfo');
-        await this.emit('Effect/getEffects');
-        await this.emit('TribeInvitation/getOwnInvitations');
-        await this.emit('WheelEvent/getEvent');
-        await this.emit('Character/getColors');
-        await this.emit('Group/getGroups');
-        await this.emit('Icon/getVillages');
+        await emit('Premium/listItems');
+        await emit('GlobalInformation/getInfo');
+        await emit('Effect/getEffects');
+        await emit('TribeInvitation/getOwnInvitations');
+        await emit('WheelEvent/getEvent');
+        await emit('Character/getColors');
+        await emit('Group/getGroups');
+        await emit('Icon/getVillages');
 
         const worldConfig = gameData['WorldConfig/config'];
 
         if (worldConfig['tribe_skills']) {
-            this.emit('TribeSkill/getInfo');
+            emit('TribeSkill/getInfo');
         }
 
         if (worldConfig['resource_deposits']) {
-            this.emit('ResourceDeposit/getInfo');
+            emit('ResourceDeposit/getInfo');
         }
 
-        this.emit('System/getTime', {}).then(function (gameTime) {
+        emit('System/getTime', {}).then(function (gameTime) {
             commitMarketTimeOffset(gameTime.offset, marketId);
             commitWorldConfig(gameData['WorldConfig/config'], worldId);
             fetchWorldMapStructure(character.map_name, marketId, worldNumber);
@@ -267,14 +262,14 @@ function CreateScraper (marketId, worldNumber) {
             }
         });
 
-        this.emit('DailyLoginBonus/getInfo', null);
-        this.emit('Quest/getQuestLines');
-        this.emit('Crm/getInterstitials', {device_type: 'desktop'});
+        emit('DailyLoginBonus/getInfo', null);
+        emit('Quest/getQuestLines');
+        emit('Crm/getInterstitials', {device_type: 'desktop'});
 
         let village;
 
         if (createVillageId) {
-            const villages = await this.emit('VillageBatch/getVillageData', {village_ids: [createVillageId]});
+            const villages = await emit('VillageBatch/getVillageData', {village_ids: [createVillageId]});
             village = villages[createVillageId]['Village/village'];
         } else {
             village = characterInfo.villages[0];
@@ -283,7 +278,7 @@ function CreateScraper (marketId, worldNumber) {
         const coords = scaledGridCoordinates(village.x, village.y, 25, 25, MAP_CHUNK_SIZE);
 
         for (const [x, y] of coords) {
-            this.emit('Map/getVillagesByArea', {
+            emit('Map/getVillagesByArea', {
                 x: x * MAP_CHUNK_SIZE,
                 y: y * MAP_CHUNK_SIZE,
                 width: MAP_CHUNK_SIZE,
@@ -292,26 +287,26 @@ function CreateScraper (marketId, worldNumber) {
             });
         }
 
-        this.emit('System/startupTime', {startup_time: randomInteger(4000, 7000), platform: 'browser', device: userAgent});
-        this.emit('InvitePlayer/getInfo');
-        this.emit('VillageBatch/getVillageData', {village_ids: characterInfo.villages.map(village => village.id)});
-        this.emit('SecondVillage/getInfo', {});
-        this.emit('Authentication/completeLogin', {});
+        emit('System/startupTime', {startup_time: randomInteger(4000, 7000), platform: 'browser', device: userAgent});
+        emit('InvitePlayer/getInfo');
+        emit('VillageBatch/getVillageData', {village_ids: characterInfo.villages.map(village => village.id)});
+        emit('SecondVillage/getInfo', {});
+        emit('Authentication/completeLogin', {});
 
         characterSelected = character;
 
         return characterSelected;
-    };
+    }
 
     /**
      * Create a character on a specific world.
      * @param worldNumber
      * @return {Promise<AccountCharacter>}
      */
-    this.createCharacter = async function (worldNumber) {
+    async function createCharacter (worldNumber) {
         debug.sync('world:%s create character', worldId);
-        return await this.emit('Authentication/createCharacter', {world: marketId + worldNumber});
-    };
+        return await emit('Authentication/createCharacter', {world: marketId + worldNumber});
+    }
 
     /**
      * @return {Promise<{
@@ -323,7 +318,7 @@ function CreateScraper (marketId, worldNumber) {
      *     villagesByPlayer: Map<Number, Number[]>
      * }>}
      */
-    this.data = async function () {
+    async function data () {
         const CHUNK_SIZE = 50;
         const COORDS_REFERENCE = {
             topLeft: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
@@ -378,7 +373,7 @@ function CreateScraper (marketId, worldNumber) {
         };
 
         const loadVillageSection = async (x, y) => {
-            const section = await this.emit('Map/getVillagesByArea', {x, y, width: CHUNK_SIZE, height: CHUNK_SIZE});
+            const section = await emit('Map/getVillagesByArea', {x, y, width: CHUNK_SIZE, height: CHUNK_SIZE});
             processVillages(section.villages);
             return section.villages.length;
         };
@@ -421,7 +416,7 @@ function CreateScraper (marketId, worldNumber) {
         };
 
         const loadTribes = async (offset) => {
-            const data = await this.emit('Ranking/getTribeRanking', {
+            const data = await emit('Ranking/getTribeRanking', {
                 area_type: 'world',
                 offset,
                 count: RANKING_QUERY_COUNT,
@@ -472,7 +467,7 @@ function CreateScraper (marketId, worldNumber) {
         };
 
         const loadPlayers = async (offset) => {
-            const data = await this.emit('Ranking/getCharacterRanking', {
+            const data = await emit('Ranking/getCharacterRanking', {
                 area_type: 'world',
                 offset: offset,
                 count: RANKING_QUERY_COUNT,
@@ -568,12 +563,12 @@ function CreateScraper (marketId, worldNumber) {
             villagesByPlayer,
             playersByTribe
         };
-    };
+    }
 
     /**
      * @return {Promise<{players: Map<Number, Array>, tribes: Map<Number, Array>}>}
      */
-    this.achivements = async function () {
+    async function achievements () {
         const achievementsMap = {
             players: {
                 router: 'Achievement/getCharacterAchievements',
@@ -593,7 +588,7 @@ function CreateScraper (marketId, worldNumber) {
         };
 
         const loadTribes = async (offset) => {
-            const data = await this.emit('Ranking/getTribeRanking', {
+            const data = await emit('Ranking/getTribeRanking', {
                 area_type: 'world',
                 offset: offset,
                 count: RANKING_QUERY_COUNT,
@@ -630,7 +625,7 @@ function CreateScraper (marketId, worldNumber) {
         };
 
         const loadPlayers = async (offset) => {
-            const data = await this.emit('Ranking/getCharacterRanking', {
+            const data = await emit('Ranking/getCharacterRanking', {
                 area_type: 'world',
                 offset: offset,
                 count: RANKING_QUERY_COUNT,
@@ -672,7 +667,7 @@ function CreateScraper (marketId, worldNumber) {
             }
 
             const {router, key} = achievementsMap[type];
-            const {achievements} = await this.emit(router, {[key]: id});
+            const {achievements} = await emit(router, {[key]: id});
 
             achievementsData[type].set(id, achievements.filter(achievement => achievement.level));
         };
@@ -709,9 +704,16 @@ function CreateScraper (marketId, worldNumber) {
         await loadPlayersAchievements();
 
         return achievementsData;
-    };
+    }
 
     init();
+
+    this.kill = kill;
+    this.auth = auth;
+    this.selectCharacter = selectCharacter;
+    this.createCharacter = createCharacter;
+    this.data = data;
+    this.achievements = achievements;
 }
 
 async function getScraper (marketId, worldNumber) {
