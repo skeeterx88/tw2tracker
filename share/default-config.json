@@ -1,8 +1,7 @@
 {
     "general": {
         "site_name": "Tw2-Tracker",
-        "lang": "en",
-        "force_https": true
+        "lang": "en"
     },
     "ui": {
         "ranking_page_items_per_page": 20,
