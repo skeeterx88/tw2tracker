@@ -9,12 +9,10 @@ const {db} = require('./db.js');
 const sql = require('./sql.js');
 const utils = require('./utils.js');
 const config = require('./config.js');
-const Events = require('./events.js');
 const Scraper = require('./scraper.js');
 
 const syncCommands = require('./sync-commands.json');
 const syncStatus = require('./sync-status.json');
-const syncEvents = require('./sync-events.json');
 const syncTypes = require('./sync-types.json');
 
 const ACHIEVEMENT_COMMIT_ADD = 'achievement_commit_add';
@@ -415,8 +413,6 @@ async function toggleWorld (marketId, worldNumber) {
         worldNumber,
         enabled
     });
-
-    Events.trigger(syncEvents.TOGGLE_WORLD, [marketId, worldNumber, enabled]);
 
     return true;
 }
