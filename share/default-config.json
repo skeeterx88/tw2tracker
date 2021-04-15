@@ -49,10 +49,6 @@
         "database": "tw2tracker",
         "port": 5432
     },
-    "puppeteer": {
-        "chromium_path": "/usr/bin/chromium",
-        "headless": true
-    },
     "emails": {
         "issues": "issue@tw2-tracker.com",
         "contact": "contact@tw2-tracker.com",
