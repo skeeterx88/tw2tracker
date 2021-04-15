@@ -288,6 +288,7 @@ async function syncWorld (type, marketId, worldNumber) {
             }
             case syncStatus.TIMEOUT: {
                 debug.sync('world:%s timeout', worldId);
+                scraper.kill();
                 break;
             }
             case syncStatus.ALL_ACCOUNTS_FAILED: {
