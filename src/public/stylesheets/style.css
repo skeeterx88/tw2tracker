@@ -12,7 +12,7 @@
     --content-inner-shadow: inset -2px -2px 3px hsla(0, 0%, 0%, .03);
     --content-menu-shadow: 2px 2px 3px hsla(0, 0%, 0%, 0.35);
     --main-background: hsl(43, 59%, 78%);
-    --noise: url(/images/noise.webp);
+    --noise: url(/images/bg-noise.png);
     --shadow-border-1: 0px 0px 0px 1px hsl(23, 55%, 24%), 0px 0px 0px 2px hsl(23, 47%, 36%), 2px 2px 4px hsla(0, 0%, 0%, 0.50);
     --shadow-border-2: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset -1px -1px 2px hsl(0, 0%, 0%);
     --shadow-border-input: 0px 0px 0px 1px hsl(23, 67%, 17%), inset 0px 0px 0px 1px hsl(23, 67%, 17%), 2px 2px 2px hsl(0, 0%, 0%), inset 1px 1px 3px hsla(0, 0%, 0%, 0.95);
@@ -27,7 +27,7 @@
 }
 
 html {
-    background: url(/images/background-scene.webp) top no-repeat, var(--noise), hsl(37, 18%, 45%);
+    background: url(/images/bg-scene.webp) top no-repeat, var(--noise), hsl(37, 18%, 45%);
     box-sizing: border-box;
     color: hsl(24, 47%, 21%);
     font-family: 'Trebuchet MS', 'Lucida Grande', Helvetica, Arial, sans-serif;
@@ -192,7 +192,7 @@ sup {
 }
 
 main, footer {
-    background: var(--noise), url(/images/content-border-left.webp) left repeat-y, url(/images/content-border-right.webp) right repeat-y, url(/images/content-border-top.webp) top repeat-x, url(/images/content-border-bottom.webp) bottom repeat-x, var(--main-background);
+    background: var(--noise), url(/images/bg-content-border-left.webp) left repeat-y, url(/images/bg-content-border-right.webp) right repeat-y, url(/images/bg-content-border-top.webp) top repeat-x, url(/images/bg-content-border-bottom.webp) bottom repeat-x, var(--main-background);
     border-radius: 2px;
     border: 1px solid hsl(174, 16%, 26%);
     box-shadow: var(--shadow-border-1);
@@ -944,7 +944,7 @@ div.world-title {
 }
 
 .map-panel {
-    background: url(/images/side-bar-left.jpg) left repeat-y, url(/images/side-bar-right.jpg) right repeat-y, url(/images/side-bar-middle.jpg), hsl(23, 25%, 20%);
+    background: url(/images/bg-side-bar-left.jpg) left repeat-y, url(/images/bg-side-bar-right.jpg) right repeat-y, url(/images/bg-side-bar-middle.jpg), hsl(23, 25%, 20%);
     box-shadow: 5px 0 6px hsla(0, 0%, 0%, 0.80);
     color: hsl(38, 100%, 90%);
     display: flex;
@@ -1133,7 +1133,7 @@ div.world-title {
 }
 
 .map-panel .search .results {
-    background: url(/images/noise-3.png) top left hsl(32, 43%, 66%);
+    background: var(--noise) top left hsl(32, 43%, 66%);
     box-shadow: inset 0 0 0 1px hsl(31, 46%, 22%), inset 0 0 0 2px hsl(32, 51%, 72%), 5px 5px 5px hsla(0, 0%, 0%, 0.80);
     color: hsl(0, 0%, 0%);
     left: 2px;
@@ -1334,12 +1334,12 @@ div.world-title {
 }
 
 .icon-players {
-    background: url(/images/player.png) left center no-repeat;
+    background: url(/images/icon-player.png) left center no-repeat;
     padding-left: 20px;
 }
 
 .icon-tribes {
-    background: url(/images/tribe.png) left center no-repeat;
+    background: url(/images/icon-tribe.png) left center no-repeat;
     padding-left: 20px;
 }
 
@@ -1360,7 +1360,7 @@ a.player-link::before {
 }
 
 a.village-link::before {
-    background: url(/images/village-icon.png) no-repeat;
+    background: url(/images/icon-village.png) no-repeat;
 }
 
 a.player-link::before {
@@ -1368,7 +1368,7 @@ a.player-link::before {
 }
 
 a.tribe-link::before {
-    background: url(/images/tribe.png) no-repeat;
+    background: url(/images/icon-tribe.png) no-repeat;
 }
 
 .color-picker {
@@ -1752,7 +1752,7 @@ span[class^="flag-"] {
 }
 
 #map-tooltip .icon {
-    background: linear-gradient(hsla(180, 20%, 1%, 0.73), hsla(180, 20%, 1%, 0)), url(/images/background-icon-black.webp);
+    background: linear-gradient(#191B1A, #4A504B);
     border: 1px solid hsl(0, 13%, 15%);
     display: inline-block;
     height: 25px;
@@ -1770,27 +1770,27 @@ span[class^="flag-"] {
 }
 
 #map-tooltip .icon.village:before {
-    background-image: url(/images/village-icon.webp);
+    background-image: url(/images/icon-village.png);
 }
 
 #map-tooltip .icon.player:before {
-    background-image: url(/images/player-icon.webp);
+    background-image: url(/images/icon-player.png);
 }
 
 #map-tooltip .icon.tribe:before {
-    background-image: url(/images/tribe-icon.webp);
+    background-image: url(/images/icon-tribe.png);
 }
 
 #map-tooltip .icon.tribe-points-x:before {
-    background-image: url(/images/tribe-points-icon.webp);
+    background-image: url(/images/icon-tribe-points.png);
 }
 
 #map-tooltip .icon.points:before {
-    background-image: url(/images/points-icon.webp);
+    background-image: url(/images/icon-points.png);
 }
 
 #map-tooltip .icon.province:before {
-    background-image: url(/images/province-icon.webp);
+    background-image: url(/images/icon-province.png);
 }
 
 #languages-page a {
@@ -1805,7 +1805,7 @@ span[class^="flag-"] {
 }
 
 #languages-page .lang:hover {
-    background: url(/images/noise.webp) hsl(43, 100%, 94%);
+    background: var(--noise) hsl(43, 100%, 94%);
 }
 
 #languages-page .lang span {
