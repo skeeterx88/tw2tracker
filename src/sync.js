@@ -21,7 +21,6 @@ const parallelData = config('sync', 'parallel_data_sync');
 const parallelAchievements = config('sync', 'parallel_achievements_sync');
 
 const historyQueue = async.queue(async handler => await handler(), 1);
-
 const syncQueue = {};
 
 const worldScrapers = new Map();
@@ -150,6 +149,17 @@ async function initSyncQueue () {
     await addSyncQueue(syncTypes.ACHIEVEMENTS, queueAchievements);
 }
 
+/**
+ * @typedef {Object} QueueItem
+ * @property {String} market_id
+ * @property {Number} world_number
+ */
+
+/**
+ * @param {String} type
+ * @param {Array<QueueItem>} newItems
+ * @return {Promise<void>}
+ */
 async function addSyncQueue (type, newItems) {
     if (!Array.isArray(newItems)) {
         throw new TypeError('Argument newItems must be an Array');
