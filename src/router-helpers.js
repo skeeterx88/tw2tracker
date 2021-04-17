@@ -99,15 +99,15 @@ async function paramVillageParse (req, worldId) {
 }
 
 function createPagination (current, total, limit, path) {
-    if (typeof current !== 'number') {
+    if (isNaN(current)) {
         throw new Error('Pagination: Current is not a number.');
     }
 
-    if (typeof total !== 'number') {
+    if (isNaN(total)) {
         throw new Error('Pagination: Total is not a number.');
     }
 
-    if (typeof limit !== 'number') {
+    if (isNaN(limit)) {
         throw new Error('Pagination: Limit is not a number.');
     }
 
