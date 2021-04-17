@@ -1,0 +1,8 @@
+CREATE SCHEMA IF NOT EXISTS twoverflow;
+
+CREATE TABLE IF NOT EXISTS twoverflow.usage (
+    id SERIAL PRIMARY KEY,
+    player_id TEXT NOT NULL,
+    world_id TEXT NOT NULL,
+    date TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
+);

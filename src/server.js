@@ -111,6 +111,7 @@ module.exports = function () {
     const statsRouter = require('./routes/stats.js');
     const adminRouter = require('./routes/admin.js');
     const mapsRouter = require('./routes/maps.js');
+    const overflowRouter = require('./routes/overflow.js');
 
     app.use(function (req, res, next) {
         res.locals.i18n = i18n;
@@ -143,6 +144,7 @@ module.exports = function () {
     app.use('/login', function (req, res) {
         res.redirect('/admin/login');
     });
+    app.use('/overflow', overflowRouter);
 
     // catch 404 and forward to error handler
     app.use(function (req, res, next) {
