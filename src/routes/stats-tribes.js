@@ -3,6 +3,7 @@ const createError = require('http-errors');
 const router = express.Router();
 const {db, sql} = require('../db.js');
 const utils = require('../utils.js');
+const timeUtils = require('../time-utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
 const conquestTypes = require('../types/conquest-types.json');
@@ -406,11 +407,11 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
     for (const {period, type, time_last_level} of achievements) {
         if (period) {
             if (!achievementsRepeatableLastEarned[type]) {
-                achievementsRepeatableLastEarned[type] = utils.formatDate(time_last_level, market.time_offset, 'day-only');
+                achievementsRepeatableLastEarned[type] = timeUtils.formatDate(time_last_level, market.time_offset, 'day-only');
             }
 
             achievementsRepeatable[type] = achievementsRepeatable[type] || [];
-            achievementsRepeatable[type].push(utils.formatDate(time_last_level, market.time_offset, 'day-only'));
+            achievementsRepeatable[type].push(timeUtils.formatDate(time_last_level, market.time_offset, 'day-only'));
 
             achievementsRepeatableCategoryCount[type] = achievementsRepeatableCategoryCount[type] ?? 0;
             achievementsRepeatableCategoryCount[type]++;
@@ -418,7 +419,7 @@ const tribeAchievementsRouter = asyncRouter(async function (req, res, next) {
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || [];
-                achievementsRepeatableDetailed[type].push(utils.formatDate(time_last_level, market.time_offset, 'day-only'));
+                achievementsRepeatableDetailed[type].push(timeUtils.formatDate(time_last_level, market.time_offset, 'day-only'));
             }
         }
     }

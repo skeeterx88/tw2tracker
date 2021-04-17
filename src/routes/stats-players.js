@@ -3,6 +3,7 @@ const createError = require('http-errors');
 const router = express.Router();
 const {db, sql} = require('../db.js');
 const utils = require('../utils.js');
+const timeUtils = require('../time-utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
 const conquestTypes = require('../types/conquest-types.json');
@@ -453,12 +454,12 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
 
         for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
-                achievementsRepeatableLastEarned[type] = utils.formatDate(time_last_level, market.time_offset, 'day-only');
+                achievementsRepeatableLastEarned[type] = timeUtils.formatDate(time_last_level, market.time_offset, 'day-only');
             }
 
             if (subCategory === 'detailed') {
                 achievementsRepeatableDetailed[type] = achievementsRepeatableDetailed[type] || [];
-                achievementsRepeatableDetailed[type].push(utils.formatDate(time_last_level, market.time_offset, 'day-only'));
+                achievementsRepeatableDetailed[type].push(timeUtils.formatDate(time_last_level, market.time_offset, 'day-only'));
             }
 
             achievementsRepeatableCount[type] = achievementsRepeatableCount[type] ?? 0;

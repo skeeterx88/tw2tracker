@@ -7,6 +7,7 @@ const async = require('async');
 const debug = require('./debug.js');
 const {db, sql} = require('./db.js');
 const utils = require('./utils.js');
+const timeUtils = require('./time-utils.js');
 const config = require('./config.js');
 const Scraper = require('./scraper.js');
 
@@ -1187,7 +1188,7 @@ function mapAchievements (achievements) {
 }
 
 function getTimeUntilMidnight (timeOffset) {
-    const now = utils.UTC() + timeOffset;
+    const now = timeUtils.UTC() + timeOffset;
     const then = new Date(now);
     then.setHours(24, 0, 0, 0);
     return then - now;

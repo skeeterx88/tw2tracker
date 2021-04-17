@@ -20,6 +20,7 @@ module.exports = function () {
     const i18n = require('./i18n.js');
     const languages = require('./languages.js');
     const utils = require('./utils.js');
+    const timeUtils = require('./time-utils.js');
     const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
     const rankingSortTypes = require('./types/ranking-sort-types.json');
 
@@ -115,8 +116,8 @@ module.exports = function () {
         res.locals.i18n = i18n;
         res.locals.availableLanguages = availableLanguages;
         res.locals.formatNumbers = utils.formatNumbers;
-        res.locals.formatDate = utils.formatDate;
-        res.locals.formatSince = utils.formatSince;
+        res.locals.formatDate = timeUtils.formatDate;
+        res.locals.formatSince = timeUtils.formatSince;
         res.locals.capitalize = utils.capitalize;
         res.locals.sprintf = utils.sprintf;
         res.locals.lang = req.session.lang || config('general', 'lang');
