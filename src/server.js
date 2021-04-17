@@ -139,11 +139,6 @@ module.exports = function () {
     app.use('/admin', adminRouter);
     app.use('/maps', mapsRouter);
     app.use('/language', languagesRouter);
-
-    // temporary
-    app.use('/login', function (req, res) {
-        res.redirect('/admin/login');
-    });
     app.use('/overflow', overflowRouter);
 
     // catch 404 and forward to error handler
