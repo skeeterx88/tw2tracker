@@ -198,7 +198,13 @@ async function syncWorld (type, marketId, worldNumber) {
     let finished = false;
     let timeoutId;
 
-    const promise = new Promise(async function (resolve, reject) {
+    function finishSync (status) {
+        clearTimeout(timeoutId);
+        finished = true;
+        db.none(syncTypeValues.UPDATE_LAST_SYNC_QUERY, {status, worldId});
+    }
+
+    const syncPromise = new Promise(async function (resolve, reject) {
         timeoutId = setTimeout(function () {
             reject(syncStatus.TIMEOUT);
         }, syncTypeValues.MAX_RUNNING_TIME);
@@ -247,10 +253,10 @@ async function syncWorld (type, marketId, worldNumber) {
             return;
         }
 
+        debug.sync('world:%s fetching %s', worldId, type);
+
         switch (type) {
             case syncTypes.DATA: {
-                debug.sync('world:%s fetching data', worldId);
-
                 const data = await scraper.data();
                 await commitDataDatabase(data, worldId);
                 await commitDataFilesystem(worldId);
@@ -261,8 +267,6 @@ async function syncWorld (type, marketId, worldNumber) {
                 break;
             }
             case syncTypes.ACHIEVEMENTS: {
-                debug.sync('world:%s fetching achievements', worldId);
-
                 const data = await scraper.achievements();
                 await commitAchievementsDatabase(data, worldId);
 
@@ -276,14 +280,11 @@ async function syncWorld (type, marketId, worldNumber) {
         resolve(syncStatus.SUCCESS);
     });
 
-    let status;
-
-    promise.then(function (_status) {
-        status = _status;
+    return syncPromise.then(function (status) {
+        finishSync(status);
         debug.sync('world:%s data %s finished', worldId, type);
-    }).catch(function (_status) {
-        status = _status;
-
+    }).catch(function (status) {
+        finishSync(status);
         switch (status) {
             case syncStatus.IN_PROGRESS: {
                 debug.sync('world:%s sync in progress', worldId);
@@ -316,16 +317,10 @@ async function syncWorld (type, marketId, worldNumber) {
                 break;
             }
             default: {
-                throw _status;
+                throw status;
             }
         }
-    }).finally(function () {
-        clearTimeout(timeoutId);
-        finished = true;
-        db.none(syncTypeValues.UPDATE_LAST_SYNC_QUERY, {status, worldId});
     });
-
-    return promise;
 }
 
 async function syncAllWorlds (type) {
