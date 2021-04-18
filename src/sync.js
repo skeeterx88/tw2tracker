@@ -159,9 +159,10 @@ async function initSyncQueue () {
 /**
  * @param {String} type
  * @param {Array<QueueItem>} newItems
+ * @param {Boolean=} force Ignore active worlds, add to the queue anyway.
  * @return {Promise<void>}
  */
-async function addSyncQueue (type, newItems) {
+async function addSyncQueue (type, newItems, force) {
     if (!Array.isArray(newItems)) {
         throw new TypeError('Argument newItems must be an Array');
     }
@@ -170,10 +171,13 @@ async function addSyncQueue (type, newItems) {
 
     for (const item of newItems) {
         const worldId = item.market_id + item.world_number;
-        const active = queue.workersList().some(worker => worker.data.worldId === worldId);
 
-        if (active) {
-            continue;
+        if (!force) {
+            const active = queue.workersList().some(worker => worker.data.worldId === worldId);
+
+            if (active) {
+                continue;
+            }
         }
 
         const {id} = await db.one(sql('add-sync-queue'), {type, ...item});
