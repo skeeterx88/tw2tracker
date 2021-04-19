@@ -229,17 +229,6 @@ form input[type="submit"]:focus {
     background: var(--noise), linear-gradient(hsl(24, 43%, 48%), hsl(25, 32%, 26%));
 }
 
-div.modal {
-    background: var(--noise) hsl(23, 48%, 29%);
-    color: hsl(0, 35%, 81%);
-    margin: 0 auto;
-    padding: 3px;
-    text-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.90);
-    transition: visibility 0.02s linear, opacity 0.02s linear;
-    width: 630px;
-    z-index: 7;
-}
-
 div.world-title {
     margin-bottom: 10px;
     text-align: center;

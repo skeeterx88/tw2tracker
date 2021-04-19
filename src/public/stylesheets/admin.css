@@ -76,11 +76,6 @@
     display: inline;
 }
 
-#sync-worlds .world .in-progress {
-    border-color: hsl(108, 32%, 61%);
-    box-shadow: 0 0 0 1px green, inset 0 0 0 1px green, 2px 2px 2px hsl(0, 0%, 0%);
-}
-
 #sync-worlds .relax-button {
     margin: 5px;
 }
@@ -119,17 +114,6 @@
 
 #admin .actions .relax-button.right {
     margin-left: auto;
-}
-
-#admin section .content-border {
-    background: var(--color-content);
-    padding: 5px;
-}
-
-#admin .world-container {
-    display: block;
-    margin: 10px 5px;
-    padding: 3px 5px;
 }
 
 #admin .relax-input {
