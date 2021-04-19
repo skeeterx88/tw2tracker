@@ -131,10 +131,12 @@
             <div class="section-content">
                 <table>
                     <thead>
-                        <th></th>
-                        <th><%= i18n('column_village', 'player_profile', lang) %></th>
-                        <th><%= i18n('column_points', 'player_profile', lang) %></th>
-                        <th><%= i18n('column_date_hour', 'player_profile', lang) %></th>
+                        <tr>
+                            <th></th>
+                            <th><%= i18n('column_village', 'player_profile', lang) %></th>
+                            <th><%= i18n('column_points', 'player_profile', lang) %></th>
+                            <th><%= i18n('column_date_hour', 'player_profile', lang) %></th>
+                        </tr>
                     </thead>
                     <tbody>
                         <% if (!conquests.length) { -%>
