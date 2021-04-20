@@ -498,7 +498,7 @@ async function commitDataDatabase (data, marketId, worldNumber) {
     const worldId = marketId + worldNumber;
     debug.db('world:%s commit db data', worldId);
 
-    db.tx(async function (tx) {
+    db.task(async function (tx) {
         const oldPlayers = new Map(await tx.map(sql('get-active-subjects'), {worldId, type: 'players'}, subject => [subject.id, subject]));
         const oldTribes = new Map(await tx.map(sql('get-active-subjects'), {worldId, type: 'tribes'}, subject => [subject.id, subject]));
         const oldVillages = new Map(await tx.map(sql('get-world-villages'), {worldId}, subject => [subject.id, subject]));
