@@ -269,19 +269,13 @@ async function syncWorld (type, marketId, worldNumber) {
                 const data = await scraper.data();
                 await commitDataDatabase(data, marketId, worldNumber);
                 await commitDataFilesystem(worldId);
-
-                if (config('sync', 'store_raw_data')) {
-                    await commitRawDataFilesystem(data, worldId);
-                }
+                await commitRawDataFilesystem(data, worldId);
                 break;
             }
             case syncTypes.ACHIEVEMENTS: {
                 const data = await scraper.achievements();
                 await commitAchievementsDatabase(data, worldId);
-
-                if (config('sync', 'store_raw_data')) {
-                    await commitRawAchievementsFilesystem(data, worldId);
-                }
+                await commitRawAchievementsFilesystem(data, worldId);
                 break;
             }
         }
@@ -891,6 +885,10 @@ async function commitDataFilesystem (worldId) {
 }
 
 async function commitRawDataFilesystem (data, worldId) {
+    if (!config('sync', 'store_raw_data')) {
+        return;
+    }
+
     debug.sync('world:%s commit fs raw data', worldId);
 
     const plainData = {};
@@ -905,6 +903,10 @@ async function commitRawDataFilesystem (data, worldId) {
 }
 
 async function commitRawAchievementsFilesystem (achievements, worldId) {
+    if (!config('sync', 'store_raw_data')) {
+        return;
+    }
+
     debug.sync('world:%s commit fs raw achievements', worldId);
 
     const location = path.join('.', 'data', 'raw');
