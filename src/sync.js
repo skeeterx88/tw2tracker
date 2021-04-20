@@ -531,7 +531,7 @@ async function commitDataDatabase (data, worldId) {
                 if (village.character_id !== oldVillage.character_id && village.character_id) {
                     const newOwnerId = village.character_id;
                     const newOwner = data.players.get(newOwnerId);
-                    const oldOwner = data.villages.has(village_id) ? null : data.players.get(oldVillage.character_id);
+                    const oldOwner = data.villages.has(village_id) ? data.players.get(oldVillage.character_id) : null;
                     const oldOwnerId = oldOwner ? oldVillage.character_id : null;
 
                     const tribeData = {
