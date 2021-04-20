@@ -9,5 +9,6 @@
     "ALL_ACCOUNTS_FAILED": "all_accounts_failed",
     "TIMEOUT": "timeout",
     "IN_PROGRESS": "in_progress",
-    "FAILED_TO_SELECT_CHARACTER":  "failed_to_select_character"
+    "FAILED_TO_SELECT_CHARACTER":  "failed_to_select_character",
+    "WORLD_IN_MAINTENANCE": "world_in_maintenance"
 }

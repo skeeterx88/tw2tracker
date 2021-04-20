@@ -237,7 +237,9 @@ async function syncWorld (type, marketId, worldNumber) {
         let characterId;
 
         if (character) {
-            if (character.allow_login) {
+            if (character.maintenance) {
+                return reject(syncStatus.WORLD_IN_MAINTENANCE);
+            } else if (character.allow_login) {
                 characterId = character.character_id;
             } else {
                 return reject(syncStatus.WORLD_CLOSED);
