@@ -262,7 +262,7 @@ async function syncWorld (type, marketId, worldNumber) {
         switch (type) {
             case syncTypes.DATA: {
                 const data = await scraper.data();
-                await commitDataDatabase(data, worldId);
+                await commitDataDatabase(data, marketId, worldNumber);
                 await commitDataFilesystem(worldId);
 
                 if (config('sync', 'store_raw_data')) {
@@ -494,7 +494,8 @@ async function toggleWorld (marketId, worldNumber) {
 //     }
 // }
 
-async function commitDataDatabase (data, worldId) {
+async function commitDataDatabase (data, marketId, worldNumber) {
+    const worldId = marketId + worldNumber;
     debug.db('world:%s commit db data', worldId);
 
     db.tx(async function (tx) {
@@ -518,6 +519,7 @@ async function commitDataDatabase (data, worldId) {
                     await tx.none(sql('update-player'), {worldId, id, ...subject});
                 } else {
                     await tx.none(sql('add-player'), {worldId, id, ...subject});
+                    await tx.none(sql('add-player-global'), {worldNumber, marketId, id, name: subject.name});
                 }
             }
         }

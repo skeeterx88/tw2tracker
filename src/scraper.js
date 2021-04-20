@@ -86,6 +86,8 @@ function Scraper (marketId, worldNumber) {
      * @param {Object=} data
      * @param {Function=} callback
      * @return {Promise<object>}
+     *
+     * TODO: Detect emits that resolve with Internal Error, kill the socket.
      */
     function emit (type, data, callback) {
         return new Promise(async (resolve, reject) => {

@@ -5,6 +5,15 @@ CREATE TABLE public.tasks (
     last_run TIMESTAMP DEFAULT TIMEZONE('UTC', NOW())
 );
 
+CREATE TABLE public.players (
+    id BIGINT,
+    name TEXT,
+    market_id TEXT,
+    worlds INT[] DEFAULT ARRAY[]::int[],
+    PRIMARY KEY (id, market_id)
+);
+CREATE UNIQUE INDEX idx_players_id_market on public.players (id, market_id);
+
 CREATE TABLE public.markets (
     id VARCHAR (10) PRIMARY KEY,
     time_offset INT NULL
