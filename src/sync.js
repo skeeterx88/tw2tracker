@@ -237,14 +237,17 @@ async function syncWorld (type, marketId, worldNumber) {
         let characterId;
 
         if (character) {
-            characterId = character.character_id;
-        } else if (!character) {
+            if (character.allow_login) {
+                characterId = character.character_id;
+            } else {
+                return reject(syncStatus.WORLD_CLOSED);
+            }
+        } else {
             const created = await scraper.createCharacter(worldNumber);
+
             if (created.id) {
                 characterId = created.id;
             }
-        } else if (!character.allow_login) {
-            return reject(syncStatus.WORLD_CLOSED);
         }
 
         const selected = await scraper.selectCharacter(characterId);
