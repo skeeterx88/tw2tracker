@@ -6,10 +6,11 @@ const utils = require('../utils.js');
 const timeUtils = require('../time-utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
-const conquestTypes = require('../types/conquest-types.json');
+const conquestTypes = require('../types/conquest-types.js');
 const conquestCategories = ['gain', 'loss', 'all', 'self'];
 const historyOrderTypes = require('../types/history-order-type.js');
 const {calcHistoryChanges} = require('../history-utils.js');
+const {processPlayerConquestTypes} = require('../conquest-utils.js');
 
 const playerFieldsOrder = [
     ['points', historyOrderTypes.ASC],
@@ -27,6 +28,29 @@ const playerShortFieldsOrder = [
     ['rank', historyOrderTypes.DESC],
     ['victory_points', historyOrderTypes.ASC]
 ];
+
+const conquestsTypeMap = {
+    all: {
+        sqlConquests: sql('get-player-conquests'),
+        sqlCount: sql('get-player-conquests-count'),
+        navigationTitleKey: 'sub_title_all'
+    },
+    gain: {
+        sqlConquests: sql('get-player-conquests-gain'),
+        sqlCount: sql('get-player-conquests-gain-count'),
+        navigationTitleKey: 'sub_title_gain'
+    },
+    loss: {
+        sqlConquests: sql('get-player-conquests-loss'),
+        sqlCount: sql('get-player-conquests-loss-count'),
+        navigationTitleKey: 'sub_title_loss'
+    },
+    self: {
+        sqlConquests: sql('get-player-conquests-self'),
+        sqlCount: sql('get-player-conquests-self-count'),
+        navigationTitleKey: 'sub_title_self'
+    }
+};
 
 const {
     paramWorld,
@@ -60,17 +84,8 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     const world = await db.one(sql('get-world'), {worldId});
 
     const conquestLimit = config('ui', 'profile_last_conquest_count');
-    const conquests = await db.map(sql('get-player-conquests'), {worldId, playerId, offset: 0, limit: conquestLimit}, function (conquest) {
-        if (conquest.new_owner === conquest.old_owner) {
-            conquest.type = conquestTypes.SELF;
-        } else if (conquest.new_owner === playerId) {
-            conquest.type = conquestTypes.GAIN;
-        } else if (conquest.old_owner === playerId) {
-            conquest.type = conquestTypes.LOSS;
-        }
-
-        return conquest;
-    });
+    const conquestsRaw = await db.any(sql('get-player-conquests'), {worldId, playerId, offset: 0, limit: conquestLimit});
+    const conquests = processPlayerConquestTypes(conquestsRaw, playerId);
 
     const conquestCount = (await db.one(sql('get-player-conquests-count'), {worldId, playerId})).count;
     const conquestGainCount = (await db.one(sql('get-player-conquests-gain-count'), {worldId, playerId})).count;
@@ -207,49 +222,17 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
-    const conquestsTypeMap = {
-        all: {
-            sqlConquests: sql('get-player-conquests'),
-            sqlCount: sql('get-player-conquests-count'),
-            navigationTitle: i18n('sub_title_all', 'player_profile_conquests', res.locals.lang)
-        },
-        gain: {
-            sqlConquests: sql('get-player-conquests-gain'),
-            sqlCount: sql('get-player-conquests-gain-count'),
-            navigationTitle: i18n('sub_title_gain', 'player_profile_conquests', res.locals.lang)
-        },
-        loss: {
-            sqlConquests: sql('get-player-conquests-loss'),
-            sqlCount: sql('get-player-conquests-loss-count'),
-            navigationTitle: i18n('sub_title_loss', 'player_profile_conquests', res.locals.lang)
-        },
-        self: {
-            sqlConquests: sql('get-player-conquests-self'),
-            sqlCount: sql('get-player-conquests-self-count'),
-            navigationTitle: i18n('sub_title_self', 'player_profile_conquests', res.locals.lang)
-        }
-    };
-
     const category = req.params.category ?? 'all';
 
     if (!conquestCategories.includes(category)) {
         throw createError(404, i18n('router_missing_sub_category', 'errors', res.locals.lang));
     }
 
-    const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, playerId, offset, limit}, function (conquest) {
-        if (conquest.new_owner === conquest.old_owner) {
-            conquest.type = conquestTypes.SELF;
-        } else if (conquest.new_owner === playerId) {
-            conquest.type = conquestTypes.GAIN;
-        } else if (conquest.old_owner === playerId) {
-            conquest.type = conquestTypes.LOSS;
-        }
-
-        return conquest;
-    });
+    const conquestsRaw = await db.any(conquestsTypeMap[category].sqlConquests, {worldId, playerId, offset, limit});
+    const conquests = processPlayerConquestTypes(conquestsRaw, playerId);
 
     const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, playerId})).count;
-    const navigationTitle = conquestsTypeMap[category].navigationTitle;
+    const navigationTitle = i18n(conquestsTypeMap[category].navigationTitleKey, 'player_profile_conquests', res.locals.lang);
 
     mergeBackendLocals(res, {
         marketId,

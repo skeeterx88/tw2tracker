@@ -6,10 +6,11 @@ const utils = require('../utils.js');
 const timeUtils = require('../time-utils.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
-const conquestTypes = require('../types/conquest-types.json');
+const conquestTypes = require('../types/conquest-types.js');
 const memberChangeTypes = require('../types/member-change-types.json');
 const historyOrderTypes = require('../types/history-order-type.js');
 const {calcHistoryChanges} = require('../history-utils.js');
+const {processTribeConquestTypes} = require('../conquest-utils.js');
 
 const tribeFieldsOrder = [
     ['members', historyOrderTypes.ASC],
@@ -62,17 +63,8 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const world = await db.one(sql('get-world'), {worldId});
 
     const conquestLimit = config('ui', 'profile_last_conquest_count');
-    const conquests = await db.map(sql('get-tribe-conquests'), {worldId, tribeId, offset: 0, limit: conquestLimit}, function (conquest) {
-        if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
-            conquest.type = conquestTypes.SELF;
-        } else if (conquest.new_owner_tribe_id === tribeId) {
-            conquest.type = conquestTypes.GAIN;
-        } else if (conquest.old_owner_tribe_id === tribeId) {
-            conquest.type = conquestTypes.LOSS;
-        }
-
-        return conquest;
-    });
+    const conquestsRaw = await db.any(sql('get-tribe-conquests'), {worldId, tribeId, offset: 0, limit: conquestLimit});
+    const conquests = processTribeConquestTypes(conquestsRaw, tribeId);
 
     const conquestCount = (await db.one(sql('get-tribe-conquests-count'), {worldId, tribeId})).count;
     const conquestGainCount = (await db.one(sql('get-tribe-conquests-gain-count'), {worldId, tribeId})).count;
@@ -175,17 +167,8 @@ const tribeConquestsRouter = asyncRouter(async function (req, res, next) {
         throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
     }
 
-    const conquests = await db.map(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit}, function (conquest) {
-        if (conquest.new_owner_tribe_id === conquest.old_owner_tribe_id) {
-            conquest.type = conquestTypes.SELF;
-        } else if (conquest.new_owner_tribe_id === tribeId) {
-            conquest.type = conquestTypes.GAIN;
-        } else if (conquest.old_owner_tribe_id === tribeId) {
-            conquest.type = conquestTypes.LOSS;
-        }
-
-        return conquest;
-    });
+    const conquestsRaw = await db.any(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit});
+    const conquests = processTribeConquestTypes(conquestsRaw, tribeId);
 
     const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, tribeId})).count;
     const navigationTitle = conquestsTypeMap[category].navigationTitle;
