@@ -8,7 +8,25 @@ const config = require('../config.js');
 const i18n = require('../i18n.js');
 const conquestTypes = require('../types/conquest-types.json');
 const conquestCategories = ['gain', 'loss', 'all', 'self'];
-const historyOrderTypes = require('../types/history-order-types.json');
+const historyOrderTypes = require('../types/history-order-type.js');
+const {calcHistoryChanges} = require('../history-utils.js');
+
+const playerFieldsOrder = [
+    ['points', historyOrderTypes.ASC],
+    ['villages', historyOrderTypes.ASC],
+    ['rank', historyOrderTypes.DESC],
+    ['victory_points', historyOrderTypes.ASC],
+    ['bash_points_off', historyOrderTypes.ASC],
+    ['bash_points_def', historyOrderTypes.ASC],
+    ['bash_points_total', historyOrderTypes.ASC]
+];
+
+const playerShortFieldsOrder = [
+    ['points', historyOrderTypes.ASC],
+    ['villages', historyOrderTypes.ASC],
+    ['rank', historyOrderTypes.DESC],
+    ['victory_points', historyOrderTypes.ASC]
+];
 
 const {
     paramWorld,
@@ -19,8 +37,7 @@ const {
     createPagination,
     createNavigation,
     mergeBackendLocals,
-    asyncRouter,
-    getHistoryChangeType
+    asyncRouter
 } = require('../router-helpers.js');
 
 const playerProfileRouter = asyncRouter(async function (req, res, next) {
@@ -76,19 +93,9 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
             : sum + points.slice(0, level).reduce((sum, next) => sum + next, 0);
     }, 0);
 
-    let last;
     const historyLimit = config('ui', 'profile_last_history_count');
-    const history = (await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit}))
-        .reverse()
-        .map(function (current) {
-            current.points_change = getHistoryChangeType('points', current, last);
-            current.villages_change = getHistoryChangeType('villages', current, last);
-            current.rank_change = getHistoryChangeType('rank', current, last, historyOrderTypes.DESC);
-            current.victory_points_change = getHistoryChangeType('victory_points', current, last);
-            last = current;
-            return current;
-        })
-        .reverse();
+    const historyRaw = await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit});
+    const history = calcHistoryChanges(historyRaw, playerShortFieldsOrder);
 
     const tribeChangesCount = (await db.one(sql('get-player-tribe-changes-count'), {worldId, id: playerId})).count;
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
@@ -126,8 +133,8 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]}
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]}
         ])
     });
 });
@@ -170,8 +177,8 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: i18n('villages', 'navigation', res.locals.lang)}
         ])
     });
@@ -267,8 +274,8 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: navigationTitle}
         ])
     });
@@ -327,8 +334,8 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: i18n('tribe_changes', 'navigation', res.locals.lang)}
         ])
     });
@@ -502,8 +509,8 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: i18n('achievements', 'navigation', res.locals.lang)}
         ])
     });
@@ -528,22 +535,9 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
-    let last;
     const historyLimit = config('sync', 'maximum_history_days');
-    const history = (await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit}))
-        .reverse()
-        .map(function (current) {
-            current.points_change = getHistoryChangeType('points', current, last);
-            current.villages_change = getHistoryChangeType('villages', current, last);
-            current.rank_change = getHistoryChangeType('rank', current, last, historyOrderTypes.DESC);
-            current.victory_points_change = getHistoryChangeType('victory_points', current, last);
-            current.bash_points_off_change = getHistoryChangeType('bash_points_off', current, last);
-            current.bash_points_def_change = getHistoryChangeType('bash_points_def', current, last);
-            current.bash_points_total_change = getHistoryChangeType('bash_points_total', current, last);
-            last = current;
-            return current;
-        })
-        .reverse();
+    const historyRaw = await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit});
+    const history = calcHistoryChanges(historyRaw, playerFieldsOrder);
 
     mergeBackendLocals(res, {
         marketId,
@@ -562,8 +556,8 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/players/${playerId}`, replaces: [player.name]},
+            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${playerId}`, replaces: [player.name]},
             {label: i18n('history', 'navigation', res.locals.lang)}
         ])
     });
