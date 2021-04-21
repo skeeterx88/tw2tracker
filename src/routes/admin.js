@@ -377,12 +377,11 @@ const accountsEditRouter = asyncRouter(async function (req, res) {
     const {name, pass, id: accountId} = req.body;
     const account = await db.any(sql('get-account'), {accountId});
 
-    // TODO: add values to config.json
     if (!account.length) {
         req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang, [accountId]));
-    } else if (pass.length < 4) {
+    } else if (pass.length < config('sync_accounts', 'min_password_length')) {
         req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
-    } else if (name.length < 4) {
+    } else if (name.length < config('sync_accounts', 'min_username_length')) {
         req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [4]));
     } else {
         req.flash('messages', i18n('message_sync_account_altered', 'admin', res.locals.lang));
@@ -395,10 +394,9 @@ const accountsEditRouter = asyncRouter(async function (req, res) {
 const accountsCreateRouter = asyncRouter(async function (req, res) {
     const {name, pass, id: accountId} = req.body;
 
-    // TODO: add values to config.json
-    if (pass.length < 4) {
+    if (pass.length < config('sync_accounts', 'min_password_length')) {
         req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
-    } else if (name.length < 4) {
+    } else if (name.length < config('sync_accounts', 'min_username_length')) {
         req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [4]));
     } else {
         const accountExists = await db.any(sql('get-account-by-name'), {name});
@@ -455,14 +453,13 @@ const modsEditRouter = asyncRouter(async function (req, res) {
     const [accountName] = await db.any(sql('get-mod-account-by-name'), {name});
     const [accountEmail] = await db.any(sql('get-mod-account-by-email'), {email});
 
-    // TODO: add values to config.json
     if (!mod) {
         req.flash('error', i18n('error_mod_account_not_exists', 'admin', res.locals.lang));
         return res.redirect('/admin/mods');
-    } else if (name.length < 3) {
+    } else if (name.length < config('mod_accounts', 'min_username_length')) {
         req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [3]));
         return res.redirect('/admin/mods');
-    } else if (pass && pass.length < 4) {
+    } else if (pass && pass.length < config('mod_accounts', 'min_password_length')) {
         req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
         return res.redirect('/admin/mods');
     } else if (accountName && accountName.id !== id) {
@@ -518,10 +515,9 @@ const modsCreateRouter = asyncRouter(async function (req, res) {
     const [accountName] = await db.any(sql('get-mod-account-by-name'), {name});
     const [accountEmail] = await db.any(sql('get-mod-account-by-email'), {email});
 
-    // TODO: add values to config.json
-    if (name.length < 3) {
+    if (name.length < config('mod_accounts', 'min_username_length')) {
         req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [3]));
-    } else if (pass.length < 4) {
+    } else if (pass.length < config('mod_accounts', 'min_password_length')) {
         req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
     } else if (accountName) {
         req.flash('error', i18n('error_mod_username_already_exists', 'admin', res.locals.lang));

@@ -42,6 +42,14 @@
         "clean_shares": "24 hours",
         "save_history": "24 hours"
     },
+    "sync_accounts": {
+        "min_password_length": 4,
+        "min_username_length": 4
+    },
+    "mod_accounts": {
+        "min_password_length": 4,
+        "min_username_length": 3
+    },
     "database": {
         "user": "postgres",
         "host": "127.0.0.1",

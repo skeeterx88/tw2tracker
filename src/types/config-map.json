@@ -40,6 +40,14 @@
         "clean_shares": { "type": "time" },
         "save_history": { "type": "time" }
     },
+    "sync_accounts": {
+        "min_password_length": { "type": "number", "min": 1, "max": 100 },
+        "min_username_length": { "type": "number", "min": 1, "max": 100 }
+    },
+    "mod_accounts": {
+        "min_password_length": { "type": "number", "min": 1, "max": 100 },
+        "min_username_length": { "type": "number", "min": 1, "max": 100 }
+    },
     "emails": {
         "issues": { "type": "string" },
         "contact": { "type": "string" },
