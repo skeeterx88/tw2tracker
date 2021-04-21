@@ -1,5 +1,6 @@
 const config = require('./config.js');
 const pgp = require('pg-promise')();
+/** @type {pgPromise.IBaseProtocol} */
 const db = pgp(config('database'));
 const path = require('path');
 const QueryFile = require('pg-promise').QueryFile;
