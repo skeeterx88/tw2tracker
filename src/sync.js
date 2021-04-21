@@ -896,8 +896,10 @@ async function commitRawDataFilesystem (data, worldId) {
     debug.sync('world:%s commit fs raw data', worldId);
 
     const plainData = {};
+    /** @type {[String, String][]} */
+    const dataEntries = Object.entries(data);
 
-    for (const [type, value] of Object.entries(data)) {
+    for (const [type, value] of dataEntries) {
         plainData[type] = Array.from(value);
     }
 
@@ -1064,6 +1066,7 @@ async function initTasks () {
 
     debug.tasks('start task checker (interval: %s)', config('sync', 'task_check_interval'));
 
+    /** @type {[String, String][]} */
     const intervalEntries = Object.entries(config('sync_intervals'));
     const parsedIntervals = intervalEntries.map(([id, readableInterval]) => [id, humanInterval(readableInterval)]);
     const mappedIntervals = new Map(parsedIntervals);

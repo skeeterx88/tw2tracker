@@ -578,8 +578,10 @@ const settingsRouter = asyncRouter(async function (req, res) {
 const settingsEditRouter = asyncRouter(async function (req, res) {
     const newConfig = {};
     let updated = false;
+    /** @type {[String, String][]} */
+    const bodyEntries = Object.entries(req.body);
 
-    for (const [id, value] of Object.entries(req.body)) {
+    for (const [id, value] of bodyEntries) {
         const [category, configId] = id.split('/');
         newConfig[category] = newConfig[category] || {};
 
