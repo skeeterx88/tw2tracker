@@ -1,4 +1,4 @@
-const conquestTypes = require('./types/conquest-types.js');
+const conquestTypes = require('./types/conquest.js');
 
 /**
  * @param {Object} conquests

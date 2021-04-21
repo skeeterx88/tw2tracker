@@ -16,13 +16,13 @@ module.exports = function () {
 
     const {db, sql} = require('./db.js');
     const config = require('./config.js');
-    const authErrors = require('./types/auth-errors.json');
+    const authErrors = require('./types/auth-error.js');
     const i18n = require('./i18n.js');
     const languages = require('./languages.js');
     const utils = require('./utils.js');
     const timeUtils = require('./time-utils.js');
     const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
-    const rankingSortTypes = require('./types/ranking-sort-types.json');
+    const rankingSortTypes = require('./types/ranking-sort.js');
 
     const development = process.env.NODE_ENV === 'development';
     const httpServer = http.createServer();

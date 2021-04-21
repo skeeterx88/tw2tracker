@@ -1,17 +1,17 @@
 const express = require('express');
-const createError = require('http-errors');
 const router = express.Router();
-const {db, sql} = require('../db.js');
 const utils = require('../utils.js');
 const timeUtils = require('../time-utils.js');
+const conquestTypes = require('../types/conquest.js');
+const historyOrderTypes = require('../types/history-order.js');
+const createError = require('http-errors');
+const {db, sql} = require('../db.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
-const conquestTypes = require('../types/conquest-types.js');
-const conquestCategories = ['gain', 'loss', 'all', 'self'];
-const historyOrderTypes = require('../types/history-order-type.js');
 const {calcHistoryChanges} = require('../history-utils.js');
 const {processPlayerConquestTypes} = require('../conquest-utils.js');
 
+const conquestCategories = ['gain', 'loss', 'all', 'self'];
 const playerFieldsOrder = [
     ['points', historyOrderTypes.ASC],
     ['villages', historyOrderTypes.ASC],
@@ -32,23 +32,19 @@ const playerShortFieldsOrder = [
 const conquestsTypeMap = {
     all: {
         sqlConquests: sql('get-player-conquests'),
-        sqlCount: sql('get-player-conquests-count'),
-        navigationTitleKey: 'sub_title_all'
+        sqlCount: sql('get-player-conquests-count')
     },
     gain: {
         sqlConquests: sql('get-player-conquests-gain'),
-        sqlCount: sql('get-player-conquests-gain-count'),
-        navigationTitleKey: 'sub_title_gain'
+        sqlCount: sql('get-player-conquests-gain-count')
     },
     loss: {
         sqlConquests: sql('get-player-conquests-loss'),
-        sqlCount: sql('get-player-conquests-loss-count'),
-        navigationTitleKey: 'sub_title_loss'
+        sqlCount: sql('get-player-conquests-loss-count')
     },
     self: {
         sqlConquests: sql('get-player-conquests-self'),
-        sqlCount: sql('get-player-conquests-self-count'),
-        navigationTitleKey: 'sub_title_self'
+        sqlCount: sql('get-player-conquests-self-count')
     }
 };
 
@@ -232,7 +228,7 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
     const conquests = processPlayerConquestTypes(conquestsRaw, playerId);
 
     const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, playerId})).count;
-    const navigationTitle = i18n(conquestsTypeMap[category].navigationTitleKey, 'player_profile_conquests', res.locals.lang);
+    const navigationTitle = i18n('sub_title_' + category, 'player_profile_conquests', res.locals.lang);
 
     mergeBackendLocals(res, {
         marketId,

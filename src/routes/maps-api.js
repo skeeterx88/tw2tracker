@@ -7,7 +7,7 @@ const router = express.Router();
 const {db, sql} = require('../db.js');
 const utils = require('../utils.js');
 const i18n = require('../i18n.js');
-const mapShareTypes = require('../types/map-share-types.json');
+const mapShareTypes = require('../types/map-share.js');
 
 const {
     paramWorldParse,

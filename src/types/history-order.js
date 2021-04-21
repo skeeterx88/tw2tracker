@@ -1,9 +1,9 @@
 /**
  * @enum {String}
  */
-const historyOrderType = {
+const historyOrderTypes = {
     ASC: 'history_asc',
     DESC: 'history_desc'
 };
 
-module.exports = historyOrderType;
+module.exports = historyOrderTypes;

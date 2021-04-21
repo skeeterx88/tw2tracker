@@ -4,8 +4,8 @@ const {ensureLoggedIn} = require('connect-ensure-login');
 const {db, sql} = require('../db.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
-const syncCommands = require('../types/sync-commands.json');
-const privilegeTypes = require('../types/privileges.json');
+const syncCommands = require('../types/sync-commands.js');
+const privilegeTypes = require('../types/privileges.js');
 const configMap = require('../types/config-map.json');
 const privilegeTypesValue = Object.values(privilegeTypes);
 const pgArray = require('pg').types.arrayParser;
@@ -16,7 +16,7 @@ const passport = require('passport');
 const humanInterval = require('human-interval');
 const fs = require('fs');
 
-const syncTypes = require('../types/sync-types.json');
+const syncTypes = require('../types/sync.js');
 
 const syncTypeMapping = {
     [syncTypes.DATA]: {

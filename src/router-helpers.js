@@ -3,7 +3,7 @@ const utils = require('./utils.js');
 const {db, sql} = require('./db.js');
 const config = require('./config.js');
 const i18n = require('./i18n.js');
-const rankingSortTypes = require('./types/ranking-sort-types.json');
+const rankingSortTypes = require('./types/ranking-sort.js');
 const rankingSortTypesValues = Object.values(rankingSortTypes);
 
 async function getPlayer (worldId, playerId) {

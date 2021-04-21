@@ -1,14 +1,14 @@
 const express = require('express');
-const createError = require('http-errors');
 const router = express.Router();
-const {db, sql} = require('../db.js');
 const utils = require('../utils.js');
 const timeUtils = require('../time-utils.js');
+const conquestTypes = require('../types/conquest.js');
+const memberChangeTypes = require('../types/member-change.js');
+const historyOrderTypes = require('../types/history-order.js');
+const createError = require('http-errors');
+const {db, sql} = require('../db.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
-const conquestTypes = require('../types/conquest-types.js');
-const memberChangeTypes = require('../types/member-change-types.json');
-const historyOrderTypes = require('../types/history-order-type.js');
 const {calcHistoryChanges} = require('../history-utils.js');
 const {processTribeConquestTypes} = require('../conquest-utils.js');
 

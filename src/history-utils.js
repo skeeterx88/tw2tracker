@@ -1,5 +1,5 @@
 const historyChangeType = require('./types/history-change-type.js');
-const historyOrderType = require('./types/history-order-type.js');
+const historyOrderType = require('./types/history-order.js');
 
 /**
  * @param {String} field
