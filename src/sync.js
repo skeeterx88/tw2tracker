@@ -37,20 +37,25 @@ const syncTypeMapping = {
     }
 };
 
+/**
+ * @param {String} marketId
+ * @param {Number=} worldNumber
+ * @return {Promise<Scraper>}
+ */
 async function getScraper (marketId, worldNumber) {
-    const worldId = marketId + worldNumber;
+    const scraperId = marketId + (typeof worldNumber === 'undefined' ? '' : worldNumber);
 
-    if (worldScrapers.has(worldId)) {
-        return worldScrapers.get(worldId);
+    if (worldScrapers.has(scraperId)) {
+        return worldScrapers.get(scraperId);
     }
 
     const scraper = new Scraper(marketId, worldNumber);
 
     scraper.onKill(function () {
-        worldScrapers.delete(worldId);
+        worldScrapers.delete(scraperId);
     });
 
-    worldScrapers.set(worldId, scraper);
+    worldScrapers.set(scraperId, scraper);
 
     return scraper;
 }
@@ -349,8 +354,7 @@ async function syncWorldList () {
 
         debug.worlds('market:%s check missing worlds', marketId);
 
-        // TODO: allow to create scrapers with identifiers other than marketId + worldNumber.
-        const scraper = await getScraper(marketId, marketId);
+        const scraper = await getScraper(marketId);
         const account = await scraper.auth();
 
         if (!account) {

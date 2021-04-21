@@ -21,7 +21,7 @@ let LEVEL_FACTOR;
  * @typedef {Object} AccountCharacter Account's character object.
  */
 function Scraper (marketId, worldNumber) {
-    const worldId = marketId + worldNumber;
+    const worldId = marketId + (typeof worldNumber === 'undefined' ? '' : worldNumber);
 
     const callbacks = new Map();
     const timeouts = new Map();
@@ -182,6 +182,10 @@ function Scraper (marketId, worldNumber) {
      * @return {Promise<AccountCharacter|Boolean>}
      */
     async function selectCharacter (characterId) {
+        if (!worldNumber) {
+            throw new Error('Scraper not configured to select characters (missing worldNumber argument)');
+        }
+
         if (characterSelected) {
             return characterSelected;
         }
@@ -276,12 +280,17 @@ function Scraper (marketId, worldNumber) {
 
     /**
      * Create a character on a specific world.
-     * @param worldNumber
+     * @param {Number} worldNumber
      * @return {Promise<AccountCharacter>}
      */
     async function createCharacter (worldNumber) {
+        if (typeof worldNumber !== 'number') {
+            throw new TypeError('worldNumber argument must be of type Number.');
+        }
+
+        const worldId = marketId + worldNumber;
         debug.sync('world:%s create character', worldId);
-        return await emit('Authentication/createCharacter', {world: marketId + worldNumber});
+        return await emit('Authentication/createCharacter', {world: worldId});
     }
 
     /**
