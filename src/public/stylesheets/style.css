@@ -492,7 +492,7 @@ div.world-title {
 }
 
 .player-other-worlds .flat-button {
-    margin: 2px;
+    margin: 2px 0px;
     display: inline-block;
     background-color: hsl(23, 25%, 30%);
     color: hsl(36, 13%, 70%);
