@@ -39,7 +39,6 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         player
     } = await paramPlayerParse(req, worldId);
 
-
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
@@ -93,6 +92,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
 
     const tribeChangesCount = (await db.one(sql('get-player-tribe-changes-count'), {worldId, id: playerId})).count;
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
+    const {worlds: otherWorlds} = await db.one(sql('get-player-other-worlds'), {marketId, id: playerId});
 
     mergeBackendLocals(res, {
         marketId,
@@ -122,6 +122,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         achievementTypes,
         history,
         tribeChangesCount,
+        otherWorlds,
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},

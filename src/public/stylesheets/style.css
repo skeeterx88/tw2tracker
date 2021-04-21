@@ -491,6 +491,21 @@ div.world-title {
     background: var(--noise) hsl(23, 25%, 20%);
 }
 
+.player-other-worlds .flat-button {
+    margin: 2px;
+    display: inline-block;
+    background-color: hsl(23, 25%, 30%);
+    color: hsl(36, 13%, 70%);
+    font-weight: normal;
+    text-decoration: none;
+}
+
+.player-other-worlds .flat-button.selected,
+.player-other-worlds .flat-button:hover {
+    border-color: hsl(24, 27%, 58%);
+    background-color: hsl(23, 25%, 35%);
+}
+
 .section-content {
     background: var(--color-content);
     border-radius: 2px;

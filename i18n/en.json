@@ -282,7 +282,8 @@
         "column_rank": "Rank",
         "column_villages": "Villages",
         "column_victory_points": "Victory Points",
-        "no_history": "No historic changes yet."
+        "no_history": "No historic changes yet.",
+        "player_other_worlds": "Player's other worlds:"
     },
     "player_profile_villages": {
         "header": "Player Villages",

@@ -77,12 +77,20 @@
                             <th><%= i18n('player_record_villages', 'player_profile', lang) %></th>
                             <td><%= formatNumbers(player.best_villages) %> <small class="right"><%= formatDate(player.best_villages_date, market.time_offset, 'hours-only') %></small></td>
                         </tr>
+                        <tr>
+                            <th><%= i18n('player_other_worlds', 'player_profile', lang) %></th>
+                            <td class="player-other-worlds">
+                                <% for (const num of otherWorlds) { %>
+                                    <a href="/stats/<%= marketId %>/<%= num %>/players/<%= player.id %>" class="flat-button<% __append(worldNumber === num ? ' selected' : '') %>"><%= marketId %><%= num %></a>
+                                <% } %>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
-                <section id="player-latest-history">
+        <section id="player-latest-history">
             <h2><%= i18n('header_last_history', 'player_profile', lang) %></h2>
 
             <div class="section-content">
