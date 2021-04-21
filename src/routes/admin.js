@@ -18,6 +18,21 @@ const fs = require('fs');
 
 const syncTypes = require('../types/sync-types.json');
 
+const syncTypeMapping = {
+    [syncTypes.DATA]: {
+        SYNC_COMMAND: syncCommands.DATA,
+        SYNC_ALL_COMMAND: syncCommands.DATA_ALL,
+        I18N_SUCCESS_MESSAGE: 'message_sync_data_world_started',
+        I18N_ALL_SUCCESS_MESSAGE: 'message_sync_data_all_started'
+    },
+    [syncTypes.ACHIEVEMENTS]: {
+        SYNC_COMMAND: syncCommands.ACHIEVEMENTS,
+        SYNC_ALL_COMMAND: syncCommands.ACHIEVEMENTS_ALL,
+        I18N_SUCCESS_MESSAGE: 'message_sync_achievements_world_started',
+        I18N_ALL_SUCCESS_MESSAGE: 'message_sync_achievements_all_started'
+    }
+};
+
 const {
     mergeBackendLocals,
     asyncRouter,
@@ -96,7 +111,7 @@ function createAuthorization (privilege, denyType) {
     };
 }
 
-const loginRouter = function (req, res) {
+const loginRouter = asyncRouter(async function (req, res) {
     res.render('admin', {
         title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         subPage: 'login',
@@ -104,12 +119,12 @@ const loginRouter = function (req, res) {
         errors: req.flash('error'),
         messages: req.flash('messages')
     });
-};
+});
 
-const logoutRouter = function (req, res) {
+const logoutRouter = asyncRouter(async function (req, res) {
     req.logout();
     res.redirect('/admin/login');
-};
+});
 
 const syncRouter = asyncRouter(async function (req, res) {
     const [
@@ -167,7 +182,13 @@ const syncRouter = asyncRouter(async function (req, res) {
     });
 });
 
-const syncDataRouter = asyncRouter(async function (req, res) {
+const syncTypeRouter = asyncRouter(async function (req, res) {
+    const mapping = syncTypeMapping[req.params.type];
+
+    if (!mapping) {
+        throw createError(404, i18n('error_invalid_sync_type', 'admin', res.locals.lang));
+    }
+
     if (!paramWorld(req)) {
         req.flash('error', i18n('error_world_not_found', 'admin', res.locals.lang));
         return res.redirect('/admin/sync');
@@ -186,54 +207,25 @@ const syncDataRouter = asyncRouter(async function (req, res) {
         return res.redirect('/admin/sync');
     }
 
-    await emitSync(syncCommands.DATA, {
+    await emitSync(mapping.SYNC_COMMAND, {
         marketId,
         worldNumber
     });
 
-    req.flash('messages', i18n('message_sync_data_world_started', 'admin', res.locals.lang, [worldId]));
+    req.flash('messages', i18n(mapping.I18N_SUCCESS_MESSAGE, 'admin', res.locals.lang, [worldId]));
     res.redirect(`/admin/sync#world-${worldId}`);
 });
 
-const syncDataAllRouter = asyncRouter(async function (req, res) {
-    await emitSync(syncCommands.DATA_ALL);
+const syncTypeAllRouter = asyncRouter(async function (req, res) {
+    const mapping = syncTypeMapping[req.params.type];
 
-    req.flash('messages', i18n('message_sync_data_all_started', 'admin', res.locals.lang));
-    res.redirect('/admin/sync');
-});
-
-const syncAchievementsRouter = asyncRouter(async function (req, res) {
-    if (!paramWorld(req)) {
-        req.flash('error', i18n('error_world_not_found', 'admin', res.locals.lang));
-        return res.redirect('/admin/sync');
+    if (!mapping) {
+        throw createError(404, i18n('error_invalid_sync_type', 'admin', res.locals.lang));
     }
 
-    const {
-        marketId,
-        worldId,
-        worldNumber
-    } = await paramWorldParse(req);
+    await emitSync(mapping.SYNC_ALL_COMMAND);
 
-    const marketsWithAccounts = await db.map(sql('get-markets-with-accounts'), [], market => market.id);
-
-    if (!marketsWithAccounts.includes(marketId)) {
-        req.flash('error', i18n('error_market_has_no_sync_accounts', 'admin', res.locals.lang, [worldId]));
-        return res.redirect('/admin/sync');
-    }
-
-    await emitSync(syncCommands.ACHIEVEMENTS, {
-        marketId,
-        worldNumber
-    });
-
-    req.flash('messages', i18n('message_sync_achievements_world_started', 'admin', res.locals.lang, [worldId]));
-    res.redirect(`/admin/sync#world-${worldId}`);
-});
-
-const syncAchievementsAllRouter = asyncRouter(async function (req, res) {
-    await emitSync(syncCommands.ACHIEVEMENTS_ALL);
-
-    req.flash('messages', i18n('message_sync_achievements_all_started', 'admin', res.locals.lang));
+    req.flash('messages', i18n(mapping.I18N_ALL_SUCCESS_MESSAGE, 'admin', res.locals.lang));
     res.redirect('/admin/sync');
 });
 
@@ -657,10 +649,10 @@ router.get('/logout', logoutRouter);
 
 router.get('/', syncRouter);
 router.get('/sync', syncRouter);
-router.get('/sync/data/all', authStartSyncAction, syncDataAllRouter);
-router.get('/sync/data/:marketId/:worldNumber', authStartSyncAction, syncDataRouter);
-router.get('/sync/achievements/all', authStartSyncAction, syncAchievementsAllRouter);
-router.get('/sync/achievements/:marketId/:worldNumber', authStartSyncAction, syncAchievementsRouter);
+router.get('/sync/data/all', authStartSyncAction, syncTypeAllRouter);
+router.get('/sync/:type/:marketId/:worldNumber', authStartSyncAction, syncTypeRouter);
+router.get('/sync/achievements/all', authStartSyncAction, syncTypeAllRouter);
+router.get('/sync/:type/:marketId/:worldNumber', authStartSyncAction, syncTypeRouter);
 router.get('/sync/markets', authStartSyncAction, scrapeMarketsRouter);
 router.get('/sync/worlds', authStartSyncAction, scrapeWorldsRouter);
 router.get('/sync/toggle/:marketId/:worldNumber?', authControlSyncAction, toggleSyncRouter);
