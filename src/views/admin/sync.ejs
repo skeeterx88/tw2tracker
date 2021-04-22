@@ -8,7 +8,7 @@
                     <div class="world relax-container vertical" id="world-<%= world.world_id %>" data-market-id="<%= world.market %>" data-world-number="<%= world.num %>">
                         <div class="short-info">
                             <div class="world-id">
-                                <span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(` (${i18n('closed', 'admin_sync', lang)})`) } -%></span>
+                                <a href="/stats/<%= world.market %>/<%= world.num %>"><span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(` (${i18n('closed', 'admin_sync', lang)})`) } -%></span></a>
                             </div>
 
                             <div class="values">
