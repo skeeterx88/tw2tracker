@@ -3,7 +3,6 @@ module.exports = function () {
     const session = require('express-session');
     const connectPgSimple = require('connect-pg-simple');
     const createError = require('http-errors');
-    const compression = require('compression');
     const http = require('http');
     const path = require('path');
     const cookieParser = require('cookie-parser');
@@ -31,16 +30,14 @@ module.exports = function () {
 
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
+    app.set('x-powered-by', false);
 
-    app.use(compression({level: 9}));
     app.use(express.json());
     app.use(express.urlencoded({extended: false}));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
 
-    const sessionSecret = process.env.TW2TRACKER_SESSION_SECRET;
-
-    if (!sessionSecret) {
+    if (!process.env.TW2TRACKER_SESSION_SECRET) {
         throw new Error('Missing environment session secret TW2TRACKER_SESSION_SECRET');
     }
 
@@ -50,7 +47,7 @@ module.exports = function () {
             schemaName: 'public',
             tableName: 'session'
         }),
-        secret: sessionSecret,
+        secret: process.env.TW2TRACKER_SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {
