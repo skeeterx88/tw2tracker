@@ -24,13 +24,14 @@ module.exports = function () {
     const rankingSortTypes = require('./types/ranking-sort.js');
 
     const development = process.env.NODE_ENV === 'development';
-    const httpServer = http.createServer();
-    const port = isNaN(process.env.PORT) ? 3000 : process.env.PORT;
+    const port = parseInt(process.env.PORT, 10) || 3000;
     const app = express();
 
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'ejs');
     app.set('x-powered-by', false);
+    app.set('trust proxy', true);
+    app.set('trust proxy', 'loopback');
 
     app.use(express.json());
     app.use(express.urlencoded({extended: false}));
@@ -56,7 +57,7 @@ module.exports = function () {
         name: 'tw2tracker-session'
     }));
 
-    passport.use(new passportLocal.Strategy({
+    passport.use('local', new passportLocal.Strategy({
         passReqToCallback: true
     }, async function (req, name, pass, done) {
         const [account] = await db.any(sql('get-mod-account-by-name'), {name});
@@ -100,16 +101,9 @@ module.exports = function () {
         callback(null, user);
     });
 
-    app.use(passport.initialize());
-    app.use(passport.session());
+    app.use(passport.initialize({}));
+    app.use(passport.session({}));
     app.use(connectFlash());
-
-    const languagesRouter = require('./routes/languages.js');
-    const statsRouter = require('./routes/stats.js');
-    const adminRouter = require('./routes/admin.js');
-    const mapsRouter = require('./routes/maps.js');
-    const overflowRouter = require('./routes/overflow.js');
-
     app.use(function (req, res, next) {
         res.locals.i18n = i18n;
         res.locals.availableLanguages = availableLanguages;
@@ -126,17 +120,17 @@ module.exports = function () {
         res.locals.backendValues = {
             selectedLanguage: res.locals.lang,
             language: languages[res.locals.lang],
-            development
+            development: development
         };
 
         next();
     });
 
-    app.use('/', statsRouter);
-    app.use('/admin', adminRouter);
-    app.use('/maps', mapsRouter);
-    app.use('/language', languagesRouter);
-    app.use('/overflow', overflowRouter);
+    app.use('/', require('./routes/stats.js'));
+    app.use('/admin', require('./routes/admin.js'));
+    app.use('/maps', require('./routes/maps.js'));
+    app.use('/language', require('./routes/languages.js'));
+    app.use('/overflow', require('./routes/overflow.js'));
 
     // catch 404 and forward to error handler
     app.use(function (req, res, next) {
@@ -144,7 +138,7 @@ module.exports = function () {
     });
 
     // error handler
-    app.use(function (err, req, res, next) {
+    app.use(function (err, req, res) {
         const status = err.status || 500;
         res.locals.error = err;
         res.locals.status = status;
@@ -155,9 +149,7 @@ module.exports = function () {
         res.status(status).render('error');
     });
 
-    app.set('port', port);
-    app.set('trust proxy', true);
-    app.set('trust proxy', 'loopback');
+    const httpServer = http.createServer();
 
     httpServer.on('request', app);
     httpServer.on('error', function (error) {
