@@ -138,7 +138,7 @@ module.exports = function () {
     });
 
     // error handler
-    app.use(function (err, req, res) {
+    app.use(function (err, req, res, next) {
         const status = err.status || 500;
         res.locals.error = err;
         res.locals.status = status;
