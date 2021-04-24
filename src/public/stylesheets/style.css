@@ -1825,6 +1825,11 @@ span[class^="flag-"] {
     color: hsl(0, 100%, 50%);
 }
 
+.player-profile > .left,
+.tribe-profile > .left{
+    flex-basis: 150px;
+}
+
 /* profile charts */
 
 .ct-label.ct-horizontal.ct-end {
