@@ -122,9 +122,14 @@ const capitalize = function (value) {
         : value;
 };
 
-function sprintf (string, tokens = []) {
+/**
+ * @param {String} value
+ * @param {Array.<String|Number>} tokens
+ * @return {String}
+ */
+function sprintf (value, tokens) {
     let i = 0;
-    return string.replace(/%{[^}]*}/g, () => tokens[i++]);
+    return value.replace(/%{[^}]*}/g, () => tokens[i++]);
 }
 
 function formatNumbers (value) {
