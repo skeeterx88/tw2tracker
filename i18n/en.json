@@ -283,7 +283,12 @@
         "column_villages": "Villages",
         "column_victory_points": "Victory Points",
         "no_history": "No historic changes yet.",
-        "player_other_worlds": "Player's other worlds:"
+        "player_other_worlds": "Player's other worlds:",
+        "header_charts": "Charts",
+        "chart_points": "Points",
+        "chart_villages": "Villages",
+        "chart_bash_points_offense": "Bash Off",
+        "chart_bash_points_defense": "Bash Def"
     },
     "player_profile_villages": {
         "header": "Player Villages",
