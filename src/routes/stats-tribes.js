@@ -76,14 +76,16 @@ const tribeRouter = asyncRouter(async function (req, res, next) {
     const achievementsRepeatableCount = achievements.reduce((sum, {period}) => period ? sum + 1 : sum, 0);
 
     const historyLimit = config('ui', 'profile_last_history_count');
-    const rawHistory = await db.any(sql('get-tribe-history'), {worldId, tribeId, limit: historyLimit});
-    const history = calcHistoryChanges(rawHistory, tribeShortFieldsOrder);
+    const historyFullRaw = await db.any(sql('get-tribe-history'), {worldId, tribeId, limit: 30});
+    const historyShortRaw = historyFullRaw.slice(0, historyLimit);
+    const history = calcHistoryChanges(historyShortRaw, tribeShortFieldsOrder);
     const memberChangesCount = (await db.one(sql('get-tribe-member-changes-count'), {worldId, id: tribeId})).count;
 
     mergeBackendLocals(res, {
         marketId,
         worldNumber,
         tribe,
+        historyFullRaw,
         mapHighlights: [tribe],
         mapHighlightsType: 'tribes'
     });

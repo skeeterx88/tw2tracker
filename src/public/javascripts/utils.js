@@ -115,6 +115,14 @@ define('utils', [
         return string.replace(/%{[^}]*}/g, () => tokens[i++]);
     }
 
+    function shortifyPoints (points) {
+        if (points >= 1000000) {
+            return parseFloat((points / 1000 / 1000).toFixed(2)) + 'M';
+        } else {
+            return parseFloat((points / 1000).toFixed(2)) + 'K';
+        }
+    }
+
     return {
         hasOwn,
         ajaxPost,
@@ -126,6 +134,7 @@ define('utils', [
         formatSince,
         averageCoords,
         getElemPosition,
-        sprintf
+        sprintf,
+        shortifyPoints
     };
 });

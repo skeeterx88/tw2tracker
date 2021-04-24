@@ -105,8 +105,9 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     }, 0);
 
     const historyLimit = config('ui', 'profile_last_history_count');
-    const historyRaw = await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit});
-    const history = calcHistoryChanges(historyRaw, playerShortFieldsOrder);
+    const historyFullRaw = await db.any(sql('get-player-history'), {worldId, playerId, limit: 30});
+    const historyShortRaw = historyFullRaw.slice(0, historyLimit);
+    const history = calcHistoryChanges(historyShortRaw, playerShortFieldsOrder);
 
     const tribeChangesCount = (await db.one(sql('get-player-tribe-changes-count'), {worldId, id: playerId})).count;
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
@@ -116,6 +117,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         marketId,
         worldNumber,
         player,
+        historyFullRaw,
         mapHighlights: [player],
         mapHighlightsType: 'players'
     });

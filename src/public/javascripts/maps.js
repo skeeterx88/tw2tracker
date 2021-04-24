@@ -1248,14 +1248,6 @@ require([
         });
     };
 
-    function shortifyPoints (points) {
-        if (points >= 1000000) {
-            return parseFloat((points / 1000 / 1000).toFixed(1)) + 'kk';
-        } else {
-            return parseFloat((points / 1000).toFixed(1)) + 'k';
-        }
-    }
-
     function averagePositionFor (type, id) {
         let averageX;
         let averageY;
