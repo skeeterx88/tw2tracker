@@ -47,21 +47,33 @@ function emitSync (command, data) {
     });
 }
 
-const authRouter = asyncRouter(async function (req, res, next) {
-    passport.authenticate('local', {}, function (error, user, info) {
-        if (error) {
-            return next(error);
-        }
+const {
+    CONTROL_SYNC,
+    START_SYNC,
+    MODIFY_ACCOUNTS,
+    MODIFY_MODS,
+    MODIFY_SETTINGS
+} = privilegeTypes;
 
-        if (!user) {
-            req.flash('error', info.message);
-            return res.redirect('/admin/login');
-        }
+async function authAccount (request) {
+    const [account] = await db.any(sql('get-mod-account-by-name'), {name: request.body.name});
 
-        req.login(user, function (error) {
-            if (error) {
-                return next(error);
-            }
+    if (!account) {
+        request.flash('errors', i18n(authErrors.ACCOUNT_NOT_EXIST, 'admin'));
+        return false;
+    }
+
+    if (!account.enabled) {
+        request.flash('errors', i18n(authErrors.ACCOUNT_NOT_ENABLED, 'admin'));
+        return false;
+    }
+
+    const match = await bcrypt.compare(request.body.pass, account.pass);
+
+    if (!match) {
+        request.flash('errors', i18n(authErrors.INVALID_PASSWORD, 'admin'));
+        return false;
+    }
 
             return res.redirect('/admin');
         });
@@ -116,8 +128,8 @@ const loginRouter = asyncRouter(async function (req, res) {
         title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
         subPage: 'login',
         menu: false,
-        errors: req.flash('error'),
-        messages: req.flash('messages')
+        errors: request.flash('errors'),
+        messages: request.flash('messages')
     });
 });
 
@@ -176,9 +188,8 @@ const syncRouter = asyncRouter(async function (req, res) {
         syncingWorlds,
         syncQueueTyped,
         privilegeTypes,
-        user: req.user,
-        errors: req.flash('error'),
-        messages: req.flash('messages')
+        errors: request.flash('errors'),
+        messages: request.flash('messages')
     });
 });
 
@@ -189,9 +200,9 @@ const syncTypeRouter = asyncRouter(async function (req, res) {
         throw createError(404, i18n('error_invalid_sync_type', 'admin', res.locals.lang));
     }
 
-    if (!paramWorld(req)) {
-        req.flash('error', i18n('error_world_not_found', 'admin', res.locals.lang));
-        return res.redirect('/admin/sync');
+    if (!paramWorld(request)) {
+        request.flash('errors', i18n('error_world_not_found', 'admin', reply.locals.lang));
+        return reply.redirect('/admin/sync');
     }
 
     const {
@@ -203,8 +214,8 @@ const syncTypeRouter = asyncRouter(async function (req, res) {
     const marketsWithAccounts = await db.map(sql('get-markets-with-accounts'), [], market => market.id);
 
     if (!marketsWithAccounts.includes(marketId)) {
-        req.flash('error', i18n('error_market_has_no_sync_accounts', 'admin', res.locals.lang, [worldId]));
-        return res.redirect('/admin/sync');
+        request.flash('errors', i18n('error_market_has_no_sync_accounts', 'admin', reply.locals.lang, [worldId]));
+        return reply.redirect('/admin/sync');
     }
 
     await emitSync(mapping.SYNC_COMMAND, {
@@ -212,9 +223,9 @@ const syncTypeRouter = asyncRouter(async function (req, res) {
         worldNumber
     });
 
-    req.flash('messages', i18n(mapping.I18N_SUCCESS_MESSAGE, 'admin', res.locals.lang, [worldId]));
-    res.redirect(`/admin/sync#world-${worldId}`);
-});
+    request.flash('messages', i18n(mapping.I18N_SUCCESS_MESSAGE, 'admin', reply.locals.lang, [worldId]));
+    reply.redirect(`/admin/sync#world-${worldId}`);
+};
 
 const syncTypeAllRouter = asyncRouter(async function (req, res) {
     const mapping = syncTypeMapping[req.params.type];
@@ -225,28 +236,28 @@ const syncTypeAllRouter = asyncRouter(async function (req, res) {
 
     await emitSync(mapping.SYNC_ALL_COMMAND);
 
-    req.flash('messages', i18n(mapping.I18N_ALL_SUCCESS_MESSAGE, 'admin', res.locals.lang));
-    res.redirect('/admin/sync');
-});
+    request.flash('messages', i18n(mapping.I18N_ALL_SUCCESS_MESSAGE, 'admin', reply.locals.lang));
+    reply.redirect('/admin/sync');
+};
 
 const scrapeMarketsRouter = asyncRouter(async function (req, res) {
     await emitSync(syncCommands.MARKETS);
 
-    req.flash('messages', i18n('message_scrape_markets_started', 'admin', res.locals.lang));
-    res.redirect('/admin/sync');
-});
+    request.flash('messages', i18n('message_scrape_markets_started', 'admin', reply.locals.lang));
+    reply.redirect('/admin/sync');
+};
 
 const scrapeWorldsRouter = asyncRouter(async function (req, res) {
     await emitSync(syncCommands.WORLDS);
 
-    req.flash('messages', i18n('message_scrape_worlds_started', 'admin', res.locals.lang));
-    res.redirect('/admin/sync');
-});
+    request.flash('messages', i18n('message_scrape_worlds_started', 'admin', reply.locals.lang));
+    reply.redirect('/admin/sync');
+};
 
-const toggleSyncRouter = asyncRouter(async function (req, res) {
-    if (!paramWorld(req)) {
-        req.flash('error', i18n('error_world_not_found', 'admin', res.locals.lang));
-        return res.redirect('/admin/sync');
+const toggleSyncRouter = async function (request, reply) {
+    if (!paramWorld(request)) {
+        request.flash('errors', i18n('error_world_not_found', 'admin', reply.locals.lang));
+        return reply.redirect('/admin/sync');
     }
 
     const {
@@ -260,23 +271,23 @@ const toggleSyncRouter = asyncRouter(async function (req, res) {
         worldNumber
     });
 
-    req.flash('messages', i18n('message_world_toggled', 'admin', res.locals.lang, [worldId]));
-    res.redirect(`/admin/sync#world-${worldId}`);
-});
+    request.flash('messages', i18n('message_world_toggled', 'admin', reply.locals.lang, [worldId]));
+    reply.redirect(`/admin/sync#world-${worldId}`);
+};
 
 const resetQueueRouter = asyncRouter(async function (req, res) {
     const type = req.params.type;
 
     if (!Object.values(syncTypes).includes(type)) {
-        req.flash('error', i18n('error_invalid_sync_type', 'admin', res.locals.lang, [type]));
-        return res.redirect('/admin/sync');
+        request.flash('errors', i18n('error_invalid_sync_type', 'admin', reply.locals.lang, [type]));
+        return reply.redirect('/admin/sync');
     }
 
     await emitSync(syncCommands.DATA_RESET_QUEUE);
 
-    req.flash('messages', i18n('message_sync_queue_reseted', 'admin', res.locals.lang, [type]));
-    res.redirect('/admin/sync');
-});
+    request.flash('messages', i18n('message_sync_queue_reseted', 'admin', reply.locals.lang, [type]));
+    reply.redirect('/admin/sync');
+};
 
 const accountsRouter = asyncRouter(async function (req, res) {
     const markets = await db.map(sql('get-markets'), [], market => market.id);
@@ -304,8 +315,8 @@ const accountsRouter = asyncRouter(async function (req, res) {
         subPage,
         accounts,
         markets,
-        errors: req.flash('error'),
-        messages: req.flash('messages')
+        errors: request.flash('errors'),
+        messages: request.flash('messages')
     });
 });
 
@@ -316,13 +327,13 @@ const accountsAddMarketRouter = asyncRouter(async function (req, res) {
     const market = await db.any(sql('get-market'), {marketId});
 
     if (!account.length) {
-        req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang));
+        request.flash('errors', i18n('error_sync_account_not_exist', 'admin', reply.locals.lang));
     } else if (!market.length) {
-        req.flash('error', i18n('error_sync_market_not_exist', 'admin', res.locals.lang, [marketId.toUpperCase()]));
+        request.flash('errors', i18n('error_sync_market_not_exist', 'admin', reply.locals.lang, [marketId.toUpperCase()]));
     } else if (account[0].markets.includes(marketId)) {
-        req.flash('error', i18n('error_sync_account_market_included', 'admin', res.locals.lang, [marketId.toUpperCase()]));
+        request.flash('errors', i18n('error_sync_account_market_included', 'admin', reply.locals.lang, [marketId.toUpperCase()]));
     } else {
-        req.flash('messages', i18n('message_sync_account_market_added', 'admin', res.locals.lang, [marketId.toUpperCase()]));
+        request.flash('messages', i18n('message_sync_account_market_added', 'admin', reply.locals.lang, [marketId.toUpperCase()]));
         await db.query(sql('add-account-market'), {accountId, marketId});
     }
 
@@ -336,13 +347,13 @@ const accountsRemoveMarketRouter = asyncRouter(async function (req, res) {
     const market = await db.any(sql('get-market'), {marketId});
 
     if (!account.length) {
-        req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang, [accountId]));
+        request.flash('errors', i18n('error_sync_account_not_exist', 'admin', reply.locals.lang, [accountId]));
     } else if (!market.length) {
-        req.flash('error', i18n('error_sync_market_not_exist', 'admin', res.locals.lang, [marketId.toUpperCase()]));
+        request.flash('errors', i18n('error_sync_market_not_exist', 'admin', reply.locals.lang, [marketId.toUpperCase()]));
     } else if (!account[0].markets.includes(marketId)) {
-        req.flash('error', i18n('error_sync_account_market_included', 'admin', res.locals.lang));
+        request.flash('errors', i18n('error_sync_account_market_included', 'admin', reply.locals.lang));
     } else {
-        req.flash('messages', i18n('message_sync_account_market_removed', 'admin', res.locals.lang));
+        request.flash('messages', i18n('message_sync_account_market_removed', 'admin', reply.locals.lang));
         await db.query(sql('remove-account-market'), {accountId, marketId});
     }
 
@@ -354,11 +365,11 @@ const accountsDeleteRouter = asyncRouter(async function (req, res) {
     const account = await db.any(sql('get-account'), {accountId});
 
     if (!account.length) {
-        req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang, [accountId]));
-    } else if (account.id === req.user.id) {
-        req.flash('error', i18n('error_sync_account_delete_own', 'admin', res.locals.lang));
+        request.flash('errors', i18n('error_sync_account_not_exist', 'admin', reply.locals.lang, [accountId]));
+    } else if (account.id === request.session.account.id) {
+        request.flash('errors', i18n('error_sync_account_delete_own', 'admin', reply.locals.lang));
     } else {
-        req.flash('messages', i18n('message_sync_account_deleted', 'admin', res.locals.lang));
+        request.flash('messages', i18n('message_sync_account_deleted', 'admin', reply.locals.lang));
         await db.query(sql('delete-account'), {accountId});
     }
 
@@ -370,13 +381,13 @@ const accountsEditRouter = asyncRouter(async function (req, res) {
     const account = await db.any(sql('get-account'), {accountId});
 
     if (!account.length) {
-        req.flash('error', i18n('error_sync_account_not_exist', 'admin', res.locals.lang, [accountId]));
+        request.flash('errors', i18n('error_sync_account_not_exist', 'admin', reply.locals.lang, [accountId]));
     } else if (pass.length < config('sync_accounts', 'min_password_length')) {
-        req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
+        request.flash('errors', i18n('error_password_minimum_length', 'admin', reply.locals.lang, [4]));
     } else if (name.length < config('sync_accounts', 'min_username_length')) {
-        req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [4]));
+        request.flash('errors', i18n('error_username_minimum_length', 'admin', reply.locals.lang, [4]));
     } else {
-        req.flash('messages', i18n('message_sync_account_altered', 'admin', res.locals.lang));
+        request.flash('messages', i18n('message_sync_account_altered', 'admin', reply.locals.lang));
         await db.query(sql('edit-account'), {accountId, name, pass});
     }
 
@@ -387,16 +398,16 @@ const accountsCreateRouter = asyncRouter(async function (req, res) {
     const {name, pass, id: accountId} = req.body;
 
     if (pass.length < config('sync_accounts', 'min_password_length')) {
-        req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
+        request.flash('errors', i18n('error_password_minimum_length', 'admin', reply.locals.lang, [4]));
     } else if (name.length < config('sync_accounts', 'min_username_length')) {
-        req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [4]));
+        request.flash('errors', i18n('error_username_minimum_length', 'admin', reply.locals.lang, [4]));
     } else {
         const accountExists = await db.any(sql('get-account-by-name'), {name});
 
         if (accountExists.length) {
-            req.flash('error', i18n('error_sync_username_already_exists', 'admin', res.locals.lang, [name]));
+            request.flash('errors', i18n('error_sync_username_already_exists', 'admin', reply.locals.lang, [name]));
         } else {
-            req.flash('messages', i18n('message_sync_account_added', 'admin', res.locals.lang));
+            request.flash('messages', i18n('message_sync_account_added', 'admin', reply.locals.lang));
             await db.query(sql('add-account'), {name, pass});
         }
     }
@@ -423,8 +434,8 @@ const modsRouter = asyncRouter(async function (req, res) {
         subPage,
         mods,
         privilegeTypes,
-        errors: req.flash('error'),
-        messages: req.flash('messages')
+        errors: request.flash('errors'),
+        messages: request.flash('messages')
     });
 });
 
@@ -446,26 +457,26 @@ const modsEditRouter = asyncRouter(async function (req, res) {
     const [accountEmail] = await db.any(sql('get-mod-account-by-email'), {email});
 
     if (!mod) {
-        req.flash('error', i18n('error_mod_account_not_exists', 'admin', res.locals.lang));
-        return res.redirect('/admin/mods');
+        request.flash('errors', i18n('error_mod_account_not_exists', 'admin', reply.locals.lang));
+        return reply.redirect('/admin/mods');
     } else if (name.length < config('mod_accounts', 'min_username_length')) {
-        req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [3]));
-        return res.redirect('/admin/mods');
+        request.flash('errors', i18n('error_username_minimum_length', 'admin', reply.locals.lang, [3]));
+        return reply.redirect('/admin/mods');
     } else if (pass && pass.length < config('mod_accounts', 'min_password_length')) {
-        req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
-        return res.redirect('/admin/mods');
+        request.flash('errors', i18n('error_password_minimum_length', 'admin', reply.locals.lang, [4]));
+        return reply.redirect('/admin/mods');
     } else if (accountName && accountName.id !== id) {
-        req.flash('error', i18n('error_mod_username_already_exists', 'admin', res.locals.lang));
-        return res.redirect('/admin/mods');
+        request.flash('errors', i18n('error_mod_username_already_exists', 'admin', reply.locals.lang));
+        return reply.redirect('/admin/mods');
     } else if (accountEmail && accountEmail.id !== id) {
-        req.flash('error', i18n('error_mod_account_email_already_exists', 'admin', res.locals.lang));
-        return res.redirect('/admin/mods');
+        request.flash('errors', i18n('error_mod_account_email_already_exists', 'admin', reply.locals.lang));
+        return reply.redirect('/admin/mods');
     } else if (privileges.some(type => !privilegeTypesValue.includes(type))) {
-        req.flash('error', i18n('error_invalid_privilege', 'admin', res.locals.lang));
-        return res.redirect('/admin/mods');
-    } else if (me.id === mod.id && me.privileges[privilegeTypes.MODIFY_MODS] && !privileges.includes(privilegeTypes.MODIFY_MODS)) {
-        req.flash('error', i18n('error_can_not_remove_self_modify_mods_priv', 'admin', res.locals.lang));
-        return res.redirect('/admin/mods');
+        request.flash('errors', i18n('error_invalid_privilege', 'admin', reply.locals.lang));
+        return reply.redirect('/admin/mods');
+    } else if (me.id === mod.id && me.privileges[MODIFY_MODS] && !privileges.includes(MODIFY_MODS)) {
+        request.flash('errors', i18n('error_can_not_remove_self_modify_mods_priv', 'admin', reply.locals.lang));
+        return reply.redirect('/admin/mods');
     } else {
         if (pass) {
             const hash = await bcrypt.hash(pass, saltRounds);
@@ -480,16 +491,16 @@ const modsEditRouter = asyncRouter(async function (req, res) {
 
             return req.logIn({id, name, privileges}, function (error) {
                 if (error) {
-                    req.flash('error', error);
+                    request.flash('errors', error);
                 } else {
-                    req.flash('messages', i18n('message_mod_account_altered', 'admin', res.locals.lang));
+                    request.flash('messages', i18n('message_mod_account_altered', 'admin', reply.locals.lang));
                 }
 
                 res.redirect(`/admin/mods#mod-${id}`);
             });
         } else {
-            req.flash('messages', i18n('message_mod_account_altered', 'admin', res.locals.lang));
-            res.redirect(`/admin/mods#mod-${id}`);
+            request.flash('messages', i18n('message_mod_account_altered', 'admin', reply.locals.lang));
+            reply.redirect(`/admin/mods#mod-${id}`);
         }
     }
 });
@@ -508,20 +519,20 @@ const modsCreateRouter = asyncRouter(async function (req, res) {
     const [accountEmail] = await db.any(sql('get-mod-account-by-email'), {email});
 
     if (name.length < config('mod_accounts', 'min_username_length')) {
-        req.flash('error', i18n('error_username_minimum_length', 'admin', res.locals.lang, [3]));
+        request.flash('errors', i18n('error_username_minimum_length', 'admin', reply.locals.lang, [3]));
     } else if (pass.length < config('mod_accounts', 'min_password_length')) {
-        req.flash('error', i18n('error_password_minimum_length', 'admin', res.locals.lang, [4]));
+        request.flash('errors', i18n('error_password_minimum_length', 'admin', reply.locals.lang, [4]));
     } else if (accountName) {
-        req.flash('error', i18n('error_mod_username_already_exists', 'admin', res.locals.lang));
+        request.flash('errors', i18n('error_mod_username_already_exists', 'admin', reply.locals.lang));
     } else if (accountEmail) {
-        req.flash('error', i18n('error_mod_account_email_already_exists', 'admin', res.locals.lang));
+        request.flash('errors', i18n('error_mod_account_email_already_exists', 'admin', reply.locals.lang));
     } else if (privileges.some(type => !privilegeTypesValue.includes(type))) {
-        req.flash('error', i18n('error_invalid_privilege', 'admin', res.locals.lang));
+        request.flash('errors', i18n('error_invalid_privilege', 'admin', reply.locals.lang));
     } else {
         const hash = await bcrypt.hash(pass, saltRounds);
         const {id} = await db.one(sql('create-mod-account'), {name, pass: hash, privileges, email});
-        req.flash('messages', i18n('message_mod_account_created', 'admin', res.locals.lang));
-        return res.redirect(`/admin/mods#mod-${id}`);
+        request.flash('messages', i18n('message_mod_account_created', 'admin', reply.locals.lang));
+        return reply.redirect(`/admin/mods#mod-${id}`);
     }
 
     res.redirect('/admin/mods');
@@ -533,11 +544,11 @@ const modsDeleteRouter = asyncRouter(async function (req, res) {
     const [mod] = await db.any(sql('get-mod'), {id});
 
     if (!mod) {
-        req.flash('error', i18n('error_mod_account_not_exists', 'admin', res.locals.lang));
-    } else if (mod.id === req.session.passport.user.id) {
-        req.flash('error', i18n('error_can_not_delete_yourself', 'admin', res.locals.lang));
+        request.flash('errors', i18n('error_mod_account_not_exists', 'admin', reply.locals.lang));
+    } else if (mod.id === request.session.account.id) {
+        request.flash('errors', i18n('error_can_not_delete_yourself', 'admin', reply.locals.lang));
     } else {
-        req.flash('messages', i18n('message_mod_account_deleted', 'admin', res.locals.lang));
+        request.flash('messages', i18n('message_mod_account_deleted', 'admin', reply.locals.lang));
         await db.query(sql('delete-mod-account'), {id});
     }
 
@@ -562,8 +573,8 @@ const settingsRouter = asyncRouter(async function (req, res) {
         user: req.user,
         config,
         configMap,
-        errors: req.flash('error'),
-        messages: req.flash('messages')
+        errors: request.flash('errors'),
+        messages: request.flash('messages')
     });
 });
 
@@ -584,10 +595,10 @@ const settingsEditRouter = asyncRouter(async function (req, res) {
                 const parsed = parseInt(value, 10);
 
                 if (isNaN(parsed)) {
-                    req.flash('error', i18n('error_invalid_not_a_number', 'admin_settings', res.locals.lang, [category + ':' + configId]));
+                    request.flash('errors', i18n('error_invalid_not_a_number', 'admin_settings', reply.locals.lang, [category + ':' + configId]));
                     newConfig[category][configId] = config[category][configId];
                 } else if (parsed < map.min || parsed > map.max) {
-                    req.flash('error', i18n('error_invalid_number_range', 'admin_settings', res.locals.lang, [category + ':' + configId, map.min, map.max]));
+                    request.flash('errors', i18n('error_invalid_number_range', 'admin_settings', reply.locals.lang, [category + ':' + configId, map.min, map.max]));
                     newConfig[category][configId] = config[category][configId];
                 } else {
                     updated = true;
@@ -599,7 +610,7 @@ const settingsEditRouter = asyncRouter(async function (req, res) {
                 const parsed = humanInterval(value);
 
                 if (isNaN(parsed)) {
-                    req.flash('error', i18n('error_invalid_time_format', 'admin_settings', res.locals.lang, category + ':' + configId));
+                    request.flash('errors', i18n('error_invalid_time_format', 'admin_settings', reply.locals.lang, category + ':' + configId));
                     newConfig[category][configId] = config[category][configId];
                 } else {
                     updated = true;
@@ -616,7 +627,7 @@ const settingsEditRouter = asyncRouter(async function (req, res) {
     }
 
     if (updated) {
-        req.flash('messages', i18n('message_settings_changed', 'admin_settings', res.locals.lang));
+        request.flash('messages', i18n('message_settings_changed', 'admin_settings', reply.locals.lang));
         fs.writeFileSync('./config.json', JSON.stringify(newConfig, null, 4), 'utf-8');
     }
 

@@ -156,12 +156,6 @@ function mergeBackendLocals (res, obj) {
     };
 }
 
-function asyncRouter (handler) {
-    return function (req, res, next) {
-        Promise.resolve(handler(req, res, next)).catch(next);
-    };
-}
-
 function parseRankingSort (req, victoryPointSystem) {
     if (req.query.tsort) {
         req.session.tribeRankingSortField = req.query.tsort;
@@ -211,6 +205,5 @@ module.exports = {
     groupAchievements,
     createNavigation,
     mergeBackendLocals,
-    asyncRouter,
     parseRankingSort
 };

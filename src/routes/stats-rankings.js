@@ -12,7 +12,6 @@ const {
     createPagination,
     createNavigation,
     mergeBackendLocals,
-    asyncRouter,
     parseRankingSort
 } = require('../router-helpers.js');
 
@@ -100,7 +99,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
             {label: i18n('ranking', 'navigation', res.locals.lang), replaces: [capitalizedCategory]}
         ])
     });
-});
+};
 
 router.get('/stats/:marketId/:worldNumber/ranking/:category?/', rankingCategoryRouter);
 router.get('/stats/:marketId/:worldNumber/ranking/:category?/page/:page', rankingCategoryRouter);

@@ -85,16 +85,16 @@ module.exports = function () {
         done(null, account);
     }));
 
-    passport.serializeUser(async function (account, callback) {
-        const parsedPrivileges = typeof account.privileges === 'string' ? pgArray.create(account.privileges, String).parse() : account.privileges;
-        const privilegeEntries = await db.map(sql('get-mod-privilege-types'), [], ({type}) => [type, parsedPrivileges.includes(type)]);
-        const privilegeObject = Object.fromEntries(privilegeEntries);
+    fastify.decorateRequest('flash', function (type, msg) {
+        const msgs = this.session.flash = this.session.flash || {};
 
-        callback(null, {
-            id: account.id,
-            name: account.name,
-            privileges: privilegeObject
-        });
+        if (type && msg) {
+            return (msgs[type] = msgs[type] || []).push(msg);
+        } else if (type) {
+            const arr = msgs[type];
+            delete msgs[type];
+            return arr || [];
+        }
     });
 
     passport.deserializeUser(function (user, callback) {
