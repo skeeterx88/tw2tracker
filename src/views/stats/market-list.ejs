@@ -6,26 +6,26 @@
                     <h2 class="title"><span class="flag-<%= market.id %>"><%= market.id.toUpperCase() %></span></h2>
                     <div class="stats">
                         <ul>
-                            <li><%= i18n('players', 'market_list', lang, [formatNumbers(market.players)]) %></li>
-                            <li><%= i18n('tribes', 'market_list', lang, [formatNumbers(market.tribes)]) %></li>
-                            <li><%= i18n('villages', 'market_list', lang, [formatNumbers(market.villages)]) %></li>
+                            <li><%= i18n('players', 'market_list', [formatNumbers(market.players)]) %></li>
+                            <li><%= i18n('tribes', 'market_list', [formatNumbers(market.tribes)]) %></li>
+                            <li><%= i18n('villages', 'market_list', [formatNumbers(market.villages)]) %></li>
                         </ul>
                     </div>
                     <div class="worlds">
                         <ul>
-                            <li><%= i18n('open_worlds', 'market_list', lang, [market.openWorld]) %></li>
-                            <li><%= i18n('closed_worlds', 'market_list', lang, [market.closedWorld]) %></li>
+                            <li><%= i18n('open_worlds', 'market_list', [market.openWorld]) %></li>
+                            <li><%= i18n('closed_worlds', 'market_list', [market.closedWorld]) %></li>
                         </ul>
                     </div>
 
                     <div class="actions">
-                        <a class="relax-button toggle-list-worlds" href="/stats/<%= market.id %>"><%= i18n('world_list', 'market_list', lang) %></a>
+                        <a class="relax-button toggle-list-worlds" href="/stats/<%= market.id %>"><%= i18n('world_list', 'market_list') %></a>
                     </div>
 
                     <section class="world-list hidden">
                         <% for (const worldState of ['open', 'closed']) { %>
                             <% if (worldState === 'closed' && worldsByMarket[market.id].closed.length) { %>
-                                <h3><%= i18n('header_closed_worlds', 'market_list', lang) %></h3>
+                                <h3><%= i18n('header_closed_worlds', 'market_list') %></h3>
                             <% } %>
 
                             <% for (const [worldNumber, world] of worldsByMarket[market.id][worldState]) { -%>
@@ -33,33 +33,33 @@
                                     <h4 class="title"><span class="flag-<%= world.market %>"><%= world.name %></span><sup><%= world.num %></sup></h4>
 
                                     <div class="stats">
-                                        <p><span class="label"><%= i18n('players', 'world_list', lang, [formatNumbers(world.player_count)]) %></span></p>
-                                        <p><span class="label"><%= i18n('tribes', 'world_list', lang, [formatNumbers(world.tribe_count)]) %></span></p>
-                                        <p><span class="label"><%= i18n('villages', 'world_list', lang, [formatNumbers(world.village_count)]) %></span></p>
+                                        <p><span class="label"><%= i18n('players', 'world_list', [formatNumbers(world.player_count)]) %></span></p>
+                                        <p><span class="label"><%= i18n('tribes', 'world_list', [formatNumbers(world.tribe_count)]) %></span></p>
+                                        <p><span class="label"><%= i18n('villages', 'world_list', [formatNumbers(world.village_count)]) %></span></p>
                                     </div>
 
                                     <% if (world.config) { -%>
                                         <div class="settings">
-                                            <p><span class="label"><%= i18n('setting_world_type', 'world_list', lang) %></span> <span class="value"><% __append(world.config.victory_points ? i18n('world_type_victory_points', 'world_list', lang) : i18n('world_type_domination', 'world_list', lang)) %></span></p>
-                                            <p><span class="label"><%= i18n('setting_troop_relocation', 'world_list', lang) %></span> <span class="value"><% __append(world.config.relocate_units ? i18n('setting_enabled', 'world_list', lang) : i18n('setting_disabled', 'world_list', lang)) %></span></p>
+                                            <p><span class="label"><%= i18n('setting_world_type', 'world_list') %></span> <span class="value"><% __append(world.config.victory_points ? i18n('world_type_victory_points', 'world_list', lang) : i18n('world_type_domination', 'world_list', lang)) %></span></p>
+                                            <p><span class="label"><%= i18n('setting_troop_relocation', 'world_list') %></span> <span class="value"><% __append(world.config.relocate_units ? i18n('setting_enabled', 'world_list', lang) : i18n('setting_disabled', 'world_list', lang)) %></span></p>
                                         </div>
                                     <% } -%>
 
                                     <% if (world.open_date || world.close_date) { %>
                                         <div class="dates">
                                             <% if (world.open_date) { %>
-                                                <p><span class="label"><%= i18n('open_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
+                                                <p><span class="label"><%= i18n('open_date', 'world_list') %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
                                             <% } %>
 
                                             <% if (world.close_date) { %>
-                                                <p><span class="label"><%= i18n('close_date', 'world_list', lang) %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
+                                                <p><span class="label"><%= i18n('close_date', 'world_list') %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
                                             <% } %>
                                         </div>
                                     <% } %>
 
                                     <div class="actions">
-                                        <a class="relax-button" href="/stats/<%= world.market %>/<%= world.num %>"><%= i18n('button_stats', 'world_list', lang) %></a>
-                                        <a class="relax-button" href="/maps/<%= world.market %>/<%= world.num %>"><%= i18n('button_map', 'world_list', lang) %></a>
+                                        <a class="relax-button" href="/stats/<%= world.market %>/<%= world.num %>"><%= i18n('button_stats', 'world_list') %></a>
+                                        <a class="relax-button" href="/maps/<%= world.market %>/<%= world.num %>"><%= i18n('button_map', 'world_list') %></a>
                                     </div>
                                 </div>
                             <% } -%>

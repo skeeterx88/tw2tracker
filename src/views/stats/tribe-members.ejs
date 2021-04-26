@@ -1,23 +1,23 @@
 <div class="content">
     <div class="left">
         <section id="players">
-            <h2><%= i18n('header_tribe_members', 'tribe_profile_members', lang) %></h2>
+            <h2><%= i18n('header_tribe_members', 'tribe_profile_members') %></h2>
 
             <div class="section-content">
                 <table>
                     <thead>
                         <tr>
-                            <th><%= i18n('column_rank', 'tribe_profile_members', lang) %></th>
-                            <th><%= i18n('column_name', 'tribe_profile_members', lang) %></th>
-                            <th><%= i18n('column_points', 'tribe_profile_members', lang) %></th>
-                            <th><%= i18n('column_villages', 'tribe_profile_members', lang) %></th>
+                            <th><%= i18n('column_rank', 'tribe_profile_members') %></th>
+                            <th><%= i18n('column_name', 'tribe_profile_members') %></th>
+                            <th><%= i18n('column_points', 'tribe_profile_members') %></th>
+                            <th><%= i18n('column_villages', 'tribe_profile_members') %></th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <% if (!members.length) { %>
                             <tr>
-                                <td colspan="4"><%= i18n('no_members', 'tribe_profile_members', lang) %></td>
+                                <td colspan="4"><%= i18n('no_members', 'tribe_profile_members') %></td>
                             </tr>
                         <% } %>
 

@@ -1,6 +1,6 @@
 <div class="content">
     <div class="left">
-        <h2><%= i18n('header_tribe_member_changes', 'tribe_profile_member_changes', lang) %></h2>
+        <h2><%= i18n('header_tribe_member_changes', 'tribe_profile_member_changes') %></h2>
         <table class="section-content">
             <colgroup>
                 <col width="200px">
@@ -9,9 +9,9 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th><%= i18n('column_date_hour', 'tribe_profile_member_changes', lang) %></th>
-                    <th><%= i18n('column_player', 'tribe_profile_member_changes', lang) %></th>
-                    <th><%= i18n('column_action', 'tribe_profile_member_changes', lang) %></th>
+                    <th><%= i18n('column_date_hour', 'tribe_profile_member_changes') %></th>
+                    <th><%= i18n('column_player', 'tribe_profile_member_changes') %></th>
+                    <th><%= i18n('column_action', 'tribe_profile_member_changes') %></th>
                 </tr>
             </thead>
             <tbody>
@@ -22,15 +22,15 @@
                             <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
                             <% if (change.type === memberChangeTypes.LEFT) { -%>
-                                <td><%= i18n('left', 'tribe_profile_member_changes', lang) %></td>
+                                <td><%= i18n('left', 'tribe_profile_member_changes') %></td>
                             <% } else { -%>
-                                <td><%= i18n('join', 'tribe_profile_member_changes', lang) %></td>
+                                <td><%= i18n('join', 'tribe_profile_member_changes') %></td>
                             <% } -%>
                         </tr>
                     <% } %>
                 <% } else { -%>
                     <tr>
-                        <td colspan="4"><%= i18n('no_changes', 'tribe_profile_member_changes', lang) %></td>
+                        <td colspan="4"><%= i18n('no_changes', 'tribe_profile_member_changes') %></td>
                     </tr>
                 <% } -%>
             </tbody>

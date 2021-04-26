@@ -1,11 +1,11 @@
 <div class="sub-menu">
-    <a href="/stats/<%= marketId %>/<%= worldNumber %>/ranking/players" class="item<% if (category === 'players') __append(' selected') %>"><%= i18n('header_players', 'world', lang) %></li></a>
-    <a href="/stats/<%= marketId %>/<%= worldNumber %>/ranking/tribes" class="item<% if (category === 'tribes') __append(' selected') %>"><%= i18n('header_tribes', 'world', lang) %></a>
+    <a href="/stats/<%= marketId %>/<%= worldNumber %>/ranking/players" class="item<% if (category === 'players') __append(' selected') %>"><%= i18n('header_players', 'world') %></li></a>
+    <a href="/stats/<%= marketId %>/<%= worldNumber %>/ranking/tribes" class="item<% if (category === 'tribes') __append(' selected') %>"><%= i18n('header_tribes', 'world') %></a>
 </div>
 
 <div class="content">
     <div class="left">
-        <h2><%= i18n('header_' + category, 'world_ranking', lang) %></h2>
+        <h2><%= i18n('header_' + category, 'world_ranking') %></h2>
 
         <div class="section-content">
             <%- include('ranking/' + category + '.ejs') %>

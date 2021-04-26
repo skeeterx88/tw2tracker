@@ -1,10 +1,10 @@
 <table>
     <thead>
         <tr>
-            <th><%= i18n('column_villages', 'world_search', lang) %></th>
-            <th><%= i18n('column_points', 'world_search', lang) %></th>
-            <th><%= i18n('column_owner', 'world_search', lang) %></th>
-            <th><%= i18n('column_tribe', 'world_search', lang) %></th>
+            <th><%= i18n('column_villages', 'world_search') %></th>
+            <th><%= i18n('column_points', 'world_search') %></th>
+            <th><%= i18n('column_owner', 'world_search') %></th>
+            <th><%= i18n('column_tribe', 'world_search') %></th>
         </tr>
     </thead>
     <tbody>
@@ -16,7 +16,7 @@
                 <% if (village.player_id) { %>
                     <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
                 <% } else { %>
-                    <td><%= i18n('abandoned_village', 'world_search', lang) %></td>
+                    <td><%= i18n('abandoned_village', 'world_search') %></td>
                 <% } %>
 
                 <% if (village.tribe_id) { %>

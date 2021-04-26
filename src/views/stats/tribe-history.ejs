@@ -1,22 +1,22 @@
 <div class="content">
     <div class="single">
         <section id="tribe-history">
-            <h2><%= i18n('header_tribe_history', 'tribe_profile_history', lang) %></h2>
+            <h2><%= i18n('header_tribe_history', 'tribe_profile_history') %></h2>
 
             <div class="section-content">
                 <table>
                     <thead>
                         <tr>
-                            <th><%= i18n('column_date', 'tribe_profile_history', lang) %></th>
-                            <th><%= i18n('column_rank', 'tribe_profile_history', lang) %></th>
-                            <th><%= i18n('column_members', 'tribe_profile_history', lang) %></th>
-                            <th><%= i18n('column_points', 'tribe_profile_history', lang) %></th>
-                            <th><%= i18n('column_villages', 'tribe_profile_history', lang) %></th>
-                            <th><%= i18n('column_bash_points_offense', 'tribe_profile_history', lang) %></th>
-                            <th><%= i18n('column_bash_points_defense', 'tribe_profile_history', lang) %></th>
-                            <th><%= i18n('column_bash_points_total', 'tribe_profile_history', lang) %></th>
+                            <th><%= i18n('column_date', 'tribe_profile_history') %></th>
+                            <th><%= i18n('column_rank', 'tribe_profile_history') %></th>
+                            <th><%= i18n('column_members', 'tribe_profile_history') %></th>
+                            <th><%= i18n('column_points', 'tribe_profile_history') %></th>
+                            <th><%= i18n('column_villages', 'tribe_profile_history') %></th>
+                            <th><%= i18n('column_bash_points_offense', 'tribe_profile_history') %></th>
+                            <th><%= i18n('column_bash_points_defense', 'tribe_profile_history') %></th>
+                            <th><%= i18n('column_bash_points_total', 'tribe_profile_history') %></th>
                             <% if (world.config.victory_points) { -%>
-                                <th><%= i18n('column_victory_points', 'tribe_profile_history', lang) %></th>
+                                <th><%= i18n('column_victory_points', 'tribe_profile_history') %></th>
                             <% } -%>
                         </tr>
                     </thead>
@@ -38,7 +38,7 @@
                                 </tr>
                             <% } %>
                         <% } else { -%>
-                            <tr><td colspan="9"><%= i18n('no_history', 'tribe_profile_history', lang) %></td></tr>
+                            <tr><td colspan="9"><%= i18n('no_history', 'tribe_profile_history') %></td></tr>
                         <% } -%>
                     </tbody>
                 </table>

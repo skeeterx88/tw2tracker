@@ -6,16 +6,16 @@
             <div class="section-content">
                 <form action="/admin/login" method="POST">
                     <label class="input">
-                        <span><%= i18n('username_label', 'admin', lang) %></span>
-                        <input type="text" class="relax-input" name="username" required>
+                        <span><%= i18n('username_label', 'admin') %></span>
+                        <input type="text" class="relax-input" name="name" required>
                     </label>
                     <label class="input">
-                        <span><%= i18n('password_label', 'admin', lang) %></span>
-                        <input type="password" class="relax-input" name="password" required>
+                        <span><%= i18n('password_label', 'admin') %></span>
+                        <input type="password" class="relax-input" name="pass" required>
                     </label>
 
                     <div class="actions">
-                        <input type="submit" value="<%= i18n('button_login', 'admin', lang) %>" class="relax-button">
+                        <input type="submit" value="<%= i18n('button_login', 'admin') %>" class="relax-button">
                     </div>
                 </form>
             </div>

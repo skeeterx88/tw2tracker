@@ -8,12 +8,12 @@
         <main>
             <div class="content" id="languages-page">
                 <div class="single">
-                    <h1><%= i18n('lang', 'main_menu', lang) %></h1>
+                    <h1><%= i18n('lang', 'main_menu') %></h1>
 
-                    <% for (const langId of availableLanguages) { %>
+                    <% for (const [langId, langTitle] of availableLanguages) { %>
                         <a href="/language/<%= langId %>">
                             <div class="lang relax-container">
-                                <span class="flag-<%= langId %>"><%= i18n('language', 'meta', langId) %></span>
+                                <span class="flag-<%= langId %>"><%= langTitle %></span>
                             </div>
                         </a>
                     <% } %>

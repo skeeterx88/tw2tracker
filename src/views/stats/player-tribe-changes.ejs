@@ -1,6 +1,6 @@
 <div class="content">
     <div class="left">
-        <h2><%= i18n('header', 'player_profile_tribe_changes', lang) %></h2>
+        <h2><%= i18n('header', 'player_profile_tribe_changes') %></h2>
         <table class="section-content">
             <colgroup>
                 <col width="200px">
@@ -9,9 +9,9 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th><%= i18n('column_date_hour', 'player_profile_tribe_changes', lang) %></th>
-                    <th><%= i18n('column_old_tribe', 'player_profile_tribe_changes', lang) %></th>
-                    <th><%= i18n('column_new_tribe', 'player_profile_tribe_changes', lang) %></th>
+                    <th><%= i18n('column_date_hour', 'player_profile_tribe_changes') %></th>
+                    <th><%= i18n('column_old_tribe', 'player_profile_tribe_changes') %></th>
+                    <th><%= i18n('column_new_tribe', 'player_profile_tribe_changes') %></th>
                 </tr>
             </thead>
             <tbody>
@@ -23,19 +23,19 @@
                             <% if (change.old_tribe) { -%>
                                 <td><a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.old_tribe %>"><%= tribeTags[change.old_tribe] %></a></td>
                             <% } else { -%>
-                                <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
+                                <td><%= i18n('none', 'player_profile_tribe_changes') %></td>
                             <% } -%>
 
                             <% if (change.new_tribe) { -%>
                                 <td><a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= change.new_tribe %>"><%= tribeTags[change.new_tribe] %></a></td>
                             <% } else { -%>
-                                <td><%= i18n('none', 'player_profile_tribe_changes', lang) %></td>
+                                <td><%= i18n('none', 'player_profile_tribe_changes') %></td>
                             <% } -%>
                         </tr>
                     <% } %>
                 <% } else { -%>
                     <tr>
-                        <td colspan="4"><%= i18n('no_tribe_changes', 'player_profile_tribe_changes', lang) %></td>
+                        <td colspan="4"><%= i18n('no_tribe_changes', 'player_profile_tribe_changes') %></td>
                     </tr>
                 <% } -%>
             </tbody>

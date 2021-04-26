@@ -1,24 +1,24 @@
 <div class="content">
     <div class="conquests-map">
         <section id="players">
-            <h2><%= i18n('header_world_conquests', 'world_conquests', lang) %></h2>
+            <h2><%= i18n('header_world_conquests', 'world_conquests') %></h2>
 
             <div class="section-content">
                 <table>
                     <thead>
                         <tr>
-                            <th><%= i18n('conquest_village', 'world_conquests', lang) %></th>
-                            <th><%= i18n('conquest_points', 'world_conquests', lang) %></th>
-                            <th><%= i18n('conquest_old_owner', 'world_conquests', lang) %></th>
-                            <th><%= i18n('conquest_new_owner', 'world_conquests', lang) %></th>
-                            <th><%= i18n('conquest_date_hour', 'world_conquests', lang) %></th>
+                            <th><%= i18n('conquest_village', 'world_conquests') %></th>
+                            <th><%= i18n('conquest_points', 'world_conquests') %></th>
+                            <th><%= i18n('conquest_old_owner', 'world_conquests') %></th>
+                            <th><%= i18n('conquest_new_owner', 'world_conquests') %></th>
+                            <th><%= i18n('conquest_date_hour', 'world_conquests') %></th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <% if (!conquests.length) { -%>
                             <tr>
-                                <td colspan="6"><%= i18n('no_conquests', 'world_conquests', lang) %></td>
+                                <td colspan="6"><%= i18n('no_conquests', 'world_conquests') %></td>
                             </tr>
                         <% } else { -%>
                             <% for (let conquest of conquests) { %>
@@ -41,7 +41,7 @@
                                             <% } -%>
                                         </td>
                                     <% } else { -%>
-                                        <td><%= i18n('abandoned_village', 'world_conquests', lang) %></td>
+                                        <td><%= i18n('abandoned_village', 'world_conquests') %></td>
                                     <% } -%>
 
                                     <td>

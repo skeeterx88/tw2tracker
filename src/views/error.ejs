@@ -6,13 +6,13 @@
         <%- include('menu.ejs') %>
 
         <main>
-            <h1><%= i18n('header_error', 'errors', lang, [status]) %> <%= error.message %></h1>
+            <h1><%= i18n('header_error', 'errors', [status]) %> <%= error.message %></h1>
 
             <% if (development) { -%>
                 <pre><%= development ? error.stack : error.message %></pre>
             <% } -%>
 
-            <p><%= i18n('contact_us', 'errors', lang) %> <code><a href="mailto:<%= config('emails', 'issues') %>"><%= config('emails', 'issues') %></a></code></p>
+            <p><%= i18n('contact_us', 'errors') %> <code><a href="mailto:<%= issuesEmail %>"><%= issuesEmail %></a></code></p>
         </main>
     </body>
 </html>

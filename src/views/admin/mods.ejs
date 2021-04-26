@@ -1,32 +1,32 @@
 <div class="content" id="mods">
     <div class="left">
         <section id="mods-panel">
-            <h1><%= i18n('header_mod_accounts', 'admin_mod_accounts', lang) %></h1>
+            <h1><%= i18n('header_mod_accounts', 'admin_mod_accounts') %></h1>
 
             <div class="section-content">
                 <% for (let mod of mods) { %>
                     <div id="mod-<%= mod.id %>" class="mod relax-container">
                         <form method="POST" action="/admin/mods/edit">
                             <label class="input">
-                                <span><%= i18n('username_label', 'admin', lang) %></span>
+                                <span><%= i18n('username_label', 'admin') %></span>
                                 <input type="text" class="relax-input" name="name" value="<%= mod.name %>" minlength="3" required>
                             </label>
                             <label class="input">
-                                <span><%= i18n('password_label', 'admin', lang) %></span>
-                                <input type="password" class="relax-input" name="pass" minlength="4" placeholder="<%= i18n('keep_password_placehold', 'admin', lang) %>">
+                                <span><%= i18n('password_label', 'admin') %></span>
+                                <input type="password" class="relax-input" name="pass" minlength="4" placeholder="<%= i18n('keep_password_placehold', 'admin') %>">
                             </label>
                             <label class="input">
-                                <span><%= i18n('email_label', 'admin', lang) %></span>
+                                <span><%= i18n('email_label', 'admin') %></span>
                                 <input type="email" class="relax-input" name="email" value="<%= mod.email %>" required>
                             </label>
 
                             <fieldset class="align-checkbox">
-                                <legend><%= i18n('privilege_list', 'admin_mod_accounts', lang) %></legend>
+                                <legend><%= i18n('privilege_list', 'admin_mod_accounts') %></legend>
 
                                 <% for (const privilege of Object.values(privilegeTypes)) { %>
                                     <label>
                                         <input type="checkbox" name="privileges" value="<%= privilege %>" <% __append(mod.privileges.includes(privilege) ? 'checked' : '') %>/>
-                                        <span><%= i18n(privilege, 'admin_mod_accounts_privileges', lang) %></span>
+                                        <span><%= i18n(privilege, 'admin_mod_accounts_privileges') %></span>
                                     </label>
                                 <% } %>
                             </fieldset>
@@ -34,10 +34,10 @@
                             <input type="hidden" name="id" value="<%= mod.id %>" />
 
                             <div class="actions">
-                                <input type="submit" class="relax-button" value="<%= i18n('save', 'admin_mod_accounts', lang) %>" />
+                                <input type="submit" class="relax-button" value="<%= i18n('save', 'admin_mod_accounts') %>" />
 
-                                <% if (user.id !== mod.id) { -%>
-                                    <a class="relax-button red right" href="/admin/mods/delete/<%= mod.id %>"><%= i18n('delete', 'admin_mod_accounts', lang) %></a>
+                                <% if (account.id !== mod.id) { -%>
+                                    <a class="relax-button red right" href="/admin/mods/delete/<%= mod.id %>"><%= i18n('delete', 'admin_mod_accounts') %></a>
                                 <% } -%>
                             </div>
                         </form>
@@ -48,39 +48,39 @@
     </div>
     <div class="right">
         <section>
-            <h1><%= i18n('header_add_account', 'admin_mod_accounts', lang) %></h1>
+            <h1><%= i18n('header_add_account', 'admin_mod_accounts') %></h1>
 
             <div class="section-content">
                 <div class="relax-container">
                     <form method="POST" action="/admin/mods/create">
                         <label class="input">
-                            <span><%= i18n('username_label', 'admin', lang) %></span>
+                            <span><%= i18n('username_label', 'admin') %></span>
                             <input type="text" class="relax-input" name="name" minlength="3" required>
                         </label>
 
                         <label class="input">
-                            <span><%= i18n('password_label', 'admin', lang) %></span>
+                            <span><%= i18n('password_label', 'admin') %></span>
                             <input type="text" class="relax-input" name="pass" minlength="4" required>
                         </label>
 
                         <label class="input">
-                            <span><%= i18n('email_label', 'admin', lang) %></span>
+                            <span><%= i18n('email_label', 'admin') %></span>
                             <input type="email" class="relax-input" name="email">
                         </label>
 
                         <fieldset class="align-checkbox">
-                            <legend><%= i18n('privilege_list', 'admin_mod_accounts', lang) %></legend>
+                            <legend><%= i18n('privilege_list', 'admin_mod_accounts') %></legend>
 
                             <% for (const privilege of Object.values(privilegeTypes)) { %>
                                 <label>
                                     <input type="checkbox" name="privileges" value="<%= privilege %>" />
-                                    <span><%= i18n(privilege, 'admin_mod_accounts_privileges', lang) %></span>
+                                    <span><%= i18n(privilege, 'admin_mod_accounts_privileges') %></span>
                                 </label>
                             <% } %>
                         </fieldset>
 
                         <div class="actions">
-                            <input type="submit"  class="relax-button" value="<%= i18n('create', 'admin_mod_accounts', lang) %>"/>
+                            <input type="submit"  class="relax-button" value="<%= i18n('create', 'admin_mod_accounts') %>"/>
                         </div>
                     </form>
                 </div>

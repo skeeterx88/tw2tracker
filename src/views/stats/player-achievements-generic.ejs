@@ -1,8 +1,8 @@
 <div class="content">
     <div class="left">
         <h2>
-            <%= i18n(selectedCategory, 'achievement_categories', lang) %>
-            <%= i18n('achievements', 'player_profile_achievements', lang) %>
+            <%= i18n(selectedCategory, 'achievement_categories') %>
+            <%= i18n('achievements', 'player_profile_achievements') %>
         </h2>
 
         <table class="section-content">
@@ -14,17 +14,17 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th><%= i18n('column_name', 'player_profile_achievements', lang) %></th>
-                    <th><%= i18n('column_points', 'player_profile_achievements', lang) %></th>
-                    <th><%= i18n('column_milestone', 'player_profile_achievements', lang) %></th>
-                    <th><%= i18n('column_unlocked_on', 'player_profile_achievements', lang) %></th>
+                    <th><%= i18n('column_name', 'player_profile_achievements') %></th>
+                    <th><%= i18n('column_points', 'player_profile_achievements') %></th>
+                    <th><%= i18n('column_milestone', 'player_profile_achievements') %></th>
+                    <th><%= i18n('column_unlocked_on', 'player_profile_achievements') %></th>
                 </tr>
             </thead>
             <tbody>
                 <% if (achievementByCategory[selectedCategory].length) { -%>
                     <% for (let achievement of achievementByCategory[selectedCategory]) { %>
                         <tr>
-                            <td><%= i18n(achievement.type, 'achievements', lang) %></td>
+                            <td><%= i18n(achievement.type, 'achievements') %></td>
                             <td><%= formatNumbers(achievement.points) %></td>
                             <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
                             <td><%= formatDate(achievement.time_last_level, market.time_offset) %></td>
@@ -32,7 +32,7 @@
                     <% } %>
                 <% } else { -%>
                     <tr>
-                        <td colspan="4"><%= i18n('category_no_achievements', 'player_profile_achievements', lang) %></td>
+                        <td colspan="4"><%= i18n('category_no_achievements', 'player_profile_achievements') %></td>
                     </tr>
                 <% } -%>
             </tbody>

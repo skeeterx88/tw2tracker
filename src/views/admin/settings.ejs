@@ -1,17 +1,17 @@
 <div class="content" id="settings">
     <div class="left">
         <section>
-            <h1><%= i18n('header_settings', 'admin_settings', lang) %></h1>
+            <h1><%= i18n('header_settings', 'admin_settings') %></h1>
 
             <div class="section-content">
                 <form method="POST" action="/admin/settings/edit" class="form">
                     <% for (const [category, categoryData] of Object.entries(configMap)) { -%>
                         <fieldset>
-                            <legend><%= i18n('category_' + category, 'admin_settings', lang) %></legend>
+                            <legend><%= i18n('category_' + category, 'admin_settings') %></legend>
 
                             <% for (const [configId, configData] of Object.entries(categoryData)) { -%>
                                 <div class="setting">
-                                    <label for="<%= category + '_' + configId %>"><%= i18n('label_' + category + '_' + configId, 'admin_settings', lang) %></label>
+                                    <label for="<%= category + '_' + configId %>"><%= i18n('label_' + category + '_' + configId, 'admin_settings') %></label>
 
                                     <% if (configData.type === 'string') { -%>
                                         <input class="relax-input" type="text" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config(category, configId) %>"/>
@@ -33,7 +33,7 @@
                         </fieldset>
                     <% } -%>
 
-                    <input type="submit" class="relax-button" value="<%= i18n('save_settings', 'admin_settings', lang) %>" />
+                    <input type="submit" class="relax-button" value="<%= i18n('save_settings', 'admin_settings') %>" />
                 </form>
             </div>
         </section>

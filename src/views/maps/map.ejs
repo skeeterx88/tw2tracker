@@ -8,10 +8,10 @@
                     <a href="/stats/br/51"><h1><%= world.name %></h1></a>
                     <section>
                         <button class="element relax-button" id="current-world"><span class="flag-<%= marketId %>"><%= marketId %><%= world.num %></span></button>
-                        <button class="element relax-button stretch change-settings"><%= i18n('button_settings', 'maps', lang) %></button>
+                        <button class="element relax-button stretch change-settings"><%= i18n('button_settings', 'maps') %></button>
                     </section>
                     <section>
-                        <button class="element relax-button stretch" id="ranking-toggle"><%= i18n('button_ranking', 'maps', lang) %></button>
+                        <button class="element relax-button stretch" id="ranking-toggle"><%= i18n('button_ranking', 'maps') %></button>
                     </section>
                 </div>
 
@@ -24,12 +24,12 @@
                 </div>
 
                 <div class="highlights">
-                    <h2><%= i18n('header_highlights', 'maps', lang) %></h2>
+                    <h2><%= i18n('header_highlights', 'maps') %></h2>
 
                     <section class="search column">
-                        <input type="text" class="relax-input element" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps', lang) %>">
+                        <input type="text" class="relax-input element" spellcheck="false" autocomplete="off" placeholder="<%= i18n('search_placeholder', 'maps') %>">
                         <div class="results hidden element">
-                            <div class="no-results hidden"><%= i18n('search_no_results', 'maps', lang) %></div>
+                            <div class="no-results hidden"><%= i18n('search_no_results', 'maps') %></div>
                         </div>
                     </section>
 
@@ -39,13 +39,13 @@
                 <div>
                     <section>
                         <button id="map-share" class="element stretch relax-button">
-                            <span><%= i18n('button_gen_dynamic_map', 'maps', lang) %></span>
+                            <span><%= i18n('button_gen_dynamic_map', 'maps') %></span>
                             <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
                         </button>
                     </section>
                     <section>
                         <button id="map-save" class="element stretch relax-button">
-                            <span><%= i18n('button_gen_static_map', 'maps', lang) %></span>
+                            <span><%= i18n('button_gen_static_map', 'maps') %></span>
                             <div class="loading hidden"><div class="b1"></div><div class="b2"></div><div></div></div>
                         </button>
                     </section>
@@ -64,12 +64,12 @@
                     </div>
 
                     <div class="flat-button last-sync hidden">
-                        <span><%= i18n('last_update', 'maps', lang) %></span>
+                        <span><%= i18n('last_update', 'maps') %></span>
                         <span class="date"></span>
                     </div>
 
                     <div class="flat-button share-date hidden">
-                        <span><%= i18n('share_date', 'maps', lang) %></span>
+                        <span><%= i18n('share_date', 'maps') %></span>
                         <span class="date"></span>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
         </div>
 
         <div class="map-world-list floating-modal invisible">
-            <h2><%= i18n('open_worlds', 'maps', lang) %></h2>
+            <h2><%= i18n('open_worlds', 'maps') %></h2>
             <div class="loading"><div class="b1"></div><div class="b2"></div><div></div></div>
             <div class="wrapper">
                 <ul class="map-market-list"></ul>
@@ -102,11 +102,11 @@
         </div>
 
         <div class="map-settings floating-modal invisible">
-            <div class="color-option" data-setting-id="backgroundColor"><label><%= i18n('settings_bg_color', 'maps', lang) %></label></div>
-            <div class="color-option" data-setting-id="neutralColor"><label><%= i18n('settings_neutral_color', 'maps', lang) %></label></div>
-            <div class="color-option" data-setting-id="barbarianColor"><label><%= i18n('settings_barbarian_color', 'maps', lang) %></label></div>
-            <div class="color-option" data-setting-id="highlightPlayerColor"><label><%= i18n('settings_highlight_player_color', 'maps', lang) %></label></div>
-            <div class="color-option" data-setting-id="demarcationsColor"><label><%= i18n('settings_demarcations_color', 'maps', lang) %></label></div>
+            <div class="color-option" data-setting-id="backgroundColor"><label><%= i18n('settings_bg_color', 'maps') %></label></div>
+            <div class="color-option" data-setting-id="neutralColor"><label><%= i18n('settings_neutral_color', 'maps') %></label></div>
+            <div class="color-option" data-setting-id="barbarianColor"><label><%= i18n('settings_barbarian_color', 'maps') %></label></div>
+            <div class="color-option" data-setting-id="highlightPlayerColor"><label><%= i18n('settings_highlight_player_color', 'maps') %></label></div>
+            <div class="color-option" data-setting-id="demarcationsColor"><label><%= i18n('settings_demarcations_color', 'maps') %></label></div>
         </div>
 
         <template id="floating-modal">
@@ -126,16 +126,16 @@
             <table class="floating-ranking" data-type="players">
                 <thead>
                     <tr>
-                        <th data-sort="rank" class="sort selected"><%= i18n('column_rank', 'world', lang) %></th>
-                        <th><%= i18n('column_player', 'world', lang) %></th>
-                        <th><%= i18n('column_tribe', 'world', lang) %></th>
-                        <th data-sort="points" class="sort" title="<%= i18n('column_points', 'world', lang) %>"><%= i18n('column_points', 'world', lang) %></th>
-                        <th data-sort="villages" class="sort" title="<%= i18n('column_villages', 'world', lang) %>"><%= i18n('column_villages', 'world', lang) %></th>
-                        <th data-sort="bash_off" class="sort" title="<%= i18n('column_bash_points_offense', 'world', lang) %>"><%= i18n('column_bash_points_offense', 'world', lang) %></th>
-                        <th data-sort="bash_def" class="sort" title="<%= i18n('column_bash_points_defense', 'world', lang) %>"><%= i18n('column_bash_points_defense', 'world', lang) %></th>
-                        <th data-sort="bash_total" class="sort" title="<%= i18n('column_bash_points_total', 'world', lang) %>"><%= i18n('column_bash_points_total', 'world', lang) %></th>
-                        <th data-sort="victory_points" class="sort victory-points hidden" title="<%= i18n('column_victory_points', 'world', lang) %>"><%= i18n('column_victory_points', 'world', lang) %></th>
-                        <th title="<%= i18n('column_actions', 'world', lang) %>"><%= i18n('column_actions', 'world', lang) %></th>
+                        <th data-sort="rank" class="sort selected"><%= i18n('column_rank', 'world') %></th>
+                        <th><%= i18n('column_player', 'world') %></th>
+                        <th><%= i18n('column_tribe', 'world') %></th>
+                        <th data-sort="points" class="sort" title="<%= i18n('column_points', 'world') %>"><%= i18n('column_points', 'world') %></th>
+                        <th data-sort="villages" class="sort" title="<%= i18n('column_villages', 'world') %>"><%= i18n('column_villages', 'world') %></th>
+                        <th data-sort="bash_off" class="sort" title="<%= i18n('column_bash_points_offense', 'world') %>"><%= i18n('column_bash_points_offense', 'world') %></th>
+                        <th data-sort="bash_def" class="sort" title="<%= i18n('column_bash_points_defense', 'world') %>"><%= i18n('column_bash_points_defense', 'world') %></th>
+                        <th data-sort="bash_total" class="sort" title="<%= i18n('column_bash_points_total', 'world') %>"><%= i18n('column_bash_points_total', 'world') %></th>
+                        <th data-sort="victory_points" class="sort victory-points hidden" title="<%= i18n('column_victory_points', 'world') %>"><%= i18n('column_victory_points', 'world') %></th>
+                        <th title="<%= i18n('column_actions', 'world') %>"><%= i18n('column_actions', 'world') %></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -143,11 +143,11 @@
                     <tr>
                         <td colspan="10">
                             <div class="pagination">
-                                <a class="page first">&lt;&lt;&lt; <%= i18n('first', 'pagination', lang) %></a>
-                                <a class="page prev">&lt; <%= i18n('previous', 'pagination', lang) %></a>
+                                <a class="page first">&lt;&lt;&lt; <%= i18n('first', 'pagination') %></a>
+                                <a class="page prev">&lt; <%= i18n('previous', 'pagination') %></a>
                                 <div class="pages"></div>
-                                <a class="page last"><%= i18n('last', 'pagination', lang) %> &gt;&gt;&gt;</a>
-                                <a class="page next"><%= i18n('next', 'pagination', lang) %> &gt;</a>
+                                <a class="page last"><%= i18n('last', 'pagination') %> &gt;&gt;&gt;</a>
+                                <a class="page next"><%= i18n('next', 'pagination') %> &gt;</a>
                             </div>
                         </td>
                     </tr>
@@ -159,16 +159,16 @@
             <table class="floating-ranking" data-type="tribes">
                 <thead>
                     <tr>
-                        <th data-sort="rank" class="sort selected" title="<%= i18n('column_rank', 'world', lang) %>"><%= i18n('column_rank', 'world', lang) %></th>
-                        <th title="column_tribe', 'world', lang) %>"><%= i18n('column_tribe', 'world', lang) %></th>
-                        <th title="<%= i18n('column_tribe_tag', 'world', lang) %>"><%= i18n('column_tribe_tag', 'world', lang) %></th>
-                        <th data-sort="points" class="sort" title="<%= i18n('column_points', 'world', lang) %>"><%= i18n('column_points', 'world', lang) %></th>
-                        <th data-sort="villages" class="sort" title="<%= i18n('column_villages', 'world', lang) %>"><%= i18n('column_villages', 'world', lang) %></th>
-                        <th data-sort="bash_off" class="sort" title="<%= i18n('column_bash_points_offense', 'world', lang) %>"><%= i18n('column_bash_points_offense', 'world', lang) %></th>
-                        <th data-sort="bash_def" class="sort" title="<%= i18n('column_bash_points_defense', 'world', lang) %>"><%= i18n('column_bash_points_defense', 'world', lang) %></th>
-                        <th data-sort="bash_total" class="sort" title="<%= i18n('column_bash_points_total', 'world', lang) %>"><%= i18n('column_bash_points_total', 'world', lang) %></th>
-                        <th data-sort="victory_points" class="sort victory-points hidden" title="<%= i18n('column_victory_points', 'world', lang) %>"><%= i18n('column_victory_points', 'world', lang) %></th>
-                        <th title="<%= i18n('column_actions', 'world', lang) %>"><%= i18n('column_actions', 'world', lang) %></th>
+                        <th data-sort="rank" class="sort selected" title="<%= i18n('column_rank', 'world') %>"><%= i18n('column_rank', 'world') %></th>
+                        <th title="column_tribe', 'world') %>"><%= i18n('column_tribe', 'world') %></th>
+                        <th title="<%= i18n('column_tribe_tag', 'world') %>"><%= i18n('column_tribe_tag', 'world') %></th>
+                        <th data-sort="points" class="sort" title="<%= i18n('column_points', 'world') %>"><%= i18n('column_points', 'world') %></th>
+                        <th data-sort="villages" class="sort" title="<%= i18n('column_villages', 'world') %>"><%= i18n('column_villages', 'world') %></th>
+                        <th data-sort="bash_off" class="sort" title="<%= i18n('column_bash_points_offense', 'world') %>"><%= i18n('column_bash_points_offense', 'world') %></th>
+                        <th data-sort="bash_def" class="sort" title="<%= i18n('column_bash_points_defense', 'world') %>"><%= i18n('column_bash_points_defense', 'world') %></th>
+                        <th data-sort="bash_total" class="sort" title="<%= i18n('column_bash_points_total', 'world') %>"><%= i18n('column_bash_points_total', 'world') %></th>
+                        <th data-sort="victory_points" class="sort victory-points hidden" title="<%= i18n('column_victory_points', 'world') %>"><%= i18n('column_victory_points', 'world') %></th>
+                        <th title="<%= i18n('column_actions', 'world') %>"><%= i18n('column_actions', 'world') %></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -176,11 +176,11 @@
                     <tr>
                         <td colspan="10">
                             <div class="pagination">
-                                <a class="page first">&lt;&lt;&lt; <%= i18n('first', 'pagination', lang) %></a>
-                                <a class="page prev">&lt; <%= i18n('previous', 'pagination', lang) %></a>
+                                <a class="page first">&lt;&lt;&lt; <%= i18n('first', 'pagination') %></a>
+                                <a class="page prev">&lt; <%= i18n('previous', 'pagination') %></a>
                                 <div class="pages"></div>
-                                <a class="page last"><%= i18n('last', 'pagination', lang) %> &gt;&gt;&gt;</a>
-                                <a class="page next"><%= i18n('next', 'pagination', lang) %> &gt;</a>
+                                <a class="page last"><%= i18n('last', 'pagination') %> &gt;&gt;&gt;</a>
+                                <a class="page next"><%= i18n('next', 'pagination') %> &gt;</a>
                             </div>
                         </td>
                     </tr>

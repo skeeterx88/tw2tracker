@@ -1,6 +1,6 @@
 <div class="content">
     <div class="left">
-        <h2><%= i18n('overview', 'achievement_categories', lang) %></h2>
+        <h2><%= i18n('overview', 'achievement_categories') %></h2>
 
         <table class="section-content">
             <colgroup>
@@ -9,8 +9,8 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th><%= i18n('column_category', 'player_profile_achievements', lang) %></th>
-                    <th><%= i18n('column_progress', 'player_profile_achievements', lang) %></th>
+                    <th><%= i18n('column_category', 'player_profile_achievements') %></th>
+                    <th><%= i18n('column_progress', 'player_profile_achievements') %></th>
                 </tr>
             </thead>
             <tbody>
@@ -19,7 +19,7 @@
 
                     <tr>
                         <td>
-                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= i18n(category, 'achievement_categories', lang) %></a>
+                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.id %>/achievements/<%= categorySubpage %>"><%= i18n(category, 'achievement_categories') %></a>
                         </td>
                         <td>
                             <div class="progress-bar-wrapper">

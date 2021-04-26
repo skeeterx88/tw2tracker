@@ -1,7 +1,7 @@
 <div class="content">
     <div class="left">
         <section id="village">
-            <h2><%= i18n('header_village_profile', 'village_profile', lang) %></h2>
+            <h2><%= i18n('header_village_profile', 'village_profile') %></h2>
 
             <div class="section-content">
                 <table class="vertical">
@@ -11,27 +11,27 @@
                     </colgroup>
                     <tbody>
                         <tr>
-                            <th><%= i18n('village_name', 'village_profile', lang) %></th>
+                            <th><%= i18n('village_name', 'village_profile') %></th>
                             <td><%= village.name %></td>
                         </tr>
                         <tr>
-                            <th><%= i18n('village_location', 'village_profile', lang) %></th>
+                            <th><%= i18n('village_location', 'village_profile') %></th>
                             <td><%= village.x %>|<%= village.y %></td>
                         </tr>
                         <tr>
-                            <th><%= i18n('village_points', 'village_profile', lang) %></th>
+                            <th><%= i18n('village_points', 'village_profile') %></th>
                             <td><%= formatNumbers(village.points) %></td>
                         </tr>
                         <tr>
-                            <th><%= i18n('village_owner', 'village_profile', lang) %></th>
+                            <th><%= i18n('village_owner', 'village_profile') %></th>
                             <% if (village.character_id) { -%>
                                 <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.character_id %>"><%= village.player_name %></a></td>
                             <% } else { -%>
-                                <td><%= i18n('abandoned_village', 'village_profile', lang) %></td>
+                                <td><%= i18n('abandoned_village', 'village_profile') %></td>
                             <% } -%>
                         </tr>
                         <tr>
-                            <th><%= i18n('village_owner_tribe', 'village_profile', lang) %></th>
+                            <th><%= i18n('village_owner_tribe', 'village_profile') %></th>
                             <% if (village.character_id && village.tribe_id) { -%>
                                 <td><a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= village.tribe_id %>"><%= village.tribe_tag %></a></td>
                             <% } else { -%>
@@ -42,22 +42,22 @@
                 </table>
             </div>
 
-            <h3><%= i18n('header_conquest_history', 'village_profile', lang) %></h3>
+            <h3><%= i18n('header_conquest_history', 'village_profile') %></h3>
             <div class="section-content">
                 <table>
                     <thead>
                         <tr>
-                            <th><%= i18n('conquest_date_hour', 'village_profile', lang) %></th>
-                            <th><%= i18n('conquest_points', 'village_profile', lang) %></th>
-                            <th><%= i18n('conquest_old_owner', 'village_profile', lang) %></th>
-                            <th><%= i18n('conquest_new_owner', 'village_profile', lang) %></th>
+                            <th><%= i18n('conquest_date_hour', 'village_profile') %></th>
+                            <th><%= i18n('conquest_points', 'village_profile') %></th>
+                            <th><%= i18n('conquest_old_owner', 'village_profile') %></th>
+                            <th><%= i18n('conquest_new_owner', 'village_profile') %></th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <% if (!conquests.length) { -%>
                             <tr>
-                                <td colspan="4"><%= i18n('no_conquests', 'village_profile', lang) %></td>
+                                <td colspan="4"><%= i18n('no_conquests', 'village_profile') %></td>
                             </tr>
                         <% } else { -%>
                             <% for (let conquest of conquests) { %>
@@ -78,7 +78,7 @@
                                             <% } -%>
                                         </td>
                                     <% } else { -%>
-                                        <td><%= i18n('abandoned_village', 'village_profile', lang) %></td>
+                                        <td><%= i18n('abandoned_village', 'village_profile') %></td>
                                     <% } -%>
 
                                     <td>

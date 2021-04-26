@@ -1,14 +1,14 @@
 <table>
     <thead>
         <tr>
-            <th><a href="?psort=rank"><%= i18n('column_rank', 'world_ranking', lang) %> <span class="icon-sort <% if (sortField === 'rank') __append('selected') %>"></span></a></th>
-            <th><%= i18n('column_player', 'world_ranking', lang) %></th>
-            <th><%= i18n('column_tribe', 'world_ranking', lang) %></th>
-            <th><a href="?psort=points"><%= i18n('column_points', 'world_ranking', lang) %> <span class="icon-sort <% if (sortField === 'points') __append('selected') %>"></span></a></th>
+            <th><a href="?psort=rank"><%= i18n('column_rank', 'world_ranking') %> <span class="icon-sort <% if (sortField === 'rank') __append('selected') %>"></span></a></th>
+            <th><%= i18n('column_player', 'world_ranking') %></th>
+            <th><%= i18n('column_tribe', 'world_ranking') %></th>
+            <th><a href="?psort=points"><%= i18n('column_points', 'world_ranking') %> <span class="icon-sort <% if (sortField === 'points') __append('selected') %>"></span></a></th>
             <% if (world.config && world.config.victory_points) { -%>
-                <th title="Victory Points"><a href="?psort=victory_points"><%= i18n('column_victory_points', 'world_ranking', lang) %> <span class="icon-sort <% if (sortField === 'victory_points') __append('selected') %>"></span></a></th>
+                <th title="Victory Points"><a href="?psort=victory_points"><%= i18n('column_victory_points', 'world_ranking') %> <span class="icon-sort <% if (sortField === 'victory_points') __append('selected') %>"></span></a></th>
             <% } -%>
-            <th><a href="?psort=villages"><%= i18n('column_villages', 'world_ranking', lang) %> <span class="icon-sort <% if (sortField === 'villages') __append('selected') %>"></span></a></th>
+            <th><a href="?psort=villages"><%= i18n('column_villages', 'world_ranking') %> <span class="icon-sort <% if (sortField === 'villages') __append('selected') %>"></span></a></th>
         </tr>
     </thead>
     <tbody>
