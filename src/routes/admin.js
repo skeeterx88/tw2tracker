@@ -649,9 +649,7 @@ router.get('/logout', logoutRouter);
 
 router.get('/', syncRouter);
 router.get('/sync', syncRouter);
-router.get('/sync/data/all', authStartSyncAction, syncTypeAllRouter);
-router.get('/sync/:type/:marketId/:worldNumber', authStartSyncAction, syncTypeRouter);
-router.get('/sync/achievements/all', authStartSyncAction, syncTypeAllRouter);
+router.get('/sync/:type/all', authStartSyncAction, syncTypeAllRouter);
 router.get('/sync/:type/:marketId/:worldNumber', authStartSyncAction, syncTypeRouter);
 router.get('/sync/markets', authStartSyncAction, scrapeMarketsRouter);
 router.get('/sync/worlds', authStartSyncAction, scrapeWorldsRouter);
