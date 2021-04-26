@@ -23,8 +23,8 @@
                                         <input class="relax-input" type="password" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>" value="<%= config(category, configId) %>"/>
                                     <% } else if (configData.type === 'language') { -%>
                                         <select class="relax-input" name="<%= category + '/' + configId + '' %>" id="<%= category + '_' + configId %>">
-                                            <% for (const langId of availableLanguages) { %>
-                                                <option value="<%= langId %>"<% __append(config(category, configId) === langId ? ' selected' : '') %>><%= i18n('language', 'meta', langId) %></option>
+                                            <% for (const [langId, langTitle] of availableLanguages) { %>
+                                                <option value="<%= langId %>"<% __append(config(category, configId) === langId ? ' selected' : '') %>><%= langTitle %></option>
                                             <% } %>
                                         </select>
                                     <% } -%>

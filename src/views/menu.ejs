@@ -12,11 +12,11 @@
 
 <div id="language-list" class="modal-container hidden">
     <header>
-        <h2><%= i18n('lang', 'main_menu', lang) %></h2>
+        <h2><%= i18n('lang', 'main_menu') %></h2>
         <div class="close-wrapper"><span class="close">x</span></div>
     </header>
 
-    <% for (const langId of availableLanguages) { -%>
-        <a href="/language/<%= langId %>"><span class="flag-<%= langId %>"><%= i18n('language', 'meta', langId) %></span></a>
+    <% for (const [langId, langTitle] of availableLanguages) { -%>
+        <a href="/language/<%= langId %>"><span class="flag-<%= langId %>"><%= langTitle %></span></a>
     <% } -%>
 </div>

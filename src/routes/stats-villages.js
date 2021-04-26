@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 const {db, sql} = require('../db.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
@@ -9,32 +7,31 @@ const {
     paramWorldParse,
     paramVillageParse,
     createNavigation,
-    mergeBackendLocals,
-    asyncRouter
+    mergeBackendLocals
 } = require('../router-helpers.js');
 
-const villageRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const villageRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const {
         villageId,
         village
-    } = await paramVillageParse(req, worldId);
+    } = await paramVillageParse(request, worldId);
 
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
     const conquests = await db.any(sql('get-village-conquests'), {worldId, villageId});
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber,
         village,
@@ -42,9 +39,9 @@ const villageRouter = asyncRouter(async function (req, res, next) {
         mapHighlightsType: 'villages'
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/village',
-        title: i18n('stats_village', 'page_titles', res.locals.lang, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_village', 'page_titles', reply.locals.lang, [village.name, village.x, village.y, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
@@ -52,14 +49,15 @@ const villageRouter = asyncRouter(async function (req, res, next) {
         village,
         conquests,
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('village', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}/villages/${village.id}`, replaces: [village.name]}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('village', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}/villages/${village.id}`, replaces: [village.name]}
         ])
     });
-});
+};
 
-router.get('/stats/:marketId/:worldNumber/villages/:villageId', villageRouter);
-
-module.exports = router;
+module.exports = function (fastify, opts, done) {
+    fastify.get('/stats/:marketId/:worldNumber/villages/:villageId', villageRouter);
+    done();
+};

@@ -149,9 +149,9 @@ function groupAchievements (achievements) {
     return Object.entries(group);
 }
 
-function mergeBackendLocals (res, obj) {
-    res.locals.backendValues = {
-        ...res.locals.backendValues,
+function mergeBackendLocals (reply, obj) {
+    reply.locals.backendValues = {
+        ...reply.locals.backendValues,
         ...obj
     };
 }

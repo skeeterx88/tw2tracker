@@ -1,89 +1,70 @@
-module.exports = function () {
-    const express = require('express');
-    const session = require('express-session');
-    const connectPgSimple = require('connect-pg-simple');
-    const createError = require('http-errors');
-    const http = require('http');
-    const path = require('path');
-    const cookieParser = require('cookie-parser');
-    const passport = require('passport');
-    const passportLocal = require('passport-local');
-    const connectFlash = require('connect-flash');
-    const bcrypt = require('bcrypt');
-    const pgArray = require('pg').types.arrayParser;
-    const fs = require('fs');
+const path = require('path');
+const fs = require('fs');
+const Fastify = require('fastify');
+const connectPgSimple = require('connect-pg-simple');
+const createError = require('http-errors');
 
-    const {db, sql} = require('./db.js');
-    const config = require('./config.js');
-    const authErrors = require('./types/auth-error.js');
-    const i18n = require('./i18n.js');
-    const languages = require('./languages.js');
-    const utils = require('./utils.js');
-    const timeUtils = require('./time-utils.js');
-    const availableLanguages = fs.readdirSync('./i18n').map(file => path.parse(file).name);
-    const rankingSortTypes = require('./types/ranking-sort.js');
+const fastifyView = require('point-of-view');
+const fastifyStatic = require('fastify-static');
+const fastifySession = require('fastify-session');
+const fastifyCookie = require('fastify-cookie');
+const fastifyBodyParser = require('fastify-formbody');
+const ejs = require('ejs');
 
-    const development = process.env.NODE_ENV === 'development';
-    const port = parseInt(process.env.PORT, 10) || 3000;
-    const app = express();
+const {db} = require('./db.js');
+const config = require('./config.js');
+const i18n = require('./i18n.js');
 
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'ejs');
-    app.set('x-powered-by', false);
-    app.set('trust proxy', true);
-    app.set('trust proxy', 'loopback');
+const languages = require('./languages.js');
+const utils = require('./utils.js');
+const timeUtils = require('./time-utils.js');
+const rankingSortTypes = require('./types/ranking-sort.js');
 
-    app.use(express.json());
-    app.use(express.urlencoded({extended: false}));
-    app.use(cookieParser());
-    app.use(express.static(path.join(__dirname, 'public')));
+const availableLanguages = fs.readdirSync('./i18n').map(function (file) {
+    const id = path.parse(file).name;
+    return [id, i18n('language', 'meta', id)];
+});
 
-    if (!process.env.TW2TRACKER_SESSION_SECRET) {
-        throw new Error('Missing environment session secret TW2TRACKER_SESSION_SECRET');
+const SessionStore = connectPgSimple(fastifySession);
+const sessionOptions = {
+    name: 'tw2tracker-session',
+    secret: process.env.TW2TRACKER_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: new SessionStore({
+        pgPromise: db,
+        schemaName: 'public',
+        tableName: 'session'
+    }),
+    cookie: {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        secure: false
     }
+};
 
-    app.use(session({
-        store: new (connectPgSimple(session))({
-            pgPromise: db,
-            schemaName: 'public',
-            tableName: 'session'
-        }),
-        secret: process.env.TW2TRACKER_SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 30 * 24 * 60 * 60 * 1000
-        },
-        name: 'tw2tracker-session'
-    }));
+const statsRouter = require('./routes/stats.js');
+const mapsRouter = require('./routes/maps.js');
+const languageRouter = require('./routes/languages.js');
+const adminRouter = require('./routes/admin.js');
+const overflowRouter = require('./routes/overflow.js');
 
-    passport.use('local', new passportLocal.Strategy({
-        passReqToCallback: true
-    }, async function (req, name, pass, done) {
-        const [account] = await db.any(sql('get-mod-account-by-name'), {name});
+module.exports = async function () {
+    const fastify = Fastify({
+        trustProxy: true
+    });
 
-        if (!account) {
-            return done(null, false, {
-                message: i18n(authErrors.ACCOUNT_NOT_EXIST, 'admin')
-            });
-        }
+    fastify.register(fastifyView, {
+        engine: {ejs},
+        root: path.join(__dirname, 'views')
+    });
 
-        if (!account.enabled) {
-            return done(null, false, {
-                message: i18n(authErrors.ACCOUNT_NOT_ENABLED, 'admin')
-            });
-        }
+    fastify.register(fastifyStatic, {
+        root: path.join(__dirname, 'public')
+    });
 
-        const match = await bcrypt.compare(pass, account.pass);
-
-        if (!match) {
-            return done(null, false, {
-                message: i18n(authErrors.INVALID_PASSWORD, 'admin')
-            });
-        }
-
-        done(null, account);
-    }));
+    fastify.register(fastifyBodyParser);
+    fastify.register(fastifyCookie);
+    fastify.register(fastifySession, sessionOptions);
 
     fastify.decorateRequest('flash', function (type, msg) {
         const msgs = this.session.flash = this.session.flash || {};
@@ -97,86 +78,55 @@ module.exports = function () {
         }
     });
 
-    passport.deserializeUser(function (user, callback) {
-        callback(null, user);
-    });
+    fastify.decorateReply('locals', null);
+    fastify.addHook('preHandler', async function (request, reply) {
+        reply.locals = {};
+        reply.locals.availableLanguages = availableLanguages;
+        reply.locals.formatNumbers = utils.formatNumbers;
+        reply.locals.formatDate = timeUtils.formatDate;
+        reply.locals.formatSince = timeUtils.formatSince;
+        reply.locals.capitalize = utils.capitalize;
+        reply.locals.sprintf = utils.sprintf;
+        reply.locals.lang = request.session.lang || config('general', 'lang');
+        reply.locals.tribeRankingSortField = request.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;
+        reply.locals.playerRankingSortField = request.session.playerRankingSortField || rankingSortTypes.VICTORY_POINTS;
+        reply.locals.account = request.session.account;
 
-    app.use(passport.initialize({}));
-    app.use(passport.session({}));
-    app.use(connectFlash());
-    app.use(function (req, res, next) {
-        res.locals.i18n = i18n;
-        res.locals.availableLanguages = availableLanguages;
-        res.locals.formatNumbers = utils.formatNumbers;
-        res.locals.formatDate = timeUtils.formatDate;
-        res.locals.formatSince = timeUtils.formatSince;
-        res.locals.capitalize = utils.capitalize;
-        res.locals.sprintf = utils.sprintf;
-        res.locals.lang = req.session.lang || config('general', 'lang');
-        res.locals.tribeRankingSortField = req.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;
-        res.locals.playerRankingSortField = req.session.playerRankingSortField || rankingSortTypes.VICTORY_POINTS;
-        res.locals.user = req.session.passport ? req.session.passport.user : {};
-
-        res.locals.backendValues = {
-            selectedLanguage: res.locals.lang,
-            language: languages[res.locals.lang],
-            development: development
+        reply.locals.i18n = function (key, namespace, tokens) {
+            return i18n(key, namespace, reply.locals.lang, tokens);
         };
 
-        next();
+        reply.locals.backendValues = {
+            selectedLanguage: reply.locals.lang,
+            language: languages[reply.locals.lang]
+        };
     });
 
-    app.use('/', require('./routes/stats.js'));
-    app.use('/admin', require('./routes/admin.js'));
-    app.use('/maps', require('./routes/maps.js'));
-    app.use('/language', require('./routes/languages.js'));
-    app.use('/overflow', require('./routes/overflow.js'));
+    fastify.register(statsRouter);
+    fastify.register(mapsRouter);
+    fastify.register(languageRouter);
+    fastify.register(adminRouter);
+    fastify.register(overflowRouter);
 
-    // catch 404 and forward to error handler
-    app.use(function (req, res, next) {
-        next(createError(404));
+    fastify.setNotFoundHandler(function (request) {
+        throw createError(404, i18n('router_not_found', 'errors', request.session.lang));
     });
 
-    // error handler
-    app.use(function (err, req, res, next) {
-        const status = err.status || 500;
-        res.locals.error = err;
-        res.locals.status = status;
-        res.locals.title = i18n('header_error', 'errors', req.session.lang, [status]) + ' - ' + config('general', 'site_name');
-        res.locals.config = config;
-        res.locals.development = development;
+    fastify.setErrorHandler((error, request, reply) => {
+        const status = error.status || 500;
 
-        res.status(status).render('error');
+        reply.view('error.ejs', {
+            title: i18n('header_error', 'errors', request.session.lang, [status]) + ' - ' + config('general', 'site_name'),
+            showStack: process.env.NODE_ENV === 'development',
+            issuesEmail: config('emails', 'issues'),
+            error,
+            status
+        });
     });
 
-    const httpServer = http.createServer();
-
-    httpServer.on('request', app);
-    httpServer.on('error', function (error) {
-        if (error.syscall !== 'listen') {
-            throw error;
-        }
-
-        const bind = typeof port === 'string'
-            ? `Pipe ${port}`
-            : `Port ${port}`;
-
-        switch (error.code) {
-            case 'EACCES': {
-                console.error(`${bind} requires elevated privileges`);
-                process.exit(1);
-                break;
-            }
-            case 'EADDRINUSE': {
-                console.error(`${bind} is already in use`);
-                process.exit(1);
-                break;
-            }
-            default: {
-                throw error;
-            }
+    fastify.listen(3000, (err) => {
+        if (err) {
+            throw err;
         }
     });
-
-    httpServer.listen(port);
 };

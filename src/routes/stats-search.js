@@ -1,6 +1,4 @@
-const express = require('express');
 const createError = require('http-errors');
-const router = express.Router();
 const {db, sql} = require('../db.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
@@ -10,76 +8,75 @@ const {
     paramWorldParse,
     createPagination,
     createNavigation,
-    mergeBackendLocals,
-    asyncRouter
+    mergeBackendLocals
 } = require('../router-helpers.js');
 
 const searchCategories = ['players', 'tribes', 'villages'];
 
-const searchPostRedirectRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const searchPostRedirectRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
-    const rawQuery = encodeURIComponent(req.body.query);
-    const category = (req.body.category || '').toLowerCase();
+    const rawQuery = encodeURIComponent(request.body.query);
+    const category = (request.body.category || '').toLowerCase();
 
     if (!searchCategories.includes(category)) {
-        throw createError(404, i18n('router_missing_category', 'errors', res.locals.lang));
+        throw createError(404, i18n('router_missing_category', 'errors', reply.locals.lang));
     }
 
-    return res.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
-});
+    return reply.redirect(303, `/stats/${marketId}/${worldNumber}/search/${category}/${rawQuery}`);
+};
 
-const searchGetRedirectRouter = asyncRouter(async function (req, res, next) {
+const searchGetRedirectRouter = async function (request, reply) {
     const {
         marketId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
-    return res.redirect(302, `/stats/${marketId}/${worldNumber}`);
-});
+    return reply.redirect(302, `/stats/${marketId}/${worldNumber}`);
+};
 
-const categorySearchRouter = asyncRouter(async function (req, res, next) {
-    const category = req.params.category;
+const categorySearchRouter = async function (request, reply, done) {
+    const category = request.params.category;
 
     if (!searchCategories.includes(category)) {
-        return next();
+        return done();
     }
 
-    if (!paramWorld(req)) {
-        return next();
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const world = await db.one(sql('get-world'), {worldId});
 
-    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
+    const page = request.params.page && !isNaN(request.params.page) ? Math.max(1, parseInt(request.params.page, 10)) : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
-    const rawQuery = decodeURIComponent(req.params.query);
+    const rawQuery = decodeURIComponent(request.params.query);
 
     if (!rawQuery) {
-        throw createError(500, i18n('error_no_search', 'world_search', res.locals.lang));
+        throw createError(500, i18n('error_no_search', 'world_search', reply.locals.lang));
     }
 
     if (rawQuery.length < config('search', 'min_search_characters')) {
-        throw createError(500, i18n('error_min_chars', 'world_search', res.locals.lang, [config('search', 'min_search_characters')]));
+        throw createError(500, i18n('error_min_chars', 'world_search', reply.locals.lang, [config('search', 'min_search_characters')]));
     }
 
     if (rawQuery.length > config('search', 'max_search_characters')) {
-        throw createError(500, i18n('error_max_chars', 'world_search', res.locals.lang, [config('search', 'max_search_characters')]));
+        throw createError(500, i18n('error_max_chars', 'world_search', reply.locals.lang, [config('search', 'max_search_characters')]));
     }
 
     const query = '%' + rawQuery + '%';
@@ -87,32 +84,33 @@ const categorySearchRouter = asyncRouter(async function (req, res, next) {
     const results = allResults.slice(offset, offset + limit);
     const total = allResults.length;
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber
     });
 
-    return res.render('stats', {
+    return reply.view('stats.ejs', {
         page: 'stats/search',
-        title: i18n('stats_search', 'page_titles', res.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_search', 'page_titles', reply.locals.lang, [rawQuery, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         category,
         results,
         resultsCount: results.length,
-        pagination: createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, request.url),
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('search', 'navigation', res.locals.lang), replaces: [rawQuery]}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('search', 'navigation', reply.locals.lang), replaces: [rawQuery]}
         ])
     });
-});
+};
 
-router.post('/stats/:marketId/:worldNumber/search/', searchPostRedirectRouter);
-router.get('/stats/:marketId/:worldNumber/search/', searchGetRedirectRouter);
-router.get('/stats/:marketId/:worldNumber/search/:category/:query', categorySearchRouter);
-router.get('/stats/:marketId/:worldNumber/search/:category/:query/page/:page', categorySearchRouter);
-
-module.exports = router;
+module.exports = function (fastify, opts, done) {
+    fastify.post('/stats/:marketId/:worldNumber/search', searchPostRedirectRouter);
+    fastify.get('/stats/:marketId/:worldNumber/search', searchGetRedirectRouter);
+    fastify.get('/stats/:marketId/:worldNumber/search/:category/:query', categorySearchRouter);
+    fastify.get('/stats/:marketId/:worldNumber/search/:category/:query/page/:page', categorySearchRouter);
+    done();
+};

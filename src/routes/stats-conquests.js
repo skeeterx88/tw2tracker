@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 const {db, sql} = require('../db.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
@@ -9,26 +7,25 @@ const {
     paramWorldParse,
     createPagination,
     createNavigation,
-    mergeBackendLocals,
-    asyncRouter
+    mergeBackendLocals
 } = require('../router-helpers.js');
 
-const conquestsRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const conquestsRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
-    const page = req.params.page && !isNaN(req.params.page)
-        ? Math.max(1, parseInt(req.params.page, 10))
+    const page = request.params.page && !isNaN(request.params.page)
+        ? Math.max(1, parseInt(request.params.page, 10))
         : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
@@ -36,30 +33,31 @@ const conquestsRouter = asyncRouter(async function (req, res, next) {
     const conquests = await db.any(sql('get-world-conquests'), {worldId, offset, limit});
     const total = parseInt((await db.one(sql('get-world-conquests-count'), {worldId})).count, 10);
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/conquests',
-        title: i18n('stats_world_conquests', 'page_titles', res.locals.lang, [marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_world_conquests', 'page_titles', reply.locals.lang, [marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
         world,
         conquests,
-        pagination: createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, request.url),
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('conquests', 'navigation', res.locals.lang)}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('conquests', 'navigation', reply.locals.lang)}
         ])
     });
-});
+};
 
-router.get('/stats/:marketId/:worldNumber/conquests', conquestsRouter);
-router.get('/stats/:marketId/:worldNumber/conquests/page/:page', conquestsRouter);
-
-module.exports = router;
+module.exports = function (fastify, opts, done) {
+    fastify.get('/stats/:marketId/:worldNumber/conquests', conquestsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/conquests/page/:page', conquestsRouter);
+    done();
+};

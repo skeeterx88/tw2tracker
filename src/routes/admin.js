@@ -1,22 +1,26 @@
-const {Router} = require('express');
-const {ensureLoggedIn} = require('connect-ensure-login');
-
 const {db, sql} = require('../db.js');
 const config = require('../config.js');
 const i18n = require('../i18n.js');
+const configMap = require('../config-map.json');
+
 const syncCommands = require('../types/sync-commands.js');
 const privilegeTypes = require('../types/privileges.js');
-const configMap = require('../types/config-map.json');
+const authErrors = require('../types/auth-error.js');
+
 const privilegeTypesValue = Object.values(privilegeTypes);
 const pgArray = require('pg').types.arrayParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const createError = require('http-errors');
-const passport = require('passport');
 const humanInterval = require('human-interval');
 const fs = require('fs');
 
 const syncTypes = require('../types/sync.js');
+
+const restrictionTypes = {
+    ACCESS: 0,
+    ACTION: 1
+};
 
 const syncTypeMapping = {
     [syncTypes.DATA]: {
@@ -35,7 +39,6 @@ const syncTypeMapping = {
 
 const {
     mergeBackendLocals,
-    asyncRouter,
     paramWorldParse,
     paramWorld
 } = require('../router-helpers.js');
@@ -75,27 +78,32 @@ async function authAccount (request) {
         return false;
     }
 
-            return res.redirect('/admin');
-        });
-    })(req, res, next);
-});
+    const parsedPrivileges = typeof account.privileges === 'string' ? pgArray.create(account.privileges, String).parse() : account.privileges;
+    const privilegeEntries = privilegeTypesValue.map(type => [type, parsedPrivileges.includes(type)]);
 
-function createAdminMenu (user, selected) {
+    return {
+        id: account.id,
+        name: account.name,
+        privileges: Object.fromEntries(privilegeEntries)
+    };
+}
+
+function createAdminMenu (account, selected) {
     const adminMenu = [
         ['sync', {
             enabled: true,
             selected: selected === 'sync'
         }],
         ['accounts', {
-            enabled: user.privileges[privilegeTypes.MODIFY_ACCOUNTS],
+            enabled: account.privileges[MODIFY_ACCOUNTS],
             selected: selected === 'accounts'
         }],
         ['mods', {
-            enabled: user.privileges[privilegeTypes.MODIFY_MODS],
+            enabled: account.privileges[MODIFY_MODS],
             selected: selected === 'mods'
         }],
         ['settings', {
-            enabled: user.privileges[privilegeTypes.MODIFY_SETTINGS],
+            enabled: account.privileges[MODIFY_SETTINGS],
             selected: selected === 'settings'
         }]
     ];
@@ -105,40 +113,32 @@ function createAdminMenu (user, selected) {
     });
 }
 
-function createAuthorization (privilege, denyType) {
-    return function (req, res, next) {
-        if (req.user.privileges[privilege]) {
-            next();
-        } else {
-            switch (denyType) {
-                case 'access': {
-                    throw createError(401, i18n('error_not_authorized_access', 'admin', res.locals.lang));
-                }
-                case 'action': {
-                    req.flash('error', i18n('error_not_authorized_action', 'admin', res.locals.lang));
-                    res.redirect('back');
-                }
-            }
-        } 
-    };
-}
+const authRouter = async function (request, reply) {
+    request.session.account = await authAccount(request);
 
-const loginRouter = asyncRouter(async function (req, res) {
-    res.render('admin', {
-        title: i18n('admin_panel_login', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
+    if (!request.session.account) {
+        reply.redirect('/admin/login');
+    } else {
+        reply.redirect('/admin');
+    }
+};
+
+const loginRouter = async function (request, reply) {
+    reply.view('admin.ejs', {
+        title: i18n('admin_panel_login', 'page_titles', reply.locals.lang, [config('general', 'site_name')]),
         subPage: 'login',
         menu: false,
         errors: request.flash('errors'),
         messages: request.flash('messages')
     });
-});
+};
 
-const logoutRouter = asyncRouter(async function (req, res) {
-    req.logout();
-    res.redirect('/admin/login');
-});
+const logoutRouter = async function (request, reply) {
+    request.session.account = null;
+    reply.redirect('/admin/login');
+};
 
-const syncRouter = asyncRouter(async function (req, res) {
+const syncRouter = async function (request, reply) {
     const [
         openWorlds,
         closedWorlds,
@@ -170,16 +170,16 @@ const syncRouter = asyncRouter(async function (req, res) {
     }
 
     const subPage = 'sync';
-    const menu = createAdminMenu(req.user, subPage);
+    const menu = createAdminMenu(request.session.account, subPage);
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         subPage,
-        accountPrivileges: req.user.privileges,
+        accountPrivileges: request.session.account.privileges,
         privilegeTypes
     });
 
-    res.render('admin', {
-        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
+    reply.view('admin.ejs', {
+        title: i18n('admin_panel', 'page_titles', reply.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         openWorlds,
@@ -191,13 +191,13 @@ const syncRouter = asyncRouter(async function (req, res) {
         errors: request.flash('errors'),
         messages: request.flash('messages')
     });
-});
+};
 
-const syncTypeRouter = asyncRouter(async function (req, res) {
-    const mapping = syncTypeMapping[req.params.type];
+const syncTypeRouter = async function (request, reply) {
+    const mapping = syncTypeMapping[request.params.type];
 
     if (!mapping) {
-        throw createError(404, i18n('error_invalid_sync_type', 'admin', res.locals.lang));
+        throw createError(404, i18n('error_invalid_sync_type', 'admin', reply.locals.lang));
     }
 
     if (!paramWorld(request)) {
@@ -209,7 +209,7 @@ const syncTypeRouter = asyncRouter(async function (req, res) {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const marketsWithAccounts = await db.map(sql('get-markets-with-accounts'), [], market => market.id);
 
@@ -227,11 +227,11 @@ const syncTypeRouter = asyncRouter(async function (req, res) {
     reply.redirect(`/admin/sync#world-${worldId}`);
 };
 
-const syncTypeAllRouter = asyncRouter(async function (req, res) {
-    const mapping = syncTypeMapping[req.params.type];
+const syncTypeAllRouter = async function (request, reply) {
+    const mapping = syncTypeMapping[request.params.type];
 
     if (!mapping) {
-        throw createError(404, i18n('error_invalid_sync_type', 'admin', res.locals.lang));
+        throw createError(404, i18n('error_invalid_sync_type', 'admin', reply.locals.lang));
     }
 
     await emitSync(mapping.SYNC_ALL_COMMAND);
@@ -240,14 +240,14 @@ const syncTypeAllRouter = asyncRouter(async function (req, res) {
     reply.redirect('/admin/sync');
 };
 
-const scrapeMarketsRouter = asyncRouter(async function (req, res) {
+const scrapeMarketsRouter = async function (request, reply) {
     await emitSync(syncCommands.MARKETS);
 
     request.flash('messages', i18n('message_scrape_markets_started', 'admin', reply.locals.lang));
     reply.redirect('/admin/sync');
 };
 
-const scrapeWorldsRouter = asyncRouter(async function (req, res) {
+const scrapeWorldsRouter = async function (request, reply) {
     await emitSync(syncCommands.WORLDS);
 
     request.flash('messages', i18n('message_scrape_worlds_started', 'admin', reply.locals.lang));
@@ -264,7 +264,7 @@ const toggleSyncRouter = async function (request, reply) {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     await emitSync(syncCommands.TOGGLE, {
         marketId,
@@ -275,8 +275,8 @@ const toggleSyncRouter = async function (request, reply) {
     reply.redirect(`/admin/sync#world-${worldId}`);
 };
 
-const resetQueueRouter = asyncRouter(async function (req, res) {
-    const type = req.params.type;
+const resetQueueRouter = async function (request, reply) {
+    const type = request.params.type;
 
     if (!Object.values(syncTypes).includes(type)) {
         request.flash('errors', i18n('error_invalid_sync_type', 'admin', reply.locals.lang, [type]));
@@ -289,7 +289,7 @@ const resetQueueRouter = asyncRouter(async function (req, res) {
     reply.redirect('/admin/sync');
 };
 
-const accountsRouter = asyncRouter(async function (req, res) {
+const accountsRouter = async function (request, reply) {
     const markets = await db.map(sql('get-markets'), [], market => market.id);
     const accounts = await db.map(sql('get-accounts'), [], function (account) {
         account.missingMarkets = getMissingMarkets(account.markets || [], markets);
@@ -303,14 +303,14 @@ const accountsRouter = asyncRouter(async function (req, res) {
     }
 
     const subPage = 'accounts';
-    const menu = createAdminMenu(req.user, subPage);
+    const menu = createAdminMenu(request.session.account, subPage);
 
-    mergeBackendLocals(res, {        
+    mergeBackendLocals(reply, {
         subPage
     });
 
-    res.render('admin', {
-        title: i18n('admin_panel_sync_accounts', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
+    reply.view('admin.ejs', {
+        title: i18n('admin_panel_sync_accounts', 'page_titles', reply.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         accounts,
@@ -318,11 +318,11 @@ const accountsRouter = asyncRouter(async function (req, res) {
         errors: request.flash('errors'),
         messages: request.flash('messages')
     });
-});
+};
 
-const accountsAddMarketRouter = asyncRouter(async function (req, res) {
-    const accountId = req.params.accountId;
-    const marketId = req.params.marketId;
+const accountsAddMarketRouter = async function (request, reply) {
+    const accountId = request.params.accountId;
+    const marketId = request.params.marketId;
     const account = await db.any(sql('get-account'), {accountId});
     const market = await db.any(sql('get-market'), {marketId});
 
@@ -337,12 +337,12 @@ const accountsAddMarketRouter = asyncRouter(async function (req, res) {
         await db.query(sql('add-account-market'), {accountId, marketId});
     }
 
-    res.redirect(`/admin/accounts#account-${accountId}`);
-});
+    reply.redirect(`/admin/accounts#account-${accountId}`);
+};
 
-const accountsRemoveMarketRouter = asyncRouter(async function (req, res) {
-    const accountId = req.params.accountId;
-    const marketId = req.params.marketId;
+const accountsRemoveMarketRouter = async function (request, reply) {
+    const accountId = request.params.accountId;
+    const marketId = request.params.marketId;
     const account = await db.any(sql('get-account'), {accountId});
     const market = await db.any(sql('get-market'), {marketId});
 
@@ -357,11 +357,11 @@ const accountsRemoveMarketRouter = asyncRouter(async function (req, res) {
         await db.query(sql('remove-account-market'), {accountId, marketId});
     }
 
-    res.redirect(`/admin/accounts#account-${accountId}`);
-});
+    reply.redirect(`/admin/accounts#account-${accountId}`);
+};
 
-const accountsDeleteRouter = asyncRouter(async function (req, res) {
-    const accountId = req.params.accountId;
+const accountsDeleteRouter = async function (request, reply) {
+    const accountId = request.params.accountId;
     const account = await db.any(sql('get-account'), {accountId});
 
     if (!account.length) {
@@ -373,11 +373,11 @@ const accountsDeleteRouter = asyncRouter(async function (req, res) {
         await db.query(sql('delete-account'), {accountId});
     }
 
-    res.redirect('/admin/accounts');
-});
+    reply.redirect('/admin/accounts');
+};
 
-const accountsEditRouter = asyncRouter(async function (req, res) {
-    const {name, pass, id: accountId} = req.body;
+const accountsEditRouter = async function (request, reply) {
+    const {name, pass, id: accountId} = request.body;
     const account = await db.any(sql('get-account'), {accountId});
 
     if (!account.length) {
@@ -391,11 +391,11 @@ const accountsEditRouter = asyncRouter(async function (req, res) {
         await db.query(sql('edit-account'), {accountId, name, pass});
     }
 
-    res.redirect(`/admin/accounts#account-${accountId}`);
-});
+    reply.redirect(`/admin/accounts#account-${accountId}`);
+};
 
-const accountsCreateRouter = asyncRouter(async function (req, res) {
-    const {name, pass, id: accountId} = req.body;
+const accountsCreateRouter = async function (request, reply) {
+    const {name, pass, id: accountId} = request.body;
 
     if (pass.length < config('sync_accounts', 'min_password_length')) {
         request.flash('errors', i18n('error_password_minimum_length', 'admin', reply.locals.lang, [4]));
@@ -412,24 +412,24 @@ const accountsCreateRouter = asyncRouter(async function (req, res) {
         }
     }
 
-    res.redirect(`/admin/accounts#account-${accountId}`);
-});
+    reply.redirect(`/admin/accounts#account-${accountId}`);
+};
 
-const modsRouter = asyncRouter(async function (req, res) {
+const modsRouter = async function (request, reply) {
     const mods = await db.map(sql('get-mods'), [], function (mod) {
         mod.privileges = pgArray.create(mod.privileges, String).parse();
         return mod;
     });
 
     const subPage = 'mods';
-    const menu = createAdminMenu(req.user, subPage);
+    const menu = createAdminMenu(request.session.account, subPage);
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         subPage
     });
 
-    res.render('admin', {
-        title: i18n('admin_panel_mod_accounts', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
+    reply.view('admin.ejs', {
+        title: i18n('admin_panel_mod_accounts', 'page_titles', reply.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         mods,
@@ -437,11 +437,11 @@ const modsRouter = asyncRouter(async function (req, res) {
         errors: request.flash('errors'),
         messages: request.flash('messages')
     });
-});
+};
 
-const modsEditRouter = asyncRouter(async function (req, res) {
-    const {name, pass, email} = req.body;
-    let {id, privileges} = req.body;
+const modsEditRouter = async function (request, reply) {
+    const {name, pass, email} = request.body;
+    let {id, privileges} = request.body;
 
     id = parseInt(id, 10);
 
@@ -451,7 +451,7 @@ const modsEditRouter = asyncRouter(async function (req, res) {
         privileges = [privileges];
     }
 
-    const me = req.session.passport.user;
+    const me = request.session.account;
     const [mod] = await db.any(sql('get-mod'), {id});
     const [accountName] = await db.any(sql('get-mod-account-by-name'), {name});
     const [accountEmail] = await db.any(sql('get-mod-account-by-email'), {email});
@@ -485,29 +485,29 @@ const modsEditRouter = asyncRouter(async function (req, res) {
             await db.query(sql('update-mod-account-keep-pass'), {id, name, privileges, email});
         }
 
-        if (id === req.user.id) {
-            req.logout();
-            res.redirect('/admin/login');
+        if (id === request.session.account.id) {
+            request.session.account = null;
+            reply.redirect('/admin/login');
 
-            return req.logIn({id, name, privileges}, function (error) {
+            return request.logIn({id, name, privileges}, function (error) {
                 if (error) {
                     request.flash('errors', error);
                 } else {
                     request.flash('messages', i18n('message_mod_account_altered', 'admin', reply.locals.lang));
                 }
 
-                res.redirect(`/admin/mods#mod-${id}`);
+                reply.redirect(`/admin/mods#mod-${id}`);
             });
         } else {
             request.flash('messages', i18n('message_mod_account_altered', 'admin', reply.locals.lang));
             reply.redirect(`/admin/mods#mod-${id}`);
         }
     }
-});
+};
 
-const modsCreateRouter = asyncRouter(async function (req, res) {
-    const {name, pass, email} = req.body;
-    let {privileges} = req.body;
+const modsCreateRouter = async function (request, reply) {
+    const {name, pass, email} = request.body;
+    let {privileges} = request.body;
 
     if (!privileges) {
         privileges = [];
@@ -535,11 +535,11 @@ const modsCreateRouter = asyncRouter(async function (req, res) {
         return reply.redirect(`/admin/mods#mod-${id}`);
     }
 
-    res.redirect('/admin/mods');
-});
+    reply.redirect('/admin/mods');
+};
 
-const modsDeleteRouter = asyncRouter(async function (req, res) {
-    const {id} = req.params;
+const modsDeleteRouter = async function (request, reply) {
+    const {id} = request.params;
 
     const [mod] = await db.any(sql('get-mod'), {id});
 
@@ -552,37 +552,36 @@ const modsDeleteRouter = asyncRouter(async function (req, res) {
         await db.query(sql('delete-mod-account'), {id});
     }
 
-    res.redirect('/admin/mods');
-});
+    reply.redirect('/admin/mods');
+};
 
-const settingsRouter = asyncRouter(async function (req, res) {
+const settingsRouter = async function (request, reply) {
     const subPage = 'settings';
-    const menu = createAdminMenu(req.user, subPage);
+    const menu = createAdminMenu(request.session.account, subPage);
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         subPage,
-        accountPrivileges: req.user.privileges,
+        accountPrivileges: request.session.account.privileges,
         privilegeTypes
     });
 
-    res.render('admin', {
-        title: i18n('admin_panel', 'page_titles', res.locals.lang, [config('general', 'site_name')]),
+    reply.view('admin.ejs', {
+        title: i18n('admin_panel', 'page_titles', reply.locals.lang, [config('general', 'site_name')]),
         menu,
         subPage,
         privilegeTypes,
-        user: req.user,
         config,
         configMap,
         errors: request.flash('errors'),
         messages: request.flash('messages')
     });
-});
+};
 
-const settingsEditRouter = asyncRouter(async function (req, res) {
+const settingsEditRouter = async function (request, reply) {
     const newConfig = {};
     let updated = false;
     /** @type {[String, String][]} */
-    const bodyEntries = Object.entries(req.body);
+    const bodyEntries = Object.entries(request.body);
 
     for (const [id, value] of bodyEntries) {
         const [category, configId] = id.split('/');
@@ -631,58 +630,290 @@ const settingsEditRouter = asyncRouter(async function (req, res) {
         fs.writeFileSync('./config.json', JSON.stringify(newConfig, null, 4), 'utf-8');
     }
 
-    res.redirect('/admin/settings');
-});
+    reply.redirect('/admin/settings');
+};
 
-const {
-    CONTROL_SYNC,
-    START_SYNC,
-    MODIFY_ACCOUNTS,
-    MODIFY_MODS,
-    MODIFY_SETTINGS
-} = privilegeTypes;
+module.exports = async function (fastify) {
+    fastify.register(require('fastify-auth'));
 
-const authControlSyncAction = createAuthorization(CONTROL_SYNC, 'action');
-const authStartSyncAction = createAuthorization(START_SYNC, 'action');
-const authModifyAccountsAccess = createAuthorization(MODIFY_ACCOUNTS, 'access');
-const authModifyAccountsAction = createAuthorization(MODIFY_ACCOUNTS, 'action');
-const authModifyModsAccess = createAuthorization(MODIFY_MODS, 'access');
-const authModifyModsAction = createAuthorization(MODIFY_MODS, 'action');
-const authModifySettingsAccess = createAuthorization(MODIFY_SETTINGS, 'access');
-const authModifySettingsAction = createAuthorization(MODIFY_SETTINGS, 'action');
+    function createRestriction (id, privilege, denyType) {
+        fastify.decorate(id, async function (request, reply) {
+            if (!request.session.account.privileges[privilege]) {
+                switch (denyType) {
+                    case restrictionTypes.ACCESS: {
+                        throw createError(401, i18n('error_not_authorized_access', 'admin', reply.locals.lang));
+                    }
+                    case restrictionTypes.ACTION: {
+                        throw createError(401, i18n('error_not_authorized_action', 'admin', reply.locals.lang));
+                    }
+                }
+            }
+        });
+    }
 
-const router = Router();
+    createRestriction('authControlSyncAction', CONTROL_SYNC, restrictionTypes.ACTION);
+    createRestriction('authStartSyncAction', START_SYNC, restrictionTypes.ACTION);
+    createRestriction('authModifyAccountsAccess', MODIFY_ACCOUNTS, restrictionTypes.ACCESS);
+    createRestriction('authModifyAccountsAction', MODIFY_ACCOUNTS, restrictionTypes.ACTION);
+    createRestriction('authModifyModsAccess', MODIFY_MODS, restrictionTypes.ACCESS);
+    createRestriction('authModifyModsAction', MODIFY_MODS, restrictionTypes.ACTION);
+    createRestriction('authModifySettingsAccess', MODIFY_SETTINGS, restrictionTypes.ACCESS);
+    createRestriction('authModifySettingsAction', MODIFY_SETTINGS, restrictionTypes.ACTION);
 
-router.get('/login', loginRouter);
-router.post('/login', authRouter);
-router.use(ensureLoggedIn('/admin/login'));
-router.get('/logout', logoutRouter);
+    fastify.decorate('requireAuth', async function (request, reply) {
+        if (!request.session.account) {
+            reply.redirect('/admin/login');
+        }
+    });
 
-router.get('/', syncRouter);
-router.get('/sync', syncRouter);
-router.get('/sync/data/all', authStartSyncAction, syncTypeAllRouter);
-router.get('/sync/:type/:marketId/:worldNumber', authStartSyncAction, syncTypeRouter);
-router.get('/sync/achievements/all', authStartSyncAction, syncTypeAllRouter);
-router.get('/sync/:type/:marketId/:worldNumber', authStartSyncAction, syncTypeRouter);
-router.get('/sync/markets', authStartSyncAction, scrapeMarketsRouter);
-router.get('/sync/worlds', authStartSyncAction, scrapeWorldsRouter);
-router.get('/sync/toggle/:marketId/:worldNumber?', authControlSyncAction, toggleSyncRouter);
+    await fastify.after();
 
-router.get('/sync/queue/:type/reset', authStartSyncAction, resetQueueRouter);
+    fastify.route({
+        method: 'POST',
+        url: '/admin/login',
+        handler: authRouter
+    });
 
-router.get('/accounts', authModifyAccountsAccess, accountsRouter);
-router.get('/accounts/markets/add/:accountId/:marketId', authModifyAccountsAction, accountsAddMarketRouter);
-router.get('/accounts/markets/remove/:accountId/:marketId', authModifyAccountsAction, accountsRemoveMarketRouter);
-router.get('/accounts/delete/:accountId', authModifyAccountsAction, accountsDeleteRouter);
-router.post('/accounts/edit/', authModifyAccountsAction, accountsEditRouter);
-router.post('/accounts/create/', authModifyAccountsAction, accountsCreateRouter);
+    fastify.route({
+        method: 'GET',
+        url: '/admin/login',
+        handler: loginRouter
+    });
 
-router.get('/mods', authModifyModsAccess, modsRouter);
-router.post('/mods/edit', authModifyModsAction, modsEditRouter);
-router.post('/mods/create', authModifyModsAction, modsCreateRouter);
-router.get('/mods/delete/:id', authModifyModsAction, modsDeleteRouter);
+    fastify.route({
+        method: 'GET',
+        url: '/admin/logout',
+        handler: logoutRouter
+    });
 
-router.get('/settings', authModifySettingsAccess, settingsRouter);
-router.post('/settings/edit', authModifySettingsAction, settingsEditRouter);
+    fastify.route({
+        method: 'GET',
+        url: '/admin',
+        handler: (request, reply) => reply.redirect('/admin/sync')
+    });
 
-module.exports = router;
+    fastify.route({
+        method: 'GET',
+        url: '/admin/sync',
+        preHandler: fastify.auth([
+            fastify.requireAuth
+        ]),
+        handler: syncRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/sync/:type/:marketId/:worldNumber',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authStartSyncAction
+        ], {
+            relation: 'and'
+        }),
+        handler: syncTypeRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/sync/:type/all',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authStartSyncAction
+        ], {
+            relation: 'and'
+        }),
+        handler: syncTypeAllRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/sync/markets',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authStartSyncAction
+        ], {
+            relation: 'and'
+        }),
+        handler: scrapeMarketsRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/sync/worlds',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authStartSyncAction
+        ], {
+            relation: 'and'
+        }),
+        handler: scrapeWorldsRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/sync/toggle/:marketId/:worldNumber',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authControlSyncAction
+        ], {
+            relation: 'and'
+        }),
+        handler: toggleSyncRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/sync/queue/:type/reset',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authStartSyncAction
+        ], {
+            relation: 'and'
+        }),
+        handler: resetQueueRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/accounts',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyAccountsAccess
+        ], {
+            relation: 'and'
+        }),
+        handler: accountsRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/accounts/markets/add/:accountId/:marketId',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyAccountsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: accountsAddMarketRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/accounts/markets/remove/:accountId/:marketId',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyAccountsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: accountsRemoveMarketRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/accounts/delete/:accountId',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyAccountsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: accountsDeleteRouter
+    });
+
+    fastify.route({
+        method: 'POST',
+        url: '/admin/accounts/edit',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyAccountsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: accountsEditRouter
+    });
+
+    fastify.route({
+        method: 'POST',
+        url: '/admin/accounts/create',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyAccountsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: accountsCreateRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/mods',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyModsAccess
+        ], {
+            relation: 'and'
+        }),
+        handler: modsRouter
+    });
+
+    fastify.route({
+        method: 'POST',
+        url: '/admin/mods/edit',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyModsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: modsEditRouter
+    });
+
+    fastify.route({
+        method: 'POST',
+        url: '/admin/mods/create',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyModsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: modsCreateRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/mods/delete/:id',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifyModsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: modsDeleteRouter
+    });
+
+    fastify.route({
+        method: 'GET',
+        url: '/admin/settings',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifySettingsAccess
+        ], {
+            relation: 'and'
+        }),
+        handler: settingsRouter
+    });
+
+    fastify.route({
+        method: 'POST',
+        url: '/admin/settings/edit',
+        preHandler: fastify.auth([
+            fastify.requireAuth,
+            fastify.authModifySettingsAction
+        ], {
+            relation: 'and'
+        }),
+        handler: settingsEditRouter
+    });
+};

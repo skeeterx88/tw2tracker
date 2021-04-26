@@ -16,10 +16,10 @@
                     <tbody>
                         <% for (let village of villages) { %>
                             <tr class="quick-highlight" data-id="<%= village.village_id %>" data-type="villages">
-                                <td><a class="icon-villages" href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>/"><%= village.village_name %></a></td>
+                                <td><a class="icon-villages" href="/stats/<%= marketId %>/<%= worldNumber %>/villages/<%= village.village_id %>"><%= village.village_name %></a></td>
                                 <td><%= village.village_x %>|<%= village.village_y %></td>
                                 <td><%= formatNumbers(village.village_points) %></td>
-                                <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>/"><%= village.player_name %></a></td>
+                                <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= village.player_id %>"><%= village.player_name %></a></td>
                             </tr>
                         <% } %>
                     </tbody>

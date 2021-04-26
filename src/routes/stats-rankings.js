@@ -1,6 +1,4 @@
-const express = require('express');
 const createError = require('http-errors');
-const router = express.Router();
 const {db, sql} = require('../db.js');
 const utils = require('../utils.js');
 const config = require('../config.js');
@@ -28,25 +26,25 @@ const rankingRouterSqlMap = {
     }
 };
 
-const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const rankingCategoryRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
-    const category = req.params.category;
+    const category = request.params.category;
 
     if (!rankingCategories.includes(category)) {
-        throw createError(404, i18n('router_missing_category', 'errors', res.locals.lang));
+        throw createError(404, i18n('router_missing_category', 'errors', reply.locals.lang));
     }
 
-    const page = req.params.page && !isNaN(req.params.page)
-        ? Math.max(1, parseInt(req.params.page, 10))
+    const page = request.params.page && !isNaN(request.params.page)
+        ? Math.max(1, parseInt(request.params.page, 10))
         : 1;
     const limit = parseInt(config('ui', 'ranking_page_items_per_page'), 10);
     const offset = limit * (page - 1);
@@ -58,7 +56,7 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         playerRankingSortOrder,
         tribeRankingSortField,
         tribeRankingSortOrder
-    } = parseRankingSort(req, world.config.victory_points);
+    } = parseRankingSort(request, world.config.victory_points);
 
     const sortField = category === 'players' ? playerRankingSortField : tribeRankingSortField;
     const sortOrder = category === 'players' ? playerRankingSortOrder : tribeRankingSortOrder;
@@ -76,14 +74,14 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         }
     }
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/ranking',
-        title: i18n('stats_ranking', 'page_titles', res.locals.lang, [capitalizedCategory, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_ranking', 'page_titles', reply.locals.lang, [capitalizedCategory, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         worldName: world.name,
@@ -91,17 +89,18 @@ const rankingCategoryRouter = asyncRouter(async function (req, res, next) {
         ranking,
         category,
         sortField,
-        pagination: createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, request.url),
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('ranking', 'navigation', res.locals.lang), replaces: [capitalizedCategory]}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
+            {label: i18n('ranking', 'navigation', reply.locals.lang), replaces: [capitalizedCategory]}
         ])
     });
 };
 
-router.get('/stats/:marketId/:worldNumber/ranking/:category?/', rankingCategoryRouter);
-router.get('/stats/:marketId/:worldNumber/ranking/:category?/page/:page', rankingCategoryRouter);
-
-module.exports = router;
+module.exports = function (fastify, opts, done) {
+    fastify.get('/stats/:marketId/:worldNumber/ranking/:category', rankingCategoryRouter);
+    fastify.get('/stats/:marketId/:worldNumber/ranking/:category/page/:page', rankingCategoryRouter);
+    done();
+};

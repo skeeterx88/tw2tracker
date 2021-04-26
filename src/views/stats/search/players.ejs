@@ -12,10 +12,10 @@
         <% for (let player of results) { %>
             <tr>
                 <td><%= formatNumbers(player.player_rank) %></td>
-                <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.player_id %>/"><%= player.player_name %></a></td>
+                <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= player.player_id %>"><%= player.player_name %></a></td>
 
                 <% if (player.tribe_id) { %>
-                    <td><a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= player.tribe_id %>/"><%= player.tribe_tag %></a></td>
+                    <td><a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= player.tribe_id %>"><%= player.tribe_tag %></a></td>
                 <% } else { %>
                     <td>-</td>
                 <% } %>

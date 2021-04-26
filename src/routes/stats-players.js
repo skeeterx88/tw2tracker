@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 const utils = require('../utils.js');
 const timeUtils = require('../time-utils.js');
 const conquestTypes = require('../types/conquest.js');
@@ -56,12 +54,11 @@ const {
     getPlayerVillages,
     createPagination,
     createNavigation,
-    mergeBackendLocals,
-    asyncRouter
+    mergeBackendLocals
 } = require('../router-helpers.js');
 
-const playerProfileRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
+const playerProfileRouter = async function (request, reply, next) {
+    if (!paramWorld(request)) {
         return next();
     }
 
@@ -69,12 +66,12 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const {
         playerId,
         player
-    } = await paramPlayerParse(req, worldId);
+    } = await paramPlayerParse(request, worldId);
 
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
@@ -113,7 +110,7 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
     const tribe = player.tribe_id ? await getTribe(worldId, player.tribe_id) : false;
     const {worlds: otherWorlds} = await db.one(sql('get-player-other-worlds'), {marketId, id: playerId});
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber,
         player,
@@ -122,9 +119,9 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         mapHighlightsType: 'players'
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/player',
-        title: i18n('stats_player', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_player', 'page_titles', reply.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
@@ -144,34 +141,34 @@ const playerProfileRouter = asyncRouter(async function (req, res, next) {
         tribeChangesCount,
         otherWorlds,
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]}
         ])
     });
-});
+};
 
-const playerVillagesRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const playerVillagesRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const {
         playerId,
         player
-    } = await paramPlayerParse(req, worldId);
+    } = await paramPlayerParse(request, worldId);
 
     const world = await db.one(sql('get-world'), {worldId});
     const villages = await getPlayerVillages(worldId, playerId);
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber,
         player,
@@ -179,60 +176,60 @@ const playerVillagesRouter = asyncRouter(async function (req, res, next) {
         mapHighlightsType: 'players'
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/player-villages',
-        title: i18n('stats_player_villages', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_player_villages', 'page_titles', reply.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         marketId,
         worldNumber,
         world,
         player,
         villages,
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n('villages', 'navigation', res.locals.lang)}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('villages', 'navigation', reply.locals.lang)}
         ])
     });
-});
+};
 
-const playerConquestsRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const playerConquestsRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const {
         playerId,
         player
-    } = await paramPlayerParse(req, worldId);
+    } = await paramPlayerParse(request, worldId);
 
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
-    const page = req.params.page && !isNaN(req.params.page) ? Math.max(1, parseInt(req.params.page, 10)) : 1;
+    const page = request.params.page && !isNaN(request.params.page) ? Math.max(1, parseInt(request.params.page, 10)) : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
 
-    const category = req.params.category ?? 'all';
+    const category = request.params.category ?? 'all';
 
     if (!conquestCategories.includes(category)) {
-        throw createError(404, i18n('router_missing_sub_category', 'errors', res.locals.lang));
+        throw createError(404, i18n('router_missing_sub_category', 'errors', reply.locals.lang));
     }
 
     const conquestsRaw = await db.any(conquestsTypeMap[category].sqlConquests, {worldId, playerId, offset, limit});
     const conquests = processPlayerConquestTypes(conquestsRaw, playerId);
 
     const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, playerId})).count;
-    const navigationTitle = i18n('sub_title_' + category, 'player_profile_conquests', res.locals.lang);
+    const navigationTitle = i18n('sub_title_' + category, 'player_profile_conquests', reply.locals.lang);
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber,
         player,
@@ -240,9 +237,9 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         mapHighlightsType: 'players'
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/player-conquests',
-        title: i18n('stats_player_conquests', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_player_conquests', 'page_titles', reply.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
@@ -251,32 +248,32 @@ const playerConquestsRouter = asyncRouter(async function (req, res, next) {
         conquests,
         category,
         navigationTitle,
-        pagination: createPagination(page, total, limit, req.path),
+        pagination: createPagination(page, total, limit, request.url),
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: navigationTitle}
         ])
     });
-});
+};
 
-const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const playerTribeChangesRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const {
         playerId,
         player
-    } = await paramPlayerParse(req, worldId);
+    } = await paramPlayerParse(request, worldId);
 
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
@@ -294,7 +291,7 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         }
     }
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber,
         player,
@@ -302,9 +299,9 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         mapHighlightsType: 'players'
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/player-tribe-changes',
-        title: i18n('stats_player_tribe_changes', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_player_tribe_changes', 'page_titles', reply.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
@@ -313,50 +310,50 @@ const playerTribeChangesRouter = asyncRouter(async function (req, res, next) {
         tribeChanges,
         tribeTags,
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n('tribe_changes', 'navigation', res.locals.lang)}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('tribe_changes', 'navigation', reply.locals.lang)}
         ])
     });
-});
+};
 
-const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const playerAchievementsRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const {
         playerId,
         player
-    } = await paramPlayerParse(req, worldId);
+    } = await paramPlayerParse(request, worldId);
 
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
 
-    const selectedCategory = req.params.category;
-    const subCategory = req.params.subCategory;
+    const selectedCategory = request.params.category;
+    const subCategory = request.params.subCategory;
 
     const achievementCategories = ['battle', 'points', 'tribe', 'repeatable', 'special', 'friends', 'milestone', 'ruler'];
     const achievementCategoriesUnique = ['battle', 'points', 'tribe', 'special', 'friends', 'milestone', 'ruler'];
 
     if (selectedCategory && !achievementCategories.includes(selectedCategory)) {
-        throw createError(404, i18n('router_missing_category', 'errors', res.locals.lang));
+        throw createError(404, i18n('router_missing_category', 'errors', reply.locals.lang));
     }
 
     if (selectedCategory === 'repeatable') {
         if (!(subCategory === 'detailed' || !subCategory)) {
-            throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
+            throw createError(404, i18n('router_missing_sub_page', 'errors', reply.locals.lang));
         }
     } else if (subCategory) {
-        throw createError(404, i18n('router_missing_sub_page', 'errors', res.locals.lang));
+        throw createError(404, i18n('router_missing_sub_page', 'errors', reply.locals.lang));
     }
 
     const achievementTypes = Object.fromEntries(await db.map(sql('achievement-types'), {}, (achievement) => [achievement.name, achievement]));
@@ -398,7 +395,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
 
     if (!selectedCategory) {
         categoryTemplate = 'overview';
-        navigationTitle = i18n(selectedCategory, 'achievement_categories', res.locals.lang) + ' ' + i18n('achievements', 'player_profile_achievements', res.locals.lang);
+        navigationTitle = i18n(selectedCategory, 'achievement_categories', reply.locals.lang) + ' ' + i18n('achievements', 'player_profile_achievements', reply.locals.lang);
         
         const categoriesMaxPoints = {};
 
@@ -439,7 +436,7 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         }]);
     } else if (selectedCategory === 'repeatable') {
         categoryTemplate = 'repeatable';
-        navigationTitle = i18n(selectedCategory, 'achievement_categories', res.locals.lang) + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievement_categories', reply.locals.lang) + ' Achievements';
 
         for (const {type, time_last_level} of achievementsRepeatable) {
             if (!achievementsRepeatableLastEarned[type]) {
@@ -456,18 +453,18 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         }
     } else {
         categoryTemplate = 'generic';
-        navigationTitle = i18n(selectedCategory, 'achievement_categories', res.locals.lang) + ' Achievements';
+        navigationTitle = i18n(selectedCategory, 'achievement_categories', reply.locals.lang) + ' Achievements';
     }
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber,
         player
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/player-achievements',
-        title: i18n('stats_player_achievements', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_player_achievements', 'page_titles', reply.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
@@ -488,30 +485,30 @@ const playerAchievementsRouter = asyncRouter(async function (req, res, next) {
         achievementTypes,
         navigationTitle,
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
-            {label: i18n('achievements', 'navigation', res.locals.lang)}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
+            {label: i18n('achievements', 'navigation', reply.locals.lang)}
         ])
     });
-});
+};
 
-const playerHistoryRouter = asyncRouter(async function (req, res, next) {
-    if (!paramWorld(req)) {
-        return next();
+const playerHistoryRouter = async function (request, reply, done) {
+    if (!paramWorld(request)) {
+        return done();
     }
 
     const {
         marketId,
         worldId,
         worldNumber
-    } = await paramWorldParse(req);
+    } = await paramWorldParse(request);
 
     const {
         playerId,
         player
-    } = await paramPlayerParse(req, worldId);
+    } = await paramPlayerParse(request, worldId);
 
     const market = await db.one(sql('get-market'), {marketId});
     const world = await db.one(sql('get-world'), {worldId});
@@ -520,14 +517,14 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
     const historyRaw = await db.any(sql('get-player-history'), {worldId, playerId, limit: historyLimit});
     const history = calcHistoryChanges(historyRaw, playerFieldsOrder);
 
-    mergeBackendLocals(res, {
+    mergeBackendLocals(reply, {
         marketId,
         worldNumber
     });
 
-    res.render('stats', {
+    reply.view('stats.ejs', {
         page: 'stats/player-history',
-        title: i18n('stats_player_history', 'page_titles', res.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
+        title: i18n('stats_player_history', 'page_titles', reply.locals.lang, [player.name, marketId.toUpperCase(), world.name, config('general', 'site_name')]),
         market,
         marketId,
         worldNumber,
@@ -535,21 +532,25 @@ const playerHistoryRouter = asyncRouter(async function (req, res, next) {
         player,
         history,
         navigation: createNavigation([
-            {label: i18n('stats', 'navigation', res.locals.lang), url: '/'},
-            {label: i18n('server', 'navigation', res.locals.lang), url: `/stats/${marketId}/`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
-            {label: i18n('player', 'navigation', res.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${playerId}`, replaces: [player.name]},
-            {label: i18n('history', 'navigation', res.locals.lang)}
+            {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
+            {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${playerId}`, replaces: [player.name]},
+            {label: i18n('history', 'navigation', reply.locals.lang)}
         ])
     });
-});
+};
 
-router.get('/stats/:marketId/:worldNumber/players/:playerId', playerProfileRouter);
-router.get('/stats/:marketId/:worldNumber/players/:playerId/villages', playerVillagesRouter);
-router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category?', playerConquestsRouter);
-router.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category?/page/:page', playerConquestsRouter);
-router.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', playerTribeChangesRouter);
-router.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:category?/:subCategory?', playerAchievementsRouter);
-router.get('/stats/:marketId/:worldNumber/players/:playerId/history', playerHistoryRouter);
-
-module.exports = router;
+module.exports = function (fastify, opts, done) {
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId', playerProfileRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/villages', playerVillagesRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/conquests', playerConquestsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category', playerConquestsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category/page/:page', playerConquestsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', playerTribeChangesRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/achievements', playerAchievementsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:category', playerAchievementsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/achievements/:category/:subCategory', playerAchievementsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/history', playerHistoryRouter);
+    done();
+};

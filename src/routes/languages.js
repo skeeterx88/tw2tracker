@@ -1,17 +1,19 @@
-const express = require('express');
-const router = express.Router();
 const config = require('../config.js');
 const i18n = require('../i18n.js');
 
-router.get('/:lang?', function (req, res) {
-    if (req.params.lang) {
-        req.session.lang = req.params.lang || config('general', 'lang');
-        return res.redirect('back');
+const languageRouter = async function (request, reply) {
+    if (request.params.lang) {
+        request.session.lang = request.params.lang || config('general', 'lang');
+        return reply.redirect('/');
     }
 
-    res.render('languages', {
-        title: i18n('languages', 'page_titles', res.locals.lang, [config('general', 'site_name')])
+    reply.view('languages.ejs', {
+        title: i18n('languages', 'page_titles', reply.locals.lang, [config('general', 'site_name')])
     });
-});
+};
 
-module.exports = router;
+module.exports = function (fastify, opts, done) {
+    fastify.get('/language', languageRouter);
+    fastify.get('/language/:lang', languageRouter);
+    done();
+};
