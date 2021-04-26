@@ -169,7 +169,7 @@ const crateShareRouter = asyncRouter(async function (req, res) {
     } = req.body;
 
     const worldId = marketId + worldNumber;
-    const {exists: worldExists} = await db.one(sql('helpers/schema-exists'), {schema: worldId});
+    const [worldExists] = await db.any(sql('helpers/schema-exists'), {schema: worldId});
 
     if (!worldExists) {
         res.status(404);
@@ -230,7 +230,7 @@ const getShareRouter = asyncRouter(async function (req, res) {
     } = req.body;
 
     const worldId = marketId + worldNumber;
-    const {exists: worldExists} = await db.one(sql('helpers/schema-exists'), {schema: worldId});
+    const [worldExists] = await db.any(sql('helpers/schema-exists'), {schema: worldId});
 
     if (!worldExists) {
         res.status(404);

@@ -53,9 +53,9 @@ async function paramWorldParse (req) {
     const marketId = req.params.marketId;
     const worldNumber = parseInt(req.params.worldNumber, 10);
     const worldId = marketId + worldNumber;
-    const {exists: worldSchema} = await db.one(sql('helpers/schema-exists'), {schema: worldId});
+    const [worldExists] = await db.any(sql('helpers/schema-exists'), {schema: worldId});
 
-    if (!worldSchema) {
+    if (!worldExists) {
         throw createError(404, i18n('missing_world', 'errors', req.session.lang));
     }
 
