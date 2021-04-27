@@ -126,28 +126,28 @@ function Scraper (marketId, worldNumber) {
     /**
      * Completely defuses the scraper.
      */
-    function kill () {
+    this.kill = function kill () {
         clearTimeout(pingIntervalId);
         socket.close();
         onKillHandler();
-    }
+    };
 
     /**
      * @param {Function} handler
      */
-    function onKill (handler) {
+    this.onKill = function onKill (handler) {
         if (typeof handler === 'function') {
             onKillHandler = handler;
         } else {
             throw new TypeError('Scraper: onKill handler is not a Function');
         }
-    }
+    };
 
     /**
      * Authenticate using one of the available sync accounts.
      * @return {Promise<MarketAccount|syncStatus>} The authenticated account or syncStatus.
      */
-    async function auth () {
+    this.auth = async function auth () {
         if (authenticated) {
             return authenticated;
         }
@@ -173,7 +173,7 @@ function Scraper (marketId, worldNumber) {
         }
 
         throw syncStatus.ALL_ACCOUNTS_FAILED;
-    }
+    };
 
     /**
      * Select an account's character (world). Simulates the emits
@@ -182,7 +182,7 @@ function Scraper (marketId, worldNumber) {
      * @param {Number} characterId
      * @return {Promise<AccountCharacter|Boolean>}
      */
-    async function selectCharacter (characterId) {
+    this.selectCharacter = async function selectCharacter (characterId) {
         if (!worldNumber) {
             throw new Error('Scraper not configured to select characters (missing worldNumber argument)');
         }
@@ -277,14 +277,14 @@ function Scraper (marketId, worldNumber) {
         characterSelected = character;
 
         return characterSelected;
-    }
+    };
 
     /**
      * Create a character on a specific world.
      * @param {Number} worldNumber
      * @return {Promise<AccountCharacter>}
      */
-    async function createCharacter (worldNumber) {
+    this.createCharacter = async function createCharacter (worldNumber) {
         if (typeof worldNumber !== 'number') {
             throw new TypeError('worldNumber argument must be of type Number.');
         }
@@ -292,7 +292,7 @@ function Scraper (marketId, worldNumber) {
         const worldId = marketId + worldNumber;
         debug.sync('world:%s create character', worldId);
         return await emit('Authentication/createCharacter', {world: worldId});
-    }
+    };
 
     /**
      * @return {Promise<{
@@ -304,7 +304,7 @@ function Scraper (marketId, worldNumber) {
      *     villagesByPlayer: Map<Number, Number[]>
      * }>}
      */
-    async function data () {
+    this.data = async function data () {
         const CHUNK_SIZE = 50;
         const COORDS_REFERENCE = {
             topLeft: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
@@ -523,12 +523,12 @@ function Scraper (marketId, worldNumber) {
             villagesByPlayer,
             playersByTribe
         };
-    }
+    };
 
     /**
      * @return {Promise<{players: Map<Number, Array>, tribes: Map<Number, Array>}>}
      */
-    async function achievements () {
+    this.achievements = async function achievements () {
         const achievementsMap = {
             players: {
                 router: 'Achievement/getCharacterAchievements',
@@ -627,17 +627,9 @@ function Scraper (marketId, worldNumber) {
         await loadPlayersAchievements();
 
         return achievementsData;
-    }
+    };
 
     init();
-
-    this.kill = kill;
-    this.onKill = onKill;
-    this.auth = auth;
-    this.selectCharacter = selectCharacter;
-    this.createCharacter = createCharacter;
-    this.data = data;
-    this.achievements = achievements;
 }
 
 async function commitMarketTimeOffset (timeOffset, marketId) {
