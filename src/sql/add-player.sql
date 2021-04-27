@@ -11,7 +11,7 @@ INSERT INTO ${worldId:name}.players (
     bash_points_def,
     bash_points_total
 ) VALUES (
-    ${id},
+    ${playerId},
     ${name},
     ${points},
     ${villages},

@@ -2,16 +2,52 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const async = require('async');
 const utils = require('./utils.js');
 const debug = require('./debug.js');
 const {db, sql} = require('./db.js');
 const syncStatus = require('./types/sync-status');
 
 const userAgent = 'Mozilla/5.0%20(X11;%20Linux%20x86_64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/89.0.4389.114%20Safari/537.36';
-const MAP_CHUNK_SIZE = 25;
-const RANKING_QUERY_COUNT = 25;
+const SIMUL_MAP_CHUNK_SIZE = 25;
+const MAP_CHUNK_SIZE = 50;
 let LEVEL_EXPONENT;
 let LEVEL_FACTOR;
+/** @enum {Number} */
+const boundarieMapDirections = {LEFT: 0, RIGHT: 1, TOP: 2, BOTTOM: 3};
+/** @enum {Number} */
+const remainingMapDirections = {TOP_LEFT: 0, TOP_RIGHT: 1, BOTTOM_LEFT: 2, BOTTOM_RIGHT: 3};
+/**
+ * Those continents are used to detect how big a world is.
+ * For each direction, each continent is loaded until one return zero villages.
+ * Than the previous continent coord is defined as a boundarie limit.
+ * @type {Object}
+ */
+const BOUNDARIE_CONTINENT_REFERENCE = {
+    [boundarieMapDirections.LEFT]: [[400, 400], [400, 500], [300, 400], [300, 500], [200, 400], [200, 500], [100, 400], [100, 500], [0, 400], [0, 500]],
+    [boundarieMapDirections.RIGHT]: [[500, 400], [500, 500], [600, 400], [600, 500], [700, 400], [700, 500], [800, 400], [800, 500], [900, 400], [900, 500]],
+    [boundarieMapDirections.TOP]: [[400, 300], [500, 300], [400, 200], [500, 200], [400, 100], [500, 100], [400, 0], [500, 0]],
+    [boundarieMapDirections.BOTTOM]: [[400, 600], [500, 600], [400, 700], [500, 700], [400, 800], [500, 800], [400, 900], [500, 900]]
+};
+/**
+ * All remaing continents that are not present on BOUNDARIE_CONTINENT_REFERENCE.
+ * @type {Object}
+ */
+const REMAINING_CONTINENT_REFERENCE = {
+    [remainingMapDirections.TOP_LEFT]: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
+    [remainingMapDirections.TOP_RIGHT]: [[600, 0], [700, 0], [800, 0], [900, 0], [600, 100], [700, 100], [800, 100], [900, 100], [600, 200], [700, 200], [800, 200], [900, 200], [600, 300], [700, 300], [800, 300], [900, 300]],
+    [remainingMapDirections.BOTTOM_LEFT]: [[0, 600], [100, 600], [200, 600], [300, 600], [0, 700], [100, 700], [200, 700], [300, 700], [0, 800], [100, 800], [200, 800], [300, 800], [0, 900], [100, 900], [200, 900], [300, 900]],
+    [remainingMapDirections.BOTTOM_RIGHT]: [[600, 600], [700, 600], [800, 600], [900, 600], [600, 700], [700, 700], [800, 700], [900, 700], [600, 800], [700, 800], [800, 800], [900, 800], [600, 900], [700, 900], [800, 900], [900, 900]]
+};
+
+const emitRankingData = {
+    area_type: 'world',
+    offset: 0,
+    count: 1,
+    order_by: 'rank',
+    order_dir: 0,
+    query: ''
+};
 
 /**
  * @class
@@ -256,14 +292,14 @@ function Scraper (marketId, worldNumber) {
             village = characterInfo.villages[0];
         }
 
-        const coords = scaledGridCoordinates(village.x, village.y, 25, 25, MAP_CHUNK_SIZE);
+        const coords = scaledGridCoordinates(village.x, village.y, 25, 25, SIMUL_MAP_CHUNK_SIZE);
 
         for (const [x, y] of coords) {
             emit('Map/getVillagesByArea', {
-                x: x * MAP_CHUNK_SIZE,
-                y: y * MAP_CHUNK_SIZE,
-                width: MAP_CHUNK_SIZE,
-                height: MAP_CHUNK_SIZE,
+                x: x * SIMUL_MAP_CHUNK_SIZE,
+                y: y * SIMUL_MAP_CHUNK_SIZE,
+                width: SIMUL_MAP_CHUNK_SIZE,
+                height: SIMUL_MAP_CHUNK_SIZE,
                 character_id: characterId
             });
         }
@@ -336,329 +372,217 @@ function Scraper (marketId, worldNumber) {
      * }>}
      */
     this.data = async function data () {
-        const CHUNK_SIZE = 50;
-        const COORDS_REFERENCE = {
-            topLeft: [[0, 0], [100, 0], [200, 0], [300, 0], [0, 100], [100, 100], [200, 100], [300, 100], [0, 200], [100, 200], [200, 200], [300, 200], [0, 300], [100, 300], [200, 300], [300, 300]],
-            topRight: [[600, 0], [700, 0], [800, 0], [900, 0], [600, 100], [700, 100], [800, 100], [900, 100], [600, 200], [700, 200], [800, 200], [900, 200], [600, 300], [700, 300], [800, 300], [900, 300]],
-            bottomLeft: [[0, 600], [100, 600], [200, 600], [300, 600], [0, 700], [100, 700], [200, 700], [300, 700], [0, 800], [100, 800], [200, 800], [300, 800], [0, 900], [100, 900], [200, 900], [300, 900]],
-            bottomRight: [[600, 600], [700, 600], [800, 600], [900, 600], [600, 700], [700, 700], [800, 700], [900, 700], [600, 800], [700, 800], [800, 800], [900, 800], [600, 900], [700, 900], [800, 900], [900, 900]]
-        };
-        const BOUNDARIE_REFERENCE_COORDS = {
-            left: [[400, 400], [400, 500], [300, 400], [300, 500], [200, 400], [200, 500], [100, 400], [100, 500], [0, 400], [0, 500]],
-            right: [[500, 400], [500, 500], [600, 400], [600, 500], [700, 400], [700, 500], [800, 400], [800, 500], [900, 400], [900, 500]],
-            top: [[400, 300], [500, 300], [400, 200], [500, 200], [400, 100], [500, 100], [400, 0], [500, 0]],
-            bottom: [[400, 600], [500, 600], [400, 700], [500, 700], [400, 800], [500, 800], [400, 900], [500, 900]]
-        };
-
-        const playersByTribe = new Map();
-        const villagesByPlayer = new Map();
-        const villages = new Map();
-        const tribes = new Map();
-        const players = new Map();
-        const provinces = new Map();
-
-        const getBoundaries = async function () {
-            const boundaries = {
-                left: 500,
-                right: 500,
-                top: 500,
-                bottom: 500
-            };
-
-            for (const side of ['left', 'right', 'top', 'bottom']) {
-                for (let i = 0; i < BOUNDARIE_REFERENCE_COORDS[side].length; i++) {
-                    const [x, y] = BOUNDARIE_REFERENCE_COORDS[side][i];
-
-                    if (await loadContinent(x, y) === 0) {
-                        break;
-                    }
-
-                    boundaries[side] = (side === 'left' || side === 'right') ? x : y;
-                }
+        function processTribes (rawTribes) {
+            const tribes = new Map();
+            for (const tribe of rawTribes) {
+                tribe.level = tribePowerToLevel(tribe.power);
+                tribes.set(tribe.tribe_id, tribe);
             }
-
-            return boundaries;
-        };
-
-        const filterBlocks = function (boundaries) {
-            return [
-                ...COORDS_REFERENCE.topLeft.filter(([x, y]) => x >= boundaries.left && y >= boundaries.top),
-                ...COORDS_REFERENCE.topRight.filter(([x, y]) => x <= boundaries.right && y >= boundaries.top),
-                ...COORDS_REFERENCE.bottomLeft.filter(([x, y]) => x >= boundaries.left && y <= boundaries.bottom),
-                ...COORDS_REFERENCE.bottomRight.filter(([x, y]) => x <= boundaries.right && y <= boundaries.bottom)
-            ];
-        };
-
-        const loadVillageSection = async (x, y) => {
-            const section = await emit('Map/getVillagesByArea', {x, y, width: CHUNK_SIZE, height: CHUNK_SIZE});
-            processVillages(section.villages);
-            return section.villages.length;
-        };
-
-        const loadContinent = async function (x, y) {
-            const loadVillages = [
-                await loadVillageSection(x, y),
-                await loadVillageSection(x + CHUNK_SIZE, y),
-                await loadVillageSection(x, y + CHUNK_SIZE),
-                await loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
-            ];
-
-            return loadVillages.reduce((sum, value) => sum + value);
-        };
-
-        const processVillages = function (rawVillages) {
-            if (!rawVillages.length) {
-                return;
-            }
-
-            for (const village of rawVillages) {
-                let province_id;
-
-                if (provinces.has(village.province_name)) {
-                    province_id = provinces.get(village.province_name);
-                } else {
-                    province_id = provinces.size;
-                    provinces.set(village.province_name, province_id);
-                }
-
-                villages.set(village.id, {
-                    x: village.x,
-                    y: village.y,
-                    name: village.name,
-                    points: village.points,
-                    character_id: village.character_id || null,
-                    province_id
-                });
-            }
-        };
-
-        const loadTribes = async (offset) => {
-            const {total} = await emit('Ranking/getTribeRanking', {
-                area_type: 'world',
-                offset: 0,
-                count: 1,
-                order_by: 'rank',
-                order_dir: 0,
-                query: ''
-            });
-
-            const data = await emit('Ranking/getTribeRanking', {
-                area_type: 'world',
-                offset: 0,
-                count: total,
-                order_by: 'rank',
-                order_dir: 0,
-                query: ''
-            });
-
-            for (const tribe of data.ranking) {
-                tribes.set(tribe.tribe_id, {
-                    bash_points_def: tribe.bash_points_def,
-                    bash_points_off: tribe.bash_points_off,
-                    bash_points_total: tribe.bash_points_total,
-                    members: tribe.members,
-                    name: tribe.name,
-                    tag: tribe.tag,
-                    points: tribe.points,
-                    points_per_member: tribe.points_per_member,
-                    points_per_villages: tribe.points_per_villages,
-                    rank: tribe.rank,
-                    victory_points: tribe.victory_points,
-                    villages: tribe.villages,
-                    level: tribePowerToLevel(tribe.power)
-                });
-            }
-        };
-
-        const loadPlayers = async (offset) => {
-            const {total} = await emit('Ranking/getCharacterRanking', {
-                area_type: 'world',
-                offset: 0,
-                count: 1,
-                order_by: 'rank',
-                order_dir: 0,
-                query: ''
-            });
-
-            const data = await emit('Ranking/getCharacterRanking', {
-                area_type: 'world',
-                offset: 0,
-                count: total,
-                order_by: 'rank',
-                order_dir: 0,
-                query: ''
-            });
-
-            for (const player of data.ranking) {
-                players.set(player.character_id, {
-                    bash_points_def: player.bash_points_def,
-                    bash_points_off: player.bash_points_off,
-                    bash_points_total: player.bash_points_total,
-                    name: player.name,
-                    points: player.points,
-                    points_per_villages: player.points_per_villages,
-                    rank: player.rank,
-                    tribe_id: player.tribe_id,
-                    victory_points: player.victory_points,
-                    villages: player.villages
-                });
-            }
-        };
-
-        const processVillagesByPlayer = function () {
-            for (const character_id of players.keys()) {
-                villagesByPlayer.set(character_id, []);
-            }
-
-            for (const [id, village] of villages.entries()) {
-                const {character_id} = village;
-
-                if (villagesByPlayer.has(character_id)) {
-                    villagesByPlayer.get(character_id).push(id);
-                }
-            }
-        };
-
-        const processPlayersByTribe = function () {
-            for (const tribe_id of tribes.keys()) {
-                playersByTribe.set(tribe_id, []);
-            }
-
-            for (const [character_id, player] of players.entries()) {
-                const {tribe_id} = player;
-
-                if (tribe_id) {
-                    playersByTribe.get(tribe_id).push(character_id);
-                }
-            }
-        };
-
-        const boundaries = await getBoundaries();
-        const missingBlocks = filterBlocks(boundaries);
-
-        for (const [x, y] of missingBlocks) {
-            await loadContinent(x, y);
+            return tribes;
         }
 
-        await loadTribes();
-        await loadPlayers();
+        function processPlayers (rawPlayers) {
+            const players = new Map();
+            for (const player of rawPlayers) {
+                players.set(player.character_id, player);
+            }
+            return players;
+        }
 
-        processVillagesByPlayer();
-        processPlayersByTribe();
+        const {villages, provinces} = await loadContinents();
+        const rawTribes = await loadTribesRanking();
+        const rawPlayers = await loadPlayersRanking();
+        const tribes = processTribes(rawTribes);
+        const players = processPlayers(rawPlayers);
+        const villagesByPlayer = processVillagesByPlayer(villages, players);
+        const playersByTribe = processPlayersByTribe(players, tribes);
 
         return {
+            provinces,
             villages,
             players,
+            playersByTribe,
             tribes,
-            provinces,
-            villagesByPlayer,
-            playersByTribe
+            villagesByPlayer
         };
     };
 
     /**
-     * @return {Promise<{players: Map<Number, Array>, tribes: Map<Number, Array>}>}
+     * @return {Promise<{
+     *     players: Map<Number, Array>,
+     *     tribes: Map<Number, Array>
+     * }>}
      */
     this.achievements = async function achievements () {
-        const achievementsMap = {
-            players: {
-                router: 'Achievement/getCharacterAchievements',
-                key: 'character_id'
-            },
-            tribes: {
-                router: 'Achievement/getTribeAchievements',
-                key: 'tribe_id'
-            }
-        };
+        async function processTribes (rawTribes) {
+            const queue = async.queue(async handler => await handler(), 4);
+            const tribesAchievements = new Map();
 
-        const playerIds = new Set();
-        const tribeIds = new Set();
-        const achievementsData = {
-            players: new Map(),
-            tribes: new Map()
-        };
-
-        const loadTribes = async (offset) => {
-            const data = await emit('Ranking/getTribeRanking', {
-                area_type: 'world',
-                offset: offset,
-                count: RANKING_QUERY_COUNT,
-                order_by: 'rank',
-                order_dir: 0,
-                query: ''
-            });
-
-            for (const tribe of data.ranking) {
-                tribeIds.add(tribe.tribe_id);
-            }
-        };
-
-        const loadPlayers = async () => {
-            const {count} = await emit('Ranking/getCharacterRanking', {
-                area_type: 'world',
-                offset: 0,
-                count: 1,
-                order_by: 'rank',
-                order_dir: 0,
-                query: ''
-            });
-
-            const data = await emit('Ranking/getCharacterRanking', {
-                area_type: 'world',
-                offset: 0,
-                count: count,
-                order_by: 'rank',
-                order_dir: 0,
-                query: ''
-            });
-
-            for (const player of data.ranking) {
-                playerIds.add(player.character_id);
-            }
-        };
-
-        const loadAchievements = async (type, id) => {
-            if (!id) {
-                return;
+            for (const {tribe_id} of rawTribes) {
+                queue.push(async function () {
+                    const {achievements} = await emit('Achievement/getTribeAchievements', {tribe_id});
+                    tribesAchievements.set(tribe_id, achievements);
+                });
             }
 
-            const {router, key} = achievementsMap[type];
-            const {achievements} = await emit(router, {[key]: id});
+            await queue.drain();
+            return tribesAchievements;
+        }
 
-            achievementsData[type].set(id, achievements.filter(achievement => achievement.level));
+        async function processPlayers (rawPlayers) {
+            const queue = async.queue(async handler => await handler(), 4);
+            const playersAchievements = new Map();
 
-            await sleep();
-        };
-
-        const loadTribesAchievements = async function () {
-            const tribeIdsArray = Array.from(tribeIds.values());
-
-            for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
-                await loadAchievements('tribes', tribeIdsArray[i]);
-                await loadAchievements('tribes', tribeIdsArray[i + 1]);
-                await loadAchievements('tribes', tribeIdsArray[i + 2]);
-                await loadAchievements('tribes', tribeIdsArray[i + 3]);
+            for (const {character_id} of rawPlayers) {
+                queue.push(async function () {
+                    const {achievements} = await emit('Achievement/getCharacterAchievements', {character_id});
+                    playersAchievements.set(character_id, achievements);
+                });
             }
+
+            await queue.drain();
+            return playersAchievements;
+        }
+
+        const rawPlayers = await loadPlayersRanking();
+        const rawTribes = await loadTribesRanking();
+        const players = await processPlayers(rawPlayers);
+        const tribes = await processTribes(rawTribes);
+
+        return {
+            players,
+            tribes
         };
-
-        const loadPlayersAchievements = async function () {
-            const playerIdsArray = Array.from(playerIds.values());
-
-            for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
-                await loadAchievements('players', playerIdsArray[i]);
-                await loadAchievements('players', playerIdsArray[i + 1]);
-                await loadAchievements('players', playerIdsArray[i + 2]);
-                await loadAchievements('players', playerIdsArray[i + 3]);
-            }
-        };
-
-        await loadTribes();
-        await loadPlayers();
-        await loadTribesAchievements();
-        await loadPlayersAchievements();
-
-        return achievementsData;
     };
+
+    async function loadVillageSection (x, y) {
+        return await emit('Map/getVillagesByArea', {x, y, width: MAP_CHUNK_SIZE, height: MAP_CHUNK_SIZE});
+    }
+
+    async function loadContinents () {
+        const rawVillages = [];
+
+        const boundaries = {
+            [boundarieMapDirections.LEFT]: 500,
+            [boundarieMapDirections.RIGHT]: 500,
+            [boundarieMapDirections.TOP]: 500,
+            [boundarieMapDirections.BOTTOM]: 500
+        };
+
+        for (const direction of Object.values(boundarieMapDirections)) {
+            for (let i = 0; i < BOUNDARIE_CONTINENT_REFERENCE[direction].length; i++) {
+                const [x, y] = BOUNDARIE_CONTINENT_REFERENCE[direction][i];
+                const continentVillages = await loadContinent(x, y);
+
+                if (continentVillages.length === 0) {
+                    break;
+                }
+
+                rawVillages.push(...continentVillages);
+                boundaries[direction] = (direction === boundarieMapDirections.LEFT || direction === boundarieMapDirections.RIGHT) ? x : y;
+            }
+        }
+
+        const missingContinents = filterContinentsOutsideBoundaries(boundaries);
+
+        for (const [x, y] of missingContinents) {
+            const continentVillages = await loadContinent(x, y);
+            rawVillages.push(...continentVillages);
+        }
+
+        return processVillages(rawVillages);
+    }
+
+    async function loadContinent (x, y) {
+        const villages = [];
+        const sections = [
+            await loadVillageSection(x, y),
+            await loadVillageSection(x + MAP_CHUNK_SIZE, y),
+            await loadVillageSection(x, y + MAP_CHUNK_SIZE),
+            await loadVillageSection(x + MAP_CHUNK_SIZE, y + MAP_CHUNK_SIZE)
+        ];
+
+        for (const section of sections) {
+            villages.push(...section.villages);
+        }
+
+        return villages;
+    }
+
+    async function loadTribesRanking () {
+        const {total} = await emit('Ranking/getTribeRanking', emitRankingData);
+        const {ranking} = await emit('Ranking/getTribeRanking', {...emitRankingData, ...{count: total}});
+        return ranking;
+    }
+
+    async function loadPlayersRanking () {
+        const {total} = await emit('Ranking/getCharacterRanking', emitRankingData);
+        const {ranking} = await emit('Ranking/getCharacterRanking', {...emitRankingData, ...{count: total}});
+        return ranking;
+    }
+
+    function processVillages (rawVillages) {
+        const villages = new Map();
+        const provinces = new Map();
+
+        for (const village of rawVillages) {
+            let province_id;
+
+            if (provinces.has(village.province_name)) {
+                province_id = provinces.get(village.province_name);
+            } else {
+                province_id = provinces.size;
+                provinces.set(village.province_name, province_id);
+            }
+
+            villages.set(village.id, {
+                x: village.x,
+                y: village.y,
+                name: village.name,
+                points: village.points,
+                character_id: village.character_id || null,
+                province_id
+            });
+        }
+
+        return {villages, provinces};
+    }
+
+    function processVillagesByPlayer (villages, players) {
+        const villagesByPlayer = new Map();
+
+        for (const character_id of players.keys()) {
+            villagesByPlayer.set(character_id, []);
+        }
+
+        for (const [id, village] of villages.entries()) {
+            const {character_id} = village;
+
+            if (villagesByPlayer.has(character_id)) {
+                villagesByPlayer.get(character_id).push(id);
+            }
+        }
+
+        return villagesByPlayer;
+    }
+
+    function processPlayersByTribe (players, tribes) {
+        const playersByTribe = new Map();
+
+        for (const tribe_id of tribes.keys()) {
+            playersByTribe.set(tribe_id, []);
+        }
+
+        for (const [character_id, player] of players.entries()) {
+            const {tribe_id} = player;
+
+            if (tribe_id) {
+                playersByTribe.get(tribe_id).push(character_id);
+            }
+        }
+
+        return playersByTribe;
+    }
 
     init();
 }
@@ -734,8 +658,8 @@ async function fetchWorldMapStructure (fileName, marketId, worldNumber) {
     const buffer = await utils.getBuffer(url);
     const gzipped = zlib.gzipSync(buffer);
 
-    fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true});
-    fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped);
+    await fs.promises.mkdir(path.join('.', 'data', worldId), {recursive: true});
+    await fs.promises.writeFile(path.join('.', 'data', worldId, 'struct'), gzipped);
 }
 
 
@@ -792,10 +716,19 @@ function tribePowerToLevel (power) {
     return level;
 }
 
-function sleep (ms = 250) {
-    return new Promise(function (resolve) {
-        setTimeout(resolve, ms);
-    });
+// function sleep (ms = 250) {
+//     return new Promise(function (resolve) {
+//         setTimeout(resolve, ms);
+//     });
+// }
+
+function filterContinentsOutsideBoundaries (boundaries) {
+    return [
+        ...REMAINING_CONTINENT_REFERENCE[remainingMapDirections.TOP_LEFT].filter(([x, y]) => x >= boundaries[boundarieMapDirections.LEFT] && y >= boundaries[boundarieMapDirections.TOP]),
+        ...REMAINING_CONTINENT_REFERENCE[remainingMapDirections.TOP_RIGHT].filter(([x, y]) => x <= boundaries[boundarieMapDirections.RIGHT] && y >= boundaries[boundarieMapDirections.TOP]),
+        ...REMAINING_CONTINENT_REFERENCE[remainingMapDirections.BOTTOM_LEFT].filter(([x, y]) => x >= boundaries[boundarieMapDirections.LEFT] && y <= boundaries[boundarieMapDirections.BOTTOM]),
+        ...REMAINING_CONTINENT_REFERENCE[remainingMapDirections.BOTTOM_RIGHT].filter(([x, y]) => x <= boundaries[boundarieMapDirections.RIGHT] && y <= boundaries[boundarieMapDirections.BOTTOM])
+    ];
 }
 
 module.exports = Scraper;

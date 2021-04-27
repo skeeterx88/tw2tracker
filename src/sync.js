@@ -506,20 +506,20 @@ async function commitDataDatabase (data, marketId, worldNumber) {
         const oldTribeRecords = new Map(await tx.map(sql('get-subject-records'), {worldId, type: 'tribes'}, subject => [subject.id, [subject.best_rank, subject.best_points, subject.best_villages]]));
 
         async function updateSubjectsData () {
-            for (const [id, subject] of data.tribes.entries()) {
-                if (oldTribes.has(id)) {
-                    await tx.none(sql('update-tribe'), {worldId, id, ...subject});
+            for (const [tribeId, subject] of data.tribes.entries()) {
+                if (oldTribes.has(tribeId)) {
+                    await tx.none(sql('update-tribe'), {worldId, tribeId, ...subject});
                 } else {
-                    await tx.none(sql('add-tribe'), {worldId, id, ...subject});
+                    await tx.none(sql('add-tribe'), {worldId, tribeId, ...subject});
                 }
             }
 
-            for (const [id, subject] of data.players.entries()) {
-                if (oldPlayers.has(id)) {
-                    await tx.none(sql('update-player'), {worldId, id, ...subject});
+            for (const [playerId, subject] of data.players.entries()) {
+                if (oldPlayers.has(playerId)) {
+                    await tx.none(sql('update-player'), {worldId, playerId, ...subject});
                 } else {
-                    await tx.none(sql('add-player'), {worldId, id, ...subject});
-                    await tx.none(sql('add-player-global'), {worldNumber, marketId, id, name: subject.name});
+                    await tx.none(sql('add-player'), {worldId, playerId, ...subject});
+                    await tx.none(sql('add-player-global'), {worldNumber, marketId, playerId, name: subject.name});
                 }
             }
         }

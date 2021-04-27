@@ -14,7 +14,7 @@ INSERT INTO ${worldId:name}.tribes (
     bash_points_def,
     bash_points_total
 ) VALUES (
-    ${id},
+    ${tribeId},
     ${name},
     ${tag},
     ${points},

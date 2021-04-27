@@ -10,4 +10,4 @@ SET points = ${points},
     bash_points_total = ${bash_points_total},
     last_seen = TIMEZONE('UTC', NOW()),
     archived = FALSE
-WHERE id = ${id};
+WHERE id = ${playerId};
