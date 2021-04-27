@@ -121,7 +121,9 @@ async function trigger (msg) {
             break;
         }
         case syncCommands.TOGGLE: {
-            await toggleWorld(msg.marketId, msg.worldNumber);
+            await toggleWorld(msg.marketId, msg.worldNumber).catch(function () {
+                // TODO: Add a way to comunicate the results back to the server instance (process) that triggered this command.
+            });
             break;
         }
         case syncCommands.DATA_RESET_QUEUE: {
@@ -224,7 +226,15 @@ async function syncWorld (type, marketId, worldNumber) {
             reject(syncStatus.TIMEOUT);
         }, syncTypeValues.MAX_RUNNING_TIME);
 
-        const world = await getOpenWorld(worldId);
+        const [world] = await db.any(sql('get-world'), {worldId});
+
+        if (!world) {
+            return reject(syncStatus.WORLD_NOT_FOUND);
+        }
+
+        if (!world.open) {
+            return reject(syncStatus.WORLD_CLOSED);
+        }
 
         if (!world.sync_enabled) {
             return reject(syncStatus.NOT_ENABLED);
@@ -404,7 +414,12 @@ async function syncMarketList () {
 
 async function toggleWorld (marketId, worldNumber) {
     const worldId = marketId + worldNumber;
-    const world = await getOpenWorld(worldId);
+    const [world] = await db.any(sql('get-world'), {worldId});
+
+    if (!world) {
+        return false;
+    }
+
     const enabled = !world.sync_enabled;
 
     await db.query(sql('sync-toggle-world'), {
@@ -1073,20 +1088,6 @@ async function initTasks () {
 }
 
 // helpers
-
-async function getOpenWorld (worldId) {
-    const [world] = await db.any(sql('get-world'), {worldId});
-
-    if (!world) {
-        throw new Error(`World ${worldId} not found.`);
-    }
-
-    if (!world.open) {
-        throw new Error(`World ${worldId} is closed`);
-    }
-
-    return world;
-}
 
 async function generateAchievementCommits (tx, subjectType, achievements, worldId) {
     const achievementsToCommit = [];

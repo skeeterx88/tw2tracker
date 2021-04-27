@@ -13,7 +13,8 @@ const syncStatus = {
     TIMEOUT: 'timeout',
     IN_PROGRESS: 'in_progress',
     FAILED_TO_SELECT_CHARACTER: 'failed_to_select_character',
-    WORLD_IN_MAINTENANCE: 'world_in_maintenance'
+    WORLD_IN_MAINTENANCE: 'world_in_maintenance',
+    WORLD_NOT_FOUND: 'world_not_found'
 };
 
 module.exports = syncStatus;
