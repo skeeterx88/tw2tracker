@@ -401,10 +401,19 @@ function Scraper (marketId, worldNumber) {
         };
 
         const loadTribes = async (offset) => {
+            const {total} = await emit('Ranking/getTribeRanking', {
+                area_type: 'world',
+                offset: 0,
+                count: 1,
+                order_by: 'rank',
+                order_dir: 0,
+                query: ''
+            });
+
             const data = await emit('Ranking/getTribeRanking', {
                 area_type: 'world',
-                offset,
-                count: RANKING_QUERY_COUNT,
+                offset: 0,
+                count: total,
                 order_by: 'rank',
                 order_dir: 0,
                 query: ''
@@ -427,35 +436,22 @@ function Scraper (marketId, worldNumber) {
                     level: tribePowerToLevel(tribe.power)
                 });
             }
-
-            return data.total;
-        };
-
-        const processTribes = async function () {
-            let offset = 0;
-
-            const total = await loadTribes(offset);
-            offset += RANKING_QUERY_COUNT;
-
-            if (total <= RANKING_QUERY_COUNT) {
-                return;
-            }
-
-            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-                await Promise.all([
-                    loadTribes(offset),
-                    loadTribes(offset + RANKING_QUERY_COUNT),
-                    loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
-                    loadTribes(offset + (RANKING_QUERY_COUNT * 3))
-                ]);
-            }
         };
 
         const loadPlayers = async (offset) => {
+            const {total} = await emit('Ranking/getCharacterRanking', {
+                area_type: 'world',
+                offset: 0,
+                count: 1,
+                order_by: 'rank',
+                order_dir: 0,
+                query: ''
+            });
+
             const data = await emit('Ranking/getCharacterRanking', {
                 area_type: 'world',
-                offset: offset,
-                count: RANKING_QUERY_COUNT,
+                offset: 0,
+                count: total,
                 order_by: 'rank',
                 order_dir: 0,
                 query: ''
@@ -474,28 +470,6 @@ function Scraper (marketId, worldNumber) {
                     victory_points: player.victory_points,
                     villages: player.villages
                 });
-            }
-
-            return data.total;
-        };
-
-        const processPlayers = async function () {
-            let offset = 0;
-
-            const total = await loadPlayers(offset);
-            offset += RANKING_QUERY_COUNT;
-
-            if (total <= RANKING_QUERY_COUNT) {
-                return;
-            }
-
-            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-                await Promise.all([
-                    loadPlayers(offset),
-                    loadPlayers(offset + RANKING_QUERY_COUNT),
-                    loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
-                    loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
-                ]);
             }
         };
 
@@ -534,8 +508,8 @@ function Scraper (marketId, worldNumber) {
             await loadContinent(x, y);
         }
 
-        await processTribes();
-        await processPlayers();
+        await loadTribes();
+        await loadPlayers();
 
         processVillagesByPlayer();
         processPlayersByTribe();
@@ -585,33 +559,22 @@ function Scraper (marketId, worldNumber) {
             for (const tribe of data.ranking) {
                 tribeIds.add(tribe.tribe_id);
             }
-
-            return data.total;
         };
 
-        const processTribes = async function () {
-            let offset = 0;
+        const loadPlayers = async () => {
+            const {count} = await emit('Ranking/getCharacterRanking', {
+                area_type: 'world',
+                offset: 0,
+                count: 1,
+                order_by: 'rank',
+                order_dir: 0,
+                query: ''
+            });
 
-            const total = await loadTribes(offset);
-            offset += RANKING_QUERY_COUNT;
-
-            if (total <= RANKING_QUERY_COUNT) {
-                return;
-            }
-
-            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-                await loadTribes(offset);
-                await loadTribes(offset + RANKING_QUERY_COUNT);
-                await loadTribes(offset + (RANKING_QUERY_COUNT * 2));
-                await loadTribes(offset + (RANKING_QUERY_COUNT * 3));
-            }
-        };
-
-        const loadPlayers = async (offset) => {
             const data = await emit('Ranking/getCharacterRanking', {
                 area_type: 'world',
-                offset: offset,
-                count: RANKING_QUERY_COUNT,
+                offset: 0,
+                count: count,
                 order_by: 'rank',
                 order_dir: 0,
                 query: ''
@@ -619,28 +582,6 @@ function Scraper (marketId, worldNumber) {
 
             for (const player of data.ranking) {
                 playerIds.add(player.character_id);
-            }
-
-            return data.total;
-        };
-
-        const processPlayers = async function () {
-            let offset = 0;
-
-            const total = await loadPlayers(offset);
-            offset += RANKING_QUERY_COUNT;
-
-            if (total <= RANKING_QUERY_COUNT) {
-                return;
-            }
-
-            for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-                await Promise.all([
-                    loadPlayers(offset),
-                    loadPlayers(offset + RANKING_QUERY_COUNT),
-                    loadPlayers(offset + (RANKING_QUERY_COUNT * 2)),
-                    loadPlayers(offset + (RANKING_QUERY_COUNT * 3))
-                ]);
             }
         };
 
@@ -653,6 +594,8 @@ function Scraper (marketId, worldNumber) {
             const {achievements} = await emit(router, {[key]: id});
 
             achievementsData[type].set(id, achievements.filter(achievement => achievement.level));
+
+            await sleep();
         };
 
         const loadTribesAchievements = async function () {
@@ -677,8 +620,8 @@ function Scraper (marketId, worldNumber) {
             }
         };
 
-        await processTribes();
-        await processPlayers();
+        await loadTribes();
+        await loadPlayers();
         await loadTribesAchievements();
         await loadPlayersAchievements();
 
@@ -823,6 +766,12 @@ function tribePowerToLevel (power) {
     }
 
     return level;
+}
+
+function sleep (ms = 250) {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, ms);
+    });
 }
 
 module.exports = Scraper;
