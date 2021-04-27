@@ -256,15 +256,15 @@ async function syncWorld (type, marketId, worldNumber) {
         switch (type) {
             case syncTypes.DATA: {
                 const data = await scraper.data();
+                await commitRawDataFilesystem(data, worldId);
                 await commitDataDatabase(data, marketId, worldNumber);
                 await commitDataFilesystem(worldId);
-                await commitRawDataFilesystem(data, worldId);
                 break;
             }
             case syncTypes.ACHIEVEMENTS: {
                 const data = await scraper.achievements();
-                await commitAchievementsDatabase(data, worldId);
                 await commitRawAchievementsFilesystem(data, worldId);
+                await commitAchievementsDatabase(data, worldId);
                 break;
             }
         }
