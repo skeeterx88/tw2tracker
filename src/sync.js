@@ -164,7 +164,7 @@ async function initSyncQueue () {
  */
 
 /**
- * @param {String} type
+ * @param {syncTypes} type
  * @param {Array<QueueItem>} newItems
  * @param {Boolean=} force Ignore active worlds, add to the queue anyway.
  * @return {Promise<void>}
