@@ -733,7 +733,7 @@ require([
                 const worlds = await responseWorlds.json();
 
                 allWorlds = worlds;
-                allMarkets = new Set(worlds.map((world) => world.market));
+                allMarkets = new Set(worlds.map((world) => world.market_id));
 
                 buildWorldList();
                 changeWorldList(marketId);
@@ -780,7 +780,7 @@ require([
         };
 
         const changeWorldList = function (newMarket) {
-            const marketWorlds = allWorlds.filter((world) => world.market === newMarket);
+            const marketWorlds = allWorlds.filter((world) => world.market_id === newMarket);
 
             while ($marketWorlds.firstChild) {
                 $marketWorlds.removeChild($marketWorlds.lastChild);

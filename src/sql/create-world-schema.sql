@@ -1,6 +1,6 @@
 INSERT INTO public.worlds (
-    market,
-    num,
+    market_id,
+    world_number,
     world_id,
     name,
     open

@@ -23,27 +23,27 @@ const conquestsRouter = require('./stats-conquests.js');
 const marketsRouter = async function (request, reply) {
     const worlds = await db.any(sql('get-worlds'));
     const openWorlds = worlds.filter(world => world.open);
-    const marketsIds = Array.from(new Set(worlds.map(world => world.market)));
+    const marketsIds = Array.from(new Set(worlds.map(world => world.market_id)));
     const worldsByMarket = {};
 
     for (const world of worlds) {
-        worldsByMarket[world.market] = worldsByMarket[world.market] || {closed: [], open: []};
+        worldsByMarket[world.market_id] = worldsByMarket[world.market_id] || {closed: [], open: []};
 
         if (world.open) {
-            worldsByMarket[world.market].open.push([world.num, world]);
+            worldsByMarket[world.market_id].open.push([world.world_number, world]);
         } else {
-            worldsByMarket[world.market].closed.push([world.num, world]);
+            worldsByMarket[world.market_id].closed.push([world.world_number, world]);
         }
     }
 
     const marketStats = marketsIds.map(function (id) {
         return {
             id,
-            players: openWorlds.reduce((base, next) => next.market === id ? base + next.player_count : base, 0),
-            tribes: openWorlds.reduce((base, next) => next.market === id ? base + next.tribe_count : base, 0),
-            villages: openWorlds.reduce((base, next) => next.market === id ? base + next.village_count : base, 0),
-            openWorld: worlds.filter((world) => world.market === id && world.open).length,
-            closedWorld: worlds.filter((world) => world.market === id && !world.open).length
+            players: openWorlds.reduce((base, next) => next.market_id === id ? base + next.player_count : base, 0),
+            tribes: openWorlds.reduce((base, next) => next.market_id === id ? base + next.tribe_count : base, 0),
+            villages: openWorlds.reduce((base, next) => next.market_id === id ? base + next.village_count : base, 0),
+            openWorld: worlds.filter((world) => world.market_id === id && world.open).length,
+            closedWorld: worlds.filter((world) => world.market_id === id && !world.open).length
         };
     });
 
@@ -158,7 +158,7 @@ const worldRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: world.open ? i18n('world', 'navigation', reply.locals.lang) : i18n('world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}/`, replaces: [world.name]}
+            {label: world.open ? i18n('world', 'navigation', reply.locals.lang) : i18n('world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}/`, replaces: [world.name]}
         ])
     });
 };
@@ -170,7 +170,7 @@ const worldsRouter = async function (request, reply, done) {
 
     const marketId = request.params.marketId;
     const syncedWorlds = await db.any(sql('get-synced-worlds'));
-    const marketWorlds = syncedWorlds.filter((world) => world.market === marketId);
+    const marketWorlds = syncedWorlds.filter((world) => world.market_id === marketId);
 
     if (!marketWorlds.length) {
         throw createError(404, i18n('missing_world', 'errors', reply.locals.lang));

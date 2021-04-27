@@ -24,7 +24,7 @@
 
                     <% for (const world of worlds[worldState]) { -%>
                         <div class="world <%= worldState %>">
-                            <h4 class="title"><span class="flag-<%= world.market %>"><%= world.name %></span><sup><%= world.num %></sup></h4>
+                            <h4 class="title"><span class="flag-<%= world.market_id %>"><%= world.name %></span><sup><%= world.world_number %></sup></h4>
 
                             <div class="stats">
                                 <p><span class="label"><%= i18n('players', 'world_list', [formatNumbers(world.player_count)]) %></span></p>
@@ -52,8 +52,8 @@
                             <% } %>
 
                             <div class="actions">
-                                <a class="relax-button" href="/stats/<%= world.market %>/<%= world.num %>"><%= i18n('button_stats', 'world_list') %></a>
-                                <a class="relax-button" href="/maps/<%= world.market %>/<%= world.num %>"><%= i18n('button_map', 'world_list') %></a>
+                                <a class="relax-button" href="/stats/<%= world.market_id %>/<%= world.world_number %>"><%= i18n('button_stats', 'world_list') %></a>
+                                <a class="relax-button" href="/maps/<%= world.market_id %>/<%= world.world_number %>"><%= i18n('button_map', 'world_list') %></a>
                             </div>
                         </div>
                     <% } -%>

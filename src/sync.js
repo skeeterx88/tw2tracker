@@ -330,7 +330,7 @@ async function syncWorld (type, marketId, worldNumber) {
 async function syncAllWorlds (type) {
     const syncQueue = await db.map(sql('get-sync-queue-non-active'), {type}, ({market_id, world_number}) => market_id + world_number);
     const worlds = await db.map(sql('get-sync-enabled-worlds'), [], function (world) {
-        return !syncQueue.includes(world.world_id) ? {market_id: world.market, world_number: world.num} : false;
+        return !syncQueue.includes(world.world_id) ? {market_id: world.market_id, world_number: world.world_number} : false;
     });
     const uniqueWorlds = worlds.filter(world => world !== false);
     await addSyncQueue(type, uniqueWorlds);

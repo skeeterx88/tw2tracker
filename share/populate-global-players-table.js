@@ -5,8 +5,8 @@ db.task(async function (tx) {
     const exists = {};
 
     for (const world of worlds) {
-        const marketId = world.market;
-        const worldNumber = world.num;
+        const marketId = world.market_id;
+        const worldNumber = world.world_number;
         const worldId = world.world_id;
 
         exists[worldId] = {};

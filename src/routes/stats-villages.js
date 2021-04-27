@@ -51,8 +51,8 @@ const villageRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}`, replaces: [world.name]},
-            {label: i18n('village', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.num}/villages/${village.id}`, replaces: [village.name]}
+            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
+            {label: i18n('village', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}/villages/${village.id}`, replaces: [village.name]}
         ])
     });
 };

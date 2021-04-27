@@ -1,3 +1,3 @@
 SELECT * FROM public.worlds
-WHERE market = ${marketId}
-ORDER BY num
+WHERE market_id = ${marketId}
+ORDER BY world_number

@@ -1,2 +1,2 @@
 SELECT * FROM public.worlds
-ORDER BY market, num
+ORDER BY market_id, world_number

@@ -1,4 +1,4 @@
 UPDATE public.worlds
 SET sync_enabled = ${enabled}::bool
-WHERE market = ${marketId}
-AND num = ${worldNumber}
+WHERE market_id = ${marketId}
+AND world_number = ${worldNumber}

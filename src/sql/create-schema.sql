@@ -57,8 +57,8 @@ CREATE TYPE public.sync_status AS ENUM (
 );
 
 CREATE TABLE public.worlds (
-    market VARCHAR (10) REFERENCES public.markets(id),
-    num SMALLINT,
+    market_id VARCHAR (10) REFERENCES public.markets(id),
+    world_number SMALLINT,
     world_id VARCHAR (5),
     name VARCHAR (255) NOT NULL,
     last_data_sync_date TIMESTAMP,

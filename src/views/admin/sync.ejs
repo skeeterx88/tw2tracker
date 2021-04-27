@@ -5,10 +5,10 @@
 
             <div class="section-content">
                 <% for (let world of openWorlds) { %>
-                    <div class="world relax-container vertical" id="world-<%= world.world_id %>" data-market-id="<%= world.market %>" data-world-number="<%= world.num %>">
+                    <div class="world relax-container vertical" id="world-<%= world.world_id %>" data-market-id="<%= world.market_id %>" data-world-number="<%= world.world_number %>">
                         <div class="short-info">
                             <div class="world-id">
-                                <a href="/stats/<%= world.market %>/<%= world.num %>"><span class="flag-<%= world.market %>"><%= world.market %><%= world.num %><% if (!world.open) { __append(` (${i18n('closed', 'admin_sync', lang)})`) } -%></span></a>
+                                <a href="/stats/<%= world.market_id %>/<%= world.world_number %>"><span class="flag-<%= world.market_id %>"><%= world.market_id %><%= world.world_number %><% if (!world.open) { __append(` (${i18n('closed', 'admin_sync', lang)})`) } -%></span></a>
                             </div>
 
                             <div class="values">
@@ -29,12 +29,12 @@
                         <div class="actions">
                             <% if (world.open) { -%>
                                 <% if (account.privileges[privilegeTypes.START_SYNC]) { %>
-                                    <a class="sync-data relax-button<% __append(world.sync_data_active ? ' disabled' : '') %>" data-active="no" href="/admin/sync/data/<%= world.market %>/<%= world.num %>"><%= i18n('button_sync_world_data', 'admin_sync') %></a>
-                                    <a class="sync-achievements relax-button<% __append(world.sync_achievements_active ? ' disabled' : '') %>" data-active="no" href="/admin/sync/achievements/<%= world.market %>/<%= world.num %>"><%= i18n('button_sync_world_achievements', 'admin_sync') %></a>
+                                    <a class="sync-data relax-button<% __append(world.sync_data_active ? ' disabled' : '') %>" data-active="no" href="/admin/sync/data/<%= world.market_id %>/<%= world.world_number %>"><%= i18n('button_sync_world_data', 'admin_sync') %></a>
+                                    <a class="sync-achievements relax-button<% __append(world.sync_achievements_active ? ' disabled' : '') %>" data-active="no" href="/admin/sync/achievements/<%= world.market_id %>/<%= world.world_number %>"><%= i18n('button_sync_world_achievements', 'admin_sync') %></a>
                                 <% } %>
 
                                 <% if (account.privileges[privilegeTypes.CONTROL_SYNC]) { %>
-                                    <a class="sync-toggle relax-button <% __append(world.sync_enabled ? 'red' : 'green') %> right" href="/admin/sync/toggle/<%= world.market %>/<%= world.num %>"><%= i18n(world.sync_enabled ? 'button_disable_sync' : 'button_enable_sync', 'admin_sync') %></a>
+                                    <a class="sync-toggle relax-button <% __append(world.sync_enabled ? 'red' : 'green') %> right" href="/admin/sync/toggle/<%= world.market_id %>/<%= world.world_number %>"><%= i18n(world.sync_enabled ? 'button_disable_sync' : 'button_enable_sync', 'admin_sync') %></a>
                                 <% } %>
                             <% } -%>
                         </div>
