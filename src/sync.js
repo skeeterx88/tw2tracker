@@ -308,6 +308,10 @@ async function syncWorld (type, marketId, worldNumber) {
                 db.query(sql('close-world'), [marketId, worldNumber]);
                 break;
             }
+            case syncStatus.WORLD_NOT_FOUND: {
+                debug.sync('world:%s world is not present on database anymore?', worldId);
+                break;
+            }
             case syncStatus.FAILED_TO_SELECT_CHARACTER: {
                 debug.sync('world:%s failed to select character', worldId);
                 break;
