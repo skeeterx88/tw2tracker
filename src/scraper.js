@@ -364,12 +364,12 @@ function Scraper (marketId, worldNumber) {
         };
 
         const loadContinent = async function (x, y) {
-            const loadVillages = await Promise.all([
-                loadVillageSection(x, y),
-                loadVillageSection(x + CHUNK_SIZE, y),
-                loadVillageSection(x, y + CHUNK_SIZE),
-                loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
-            ]);
+            const loadVillages = [
+                await loadVillageSection(x, y),
+                await loadVillageSection(x + CHUNK_SIZE, y),
+                await loadVillageSection(x, y + CHUNK_SIZE),
+                await loadVillageSection(x + CHUNK_SIZE, y + CHUNK_SIZE)
+            ];
 
             return loadVillages.reduce((sum, value) => sum + value);
         };
@@ -600,12 +600,10 @@ function Scraper (marketId, worldNumber) {
             }
 
             for (; offset < total; offset += RANKING_QUERY_COUNT * 4) {
-                await Promise.all([
-                    loadTribes(offset),
-                    loadTribes(offset + RANKING_QUERY_COUNT),
-                    loadTribes(offset + (RANKING_QUERY_COUNT * 2)),
-                    loadTribes(offset + (RANKING_QUERY_COUNT * 3))
-                ]);
+                await loadTribes(offset);
+                await loadTribes(offset + RANKING_QUERY_COUNT);
+                await loadTribes(offset + (RANKING_QUERY_COUNT * 2));
+                await loadTribes(offset + (RANKING_QUERY_COUNT * 3));
             }
         };
 
@@ -661,12 +659,10 @@ function Scraper (marketId, worldNumber) {
             const tribeIdsArray = Array.from(tribeIds.values());
 
             for (let i = 0, l = tribeIdsArray.length; i < l; i += 4) {
-                await Promise.all([
-                    loadAchievements('tribes', tribeIdsArray[i]),
-                    loadAchievements('tribes', tribeIdsArray[i + 1]),
-                    loadAchievements('tribes', tribeIdsArray[i + 2]),
-                    loadAchievements('tribes', tribeIdsArray[i + 3])
-                ]);
+                await loadAchievements('tribes', tribeIdsArray[i]);
+                await loadAchievements('tribes', tribeIdsArray[i + 1]);
+                await loadAchievements('tribes', tribeIdsArray[i + 2]);
+                await loadAchievements('tribes', tribeIdsArray[i + 3]);
             }
         };
 
@@ -674,12 +670,10 @@ function Scraper (marketId, worldNumber) {
             const playerIdsArray = Array.from(playerIds.values());
 
             for (let i = 0, l = playerIdsArray.length; i < l; i += 4) {
-                await Promise.all([
-                    loadAchievements('players', playerIdsArray[i]),
-                    loadAchievements('players', playerIdsArray[i + 1]),
-                    loadAchievements('players', playerIdsArray[i + 2]),
-                    loadAchievements('players', playerIdsArray[i + 3])
-                ]);
+                await loadAchievements('players', playerIdsArray[i]);
+                await loadAchievements('players', playerIdsArray[i + 1]);
+                await loadAchievements('players', playerIdsArray[i + 2]);
+                await loadAchievements('players', playerIdsArray[i + 3]);
             }
         };
 
