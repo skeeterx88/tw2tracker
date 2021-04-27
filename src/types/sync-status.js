@@ -14,7 +14,8 @@ const syncStatus = {
     IN_PROGRESS: 'in_progress',
     FAILED_TO_SELECT_CHARACTER: 'failed_to_select_character',
     WORLD_IN_MAINTENANCE: 'world_in_maintenance',
-    WORLD_NOT_FOUND: 'world_not_found'
+    WORLD_NOT_FOUND: 'world_not_found',
+    CHARACTER_NOT_SELECTED: 'character_not_selected'
 };
 
 module.exports = syncStatus;

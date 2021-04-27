@@ -312,6 +312,10 @@ async function syncWorld (type, marketId, worldNumber) {
                 debug.sync('world:%s failed to select character', worldId);
                 break;
             }
+            case syncStatus.CHARACTER_NOT_SELECTED: {
+                debug.sync('world:%s scraper tried to get character id before auth an account', worldId);
+                break;
+            }
             default: {
                 throw status;
             }

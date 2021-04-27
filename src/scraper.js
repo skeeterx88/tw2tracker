@@ -301,7 +301,7 @@ function Scraper (marketId, worldNumber) {
      */
     this.getCharacterId = async function getCharacterId (worldId) {
         if (!authenticatedAccount) {
-            return false;
+            return syncStatus.CHARACTER_NOT_SELECTED;
         }
 
         const character = authenticatedAccount.characters.find(({world_id}) => world_id === worldId);
