@@ -5,6 +5,7 @@ const zlib = require('zlib');
 const utils = require('./utils.js');
 const debug = require('./debug.js');
 const {db, sql} = require('./db.js');
+const syncStatus = require('./types/sync-status');
 
 const userAgent = 'Mozilla/5.0%20(X11;%20Linux%20x86_64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/89.0.4389.114%20Safari/537.36';
 const MAP_CHUNK_SIZE = 25;
@@ -144,7 +145,7 @@ function Scraper (marketId, worldNumber) {
 
     /**
      * Authenticate using one of the available sync accounts.
-     * @return {Promise<MarketAccount|Boolean>} The authenticated account or false.
+     * @return {Promise<MarketAccount|syncStatus>} The authenticated account or syncStatus.
      */
     async function auth () {
         if (authenticated) {
@@ -155,7 +156,7 @@ function Scraper (marketId, worldNumber) {
 
         if (!marketAccounts.length) {
             debug.auth('market:%s do not have any accounts', marketId);
-            return false;
+            throw syncStatus.NO_ACCOUNTS;
         }
 
         while (marketAccounts.length) {
@@ -171,7 +172,7 @@ function Scraper (marketId, worldNumber) {
             }
         }
 
-        return false;
+        throw syncStatus.ALL_ACCOUNTS_FAILED;
     }
 
     /**

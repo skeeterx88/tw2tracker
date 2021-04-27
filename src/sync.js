@@ -200,6 +200,12 @@ async function addSyncQueue (type, newItems, force) {
     }
 }
 
+/**
+ * @param {syncTypes} type
+ * @param {String} marketId
+ * @param {Number} worldNumber
+ * @return {Promise<syncStatus>}
+ */
 async function syncWorld (type, marketId, worldNumber) {
     const syncTypeValues = syncTypeMapping[type];
     const worldId = marketId + worldNumber;
@@ -219,24 +225,15 @@ async function syncWorld (type, marketId, worldNumber) {
         }, syncTypeValues.MAX_RUNNING_TIME);
 
         const world = await getOpenWorld(worldId);
-        const marketAccounts = await db.any(sql('get-market-accounts'), {marketId});
 
         if (!world.sync_enabled) {
             return reject(syncStatus.NOT_ENABLED);
         }
 
-        if (!marketAccounts.length) {
-            return reject(syncStatus.NO_ACCOUNTS);
-        }
-
         debug.sync('world:%s start %s sync', worldId, type);
 
         scraper = await getScraper(marketId, worldNumber);
-        const account = await scraper.auth();
-
-        if (!account) {
-            return reject(syncStatus.ALL_ACCOUNTS_FAILED);
-        }
+        const account = await scraper.auth().catch(reject);
 
         const character = account.characters.find(({world_id}) => world_id === worldId);
         let characterId;
