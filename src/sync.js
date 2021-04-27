@@ -233,32 +233,9 @@ async function syncWorld (type, marketId, worldNumber) {
         debug.sync('world:%s start %s sync', worldId, type);
 
         scraper = await getScraper(marketId, worldNumber);
-        const account = await scraper.auth().catch(reject);
-
-        const character = account.characters.find(({world_id}) => world_id === worldId);
-        let characterId;
-
-        if (character) {
-            if (character.maintenance) {
-                return reject(syncStatus.WORLD_IN_MAINTENANCE);
-            } else if (character.allow_login) {
-                characterId = character.character_id;
-            } else {
-                return reject(syncStatus.WORLD_CLOSED);
-            }
-        } else {
-            const created = await scraper.createCharacter(worldNumber);
-
-            if (created.id) {
-                characterId = created.id;
-            }
-        }
-
-        const selected = await scraper.selectCharacter(characterId);
-
-        if (!selected) {
-            return reject(syncStatus.FAILED_TO_SELECT_CHARACTER);
-        }
+        await scraper.auth().catch(reject);
+        const characterId = await scraper.getCharacterId(worldId).catch(reject);
+        await scraper.selectCharacter(characterId).catch(reject);
 
         if (finished) {
             return;

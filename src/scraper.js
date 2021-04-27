@@ -31,7 +31,7 @@ function Scraper (marketId, worldNumber) {
     const socket = new WebSocket(url);
     const LOADING_TIMEOUT = 10000;
 
-    let authenticated = false;
+    let authenticatedAccount = false;
     let characterSelected = false;
     let emitId = 1;
     let pingIntervalId;
@@ -148,8 +148,8 @@ function Scraper (marketId, worldNumber) {
      * @return {Promise<MarketAccount|syncStatus>} The authenticated account or syncStatus.
      */
     this.auth = async function auth () {
-        if (authenticated) {
-            return authenticated;
+        if (authenticatedAccount) {
+            return authenticatedAccount;
         }
 
         const marketAccounts = await db.any(sql('get-market-accounts'), {marketId});
@@ -165,7 +165,7 @@ function Scraper (marketId, worldNumber) {
 
             if (account.token) {
                 debug.auth('market:%s account %s successed', marketId, credentials.name);
-                authenticated = account;
+                authenticatedAccount = account;
                 return account;
             } else if (account.code) {
                 debug.auth('market:%s account %s failed: %s', marketId, credentials.name, account.code);
@@ -198,7 +198,7 @@ function Scraper (marketId, worldNumber) {
         });
 
         if (character.error_code) {
-            return false;
+            throw syncStatus.FAILED_TO_SELECT_CHARACTER;
         }
 
         const gameData = await emit('GameDataBatch/getGameData');
@@ -292,6 +292,37 @@ function Scraper (marketId, worldNumber) {
         const worldId = marketId + worldNumber;
         debug.sync('world:%s create character', worldId);
         return await emit('Authentication/createCharacter', {world: worldId});
+    };
+
+    /**
+     * Get the character id on a specific world.
+     * @param {String} worldId
+     * @return {Promise<Number|syncStatus>}
+     */
+    this.getCharacterId = async function getCharacterId (worldId) {
+        if (!authenticatedAccount) {
+            return false;
+        }
+
+        const character = authenticatedAccount.characters.find(({world_id}) => world_id === worldId);
+
+        if (character) {
+            if (character.maintenance) {
+                throw syncStatus.WORLD_IN_MAINTENANCE;
+            } else if (character.allow_login) {
+                return character.character_id;
+            } else {
+                throw syncStatus.WORLD_CLOSED;
+            }
+        }
+
+        const created = await this.createCharacter(worldNumber);
+
+        if (created.id) {
+            return created.id;
+        }
+
+        throw syncStatus.FAILED_TO_SELECT_CHARACTER;
     };
 
     /**
