@@ -445,6 +445,8 @@
         "button_enable_sync": "Enable sync",
         "button_reset_data_queue": "Reset data queue",
         "button_reset_achievements_queue": "Reset achievements queue",
+        "button_sync_data_all": "Sync data on all worlds",
+        "button_sync_achievements_all": "Sync achievements on all worlds",
         "data_info": "Data:",
         "achievements_info": "Achievements:",
         "last_time": "Last time:",
