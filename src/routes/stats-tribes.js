@@ -29,6 +29,25 @@ const tribeShortFieldsOrder = [
     ['victory_points', historyOrderTypes.ASC]
 ];
 
+const conquestsTypeMap = {
+    all: {
+        sqlConquests: sql('get-tribe-conquests'),
+        sqlCount: sql('get-tribe-conquests-count')
+    },
+    gain: {
+        sqlConquests: sql('get-tribe-conquests-gain'),
+        sqlCount: sql('get-tribe-conquests-gain-count')
+    },
+    loss: {
+        sqlConquests: sql('get-tribe-conquests-loss'),
+        sqlCount: sql('get-tribe-conquests-loss-count')
+    },
+    self: {
+        sqlConquests: sql('get-tribe-conquests-self'),
+        sqlCount: sql('get-tribe-conquests-self-count')
+    }
+};
+
 const {
     paramWorld,
     paramWorldParse,
@@ -136,30 +155,6 @@ const tribeConquestsRouter = async function (request, reply, done) {
     const page = request.params.page && !isNaN(request.params.page) ? Math.max(1, parseInt(request.params.page, 10)) : 1;
     const limit = config('ui', 'ranking_page_items_per_page');
     const offset = limit * (page - 1);
-
-    const conquestsTypeMap = {
-        all: {
-            sqlConquests: sql('get-tribe-conquests'),
-            sqlCount: sql('get-tribe-conquests-count'),
-            navigationTitle: i18n('sub_title_all', 'tribe_profile_achievements', reply.locals.lang)
-        },
-        gain: {
-            sqlConquests: sql('get-tribe-conquests-gain'),
-            sqlCount: sql('get-tribe-conquests-gain-count'),
-            navigationTitle: i18n('sub_title_gain', 'tribe_profile_achievements', reply.locals.lang)
-        },
-        loss: {
-            sqlConquests: sql('get-tribe-conquests-loss'),
-            sqlCount: sql('get-tribe-conquests-loss-count'),
-            navigationTitle: i18n('sub_title_loss', 'tribe_profile_achievements', reply.locals.lang)
-        },
-        self: {
-            sqlConquests: sql('get-tribe-conquests-self'),
-            sqlCount: sql('get-tribe-conquests-self-count'),
-            navigationTitle: i18n('sub_title_self', 'tribe_profile_achievements', reply.locals.lang)
-        }
-    };
-
     const category = request.params.category ?? 'all';
 
     if (!conquestCategories.includes(category)) {
@@ -168,9 +163,8 @@ const tribeConquestsRouter = async function (request, reply, done) {
 
     const conquestsRaw = await db.any(conquestsTypeMap[category].sqlConquests, {worldId, tribeId, offset, limit});
     const conquests = processTribeConquestTypes(conquestsRaw, tribeId);
-
     const total = (await db.one(conquestsTypeMap[category].sqlCount, {worldId, tribeId})).count;
-    const navigationTitle = conquestsTypeMap[category].navigationTitle;
+    const navigationTitle = i18n('sub_title_' + category, 'tribe_profile_achievements', reply.locals.lang);
 
     mergeBackendLocals(reply, {
         marketId,
