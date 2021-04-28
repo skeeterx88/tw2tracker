@@ -490,6 +490,7 @@ const tribeHistoryRouter = async function (request, reply, done) {
 module.exports = function (fastify, opts, done) {
     fastify.get('/stats/:marketId/:worldNumber/tribes/:tribeId', tribeRouter);
     fastify.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests', tribeConquestsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/page/:page', tribeConquestsRouter);
     fastify.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:category', tribeConquestsRouter);
     fastify.get('/stats/:marketId/:worldNumber/tribes/:tribeId/conquests/:category/page/:page', tribeConquestsRouter);
     fastify.get('/stats/:marketId/:worldNumber/tribes/:tribeId/members', tribeMembersRouter);

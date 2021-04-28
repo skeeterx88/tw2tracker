@@ -545,6 +545,7 @@ module.exports = function (fastify, opts, done) {
     fastify.get('/stats/:marketId/:worldNumber/players/:playerId', playerProfileRouter);
     fastify.get('/stats/:marketId/:worldNumber/players/:playerId/villages', playerVillagesRouter);
     fastify.get('/stats/:marketId/:worldNumber/players/:playerId/conquests', playerConquestsRouter);
+    fastify.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/page/:page', playerConquestsRouter);
     fastify.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category', playerConquestsRouter);
     fastify.get('/stats/:marketId/:worldNumber/players/:playerId/conquests/:category/page/:page', playerConquestsRouter);
     fastify.get('/stats/:marketId/:worldNumber/players/:playerId/tribe-changes', playerTribeChangesRouter);
