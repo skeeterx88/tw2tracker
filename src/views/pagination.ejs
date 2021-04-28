@@ -3,7 +3,7 @@
         <tr>
             <td>
                 <% if (pagination.showGotoFirst) { -%>
-                    <a class="page first" href="<%= pagination.path %>/">&lt;&lt;&lt; <%= i18n('first', 'pagination') %></a>
+                    <a class="page first" href="<%= pagination.path %>">&lt;&lt;&lt; <%= i18n('first', 'pagination') %></a>
                 <% } -%>
                 <% if (pagination.showGotoPrev) { -%>
                     <a class="page prev" href="<%= pagination.path %>/page/<%= (pagination.current - 1) %>">&lt; <%= i18n('previous', 'pagination') %></a>
