@@ -730,10 +730,8 @@ require([
 
             loadWorldsPromise = new Promise(async (resolve) => {
                 const responseWorlds = await fetch('/maps/api/get-open-worlds');
-                const worlds = await responseWorlds.json();
-
-                allWorlds = worlds;
-                allMarkets = new Set(worlds.map((world) => world.market_id));
+                allWorlds = await responseWorlds.json();
+                allMarkets = new Set(allWorlds.map((world) => world.market_id));
 
                 buildWorldList();
                 changeWorldList(marketId);
@@ -779,28 +777,28 @@ require([
             }
         };
 
-        const changeWorldList = function (newMarket) {
-            const marketWorlds = allWorlds.filter((world) => world.market_id === newMarket);
+        const changeWorldList = function (newMarketId) {
+            const marketWorlds = allWorlds.filter((world) => world.market_id === newMarketId);
 
             while ($marketWorlds.firstChild) {
                 $marketWorlds.removeChild($marketWorlds.lastChild);
             }
 
-            for (const {market, num, name} of marketWorlds) {
+            for (const world of marketWorlds) {
                 const $world = document.createElement('li');
                 const $archor = document.createElement('a');
                 const $button = document.createElement('button');
 
-                $archor.href = location.origin + `/maps/${market}/${num}/`;
+                $archor.href = location.origin + `/maps/${world.market_id}/${world.world_number}`;
 
                 $button.classList.add('world');
                 $button.classList.add('relax-button');
 
-                if (worldNumber === num && marketId === market) {
+                if (worldNumber === world.world_number && marketId === world.market_id) {
                     $button.classList.add('selected');
                 }
 
-                $button.innerText = `${num} ${name}`;
+                $button.innerText = `${world.world_number} ${world.name}`;
 
                 $archor.appendChild($button);
                 $world.appendChild($archor);
@@ -809,11 +807,7 @@ require([
         };
 
         const closeHandler = function (event) {
-            const keep = ['#all-worlds', '#current-world'].some((selector) => {
-                return event.target.closest(selector);
-            });
-
-            if (!keep) {
+            if (!event.target.closest('.map-world-list')) {
                 $worldList.classList.add('invisible');
                 removeEventListener('mousedown', closeHandler);
                 visible = false;
