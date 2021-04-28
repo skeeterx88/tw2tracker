@@ -56,14 +56,12 @@ const getWorldInfoRouter = async function (request, reply) {
 
 const getOpenWorldsRouter = async function (request, reply) {
     const allWorlds = await db.any(sql('get-open-worlds'));
-    reply.header('Content-Type', 'application/json');
-    reply.send(JSON.stringify(allWorlds));
+    reply.send(allWorlds);
 };
 
 const getMarketsRouters = async function (request, reply) {
     const marketsWithAccounts = await db.map(sql('get-markets-with-accounts'), [], market => market.id);
-    reply.header('Content-Type', 'application/json');
-    reply.send(JSON.stringify(marketsWithAccounts));
+    reply.send(marketsWithAccounts);
 };
 
 const getContinentRouter = async function (request, reply) {
@@ -239,8 +237,7 @@ const getShareRouter = async function (request, reply) {
         const shareSql = highlightsOnly ? sql('maps/get-share-highlights') : sql('maps/get-share-info');
         const mapShare = await db.one(shareSql, [mapShareId, marketId, worldNumber]);
 
-        reply.header('Content-Type', 'application/json');
-        reply.send(JSON.stringify(mapShare));
+        reply.send(mapShare);
     } catch (error) {
         reply.status(404);
         reply.send(i18n('map_share_not_found', 'errors', reply.locals.lang));
