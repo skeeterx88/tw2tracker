@@ -158,9 +158,9 @@
 
                                             <% if (conquest.old_owner_tribe_id) { -%>
                                                 <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
-                                                    <a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>
+                                                    [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
                                                 <% } else { -%>
-                                                    <a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>
+                                                    [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
                                                 <% } -%>
                                             <% } -%>
                                         </td>
@@ -173,9 +173,9 @@
 
                                         <% if (conquest.new_owner_tribe_id) { -%>
                                             <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
-                                                <a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>
+                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_now %></a>]
                                             <% } else { -%>
-                                                <a class="icon-tribes" href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>
+                                                [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.new_owner_tribe_id %>"><%= conquest.new_owner_tribe_tag_then %></a>]
                                             <% } -%>
                                         <% } -%>
                                     </td>

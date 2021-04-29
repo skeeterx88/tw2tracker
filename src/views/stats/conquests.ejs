@@ -24,13 +24,13 @@
                             <% for (let conquest of conquests) { %>
                                 <tr class="quick-highlight" data-id="<%= conquest.village_id %>" data-old-owner="<%= conquest.old_owner %>" data-new-owner="<%= conquest.new_owner %>" data-type="conquest">
                                     <td>
-                                        <a href="/stats/<%= marketId %>/<%= world.world_number %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
+                                        <a class="icon-villages" href="/stats/<%= marketId %>/<%= world.world_number %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
                                     </td>
                                     <td><%= formatNumbers(conquest.village_points_then) %></td>
 
                                     <% if (conquest.old_owner) { -%>
                                         <td>
-                                            <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
+                                            <a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
 
                                             <% if (conquest.old_owner_tribe_id) { -%>
                                                 <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
@@ -45,7 +45,7 @@
                                     <% } -%>
 
                                     <td>
-                                        <a href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
+                                        <a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.new_owner %>"><%= conquest.new_owner_name %></a>
 
                                         <% if (conquest.new_owner_tribe_id) { -%>
                                             <% if (conquest.new_owner_tribe_id === conquest.new_owner_tribe_id_now) { -%>
