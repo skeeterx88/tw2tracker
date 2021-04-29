@@ -127,7 +127,7 @@ const tribeRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/tribes/${tribeId}`, replaces: [tribe.tag]}
         ])
     });
@@ -190,7 +190,7 @@ const tribeConquestsRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: navigationTitle}
         ])
@@ -234,7 +234,7 @@ const tribeMembersRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('members', 'navigation', reply.locals.lang)}
         ])
@@ -285,7 +285,7 @@ const tribeVillagesRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('villages', 'navigation', reply.locals.lang)}
         ])
@@ -348,7 +348,7 @@ const tribeMembersChangeRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('member_changes', 'navigation', reply.locals.lang)}
         ])
@@ -427,7 +427,7 @@ const tribeAchievementsRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('achievements', 'navigation', reply.locals.lang)}
         ])
@@ -474,7 +474,7 @@ const tribeHistoryRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('tribe', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/tribes/${tribeId}`, replaces: [tribe.tag]},
             {label: i18n('history', 'navigation', reply.locals.lang)}
         ])

@@ -580,7 +580,8 @@
         "error_map_share_no_highlights": "No highlights to create a share",
         "ranking_menu_players": "Players",
         "ranking_menu_tribes": "Tribes",
-        "button_ranking": "Ranking"
+        "button_ranking": "Ranking",
+        "world_closed": "Closed"
     },
     "maps_tooltip": {
         "village": "Village",

@@ -143,7 +143,7 @@ const playerProfileRouter = async function (request, reply, next) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]}
         ])
     });
@@ -187,7 +187,7 @@ const playerVillagesRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: i18n('villages', 'navigation', reply.locals.lang)}
         ])
@@ -252,7 +252,7 @@ const playerConquestsRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: navigationTitle}
         ])
@@ -312,7 +312,7 @@ const playerTribeChangesRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: i18n('tribe_changes', 'navigation', reply.locals.lang)}
         ])
@@ -487,7 +487,7 @@ const playerAchievementsRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${player.id}`, replaces: [player.name]},
             {label: i18n('achievements', 'navigation', reply.locals.lang)}
         ])
@@ -534,7 +534,7 @@ const playerHistoryRouter = async function (request, reply, done) {
         navigation: createNavigation([
             {label: i18n('stats', 'navigation', reply.locals.lang), url: '/'},
             {label: i18n('server', 'navigation', reply.locals.lang), url: `/stats/${marketId}`, replaces: [marketId.toUpperCase()]},
-            {label: i18n('world', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}`, replaces: [world.name]},
+            {label: i18n(world.open ? 'world' : 'world_closed', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${world.world_number}`, replaces: [world.name]},
             {label: i18n('player', 'navigation', reply.locals.lang), url: `/stats/${marketId}/${worldNumber}/players/${playerId}`, replaces: [player.name]},
             {label: i18n('history', 'navigation', reply.locals.lang)}
         ])
