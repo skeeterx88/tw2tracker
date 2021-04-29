@@ -737,9 +737,11 @@ div.world-title {
     top: 0;
 }
 
-.conquest-gain,
-.conquest-loss,
-.conquest-self {
+.icon-gain,
+.icon-loss,
+.icon-self,
+.icon-join,
+.icon-left {
     border-radius: 7px;
     box-shadow: 1px 1px 0 hsla(0, 0%, 0%, 0.50);
     display: inline-block;
@@ -747,15 +749,17 @@ div.world-title {
     width: 10px;
 }
 
-.conquest-gain {
+.icon-gain,
+.icon-join {
     background: hsl(126, 71%, 44%) radial-gradient(circle at 70% 60%, hsl(126, 71%, 44%), hsl(126, 100%, 44%));
 }
 
-.conquest-loss {
+.icon-loss,
+.icon-left {
     background: hsl(0, 100%, 44%) radial-gradient(circle at 70% 60%, hsl(0, 100%, 44%), hsl(0, 88%, 65%));
 }
 
-.conquest-self {
+.icon-self {
     background: hsl(57, 100%, 44%) radial-gradient(circle at 70% 60%, hsl(56, 100%, 50%), hsl(57, 100%, 44%));
 }
 

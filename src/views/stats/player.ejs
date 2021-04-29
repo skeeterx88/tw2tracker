@@ -155,7 +155,7 @@
                         <% } else { -%>
                             <% for (let conquest of conquests) { %>
                                 <tr class="quick-highlight" data-id="<%= conquest.village_id %>" data-old-owner="<%= conquest.old_owner %>" data-new-owner="<%= conquest.new_owner %>" data-type="conquest">
-                                    <td><span class="conquest-<%= conquest.type %>"></span></td>
+                                    <td><span class="icon-<%= conquest.type %>"></span></td>
                                     <td><a href="/stats/<%= marketId %>/<%= world.world_number %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %></a></td>
                                     <td><%= formatNumbers(conquest.village_points_then) %></td>
 
