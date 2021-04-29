@@ -5,8 +5,8 @@
     <a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= tribe.id %>/conquests/self" class="item <% __append(category === 'self' ? ' selected' : '') %>"><%= i18n('menu_self', 'tribe_profile_conquests') %></a>
 </div>
 
-<div class="content">
-    <div class="conquests-map">
+<div class="content conquests">
+    <div class="left">
         <section id="players">
             <h2><%= navigationTitle %></h2>
 
@@ -76,7 +76,7 @@
         </section>
     </div>
 
-    <div class="right-really-small">
+    <div class="right">
         <%- include('./map.ejs') %>
     </div>
 </div>

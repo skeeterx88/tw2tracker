@@ -329,10 +329,6 @@ div.world-title {
     flex: 1 1;
 }
 
-.content > div.conquests-map {
-    flex-basis: 40%;
-}
-
 .content > * + * {
     margin-left: 10px;
 }
@@ -1827,7 +1823,15 @@ span[class^="flag-"] {
 
 .player-profile > .left,
 .tribe-profile > .left {
-    flex-basis: 150px;
+    flex-basis: 25%;
+}
+
+.conquests > .left {
+    flex-basis: 50%;
+}
+
+.world-home > .left {
+    flex-basis: 20%;
 }
 
 /* profile charts */
