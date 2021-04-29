@@ -143,6 +143,7 @@
                             <th></th>
                             <th><%= i18n('column_village', 'player_profile') %></th>
                             <th><%= i18n('column_points', 'player_profile') %></th>
+                            <th><%= i18n('column_old_owner', 'player_profile') %></th>
                             <th><%= i18n('column_date_hour', 'player_profile') %></th>
                         </tr>
                     </thead>
@@ -155,8 +156,25 @@
                             <% for (let conquest of conquests) { %>
                                 <tr class="quick-highlight" data-id="<%= conquest.village_id %>" data-old-owner="<%= conquest.old_owner %>" data-new-owner="<%= conquest.new_owner %>" data-type="conquest">
                                     <td><span class="conquest-<%= conquest.type %>"></span></td>
-                                    <td><a href="/stats/<%= marketId %>/<%= world.world_number %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a></td>
+                                    <td><a href="/stats/<%= marketId %>/<%= world.world_number %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %></a></td>
                                     <td><%= formatNumbers(conquest.village_points_then) %></td>
+
+                                    <% if (conquest.old_owner) { -%>
+                                        <td>
+                                            <a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= conquest.old_owner %>"><%= conquest.old_owner_name %></a>
+
+                                            <% if (conquest.old_owner_tribe_id) { -%>
+                                                <% if (conquest.old_owner_tribe_id === conquest.old_owner_tribe_id_now) { -%>
+                                                    [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_now %></a>]
+                                                <% } else { -%>
+                                                    [<a href="/stats/<%= marketId %>/<%= worldNumber %>/tribes/<%= conquest.old_owner_tribe_id %>"><%= conquest.old_owner_tribe_tag_then %></a>]
+                                                <% } -%>
+                                            <% } -%>
+                                        </td>
+                                    <% } else { -%>
+                                        <td><%= i18n('abandoned_village', 'world_conquests') %></td>
+                                    <% } -%>
+
                                     <td title="<%= formatDate(conquest.date, market.time_offset, 'hours-only') %>"><%= formatSince(conquest.date, lang) %></td>
                                 </tr>
                             <% } %>
