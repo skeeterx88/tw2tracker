@@ -9,62 +9,55 @@ require([
         historyFullRaw
     }
 ) {
+    const MAX_AXIS_X_DIVISOR = 5;
     const serializedHistory = {};
-    const chartOptions = {
-        height: 160,
-        showArea: true,
-        showPoint: false,
-        chartPadding: {
-            right: 10,
-            left: 20,
-            top: 25,
-            bottom: -2
-        },
-        fullWidth: true,
-        reverseData: true,
-        lineSmooth: false,
-        axisX: {
-            position: 'end',
-            labelOffset: {
-                x: -15,
-                y: 0
-            },
-            type: Chartist.AutoScaleAxis,
-            labelInterpolationFnc: function (ts) {
-                return new Date(ts).toLocaleDateString('default', {month: 'short', day: 'numeric'});
-            }
-        },
-        axisY: {
-            position: 'end',
-            labelInterpolationFnc: utils.shortifyPoints
-        }
-    };
-    const specializedChartOptions = {
-        villages: {
-            axisY: {
-                position: 'end',
-                labelInterpolationFnc: Chartist.noop
-            }
-        }
-    };
 
     function serializeHistory () {
         const chartTypes = ['points', 'bash_points_off', 'bash_points_def', 'villages'];
 
-        for (const type of chartTypes) {
-            serializedHistory[type] = [];
-        }
+        for (const chartType of chartTypes) {
+            const data = [];
 
-        for (const item of historyFullRaw) {
-            const date = new Date(item.date);
-
-            for (const type of chartTypes) {
-                serializedHistory[type].push({x: date, y: item[type]});
+            for (const item of historyFullRaw) {
+                data.push({
+                    x: new Date(item.date),
+                    y: item[chartType]
+                });
             }
-        }
 
-        for (const type of chartTypes) {
-            serializedHistory[type] = {series: [serializedHistory[type]]};
+            serializedHistory[chartType] = {
+                data: {series: [data]},
+                options: {
+                    height: 160,
+                    showArea: true,
+                    showPoint: false,
+                    chartPadding: {
+                        right: 10,
+                        left: 20,
+                        top: 25,
+                        bottom: -2
+                    },
+                    fullWidth: true,
+                    reverseData: true,
+                    lineSmooth: false,
+                    axisX: {
+                        labelOffset: {
+                            x: -15,
+                            y: 0
+                        },
+                        type: Chartist.FixedScaleAxis,
+                        divisor: Math.min(MAX_AXIS_X_DIVISOR, data.length - 1),
+                        labelInterpolationFnc: function (ts) {
+                            return new Date(ts).toLocaleDateString('default', {month: 'short', day: 'numeric'});
+                        }
+                    },
+                    axisY: {
+                        onlyInteger: true,
+                        position: 'end',
+                        labelInterpolationFnc: utils.shortifyPoints
+                    }
+                }
+            };
         }
     }
 
@@ -81,10 +74,8 @@ require([
             const $toSelect = document.querySelector(`#chart-selector li[data-chart-type=${chartType}]`);
             $toSelect.classList.add('selected');
 
-            new Chartist.Line('.ct-chart', serializedHistory[chartType], {
-                ...chartOptions,
-                ...(specializedChartOptions[chartType] || {})
-            });
+            const {data, options} = serializedHistory[chartType];
+            new Chartist.Line('.ct-chart', data, options);
         };
 
         for (const $categorie of $categories) {
@@ -96,6 +87,41 @@ require([
         selectChart('points');
     }
 
+    function fixChartist () {
+        function FixedScaleAxis (axisUnit, data, chartRect, options) {
+            const highLow = options.highLow || Chartist.getHighLow(data, options, axisUnit.pos);
+            this.divisor = options.divisor || 1;
+            this.ticks = options.ticks || Chartist.times(this.divisor+1).map(function (value, index) {
+                return highLow.low + (highLow.high - highLow.low) / this.divisor * index;
+            }.bind(this));
+            this.ticks.sort(function (a, b) {
+                return a - b;
+            });
+            this.range = {
+                min: highLow.low,
+                max: highLow.high
+            };
+
+            Chartist.FixedScaleAxis.super.constructor.call(this,
+                axisUnit,
+                chartRect,
+                this.ticks,
+                options);
+
+            this.stepLength = this.axisLength / this.divisor;
+        }
+
+        function projectValue (value) {
+            return this.axisLength * (+Chartist.getMultiValue(value, this.units.pos) - this.range.min) / (this.range.max - this.range.min);
+        }
+
+        Chartist.FixedScaleAxis = Chartist.Axis.extend({
+            constructor: FixedScaleAxis,
+            projectValue: projectValue
+        });
+    }
+
+    fixChartist();
     serializeHistory();
     setupSelector();
 });
