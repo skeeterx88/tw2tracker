@@ -5,15 +5,6 @@ function UTC () {
     return now.getTime() + now.getTimezoneOffset() * 1000 * 60;
 }
 
-/**
- * @param {Number} value
- * @param {Number} size
- * @return {Number}
- */
-function roundDecimal (value, size = 2) {
-    return parseFloat(value.toFixed(size));
-}
-
 function formatSince (date, lang) {
     const elapsedTime = UTC() - date;
 
@@ -29,11 +20,11 @@ function formatSince (date, lang) {
     if (minutes <= 1) {
         return i18n('now', 'time');
     } else if (hours <= 1) {
-        return timeFormat.format(roundDecimal(-minutes, 1), 'minutes');
+        return timeFormat.format(Math.round(-minutes), 'minutes');
     } else if (days <= 1) {
-        return timeFormat.format(roundDecimal(-hours, 1), 'hours');
+        return timeFormat.format(Math.round(-hours), 'hours');
     } else {
-        return timeFormat.format(roundDecimal(-days, 1), 'days');
+        return timeFormat.format(Math.round(-days), 'days');
     }
 }
 
