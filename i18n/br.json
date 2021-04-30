@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Português"
+        "language": "Português",
+        "code": "pt-BR"
     },
     "general": {
         "and": "e"

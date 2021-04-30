@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Čeština"
+        "language": "Čeština",
+        "code": "cs-CZ"
     },
     "main_menu": {
         "home": "Domů",

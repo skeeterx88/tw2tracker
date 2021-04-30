@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "English"
+        "language": "English",
+        "code": "en-US"
     },
     "general": {
         "and": "and"

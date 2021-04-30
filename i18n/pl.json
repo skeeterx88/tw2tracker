@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Polski"
+        "language": "Polski",
+        "code": "pl-PL"
     },
     "main_menu": {
         "home": "Strona Domowa",

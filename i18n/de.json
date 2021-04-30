@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Deutsch"
+        "language": "Deutsch",
+        "code": "de-DE"
     },
     "main_menu": {
         "home": "Startseite",

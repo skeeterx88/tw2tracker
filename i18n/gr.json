@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Ελληνικά"
+        "language": "Ελληνικά",
+        "code": "el-GR"
     },
     "main_menu": {
         "home": "Αρχική",

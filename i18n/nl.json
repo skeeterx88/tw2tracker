@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Nederlands"
+        "language": "Nederlands",
+        "code": "nl-NL"
     },
     "main_menu": {
         "home": "Home",

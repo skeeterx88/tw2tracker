@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Français"
+        "language": "Français",
+        "code": "fr-FR"
     },
     "main_menu": {
         "home": "Accueil",

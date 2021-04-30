@@ -1,6 +1,7 @@
 {
     "meta": {
-        "language": "Italiano"
+        "language": "Italiano",
+        "code": "it-IT"
     },
     "main_menu": {
         "home": "Home",
