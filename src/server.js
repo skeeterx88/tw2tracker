@@ -88,8 +88,8 @@ module.exports = async function () {
         reply.locals.capitalize = utils.capitalize;
         reply.locals.sprintf = utils.sprintf;
         reply.locals.lang = request.session.lang || config('general', 'lang');
-        reply.locals.tribeRankingSortField = request.session.tribeRankingSortField || rankingSortTypes.VICTORY_POINTS;
-        reply.locals.playerRankingSortField = request.session.playerRankingSortField || rankingSortTypes.VICTORY_POINTS;
+        reply.locals.tribeRankingSortField = request.session.tribeRankingSortField || rankingSortTypes.RANK;
+        reply.locals.playerRankingSortField = request.session.playerRankingSortField || rankingSortTypes.RANK;
         reply.locals.account = request.session.account;
 
         reply.locals.i18n = function (key, namespace, tokens) {
