@@ -82,7 +82,6 @@ module.exports = async function () {
     fastify.addHook('preHandler', async function (request, reply) {
         reply.locals = {};
         reply.locals.availableLanguages = availableLanguages;
-        reply.locals.formatNumbers = utils.formatNumbers;
         reply.locals.formatDate = timeUtils.formatDate;
         reply.locals.formatSince = timeUtils.formatSince;
         reply.locals.capitalize = utils.capitalize;
@@ -91,6 +90,10 @@ module.exports = async function () {
         reply.locals.tribeRankingSortField = request.session.tribeRankingSortField || rankingSortTypes.RANK;
         reply.locals.playerRankingSortField = request.session.playerRankingSortField || rankingSortTypes.RANK;
         reply.locals.account = request.session.account;
+
+        reply.locals.formatNumbers = function (value, options) {
+            return utils.formatNumbers(value, languages[reply.locals.lang].meta.code, options);
+        };
 
         reply.locals.i18n = function (key, namespace, tokens) {
             return i18n(key, namespace, reply.locals.lang, tokens);

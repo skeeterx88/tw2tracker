@@ -67,15 +67,15 @@
                         </tr>
                         <tr>
                             <th><%= i18n('player_record_rank', 'player_profile') %></th>
-                            <td><%= formatNumbers(player.best_rank) %> <small class="right"><%= formatDate(player.best_rank_date, market.time_offset, 'hours-only') %></small></td>
+                            <td><%= formatNumbers(player.best_rank) %> <small class="right"><%= formatDate(player.best_rank_date, market.time_offset, 'hour-only', lang) %></small></td>
                         </tr>
                         <tr>
                             <th><%= i18n('player_record_points', 'player_profile') %></th>
-                            <td><%= formatNumbers(player.best_points) %> <small class="right"><%= formatDate(player.best_points_date, market.time_offset, 'hours-only') %></small></td>
+                            <td><%= formatNumbers(player.best_points) %> <small class="right"><%= formatDate(player.best_points_date, market.time_offset, 'hour-only', lang) %></small></td>
                         </tr>
                         <tr>
                             <th><%= i18n('player_record_villages', 'player_profile') %></th>
-                            <td><%= formatNumbers(player.best_villages) %> <small class="right"><%= formatDate(player.best_villages_date, market.time_offset, 'hours-only') %></small></td>
+                            <td><%= formatNumbers(player.best_villages) %> <small class="right"><%= formatDate(player.best_villages_date, market.time_offset, 'hour-only', lang) %></small></td>
                         </tr>
                         <tr>
                             <th><%= i18n('player_other_worlds', 'player_profile') %></th>
@@ -111,7 +111,7 @@
                         <% if (history.length) { -%>
                             <% for (let item of history) { %>
                                 <tr>
-                                    <td><%= formatDate(item.date, market.time_offset, 'day-only') %></td>
+                                    <td><%= formatDate(item.date, market.time_offset, 'day-only', lang) %></td>
                                     <td><% __append(item.tribe_id ? `<a class="icon-tribes" href="/stats/${marketId}/${worldNumber}/tribes/${item.tribe_id}">${item.tribe_tag}</a>` : '-') %></td>
                                     <td><span class="history-change-type <%= item.rank_change %>"></span><%= formatNumbers(item.rank) %></td>
                                     <td><span class="history-change-type <%= item.points_change %>"></span><%= formatNumbers(item.points) %></td>
@@ -175,7 +175,7 @@
                                         <td><%= i18n('abandoned_village', 'world_conquests') %></td>
                                     <% } -%>
 
-                                    <td title="<%= formatDate(conquest.date, market.time_offset, 'hours-only') %>"><%= formatSince(conquest.date, lang) %></td>
+                                    <td title="<%= formatDate(conquest.date, market.time_offset, 'hour-only', lang) %>"><%= formatSince(conquest.date, lang) %></td>
                                 </tr>
                             <% } %>
                         <% } -%>
@@ -209,10 +209,10 @@
                                 <tr>
                                     <% if (achievement.category === 'repeatable') { -%>
                                         <td><%= i18n(achievement.type, 'achievements') %></td>
-                                        <td><%= formatDate(achievement.time_last_level, market.time_offset, 'day-only') %></td>
+                                        <td><%= formatDate(achievement.time_last_level, market.time_offset, 'day-only', lang) %></td>
                                     <% } else { -%>
                                         <td><%= i18n(achievement.type, 'achievements') %></td>
-                                        <td><%= formatDate(achievement.time_last_level, market.time_offset, 'hours-only') %></td>
+                                        <td><%= formatDate(achievement.time_last_level, market.time_offset, 'hour-only', lang) %></td>
                                     <% } -%>
                                 </tr>
                             <% } -%>

@@ -6,7 +6,8 @@ require([
     Chartist,
     utils,
     {
-        historyFullRaw
+        historyFullRaw,
+        language
     }
 ) {
     const MAX_AXIS_X_DIVISOR = 5;
@@ -48,7 +49,7 @@ require([
                         type: Chartist.FixedScaleAxis,
                         divisor: Math.min(MAX_AXIS_X_DIVISOR, data.length - 1),
                         labelInterpolationFnc: function (ts) {
-                            return new Date(ts).toLocaleDateString('default', {month: 'short', day: 'numeric'});
+                            return new Date(ts).toLocaleDateString(language.meta.code, {month: 'short', day: 'numeric'});
                         }
                     },
                     axisY: {

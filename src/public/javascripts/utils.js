@@ -1,7 +1,11 @@
 define('utils', [
-    'i18n'
+    'i18n',
+    'backendValues'
 ], function (
-    i18n
+    i18n,
+    {
+        language
+    }
 ) {
     const hasOwn = function (obj, property) {
         return Object.prototype.hasOwnProperty.call(obj, property);
@@ -49,31 +53,19 @@ define('utils', [
         const hours = minutes / 60;
         const days = hours / 24;
 
-        let format = '';
+        const timeFormat = new Intl.RelativeTimeFormat(language.meta.code, {
+            style: 'long'
+        });
 
         if (minutes <= 1) {
             return i18n('now', 'time');
         } else if (hours <= 1) {
-            format = i18n('minutes', 'time', [Math.round(minutes)]);
+            return timeFormat.format(minutes, 'minutes');
         } else if (days <= 1) {
-            format = i18n('hours', 'time', [Math.round(hours)]);
+            return timeFormat.format(hours, 'hours');
         } else {
-            if (days > 2) {
-                format = i18n('days', 'time', [Math.round(days)]);
-            } else {
-                const dayHours = hours % 24;
-
-                if (dayHours <= 2) {
-                    format = i18n('days', 'time', [1]);
-                } else {
-                    format = i18n('days', 'time', [1]) + ' ' + i18n('and', 'general') + ' ' + i18n('hours', 'time', [Math.round(hours)]);
-                }
-            }
+            return timeFormat.format(days, 'days');
         }
-
-        format += ' ' + i18n('ago', 'time');
-
-        return format;
     };
 
     const averageCoords = (coords) => {
@@ -116,13 +108,7 @@ define('utils', [
     }
 
     function shortifyPoints (points) {
-        if (points < 100000) {
-            return points.toLocaleString('pt-BR');
-        } else if (points >= 1000000) {
-            return parseFloat((points / 1000 / 1000).toFixed(2)) + 'M';
-        } else {
-            return parseFloat((points / 1000).toFixed(2)) + 'K';
-        }
+        return Intl.NumberFormat(language.meta.code, {notation: 'compact'}).format(points);
     }
 
     return {

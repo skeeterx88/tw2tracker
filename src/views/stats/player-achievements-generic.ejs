@@ -27,7 +27,7 @@
                             <td><%= i18n(achievement.type, 'achievements') %></td>
                             <td><%= formatNumbers(achievement.points) %></td>
                             <td><%= achievement.level %> / <%= achievementTypes[achievement.type].levels %></td>
-                            <td><%= formatDate(achievement.time_last_level, market.time_offset) %></td>
+                            <td><%= formatDate(achievement.time_last_level, market.time_offset, 'full', lang) %></td>
                         </tr>
                     <% } %>
                 <% } else { -%>

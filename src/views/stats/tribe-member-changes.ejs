@@ -18,7 +18,7 @@
                 <% if (memberChanges.length) { -%>
                     <% for (let change of memberChanges) { %>
                         <tr class="quick-highlight" data-id="<%= change.player.id %>" data-type="players">
-                            <td><%= formatDate(change.date, market.time_offset, 'hours-only') %></td>
+                            <td><%= formatDate(change.date, market.time_offset, 'hour-only', lang) %></td>
                             <td><a class="icon-players" href="/stats/<%= marketId %>/<%= worldNumber %>/players/<%= change.player.id %>"><%= change.player.name %></a></td>
 
                             <td><span class="icon-<%= change.type %>" title="<%= i18n(change.type, 'tribe_profile_member_changes') %>"></span></td>

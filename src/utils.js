@@ -132,10 +132,13 @@ function sprintf (value, tokens) {
     return value.replace(/%{[^}]*}/g, () => tokens[i++]);
 }
 
-function formatNumbers (value) {
-    return typeof value === 'number'
-        ? value.toLocaleString('pt-BR')
-        : value;
+/**
+ * @param {Number} value
+ * @param {Object} locale
+ * @return {String}
+ */
+function formatNumbers (value, locale = 'default', options = {}) {
+    return Intl.NumberFormat(locale, options).format(value);
 }
 
 /**

@@ -62,7 +62,7 @@
                         <% } else { -%>
                             <% for (let conquest of conquests) { %>
                                 <tr data-id="<%= conquest.village_id %>" data-type="villages">
-                                    <td><%= formatDate(conquest.date, market.time_offset, 'hours-only') %></td>
+                                    <td><%= formatDate(conquest.date, market.time_offset, 'hour-only', lang) %></td>
                                     <td><%= formatNumbers(conquest.village_points_then) %></td>
 
                                     <% if (conquest.old_owner) { -%>

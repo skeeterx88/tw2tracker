@@ -42,11 +42,11 @@
                             <% if (world.open_date || world.close_date) { %>
                                 <div class="dates">
                                     <% if (world.open_date) { %>
-                                        <p><span class="label"><%= i18n('open_date', 'world_list') %></span> <span class="value"><%= formatDate(world.open_date, 'day-only') %></span></p>
+                                        <p><span class="label"><%= i18n('open_date', 'world_list') %></span> <span class="value"><%= formatDate(world.open_date, 0, 'day-only', lang) %></span></p>
                                     <% } %>
 
                                     <% if (world.close_date) { %>
-                                        <p><span class="label"><%= i18n('close_date', 'world_list') %></span> <span class="value"><%= formatDate(world.close_date, 'day-only') %></span></p>
+                                        <p><span class="label"><%= i18n('close_date', 'world_list') %></span> <span class="value"><%= formatDate(world.close_date, 0, 'day-only', lang) %></span></p>
                                     <% } %>
                                 </div>
                             <% } %>
