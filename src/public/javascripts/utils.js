@@ -116,7 +116,9 @@ define('utils', [
     }
 
     function shortifyPoints (points) {
-        if (points >= 1000000) {
+        if (points < 100000) {
+            return points.toLocaleString('pt-BR');
+        } else if (points >= 1000000) {
             return parseFloat((points / 1000 / 1000).toFixed(2)) + 'M';
         } else {
             return parseFloat((points / 1000).toFixed(2)) + 'K';
