@@ -16,13 +16,13 @@
                         <tr>
                             <th></th>
                             <th><%= i18n('column_village', 'player_profile_conquests') %></th>
+                            <th><%= i18n('column_coords', 'player_profile_conquests') %></th>
                             <th><%= i18n('column_points', 'player_profile_conquests') %></th>
                             <th><%= i18n('column_old_owner', 'player_profile_conquests') %></th>
                             <th><%= i18n('column_new_owner', 'player_profile_conquests') %></th>
                             <th><%= i18n('column_date_hour', 'player_profile_conquests') %></th>
                         </tr>
                     </thead>
-
                     <tbody>
                         <% if (!conquests.length) { -%>
                             <tr>
@@ -32,9 +32,8 @@
                             <% for (let conquest of conquests) { %>
                                 <tr class="quick-highlight" data-id="<%= conquest.village_id %>" data-old-owner="<%= conquest.old_owner %>" data-new-owner="<%= conquest.new_owner %>" data-type="conquest">
                                     <td><span class="icon-<%= conquest.type %>"></span></td>
-                                    <td>
-                                        <a class="icon-villages" href="/stats/<%= marketId %>/<%= world.world_number %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %> (<%= conquest.village_x %>|<%= conquest.village_y %>)</a>
-                                    </td>
+                                    <td><a class="icon-villages" href="/stats/<%= marketId %>/<%= world.world_number %>/villages/<%= conquest.village_id %>"><%= conquest.village_name %></a></td>
+                                    <td><%= conquest.village_x %>|<%= conquest.village_y %></td>
                                     <td><%= formatNumbers(conquest.village_points_then) %></td>
 
                                     <% if (conquest.old_owner) { -%>
