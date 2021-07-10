@@ -347,9 +347,13 @@ async function syncWorldList () {
         debug.worlds('market:%s check missing worlds', marketId);
 
         const scraper = await getScraper(marketId);
-        const account = await scraper.auth();
 
-        if (!account) {
+        let account;
+
+        try {
+            account = await scraper.auth();
+        } catch (error) {
+            debug.worlds('market:%s error: %s', marketId, error);
             scraper.kill();
             continue;
         }
