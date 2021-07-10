@@ -191,7 +191,7 @@ sup {
     font-weight: normal;
 }
 
-main, footer {
+main, #footer {
     background: var(--noise), url(/images/bg-content-border-left.webp) left repeat-y, url(/images/bg-content-border-right.webp) right repeat-y, url(/images/bg-content-border-top.webp) top repeat-x, url(/images/bg-content-border-bottom.webp) bottom repeat-x, var(--main-background);
     border-radius: 2px;
     border: 1px solid hsl(174, 16%, 26%);
@@ -205,7 +205,7 @@ section {
     margin-bottom: 15px;
 }
 
-footer {
+#footer {
     text-align: center;
     margin-top: 10px;
 }
@@ -1867,6 +1867,44 @@ span[class^="flag-"] {
     40% {
         transform: scale(1.0);
     }
+}
+
+#notice {
+    visibility: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #00000070;
+    top: 0px;
+    left: 0px;
+    z-index: 998;
+}
+
+#notice-modal {
+    position: fixed;
+    width: 700px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    padding: 20px;
+}
+
+#notice footer {
+    margin-top: 10px;
+}
+
+#notice .relax-button {
+    height: 30px;
+    padding: 3px 12px;
+}
+
+#notice-dismiss {
+    float: right;
+}
+
+#notice p {
+    margin: 6px 0px;
 }
 
 @media (max-width: 800px) {
