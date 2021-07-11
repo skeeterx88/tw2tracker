@@ -1,10 +1,5 @@
 (async function () {
     const cluster = require('cluster');
-    const server = require('./server.js');
-
-    if (!cluster.isMaster) {
-        return server();
-    }
 
     const {db, sql} = require('./db.js');
 
@@ -20,6 +15,12 @@
         await db.query(sql('create-schema'));
     }
 
+    const server = require('./server.js');
+
+    if (!cluster.isMaster) {
+        return server();
+    }
+
     const Sync = require('./sync.js');
     const cpus = require('os').cpus();
 
@@ -28,5 +29,5 @@
         worker.on('message', Sync.trigger);
     }
 
-    Sync.init();
+    await Sync.init();
 })();
