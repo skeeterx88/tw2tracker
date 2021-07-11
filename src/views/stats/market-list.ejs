@@ -1,6 +1,10 @@
 <div class="content">
     <div class="single">
         <section class="market-list">
+            <% if (!marketStats.length) { -%>
+                <p><%= i18n('no_markets', 'market_list', [i18n('button_sync_world_list', 'admin_sync')]) %></p>
+            <% } -%>
+
             <% for (let market of marketStats) { -%>
                 <div class="relax-container market">
                     <h2 class="title"><span class="flag-<%= market.id %>"><%= market.id.toUpperCase() %></span></h2>
