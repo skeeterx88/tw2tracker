@@ -461,7 +461,8 @@
         "last_time": "Last time:",
         "last_status": "Last status:",
         "closed": "Closed",
-        "never": "never"
+        "never": "never",
+        "no_markets": "No markets registered. Run \"%{sync_world_list}\" on admin panel."
     },
     "admin_sync_status": {
         "success": "Success",

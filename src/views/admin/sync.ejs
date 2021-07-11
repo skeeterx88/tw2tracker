@@ -4,6 +4,10 @@
             <h1><%= i18n('header_worlds', 'admin_sync') %></h1>
 
             <div class="section-content">
+                <% if (!openWorlds.length) { -%>
+                    <p><%= i18n('no_markets', 'admin_sync', [i18n('button_sync_world_list', 'admin_sync')]) %></p>
+                <% } -%>
+
                 <% for (let world of openWorlds) { %>
                     <div class="world relax-container vertical" id="world-<%= world.world_id %>" data-market-id="<%= world.market_id %>" data-world-number="<%= world.world_number %>">
                         <div class="short-info">
