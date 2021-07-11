@@ -53,7 +53,11 @@ CREATE TYPE public.sync_status AS ENUM (
     'not_enabled',
     'all_accounts_failed',
     'timeout',
-    'in_progress'
+    'in_progress',
+    'failed_to_select_character',
+    'world_in_maintenance',
+    'world_not_found',
+    'character_not_selected'
 );
 
 CREATE TABLE public.worlds (
