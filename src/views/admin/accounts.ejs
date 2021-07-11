@@ -4,6 +4,10 @@
             <h1><%= i18n('header_accounts', 'admin_sync_accounts') %></h1>
 
             <div class="section-content">
+                <% if (!accounts.length) { -%>
+                    <p><%= i18n('no_accounts', 'admin_sync_accounts') %></p>
+                <% } -%>
+
                 <% for (let account of accounts) { %>
                     <div id="account-<%= account.id %>" class="account relax-container">
                         <form method="POST" action="/admin/accounts/edit" class="form">

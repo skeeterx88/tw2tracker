@@ -488,6 +488,7 @@
         "delete_account": "Delete account",
         "click_to_remove": "Click to remove market:",
         "click_to_add": "Click to remove market:",
+        "no_accounts": "No accounts added.",
         "no_markets": "No markets included.",
         "all_markets": "All markets included."
     },
