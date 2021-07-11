@@ -23,7 +23,7 @@ CREATE TABLE public.accounts (
     id SERIAL PRIMARY KEY,
     name VARCHAR (255) UNIQUE NOT NULL,
     pass VARCHAR (255) NOT NULL,
-    markets VARCHAR[] DEFAULT ARRAY[]::text[] NOT NULL
+    markets VARCHAR[] DEFAULT '{}' NOT NULL
 );
 
 INSERT INTO public.accounts (name, pass, markets) VALUES ('tribalwarstracker', '7FONlraMpdnvrNIVE8aOgSGISVW00A', '{br,cz,de,en,es,fr,gr,hu,it,nl,pl,pt,ro,ru,sk,tr,us,zz}');
