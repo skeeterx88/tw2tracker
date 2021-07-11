@@ -70,17 +70,17 @@ async function init () {
 
     await initSyncQueue();
 
-    const markets = await db.any(sql('get-markets'));
-    const worlds = await db.any(sql('get-worlds'));
-
-    if (!markets.length) {
-        await syncMarketList();
-    }
-
-    if (!worlds.length) {
-        await syncWorldList();
-        await syncAllWorlds(syncTypes.DATA);
-    }
+    // const markets = await db.any(sql('get-markets'));
+    // const worlds = await db.any(sql('get-worlds'));
+    //
+    // if (!markets.length) {
+    //     await syncMarketList();
+    // }
+    //
+    // if (!worlds.length) {
+    //     await syncWorldList();
+    //     await syncAllWorlds(syncTypes.DATA);
+    // }
 
     if (process.env.NODE_ENV !== 'development') {
         await initTasks();
