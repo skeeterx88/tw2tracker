@@ -164,8 +164,10 @@ function Scraper (marketId, worldNumber) {
      */
     this.kill = function kill () {
         clearTimeout(pingIntervalId);
-        socket.close();
-        onKillHandler();
+        socketReady.then(function () {
+            socket.close();
+            onKillHandler();
+        });
     };
 
     /**
