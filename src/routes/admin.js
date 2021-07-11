@@ -5,6 +5,7 @@ const configMap = require('../config-map.json');
 
 const syncCommands = require('../types/sync-commands.js');
 const privilegeTypes = require('../types/privileges.js');
+const syncStatusTypes = require('../types/sync-status.js');
 const authErrors = require('../types/auth-error.js');
 
 const privilegeTypesValue = Object.values(privilegeTypes);
@@ -188,6 +189,7 @@ const syncRouter = async function (request, reply) {
         syncingWorlds,
         syncQueueTyped,
         privilegeTypes,
+        syncStatusTypes,
         errors: request.flash('errors'),
         messages: request.flash('messages')
     });

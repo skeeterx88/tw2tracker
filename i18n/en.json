@@ -475,7 +475,8 @@
         "timeout": "Timed out",
         "in_progress": "In Progress",
         "world_in_maintenance": "World is in maintenance",
-        "failed_to_select_character": "Failed to select character"
+        "failed_to_select_character": "Failed to select character",
+        "never": "Never Synced"
     },
     "admin_sync_accounts": {
         "header_accounts": "Sync Accounts",

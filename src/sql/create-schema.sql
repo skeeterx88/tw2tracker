@@ -57,7 +57,8 @@ CREATE TYPE public.sync_status AS ENUM (
     'failed_to_select_character',
     'world_in_maintenance',
     'world_not_found',
-    'character_not_selected'
+    'character_not_selected',
+    'never'
 );
 
 CREATE TABLE public.worlds (
@@ -66,9 +67,9 @@ CREATE TABLE public.worlds (
     world_id VARCHAR (5),
     name VARCHAR (255) NOT NULL,
     last_data_sync_date TIMESTAMP,
-    last_data_sync_status public.sync_status,
+    last_data_sync_status public.sync_status DEFAULT 'never',
     last_achievements_sync_date TIMESTAMP,
-    last_achievements_sync_status public.sync_status,
+    last_achievements_sync_status public.sync_status DEFAULT 'never',
     open BOOLEAN NOT NULL DEFAULT TRUE,
     config JSONB,
     player_count INT DEFAULT 0,
