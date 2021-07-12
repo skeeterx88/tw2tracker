@@ -67,6 +67,8 @@ function Scraper (marketId, worldNumber) {
     const socket = new WebSocket(url);
     const LOADING_TIMEOUT = 10000;
 
+    debug.socket('world:%s init socket connection', worldId);
+
     let authenticatedAccount = false;
     let characterSelected = false;
     let emitId = 1;
@@ -75,7 +77,10 @@ function Scraper (marketId, worldNumber) {
     let onKillHandler = function () {};
 
     function init () {
-        socketReady = new Promise(resolve => socket.on('open', resolve));
+        socketReady = new Promise(function (resolve) {
+            debug.socket('world:%s socket opened', worldId);
+            socket.on('open', resolve);
+        });
 
         socket.on('message', function (raw) {
             const [,, json] = raw.match(/^(\d+)(.*)/);
