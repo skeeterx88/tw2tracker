@@ -1881,13 +1881,15 @@ span[class^="flag-"] {
 }
 
 #notice-modal {
-    position: fixed;
-    width: 700px;
-    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 999;
+    max-height: 90%;
+    overflow: auto;
     padding: 20px;
+    position: fixed;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    z-index: 999;
 }
 
 #notice footer {
@@ -2014,5 +2016,10 @@ span[class^="flag-"] {
         margin: auto;
         width: 366px;
         height: 132px;
+    }
+
+    #notice-modal {
+        width: 90%;
+        padding: 5px;
     }
 }
