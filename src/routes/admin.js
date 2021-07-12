@@ -285,7 +285,11 @@ const resetQueueRouter = async function (request, reply) {
         return reply.redirect('/admin/sync');
     }
 
-    await emitSync(syncCommands.DATA_RESET_QUEUE);
+    const command = type === syncTypes.ACHIEVEMENTS
+        ? syncCommands.ACHIEVEMENTS_RESET_QUEUE
+        : syncCommands.DATA_RESET_QUEUE;
+
+    await emitSync(command);
 
     request.flash('messages', i18n('message_sync_queue_reseted', 'admin', reply.locals.lang, [type]));
     reply.redirect('/admin/sync');
