@@ -133,7 +133,7 @@ function Scraper (marketId, worldNumber) {
             const headers = {traveltimes: [['browser_send', Date.now()]]};
             const msg = {type, data, id, headers};
 
-            // debug.socket('world:%s emit #%i %s %o', worldId, id, type, data);
+            debug.socket('world:%s emit #%i %s %o', worldId, id, type, data);
 
             socket.send('42' + JSON.stringify(['msg', msg]));
 
@@ -143,7 +143,7 @@ function Scraper (marketId, worldNumber) {
                     clearTimeout(timeouts.get(id));
                 }
 
-                // debug.socket('world:%s receive #%i %s', worldId, id, type);
+                debug.socket('world:%s receive #%i %s', worldId, id, type);
                 resolve(data);
             });
 
@@ -151,7 +151,7 @@ function Scraper (marketId, worldNumber) {
                 const timeoutId = setTimeout(function () {
                     callbacks.delete(id);
                     timeouts.delete(id);
-                    reject(`socket emit id ${id} timed out. TRY AGAIN?!`);
+                    debug.socket('world:%s socket emit id #%i %s timed out', worldId, id, type);
                 }, LOADING_TIMEOUT);
 
                 timeouts.set(id, timeoutId);
