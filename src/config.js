@@ -7,7 +7,7 @@ if (fs.existsSync('./config.json')) {
     config = require('../config.json');
     config = utils.mergeDeep(defaults, config);
 } else {
-    fs.promises.writeFile('./config.json', JSON.stringify(defaults));
+    fs.promises.writeFile('./config.json', JSON.stringify(defaults, null, 4));
     config = defaults;
 }
 
