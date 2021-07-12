@@ -354,6 +354,12 @@ function Scraper (marketId, worldNumber) {
             }
         }
 
+        const availableWorld = authenticatedAccount.worlds.some(({world_id}) => world_id === worldId);
+
+        if (!availableWorld) {
+            throw syncStatus.WORLD_CLOSED;
+        }
+
         const created = await this.createCharacter(worldNumber);
 
         if (created.id) {
