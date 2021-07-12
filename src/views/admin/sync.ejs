@@ -22,7 +22,7 @@
                                         <span class="sync-status last-data-sync-status"><%= i18n(world.last_data_sync_status, 'admin_sync_status', lang) %></span>]
                                     <% } else { -%>
                                         [<span class="type"><%= i18n('data_info', 'admin_sync') %></span>
-                                        <span class="sync-status last-data-sync-status"><% i18n(world.last_data_sync_status, 'admin_sync_status', lang) %></span>
+                                        <span class="sync-status last-data-sync-status"><%= i18n(world.last_data_sync_status, 'admin_sync_status', lang) %></span>
                                         <span class="sync-value last-data-sync-date" title="<% __append(world.last_data_sync_date ? formatDate(world.last_data_sync_date, 0, 'full', lang) : i18n('never', 'admin_sync', lang)) %>"><% __append(world.last_data_sync_date ? formatSince(world.last_data_sync_date, lang) : i18n('never', 'admin_sync', lang)) %></span>]
                                     <% } -%>
                                 </div>
