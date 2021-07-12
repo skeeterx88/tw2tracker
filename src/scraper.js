@@ -7,6 +7,8 @@ const utils = require('./utils.js');
 const debug = require('./debug.js');
 const {db, sql} = require('./db.js');
 const syncStatus = require('./types/sync-status');
+const config = require('./config.js');
+let selectedAddress = false;
 
 const userAgent = 'Mozilla/5.0%20(X11;%20Linux%20x86_64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/89.0.4389.114%20Safari/537.36';
 const SIMUL_MAP_CHUNK_SIZE = 25;
@@ -744,6 +746,27 @@ function filterContinentsOutsideBoundaries (boundaries) {
         ...REMAINING_CONTINENT_REFERENCE[remainingMapDirections.BOTTOM_LEFT].filter(([x, y]) => x >= boundaries[boundarieMapDirections.LEFT] && y <= boundaries[boundarieMapDirections.BOTTOM]),
         ...REMAINING_CONTINENT_REFERENCE[remainingMapDirections.BOTTOM_RIGHT].filter(([x, y]) => x <= boundaries[boundarieMapDirections.RIGHT] && y <= boundaries[boundarieMapDirections.BOTTOM])
     ];
+}
+
+function rotateAddress () {
+    const availableAddresses = config('sync', 'fail_over_ips');
+
+    if (!Array.isArray(availableAddresses) || !availableAddresses.length) {
+        selectedAddress = false;
+        return false;
+    }
+
+    if (selectedAddress) {
+        const currentIndex = availableAddresses.indexOf(selectedAddress);
+
+        if (currentIndex === -1 || availableAddresses.length === currentIndex + 1) {
+            selectedAddress = availableAddresses[0];
+        } else {
+            selectedAddress = availableAddresses[currentIndex + 1];
+        }
+    }
+
+    return true;
 }
 
 module.exports = Scraper;
