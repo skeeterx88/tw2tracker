@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  tw2tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - DATABASE_USER=postgres
+      - DATABASE_HOST=127.0.0.1
+      - DATABASE_NAME=tw2tracker
+      - DATABASE_PORT=5432
+      - EMAIL_USER=EMAIL
+      - EMAIL_PASS=PASSWORD
+    volumes:
+      - .:/app
+    networks:
+      - tw2tracker-network
+
+networks:
+  tw2tracker-network:
+    driver: bridge
+
+volumes:
+  app-data:
