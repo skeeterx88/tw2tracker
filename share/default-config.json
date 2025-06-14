@@ -57,8 +57,8 @@
         "port": 5432
     },
     "emails": {
-        "issues": "issue@tw2-tracker.com",
-        "contact": "contact@tw2-tracker.com",
+        "issues": "pedro+issues@verissimo.net.br",
+        "contact": "pedro+contact@verissimo.net.br",
         "warn_sync_mods_on_fails": 3,
         "user": "EMAIL",
         "pass": "PASSWORD"
