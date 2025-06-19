@@ -33,8 +33,8 @@ npm -v
 ## 4. Clone o repositório
 
 ```sh
-git clone <URL_DO_SEU_REPOSITORIO>
-cd <nome_da_pasta_do_projeto>
+git clone https://github.com/skeeterx88/tw2tracker.git
+cd tw2tracker
 ```
 
 ## 5. Instale as dependências do Node.js
@@ -45,24 +45,23 @@ npm install
 
 ## 6. Configure as variáveis de ambiente
 
-Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo (ajuste conforme necessário):
+Execute o comando abaixo para criar a variável de ambiente.
 
-```
-PGUSER=seu_usuario
-PGPASSWORD=sua_senha
-PGHOST=localhost
-PGDATABASE=nome_do_banco
-PGPORT=5432
-TW2TRACKER_SESSION_SECRET=uma-string-secreta-bem-grande-e-aleatoria
+```sh
+export TW2TRACKER_SESSION_SECRET=uma-string-secreta-bem-grande-e-aleatoria
 ```
 
 ## 7. Suba o PostgreSQL com Docker Compose
 
 Certifique-se de que o Docker e o Docker Compose estão instalados.  
-Na raiz do projeto (onde está o `docker-compose.yml`):
+
+Para instalar o Docker e o Docker Compose no Ubuntu, siga as instruções oficiais em:
+https://docs.docker.com/engine/install/ubuntu/
+
+Na raiz do projeto (onde está o `compose.yaml`):
 
 ```sh
-docker compose up -d
+sudo docker compose up -d
 ```
 
 O banco de dados será iniciado com as credenciais já configuradas.
@@ -73,9 +72,15 @@ O banco de dados será iniciado com as credenciais já configuradas.
 npm start
 ```
 
-A aplicação estará disponível na porta configurada (ex: 3000).
+A aplicação estará disponível na porta 3000.
 
 ---
 
 **Pronto!**  
-Seu ambiente está configurado para rodar o TW2Tracker
+Agora acesse a URL http://127.0.0.1:3000
+
+O portal admin é: http://127.0.0.1:3000/admin
+```
+Usuário: admin
+Senha: admin
+```
