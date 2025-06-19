@@ -1,6 +1,6 @@
-# TW2Tracker - Guia de Instalação no Ubuntu 25
+# TW2Tracker - Guia de Instalação no Ubuntu
 
-Este guia mostra como configurar e rodar o TW2Tracker em um Ubuntu 25, utilizando Node.js e PostgreSQL via Docker Compose.
+Este guia mostra como configurar e rodar o TW2Tracker em um Ubuntu, utilizando Node.js e PostgreSQL via Docker Compose.
 
 ---
 
