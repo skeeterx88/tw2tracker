@@ -1,7 +1,7 @@
 {
     "general": {
         "site_name": "Tw2-Tracker",
-        "lang": "br"
+        "lang": "en"
     },
     "ui": {
         "ranking_page_items_per_page": 20,
@@ -54,11 +54,12 @@
         "user": "postgres",
         "host": "127.0.0.1",
         "database": "tw2tracker",
-        "port": 5432
+        "port": 5432,
+        "password": "postgres"
     },
     "emails": {
-        "issues": "pedro+issues@verissimo.net.br",
-        "contact": "pedro+contact@verissimo.net.br",
+        "issues": "issue@tw2-tracker.com",
+        "contact": "contact@tw2-tracker.com",
         "warn_sync_mods_on_fails": 3,
         "user": "EMAIL",
         "pass": "PASSWORD"
