@@ -54,7 +54,8 @@
         "user": "postgres",
         "host": "127.0.0.1",
         "database": "tw2tracker",
-        "port": 5432
+        "port": 5432,
+        "password": "password"
     },
     "emails": {
         "issues": "pedro+issues@verissimo.net.br",

@@ -15,12 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const fs = require('fs');
-const defaults = require('../share/default-config.json');
-const utils = require('../src/utils.js');
+// const defaults = require('../share/default-config.json');
+const defaults = require('./config.json');
+const utils = require('./utils.js');
 let config;
 
 if (fs.existsSync('./config.json')) {
-    config = require('../config.json');
+    config = require('./config.json');
     config = utils.mergeDeep(defaults, config);
 } else {
     fs.promises.writeFile('./config.json', JSON.stringify(defaults, null, 4));

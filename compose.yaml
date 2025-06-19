@@ -1,20 +1,32 @@
-version: '3.8'
 services:
-  tw2tracker:
+  app:
     build:
       context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:80"
+      dockerfile: Dockerfile.node
     environment:
-      - DATABASE_USER=postgres
-      - DATABASE_HOST=127.0.0.1
-      - DATABASE_NAME=tw2tracker
-      - DATABASE_PORT=5432
-      - EMAIL_USER=EMAIL
-      - EMAIL_PASS=PASSWORD
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=tw2tracker
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    networks:
+      - tw2tracker-network
+
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: tw2tracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
-      - .:/app
+      - app-data-2:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - tw2tracker-network
 
@@ -23,4 +35,4 @@ networks:
     driver: bridge
 
 volumes:
-  app-data:
+  app-data-2:
