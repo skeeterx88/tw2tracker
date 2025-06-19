@@ -82,9 +82,7 @@ function Scraper (marketId, worldNumber) {
     const timeouts = new Map();
 
     const url = utils.marketDomain(marketId, 'wss://%market.tribalwars2.com/socket.io/?platform=desktop&EIO=3&transport=websocket');
-    const socket = new WebSocket(url, {
-        localAddress: '145.239.120.51'
-    });
+    const socket = new WebSocket(url);
     const LOADING_TIMEOUT = 10000;
 
     debug.socket('world:%s init socket connection', worldId);
